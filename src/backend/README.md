@@ -3,6 +3,7 @@
 ### Prérequis
 Vous devez avoir les outils suivants installés sur votre machine :
 * [Node.js](https://nodejs.org/fr/)
+* [npm](https://www.npmjs.com/get-npm)
 * une base de données MariaDB (vous pouvez utiliser [XAMPP](https://www.apachefriends.org/fr/index.html) pour l'installer sur votre machine)
 
 ### Installation
