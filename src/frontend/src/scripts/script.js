@@ -1,0 +1,1 @@
+// Nothing to see here, it's just to create the "script" folder in the project
