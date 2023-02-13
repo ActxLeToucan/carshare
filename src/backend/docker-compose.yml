@@ -1,6 +1,19 @@
 version: '3.1'
 
 services:
+# MariaDB setup
+  db:
+    image: mariadb
+    restart: always
+    ports:
+      - 3306:3306
+    networks:
+      - carshare_network
+    volumes:
+      - ./db/data:/var/lib/mysql
+    environment:
+      MARIADB_ROOT_PASSWORD: <change_password>
+
 # Node api setup
   node:
     build: .
@@ -9,17 +22,6 @@ services:
       - 8000:8080
     networks:
       - carshare_network
-
-# MariaDB setup
-  db:
-    image: mariadb
-    restart: always
-    networks:
-      - carshare_network
-    volumes:
-      - ./db/data:/var/lib/mysql
-    environment:
-      MARIADB_ROOT_PASSWORD: <change_password>
 
 # Added adminer (light phpmyadmin), to be able to view the database
   adminer:
