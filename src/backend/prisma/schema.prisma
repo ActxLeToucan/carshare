@@ -9,3 +9,101 @@ datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id                   Int            @id @default(autoincrement())
+  email                String         @unique @db.VarChar(64)
+  password             String         @db.Text
+  firstName            String?        @db.VarChar(50)
+  lastName             String?        @db.VarChar(50)
+  tel                  String?        @db.VarChar(16)
+  birthDate            DateTime?
+  avatar               String?        @db.VarChar(255)
+  gender               Int            @default(-1)
+  hasCar               Boolean        @default(false)
+  mailNotif            Boolean        @default(false)
+  level                Int            @default(0)
+  evaluationsPublished Evaluation[]   @relation("evaluator")
+  evaluationsReceived  Evaluation[]   @relation("evaluated")
+  travelsAsDriver      Travel[]       @relation("driver")
+  travelsAsPassenger   Passenger[]
+  notifications        Notification[]
+  createdGroups        Group[]        @relation("creator")
+  groups               Group[]        @relation("users")
+  createdAt            DateTime       @default(now())
+}
+
+model Travel {
+  id            Int            @id @default(autoincrement())
+  departureDate DateTime
+  arrivalDate   DateTime
+  maxPassengers Int            @default(1)
+  price         Float          @default(0)
+  description   String?        @db.Text
+  status        Int            @default(0)
+  driver        User           @relation(fields: [driverId], references: [id], name: "driver")
+  driverId      Int
+  passengers    Passenger[]
+  etapes        Etape[]
+  evaluations   Evaluation[]
+  notifications Notification[]
+  group         Group?         @relation(fields: [groupId], references: [id])
+  groupId       Int?
+  createdAt     DateTime       @default(now())
+}
+
+model Passenger {
+  travel      Travel  @relation(fields: [travelId], references: [id])
+  travelId    Int
+  passenger   User    @relation(fields: [passengerId], references: [id])
+  passengerId Int
+  status      Int     @default(0)
+  comment     String? @db.Text
+
+  @@id([travelId, passengerId])
+}
+
+model Etape {
+  id       Int    @id @default(autoincrement())
+  label    String @db.Text // ex: "2ter Boulevard Charlemagne 54000 Nancy"
+  city     String @db.Text // ex: "Nancy"
+  context  String @db.Text // ex: "54, Meurthe-et-Moselle, Grand Est"
+  lat      Float // ex: 48.683188
+  lng      Float // ex: 6.161877
+  travel   Travel @relation(fields: [travelId], references: [id])
+  travelId Int
+}
+
+model Evaluation {
+  id          Int      @id @default(autoincrement())
+  note        Int
+  travel      Travel   @relation(fields: [travelId], references: [id])
+  travelId    Int
+  evaluator   User     @relation(fields: [evaluatorId], references: [id], name: "evaluator")
+  evaluatorId Int
+  evaluated   User     @relation(fields: [evaluatedId], references: [id], name: "evaluated")
+  evaluatedId Int
+  createdAt   DateTime @default(now())
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  action    String?  @db.Text
+  title     String   @db.Text
+  message   String   @db.Text
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  travel    Travel?  @relation(fields: [travelId], references: [id])
+  travelId  Int?
+  createdAt DateTime @default(now())
+}
+
+model Group {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.Text
+  creator   User     @relation(fields: [creatorId], references: [id], name: "creator")
+  creatorId Int
+  users     User[]   @relation("users")
+  travels   Travel[]
+  createdAt DateTime @default(now())
+}
