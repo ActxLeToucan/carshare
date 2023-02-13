@@ -19,7 +19,7 @@ services:
     build: .
     restart: always
     ports:
-      - 8000:8080
+      - 3000:3000
     networks:
       - carshare_network
 
