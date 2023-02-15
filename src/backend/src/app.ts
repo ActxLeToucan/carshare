@@ -11,7 +11,9 @@ app.use((req, res, next) => {
 });
 
 app.get('/', (req, res) => {
-    res.send('Hello World!');
+    res.redirect('/docs');
 });
+
+app.use('/docs', require('./routes/docs'));
 
 export {app};
