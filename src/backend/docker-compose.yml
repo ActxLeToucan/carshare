@@ -12,6 +12,7 @@ services:
     volumes:
       - ./db/data:/var/lib/mysql
     environment:
+      MARIADB_DATABASE: carshare
       MARIADB_ROOT_PASSWORD: <change_password>
 
 # Node api setup
