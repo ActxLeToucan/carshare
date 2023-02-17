@@ -11,6 +11,7 @@ import "./index.css";
 
 const routes = [
     { path: "/", name: 'Home', component: () => import("./views/Home.vue") },
+    { path: "/register", name: 'Register', component: () => import("./views/Register.vue") },
     // 404 redirection
     { path: "/:catchAll(.*)", name: 'NotFound', component: () => import("./views/NotFound.vue") }
 ]
