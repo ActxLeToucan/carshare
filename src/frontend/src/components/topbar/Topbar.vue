@@ -1,8 +1,8 @@
 <template>
     <div class="flex grow-0 h-fit w-full px-4 py-2 bg-slate-50 border-b-8 border-teal-500 items-center">
-        <div class="flex w-[20%] h-fit">
+        <router-link to="/" class="flex w-[20%] h-fit">
             <h1 class="text-slate-500 text-3xl font-extrabold"> Car Share </h1>
-        </div>
+        </router-link>
         <div class="flex grow justify-evenly">
             <button-text v-for="button in buttons" :key="button.name" :href="button.link">
                 {{ button.name }}
@@ -16,8 +16,8 @@
 </template>
 
 <script>
-import ButtonText from "../buttons/ButtonText.vue"
-import ButtonBlock from "../buttons/ButtonBlock.vue"
+import ButtonText from "../inputs/ButtonText.vue"
+import ButtonBlock from "../inputs/ButtonBlock.vue"
 
 const buttons = [
     {
