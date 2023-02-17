@@ -16,4 +16,4 @@ app.get('/', (req, res) => {
 
 app.use('/docs', require('./routes/docs'));
 
-export {app};
+export { app };

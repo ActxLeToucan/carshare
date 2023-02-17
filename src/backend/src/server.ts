@@ -1,7 +1,7 @@
 import http from 'http';
-import {app} from "./app";
+import { app } from './app';
 
-function normalizePort(val: string) {
+function normalizePort (val: string) {
     const port = parseInt(val, 10);
 
     if (isNaN(port)) {
@@ -17,7 +17,7 @@ function normalizePort(val: string) {
 const port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
-function errorHandler(error: NodeJS.ErrnoException) {
+function errorHandler (error: NodeJS.ErrnoException) {
     if (error.syscall !== 'listen') {
         throw error;
     }
