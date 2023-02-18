@@ -5,18 +5,12 @@ import { error, sendMsg } from '../messages';
 const prisma = new PrismaClient();
 
 exports.users = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    queryUsers()
-        .then(async (users) => {
+    prisma.user.findMany()
+        .then(users => {
             res.status(200).json(users);
-            await prisma.$disconnect()
         })
-        .catch(async (e) => {
+        .catch(e => {
             console.error(e);
             sendMsg(req, res, error.generic.cannotConnectToDB);
-            await prisma.$disconnect();
         });
-}
-
-async function queryUsers () {
-    return prisma.user.findMany();
 }
