@@ -6,7 +6,7 @@ exports.getDocs = (req: express.Request, res: express.Response, next: express.Ne
         res.sendFile('docs/out/index.html', { root: '.' });
     } else {
         res.status(404).send('<h1>Documentation not found</h1>' +
-            '<p>If your are the owner of the server, run "npm run docs" to generate it.</p>' +
+            '<p>If you are the owner of the server, run "npm run docs" to generate it.</p>' +
             '<p>You can also find the documentation file (YAML) <a href="/docs/yaml">here</a>.</p>');
     }
 }
