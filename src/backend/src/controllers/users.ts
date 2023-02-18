@@ -1,18 +1,18 @@
 import type express from 'express';
 import { error, sendMsg } from '../messages';
-import IsEmail from 'isemail';
+import * as constraints from '../constraints';
 
 exports.signup = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (req.body.email === undefined || req.body.email === '') {
-        sendMsg(req, res, error.email.required);
+    if (!constraints.checkEmailField(req.body.email, req, res)) {
         return;
     }
-    if (!IsEmail.validate(req.body.email)) {
-        sendMsg(req, res, error.email.invalid);
+    if (!constraints.checkPasswordField(req.body.password, req, res)) {
         return;
     }
-    if (req.body.password === undefined || req.body.password === '') {
-        sendMsg(req, res, error.password.required);
+    if (!constraints.checkLastNameField(req.body.lastname, req, res)) {
+        return;
+    }
+    if (!constraints.checkFirstNameField(req.body.firstname, req, res)) {
         return;
     }
 
