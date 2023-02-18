@@ -87,3 +87,15 @@ Pour accéder à la console de pm2, exécuter la commande suivante :
 ```bash
 pm2 monit
 ```
+
+---
+
+Pour lancer le linter et s'assurer que le code répond au style du projet :
+```bash
+npm run lint
+```
+
+Pour lancer le linter et corriger automatiquement certaines des erreurs détectées :
+```bash
+npm run lint -- --fix
+```

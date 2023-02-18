@@ -17,4 +17,4 @@ app.get('/', (req, res) => {
 app.use('/docs', require('./routes/docs'));
 app.use('/users', require('./routes/users'));
 
-export {app};
+export { app };
