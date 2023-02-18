@@ -33,6 +33,12 @@ const error: APIMessagesTranslation = {
                 fr: "Cette fonctionnalité n'est pas encore implémentée",
                 en: 'This feature is not yet implemented'
             }, 501);
+        },
+        cannotConnectToDB: (req: Request) => {
+            return msgForLang(req, {
+                fr: 'Le serveur ne parvient pas à se connecter à la base de données',
+                en: 'Cannot connect the database'
+            }, 500)
         }
     }
 }
