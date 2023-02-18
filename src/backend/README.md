@@ -35,14 +35,49 @@ npm run dev
 Le serveur sera lancé en mode développement et sera redémarré automatiquement à chaque modification des fichiers.
 
 
+Pour lancer le linter et s'assurer que le code répond au style du projet :
+```bash
+npm run lint
+```
+
+Pour lancer le linter et corriger automatiquement certaines des erreurs détectées :
+```bash
+npm run lint -- --fix
+```
+
 ## Production
-### Prérequis
+Nous vous conseillons d'utiliser [Docker](#production--docker-) pour déployer le serveur en production.
+D'autant plus que ***Prisma*** nécessite des permissions élevées pour fonctionner.
+
+Si vous ne souhaitez pas utiliser Docker, vous pouvez utiliser [pm2](#production--pm2-) pour lancer le serveur en production.
+
+### Production (Docker)
+#### Prérequis
+Vous devez avoir les outils suivants installés sur votre machine :
+* [Docker](https://www.docker.com) ([tuto pour Linux en ligne de commande](https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-22-04))
+* un serveur web (Apache, Nginx, etc.)
+
+#### Installation
+1. Cloner le dépôt et se placer dans le dossier [backend](.)
+2. Copier le fichier [`docker-compose.yml.example`](docker-compose.yml.example) et le renommer en `docker-compose.yml`
+3. Modifier les variables d'environnement `MARIADB_ROOT_PASSWORD` du conteneur `db` et `DATABASE_URL` du conteneur `node` en spécifiant un mot de passe pour la base de données
+4. (optionnel) Modifier les ports des conteneurs si vous avez déjà des services qui utilisent ces ports
+5. Lancer les conteneurs
+```bash
+docker-compose up -d
+```
+6. Configurer le serveur web pour qu'il redirige les requêtes vers le serveur Node.js (reverse proxy)
+
+
+
+### Production (pm2)
+#### Prérequis
 Vous devez avoir les outils suivants installés sur votre machine :
 * [Node.js](https://nodejs.org/fr/)
 * une base de données MariaDB
 * un serveur web (Apache, Nginx, etc.)
 
-### Installation
+#### Installation
 1. Cloner le dépôt et se placer dans le dossier [backend](.)
 2. Installer les dépendances
 ```bash
@@ -68,34 +103,18 @@ pm2 start dist/index.js --name "backend"
 ```
 8. Configurer le serveur web pour qu'il redirige les requêtes vers le serveur Node.js (reverse proxy)
 
-### Quelques commandes utiles
+#### Quelques commandes utiles
 Pour lancer le serveur en mode production sans pm2, exécuter la commande suivante :
 ```bash
 npm run start
 ```
-
----
 
 Pour nettoyer les fichiers générés pour le mode production, exécuter la commande suivante :
 ```bash
 npm run clean
 ```
 
----
-
 Pour accéder à la console de pm2, exécuter la commande suivante :
 ```bash
 pm2 monit
-```
-
----
-
-Pour lancer le linter et s'assurer que le code répond au style du projet :
-```bash
-npm run lint
-```
-
-Pour lancer le linter et corriger automatiquement certaines des erreurs détectées :
-```bash
-npm run lint -- --fix
 ```
