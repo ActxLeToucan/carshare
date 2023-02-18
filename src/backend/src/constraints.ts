@@ -18,6 +18,12 @@ const constraints: Record<string, Record<string, any>> = {
     },
     firstname: {
         max: 50 // from schema.prisma
+    },
+    birthdate: {
+        regex: /^\d{4}-\d{2}-\d{2}$/ // YYYY-MM-DD
+    },
+    phone: {
+        max: 16 // from schema.prisma
     }
 }
 
@@ -34,12 +40,12 @@ function checkEmailField (email: string | undefined, req: express.Request, res: 
         sendMsg(req, res, error.email.required);
         return false;
     }
-    if (email.length > constraints.email.max) {
-        sendMsg(req, res, error.email.max, constraints.email.max);
-        return false;
-    }
     if (!IsEmail.validate(email)) {
         sendMsg(req, res, error.email.invalid);
+        return false;
+    }
+    if (email.length > constraints.email.max) {
+        sendMsg(req, res, error.email.max, constraints.email.max);
         return false;
     }
     return true;
@@ -133,4 +139,59 @@ function checkFirstNameField (firstname: string | undefined, req: express.Reques
     return true;
 }
 
-export { checkEmailField, checkPasswordField, checkLastNameField, checkFirstNameField };
+/**
+ * Check if the birthdate is valid
+ * If the date is not valid, send an error message to the client
+ * @param date Date to check
+ * @param req Express request
+ * @param res Express response
+ * @returns true if the date is valid, false otherwise
+ */
+function checkBirthDateField (date: string | undefined, req: express.Request, res: express.Response): boolean {
+    if (date === undefined || date === '') {
+        sendMsg(req, res, error.date.required);
+        return false;
+    }
+    if (date.match(constraints.birthdate.regex) === null) {
+        sendMsg(req, res, error.date.invalid);
+        return false;
+    }
+    if (new Date(date) > new Date()) {
+        sendMsg(req, res, error.date.tooLate, new Date());
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Sanitize the phone number
+ * If the phone is not valid, send an error message to the client
+ * @param phone Phone to check
+ * @param req Express request
+ * @param res Express response
+ * @returns The phone number if it is valid, null otherwise
+ */
+function sanitizePhone (phone: string | undefined, req: express.Request, res: express.Response): string | null {
+    if (phone === undefined || phone === '') {
+        return null;
+    }
+    const num = phone.replace(/[^0-9+]/g, '');
+    if (num.match(/^(\+)?[0-9]{10,}$/g) === null) {
+        sendMsg(req, res, error.phone.invalid);
+        return null;
+    }
+    if (num.length > constraints.phone.max) {
+        sendMsg(req, res, error.phone.max, constraints.phone.max);
+        return null;
+    }
+    return num;
+}
+
+export {
+    checkEmailField,
+    checkPasswordField,
+    checkLastNameField,
+    checkFirstNameField,
+    checkBirthDateField,
+    sanitizePhone
+};

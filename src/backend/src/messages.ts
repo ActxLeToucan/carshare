@@ -103,12 +103,58 @@ const error: APIMessagesTranslation = {
             }, 400);
         }
     },
+    phone: {
+        required: (req: Request) => {
+            return msgForLang(req, {
+                fr: 'Le numéro de téléphone est requis',
+                en: 'Phone number is required'
+            }, 400);
+        },
+        invalid: (req: Request) => {
+            return msgForLang(req, {
+                fr: 'Le numéro de téléphone est invalide',
+                en: 'Phone number is invalid'
+            }, 400);
+        },
+        max: (req: Request, length: number) => {
+            return msgForLang(req, {
+                fr: `Le numéro de téléphone doit contenir au plus ${length} caractère${length > 1 ? 's' : ''}`,
+                en: `Phone number must contain at most ${length} character${length > 1 ? 's' : ''}`
+            }, 400);
+        }
+    },
+    date: {
+        required: (req: Request) => {
+            return msgForLang(req, {
+                fr: 'La date est requise',
+                en: 'Date is required'
+            }, 400);
+        },
+        invalid: (req: Request) => {
+            return msgForLang(req, {
+                fr: 'La date est invalide',
+                en: 'Date is invalid'
+            }, 400);
+        },
+        tooLate: (req: Request, date: Date) => {
+            return msgForLang(req, {
+                fr: `La date doit être avant le ${date.toLocaleDateString('fr-FR')}`,
+                en: `Date must be before ${date.toLocaleDateString('en-US')}`
+            }, 400);
+        }
+    },
     generic: {
         notImplemented: (req: Request) => {
             return msgForLang(req, {
                 fr: "Cette fonctionnalité n'est pas encore implémentée",
                 en: 'This feature is not yet implemented'
             }, 501);
+        },
+        internalError: (req: Request) => {
+            return msgForLang(req, {
+                fr: 'Une erreur interne est survenue',
+                en: 'An internal error occurred'
+            }, 500);
         },
         cannotConnectToDB: (req: Request) => {
             return msgForLang(req, {
