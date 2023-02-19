@@ -1,6 +1,7 @@
 import type express from 'express';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
 import { displayableUser, error, info, sendMsg } from '../messages';
 import * as constraints from '../constraints';
 
@@ -25,7 +26,6 @@ exports.signup = (req: express.Request, res: express.Response, next: express.Nex
             return;
         }
 
-        // TODO jwt
         bcrypt.hash(req.body.password, constraints.constraints.password.salt).then((hash) => {
             prisma.user.create({
                 data: {
@@ -42,18 +42,23 @@ exports.signup = (req: express.Request, res: express.Response, next: express.Nex
                 const msg = info.user.created(req, res);
                 res.status(msg.code).json({
                     message: msg.msg,
-                    user: displayableUser(user)
+                    user: displayableUser(user),
+                    token: jwt.sign(
+                        { userId: user.id },
+                        process.env.JWT_SECRET ?? 'secret',
+                        { expiresIn: '24h' }
+                    )
                 });
-            }).catch((error) => {
-                console.error(error);
-                res.status(500).json(error);
+            }).catch((err) => {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
             });
-        }).catch((error) => {
-            console.error(error);
-            res.status(500).json(error);
+        }).catch((err) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
         });
-    }).catch((error) => {
-        console.error(error);
-        res.status(500).json(error);
+    }).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
     });
 }

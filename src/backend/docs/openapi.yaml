@@ -14,15 +14,86 @@ servers:
 paths:
   /users/signup:
     post:
-      summary: Create a new user
+      summary: Sign up
       description: Create a new user
+      tags:
+        - Users
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: john@example.com
+                password:
+                  type: string
+                  example: Password123$
+                firstName:
+                  type: string
+                  example: John
+                lastName:
+                  type: string
+                  example: Doe
+                phone:
+                  type: string
+                  example: "+330612345678"
+                gender:
+                  type: integer
+                  required: false
+                  default: -1
+                  enum:
+                    - -1
+                    - 0
+                    - 1
+                hasCar:
+                  type: boolean
+                  required: false
+                  default: false
+
       responses:
-        '200':
-          description: OK
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User created
+                  user:
+                    $ref: '#/components/schemas/User'
+                  token:
+                    type: string
+                    example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Password is required
+
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+
   /admin/users:
     get:
       summary: Get all users
       description: Get all users
+      tags:
+          - Admin
+      parameters:
+          - $ref: '#/components/parameters/Accept-Language'
       responses:
         '200':
           description: A list of all users
@@ -31,33 +102,50 @@ paths:
               schema:
                 $ref: '#/components/schemas/ArrayOfUsers'
         '500':
-          description: An error occurred when trying to connect to the database
+          $ref: '#/components/responses/InternalError'
 components:
+  parameters:
+    Accept-Language:
+      name: Accept-Language
+      in: header
+      description: The language to use in the response message (if any)
+      required: false
+      schema:
+        type: string
+        default: en
+        enum:
+          - en
+          - fr
+  responses:
+    InternalError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: An internal error has occurred, please try again later or contact an administrator
   schemas:
     User:
       type: object
       properties:
         id:
           type: integer
+          example: 1
         email:
           type: string
+          example: john@example.com
         firstName:
           type: string
-          nullable: true
-          default: null
+          example: John
         lastName:
           type: string
-          nullable: true
-          default: null
-        tel:
+          example: Doe
+        phone:
           type: string
-          nullable: true
-          default: null
-        birthDate:
-          type: string
-          format: date
-          nullable: true
-          default: null
+          example: "+330612345678"
         avatar:
           type: string
           nullable: true
@@ -86,7 +174,7 @@ components:
           email: bob@example.com
           firstName: Bob
           lastName: LeBricoleur
-          phone: 0321456789
+          phone: "0321456789"
           avatar: null
           gender: -1
           hasCar: true
@@ -97,7 +185,7 @@ components:
           email: laia@cat.world
           firstName: Laia
           lastName: Kitten
-          phone: +330612345678
+          phone: "+330612345678"
           avatar: null
           gender: 1
           hasCar: false

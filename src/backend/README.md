@@ -60,7 +60,10 @@ Vous devez avoir les outils suivants installés sur votre machine :
 #### Installation
 1. Cloner le dépôt et se placer dans le dossier [backend](.)
 2. Copier le fichier [`docker-compose.yml.example`](docker-compose.yml.example) et le renommer en `docker-compose.yml`
-3. Modifier les variables d'environnement `MARIADB_ROOT_PASSWORD` du conteneur `db` et `DATABASE_URL` du conteneur `node` en spécifiant un mot de passe pour la base de données
+3. Modifier les variables d'environnement :
+   * `MARIADB_ROOT_PASSWORD` du conteneur `db`
+   * `DATABASE_URL` du conteneur `node`
+   * `JWT_SECRET` du conteneur `node`
 4. (optionnel) Modifier les ports des conteneurs si vous avez déjà des services qui utilisent ces ports
 5. Lancer les conteneurs
 ```bash
@@ -89,19 +92,20 @@ npm i -g pm2
 ```
 3. Copier le fichier [`.env.example`](.env.example) et le renommer en `.env`
 4. Modifier les variables d'environnement du fichier `.env` pour qu'elles correspondent à votre configuration
-5. Initialiser la base de données
+5. Modifier la variable d'environnement `NODE_ENV` pour qu'elle vaille `production`
+6. Initialiser la base de données
 ```bash
 npx prisma migrate dev
 ```
-6. Générer les fichiers pour le mode production
+7. Générer les fichiers pour le mode production
 ```bash
 npm run build
 ```
-7. Lancer le serveur
+8. Lancer le serveur
 ```bash
 pm2 start dist/index.js --name "backend"
 ```
-8. Configurer le serveur web pour qu'il redirige les requêtes vers le serveur Node.js (reverse proxy)
+9. Configurer le serveur web pour qu'il redirige les requêtes vers le serveur Node.js (reverse proxy)
 
 #### Quelques commandes utiles
 Pour lancer le serveur en mode production sans pm2, exécuter la commande suivante :

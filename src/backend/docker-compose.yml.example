@@ -25,6 +25,8 @@ services:
       - carshare_network
     environment:
       DATABASE_URL: "mysql://root:<change_password>@db:3306/carshare"
+      JWT_SECRET: '<change_secret>'
+      NODE_ENV: 'production'
 
   # Added adminer (light phpmyadmin), to be able to view the database
   adminer:
