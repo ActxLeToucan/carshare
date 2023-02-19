@@ -26,7 +26,7 @@ export default {
     methods: {
         onClick() {
             if (this.href) return;
-            this.action?.();
+            this.action?.(this);
         }
     },
     mounted() {
