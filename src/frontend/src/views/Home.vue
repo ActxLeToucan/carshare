@@ -11,7 +11,7 @@
                 <p class="md:text-4xl text-2xl text-slate-500 text-center font-bold mx-auto"> Bienvenue sur Car Share ! </p>
                 <p class="md:text-2xl text-xl text-slate-400 text-center font-bold mx-auto"> Pour commencer à utiliser l'application, veuillez vous inscrire ou vous connecter. </p>
             </div>
-            <div class="flex md:flex-row flex-col justify-evenly md:mt-10 mt-4 md:space-x-24 md:space-y-0 space-y-4 mx-auto">
+            <div class="flex md:flex-row flex-col justify-evenly md:mt-20 mt-10 md:space-x-24 md:space-y-0 space-y-4 mx-auto">
                 <button-block class="mx-auto w-full" href="/register"> S'inscrire </button-block>
                 <button-block class="mx-auto w-full" href="/login"> Se connecter </button-block>
             </div>
