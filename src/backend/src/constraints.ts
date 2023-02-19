@@ -20,9 +20,6 @@ const constraints: Record<string, Record<string, any>> = {
     firstname: {
         max: 50 // from schema.prisma
     },
-    birthdate: {
-        regex: /^\d{4}-\d{2}-\d{2}$/ // YYYY-MM-DD
-    },
     phone: {
         max: 16 // from schema.prisma
     },
@@ -144,19 +141,19 @@ function checkFirstNameField (firstname: string | undefined, req: express.Reques
 }
 
 /**
- * Check if the birthdate is in a valid format
+ * Check if a date is in a valid format
  * If the date is not valid, send an error message to the client
  * @param date Date to check
  * @param req Express request
  * @param res Express response
  * @returns true if the date is valid, false otherwise
  */
-function checkBirthDateField (date: string | undefined, req: express.Request, res: express.Response): boolean {
+function checkDateField (date: string | undefined, req: express.Request, res: express.Response): boolean {
     if (date === undefined || date === '') {
         sendMsg(req, res, error.date.required);
         return false;
     }
-    if (date.match(constraints.birthdate.regex) === null) {
+    if (isNaN(new Date(date).getTime())) {
         sendMsg(req, res, error.date.invalid);
         return false;
     }
@@ -177,6 +174,7 @@ function checkBirthDateField (date: string | undefined, req: express.Request, re
  */
 function sanitizePhone (phone: string | undefined, req: express.Request, res: express.Response): string | null {
     if (phone === undefined || phone === '') {
+        sendMsg(req, res, error.phone.required);
         return null;
     }
     const num = phone.replace(/[^0-9+]/g, '');
@@ -212,7 +210,7 @@ export {
     checkPasswordField,
     checkLastNameField,
     checkFirstNameField,
-    checkBirthDateField,
+    checkDateField,
     sanitizePhone,
     sanitizeGender
 };

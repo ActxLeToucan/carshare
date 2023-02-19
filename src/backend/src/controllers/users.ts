@@ -9,10 +9,10 @@ const prisma = new PrismaClient();
 exports.signup = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     if (!constraints.checkEmailField(req.body.email, req, res)) return;
     if (!constraints.checkPasswordField(req.body.password, req, res)) return;
-    if (!constraints.checkLastNameField(req.body.lastname, req, res)) return;
-    if (!constraints.checkFirstNameField(req.body.firstname, req, res)) return;
-    if (!constraints.checkBirthDateField(req.body.birthdate, req, res)) return;
+    if (!constraints.checkLastNameField(req.body.lastName, req, res)) return;
+    if (!constraints.checkFirstNameField(req.body.firstName, req, res)) return;
     const phoneNum = constraints.sanitizePhone(req.body.phone, req, res);
+    if (phoneNum === null) return;
     const gender = constraints.sanitizeGender(req.body.gender);
 
     prisma.user.count({
@@ -31,10 +31,9 @@ exports.signup = (req: express.Request, res: express.Response, next: express.Nex
                 data: {
                     email: req.body.email,
                     password: hash,
-                    firstName: req.body.firstname,
-                    lastName: req.body.lastname,
-                    tel: phoneNum,
-                    birthDate: new Date(req.body.birthdate),
+                    firstName: req.body.firstName,
+                    lastName: req.body.lastName,
+                    phone: phoneNum,
                     avatar: null,
                     gender,
                     hasCar: req.body.hasCar
@@ -45,13 +44,13 @@ exports.signup = (req: express.Request, res: express.Response, next: express.Nex
                     message: msg.msg,
                     user: displayableUser(user)
                 });
-            }).catch((err) => {
-                console.error(err);
-                res.status(500).json(err);
+            }).catch((error) => {
+                console.error(error);
+                res.status(500).json(error);
             });
-        }).catch((err) => {
-            console.error(err);
-            res.status(500).json(err);
+        }).catch((error) => {
+            console.error(error);
+            res.status(500).json(error);
         });
     }).catch((error) => {
         console.error(error);

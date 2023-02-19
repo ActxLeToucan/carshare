@@ -41,9 +41,6 @@ components:
           type: integer
         email:
           type: string
-        password:
-          type: string
-          format: password
         firstName:
           type: string
           nullable: true
@@ -87,11 +84,9 @@ components:
       example:
         - id: 1
           email: bob@example.com
-          password: abcdef123456
           firstName: Bob
           lastName: LeBricoleur
-          tel: null
-          birthDate: null
+          phone: 0321456789
           avatar: null
           gender: -1
           hasCar: true
@@ -100,11 +95,9 @@ components:
           createdAt: 2023-01-26T15:26:31.144Z
         - id: 2
           email: laia@cat.world
-          password: CatzAreBeautiful
           firstName: Laia
           lastName: Kitten
-          tel: 06 12 34 56 78
-          birthDate: 2023-01-17
+          phone: +330612345678
           avatar: null
           gender: 1
           hasCar: false

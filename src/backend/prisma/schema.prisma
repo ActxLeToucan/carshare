@@ -16,8 +16,7 @@ model User {
   password             String         @db.Text
   firstName            String?        @db.VarChar(50)
   lastName             String?        @db.VarChar(50)
-  tel                  String?        @db.VarChar(16)
-  birthDate            DateTime?      @db.Date
+  phone                String?        @db.VarChar(16)
   avatar               String?        @db.VarChar(255)
   gender               Int            @default(-1)
   hasCar               Boolean        @default(false)
