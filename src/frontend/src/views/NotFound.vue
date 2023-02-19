@@ -1,11 +1,22 @@
 <template>
     <div class="flex grow flex-col">
         <topbar v-if="User.CurrentUser != null"></topbar>
-        <div class="flex grow flex-col justify-center w-fit space-y-6 mx-auto">
-            <h1 class="md:text-6xl text-4xl font-extrabold text-teal-500 text-center"> Car Share - Application </h1>
-            <img src="../assets/img/car.svg" class="max-w-full md:max-h-20 max-h-12 mx-auto" alt="">
-            <p class="md:text-4xl text-xl font-bold text-slate-400 text-center"> Woops, la page que vous recherchez n'existe pas ! </p>
-            <button-block class="mx-auto" :action="goBack"> Retour </button-block>
+        <div class="flex grow flex-col justify-center w-fit mx-auto">
+             <div class="flex flex-col">
+                <h1 class="md:text-6xl text-4xl font-extrabold text-teal-500 text-center md:mb-10 mb-4"> Car Share </h1>
+                <div class="flex flex-col w-fit h-fit p-4 space-y-4 rounded-lg shadow-lg bg-white border-b-4 border-slate-300 mx-auto">
+                    <img src="../assets/img/car.svg" class="max-w-full md:max-h-20 max-h-12 h-20 mx-auto" alt="">
+                </div>
+            </div>
+            <div class="flex flex-col md:mt-20 mt-10 mx-10">
+                <div class="flex flex-col space-y-4">
+                    <p class="md:text-4xl text-2xl text-slate-500 text-center font-bold mx-auto"> Woops ! </p>
+                    <p class="md:text-2xl text-xl text-slate-400 text-center font-bold mx-auto"> La page que vous cherchez n'existe pas 🤔 </p>
+                </div>
+                <div class="flex justify-center mx-auto mt-10">
+                    <button-block class="mx-auto" :action="goBack"> Retour </button-block>
+                </div>
+            </div>
         </div>
     </div>
 </template>
