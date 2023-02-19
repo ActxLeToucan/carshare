@@ -11,7 +11,8 @@ const constraints: Record<string, Record<string, any>> = {
         upper: 1,
         lower: 1,
         number: 1,
-        special: 1
+        special: 1,
+        salt: 10
     },
     lastname: {
         max: 50 // from schema.prisma
@@ -24,11 +25,14 @@ const constraints: Record<string, Record<string, any>> = {
     },
     phone: {
         max: 16 // from schema.prisma
+    },
+    gender: {
+        values: [-1, 0, 1]
     }
 }
 
 /**
- * Check if the email is valid
+ * Check if the email is in a valid format
  * If the email is not valid, send an error message to the client
  * @param email Email to check
  * @param req Express request
@@ -52,7 +56,7 @@ function checkEmailField (email: string | undefined, req: express.Request, res: 
 }
 
 /**
- * Check if the password is valid
+ * Check if the password is in a valid format
  * If the password is not valid, send an error message to the client
  * @param password Password to check
  * @param req Express request
@@ -92,7 +96,7 @@ function checkPasswordField (password: string | undefined, req: express.Request,
 }
 
 /**
- * Check if the lastname is valid
+ * Check if the lastname is in a valid format
  * If the lastname is not valid, send an error message to the client
  * @param lastname Lastname to check
  * @param req Express request
@@ -116,7 +120,7 @@ function checkLastNameField (lastname: string | undefined, req: express.Request,
 }
 
 /**
- * Check if the firstname is valid
+ * Check if the firstname is in a valid format
  * If the firstname is not valid, send an error message to the client
  * @param firstname Firstname to check
  * @param req Express request
@@ -140,7 +144,7 @@ function checkFirstNameField (firstname: string | undefined, req: express.Reques
 }
 
 /**
- * Check if the birthdate is valid
+ * Check if the birthdate is in a valid format
  * If the date is not valid, send an error message to the client
  * @param date Date to check
  * @param req Express request
@@ -166,7 +170,7 @@ function checkBirthDateField (date: string | undefined, req: express.Request, re
 /**
  * Sanitize the phone number
  * If the phone is not valid, send an error message to the client
- * @param phone Phone to check
+ * @param phone Phone to sanitize
  * @param req Express request
  * @param res Express response
  * @returns The phone number if it is valid, null otherwise
@@ -187,11 +191,28 @@ function sanitizePhone (phone: string | undefined, req: express.Request, res: ex
     return num;
 }
 
+/**
+ * Sanitize the gender
+ * @param gender Gender to sanitize
+ * @returns Gender if it is valid, undefined otherwise
+ */
+function sanitizeGender (gender: any): number | undefined {
+    if (typeof gender !== 'number') {
+        return undefined;
+    }
+    if (constraints.gender.values.includes(gender) === false) {
+        return undefined;
+    }
+    return gender;
+}
+
 export {
+    constraints,
     checkEmailField,
     checkPasswordField,
     checkLastNameField,
     checkFirstNameField,
     checkBirthDateField,
-    sanitizePhone
+    sanitizePhone,
+    sanitizeGender
 };

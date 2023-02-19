@@ -1,6 +1,7 @@
 import type express from 'express';
 import { PrismaClient } from '@prisma/client';
-import { error, sendMsg } from '../messages';
+import bcrypt from 'bcrypt';
+import { displayableUser, error, info, sendMsg } from '../messages';
 import * as constraints from '../constraints';
 
 const prisma = new PrismaClient();
@@ -12,13 +13,7 @@ exports.signup = (req: express.Request, res: express.Response, next: express.Nex
     if (!constraints.checkFirstNameField(req.body.firstname, req, res)) return;
     if (!constraints.checkBirthDateField(req.body.birthdate, req, res)) return;
     const phoneNum = constraints.sanitizePhone(req.body.phone, req, res);
-    const gender = req.body.gender;
-    const hasCar = req.body.car;
-
-    console.log('optional fields:');
-    console.log(`phone: ${phoneNum ?? 'null'}`);
-    console.log(`gender: ${typeof gender}`);
-    console.log(`car: ${typeof hasCar}`);
+    const gender = constraints.sanitizeGender(req.body.gender);
 
     prisma.user.count({
         where: {
@@ -26,16 +21,40 @@ exports.signup = (req: express.Request, res: express.Response, next: express.Nex
         }
     }).then((count) => {
         if (count > 0) {
-            sendMsg(req, res, error.email.alreadyExists);
+            sendMsg(req, res, error.email.exists);
             return;
         }
 
-        // TODO: hash password
-
-        // TODO: create user
-        sendMsg(req, res, error.generic.notImplemented);
-    }).catch((err) => {
-        console.log(err);
-        sendMsg(req, res, error.generic.internalError);
+        // TODO jwt
+        bcrypt.hash(req.body.password, constraints.constraints.password.salt).then((hash) => {
+            prisma.user.create({
+                data: {
+                    email: req.body.email,
+                    password: hash,
+                    firstName: req.body.firstname,
+                    lastName: req.body.lastname,
+                    tel: phoneNum,
+                    birthDate: new Date(req.body.birthdate),
+                    avatar: null,
+                    gender,
+                    hasCar: req.body.hasCar
+                }
+            }).then((user) => {
+                const msg = info.user.created(req, res);
+                res.status(msg.code).json({
+                    message: msg.msg,
+                    user: displayableUser(user)
+                });
+            }).catch((err) => {
+                console.error(err);
+                res.status(500).json(err);
+            });
+        }).catch((err) => {
+            console.error(err);
+            res.status(500).json(err);
+        });
+    }).catch((error) => {
+        console.error(error);
+        res.status(500).json(error);
     });
 }

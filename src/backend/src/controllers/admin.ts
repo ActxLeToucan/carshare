@@ -1,16 +1,16 @@
 import type express from 'express';
 import { PrismaClient } from '@prisma/client';
-import { error, sendMsg } from '../messages';
+import { displayableUser } from '../messages';
 
 const prisma = new PrismaClient();
 
 exports.users = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     prisma.user.findMany()
         .then(users => {
-            res.status(200).json(users);
+            res.status(200).json(users.map(displayableUser));
         })
-        .catch(e => {
-            console.error(e);
-            sendMsg(req, res, error.generic.cannotConnectToDB);
+        .catch(error => {
+            console.error(error);
+            res.status(500).json(error);
         });
 }
