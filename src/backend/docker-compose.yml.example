@@ -1,12 +1,12 @@
 version: '3.1'
 
 services:
-# MariaDB setup
+  # MariaDB setup
   db:
     image: mariadb
     restart: always
     ports:
-      - 3306:3306
+      - "3306:3306"
     networks:
       - carshare_network
     volumes:
@@ -15,27 +15,27 @@ services:
       MARIADB_DATABASE: carshare
       MARIADB_ROOT_PASSWORD: <change_password>
 
-# Node api setup
+  # Node api setup
   node:
     build: .
     restart: always
     ports:
-      - 3000:3000
+      - "3000:3000"
     networks:
       - carshare_network
+    environment:
+      DATABASE_URL: "mysql://root:<change_password>@db:3306/carshare"
 
-# Added adminer (light phpmyadmin), to be able to view the database
+  # Added adminer (light phpmyadmin), to be able to view the database
   adminer:
     image: adminer
     restart: always
     ports:
-      - 8008:8080
+      - "8008:8080"
     networks:
       - carshare_network
 
 # Common network for all services
 networks:
   carshare_network:
-    name: carshare_network
     driver: bridge
-
