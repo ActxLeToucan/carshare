@@ -15,8 +15,10 @@
 </template>
 
 <script>
-import ButtonText from "../inputs/ButtonText.vue"
-import ButtonBlock from "../inputs/ButtonBlock.vue"
+import ButtonText from '../inputs/ButtonText.vue';
+import ButtonBlock from '../inputs/ButtonBlock.vue';
+import User from '../../scripts/User.js';
+import { goTo } from '../../scripts/redirects';
 
 const buttons = [
     {
@@ -31,7 +33,7 @@ const buttons = [
         name: 'Groupes',
         link: '/groups'
     }
-]
+];
 
 export default {
     components: {
@@ -41,6 +43,16 @@ export default {
     name: 'Topbar',
     data() {
         return { buttons }
+    },
+    mounted() {
+
+        // if the topbar is displayed, it's a page that requires authentication
+        // so we check if the user is logged in, if not we redirect him to the home page
+        // (with buttons to login or register)
+        if (User.CurrentUser === null) {
+            goTo(this, '/home');
+        }
+
     }
 }
 </script>
