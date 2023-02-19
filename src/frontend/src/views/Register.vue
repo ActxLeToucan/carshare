@@ -62,7 +62,7 @@ function onValidate(modal) {
             const result = check.check(modal.get(check.field), modal);
             if (!result) {
                 modal.focus(check.field);
-                inputs_log.update(check.error, Log.ERROR);
+                inputs_log.update(check.error, Log.WARNING);
                 setTimeout(() => { inputs_log.delete(); }, 2000);
                 resolve(false);
                 return;

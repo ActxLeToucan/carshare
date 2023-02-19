@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col w-fit h-fit rounded-lg shadow-lg bg-teal-500 overflow-hidden">
+    <div class="show-up flex flex-col w-fit h-fit rounded-lg shadow-lg bg-teal-500 overflow-hidden">
         <div class="flex grow-0 h-fit justify-center items-center px-8 py-1">
             <h2 class="text-2xl text-teal-50 font-bold"> {{ title }} </h2>
         </div>
@@ -13,7 +13,7 @@
                 style="max-height: 0px;"
             ></div>
             <span class="flex grow h-1 w-full bg-slate-200 rounded-lg mb-4 mt-2"></span>
-            <div class="flex grow-0 h-fit w-full justify-between">
+            <div style="animation-delay: 0.2s" class="show-down flex grow-0 h-fit w-full justify-between">
                 <button-text ref="cancel"> Annuler </button-text>
                 <button-block ref="validate"> Valider </button-block>
             </div>
@@ -85,12 +85,9 @@ export default {
             required: false
         }
     },
-    data() { return { validate_launched: false, cancel_launched: false } },
+    data() { return {} },
     methods: {
         validate() {
-            if (this.cancel_launched || this.validate_launched) return;
-            this.validate_launched = true;
-
             retreiveFields(this);
 
             executeAfter(
@@ -104,8 +101,6 @@ export default {
             );
         },
         cancel() {
-            if (this.cancel_launched || this.validate_launched) return;
-            this.cancel_launched = true;
             executeAfter(
                 this.oncancel?.(this),
                 (res) => {
@@ -123,12 +118,22 @@ export default {
         }
     },
     mounted() {
-        this.$refs["validate"].$el.addEventListener("click", () => { this.validate(this); });
-        this.$refs["cancel"].$el.addEventListener("click", () => { this.cancel(this); });
+        this.$refs["validate"].$el.addEventListener("click", this.validate);
+        this.$refs["cancel"].$el.addEventListener("click", this.cancel);
 
         this.logZone = new LogZone(this.$refs["log-zone"]);
 
         this.onload?.(this);
+
+        // animate all inputs
+        const inputs_div = this.$refs["inputs"];
+        for (let i = 0; i < inputs_div.children.length; i++) {
+            const div = inputs_div.children[i];
+            div.children[0].classList.add("show-right");
+            div.children[1].classList.add("show-left");
+            div.children[0].style.animationDelay = `${i * 0.05}s`;
+            div.children[1].style.animationDelay = `${i * 0.05}s`;
+        }
     }
 }
 </script>

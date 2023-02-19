@@ -2,9 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-::root {
+:root {
     --animation-time: 1s;
-    --animation-ease: ease-in-out;
+    --animation-ease: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes show-up {
