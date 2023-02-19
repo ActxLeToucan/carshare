@@ -1,6 +1,6 @@
 <template>
     <div class="flex grow flex-col">
-        <topbar></topbar>
+        <topbar v-if="User.CurrentUser != null"></topbar>
         <div class="flex grow w-fit flex-col justify-center space-y-6 mx-auto">
             <modal :oncancel="onCancel" :onvalidate="onValidate" title="S'inscrire">
                 <input-text   name="firstname"        label="Nom"          placeholder="Nom de famille"                               ></input-text>
@@ -21,6 +21,7 @@ import Modal from "../components/cards/Modal.vue";
 import InputText from "../components/inputs/InputText.vue";
 import InputSwitch from "../components/inputs/InputSwitch.vue";
 import { Log } from '../scripts/Logs';
+import User from '../scripts/User';
 
 function onCancel(modal) {
     return true;
@@ -49,7 +50,7 @@ export default {
         onValidate
     },
     data() {
-        return {}
+        return { User }
     }
 }
 </script>
