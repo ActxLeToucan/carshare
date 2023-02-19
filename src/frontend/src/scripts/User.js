@@ -31,7 +31,7 @@ class User {
         const props = ["username", "email", "token", "icon", "id"];
         for (const prop of props) {
             if (this[prop] != infos[prop] && infos[prop] !== undefined) {
-                changes[prop] = infos[prop];
+                this[prop] = infos[prop];
             }
         }
     }
