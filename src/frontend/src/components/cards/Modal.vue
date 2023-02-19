@@ -1,10 +1,10 @@
 <template>
-    <div class="flex flex-col w-fit h-fit rounded-lg shadow-lg bg-teal-500 overflow-hidden">
+    <div class="show-up flex flex-col w-fit h-fit rounded-lg shadow-lg bg-teal-500 overflow-hidden">
         <div class="flex grow-0 h-fit justify-center items-center px-8 py-1">
             <h2 class="text-2xl text-teal-50 font-bold"> {{ title }} </h2>
         </div>
         <div class="flex flex-col justify-center items-center px-4 py-2 bg-slate-50 rounded-md m-1">
-            <div class="flex flex-col">
+            <div ref="inputs" class="flex flex-col">
                 <slot></slot>
             </div>
             <div
@@ -13,7 +13,7 @@
                 style="max-height: 0px;"
             ></div>
             <span class="flex grow h-1 w-full bg-slate-200 rounded-lg mb-4 mt-2"></span>
-            <div class="flex grow-0 h-fit w-full justify-between">
+            <div style="animation-delay: 0.2s" class="show-down flex grow-0 h-fit w-full justify-between">
                 <button-text ref="cancel"> Annuler </button-text>
                 <button-block ref="validate"> Valider </button-block>
             </div>
@@ -27,6 +27,35 @@ import ButtonText from '../inputs/ButtonText.vue';
 import { goBack, goHome, goToLink } from '../../scripts/redirects.js';
 import { Log, LogZone } from '../../scripts/Logs.js';
 import { executeAfter } from '../../scripts/Promises.js';
+
+function retreiveFields(modal) {
+    /**@type {HTMLDivElement} */
+    const inputs_div = modal.$refs["inputs"];
+    const inputs = [];
+    for (let i = 0; i < inputs_div.children.length; i++) {
+        const div = inputs_div.children[i];
+        const input = div.querySelector("input");
+        if (!input) continue;
+
+        if (input.type == "checkbox")
+            input.value = input.checked ? true : false;
+
+        inputs.push(input);
+    }
+
+    modal.inputs = inputs;
+    modal.get = (name) => {
+        const input = inputs.find(input => input.name == name);
+        if (!input) return null;
+        return input.value;
+    };
+    modal.focus = (name) => {
+        const input = inputs.find(input => input.name == name);
+        if (!input) return false;
+        input.focus();
+        return true;
+    };
+}
 
 export default {
     components: {
@@ -56,11 +85,11 @@ export default {
             required: false
         }
     },
-    data() { return { validate_launched: false, cancel_launched: false } },
+    data() { return {} },
     methods: {
         validate() {
-            if (this.cancel_launched || this.validate_launched) return;
-            this.validate_launched = true;
+            retreiveFields(this);
+
             executeAfter(
                 this.onvalidate?.(this),
                 (res) => {
@@ -72,8 +101,6 @@ export default {
             );
         },
         cancel() {
-            if (this.cancel_launched || this.validate_launched) return;
-            this.cancel_launched = true;
             executeAfter(
                 this.oncancel?.(this),
                 (res) => {
@@ -91,12 +118,22 @@ export default {
         }
     },
     mounted() {
-        this.$refs["validate"].$el.addEventListener("click", () => { this.validate(this); });
-        this.$refs["cancel"].$el.addEventListener("click", () => { this.cancel(this); });
+        this.$refs["validate"].$el.addEventListener("click", this.validate);
+        this.$refs["cancel"].$el.addEventListener("click", this.cancel);
 
         this.logZone = new LogZone(this.$refs["log-zone"]);
 
         this.onload?.(this);
+
+        // animate all inputs
+        const inputs_div = this.$refs["inputs"];
+        for (let i = 0; i < inputs_div.children.length; i++) {
+            const div = inputs_div.children[i];
+            div.children[0].classList.add("show-right");
+            div.children[1].classList.add("show-left");
+            div.children[0].style.animationDelay = `${i * 0.05}s`;
+            div.children[1].style.animationDelay = `${i * 0.05}s`;
+        }
     }
 }
 </script>

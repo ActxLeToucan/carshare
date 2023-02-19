@@ -49,6 +49,11 @@ class Log {
         this.#applyStyle();
     }
 
+    update(msg, type) {
+        this.setText(msg);
+        this.setType(type);
+    }
+
     delete() {
         if (this.zone !== null) {
             this.zone.removeLog(this);

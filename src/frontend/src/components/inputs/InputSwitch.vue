@@ -8,6 +8,7 @@
                 <div class="flex bg-white rounded h-6 w-6 translate-x-0 transition-all border border-b-4 border-slate-300"></div>
             </div>
         </div>
+        <input ref="checkbox" type="checkbox" :name="name" class="hidden">
     </div>
 </template>
 
@@ -24,6 +25,11 @@ export default {
             type: [String, Boolean],
             default: false,
             required: false
+        },
+        name: {
+            type: String,
+            default: "",
+            required: false
         }
     },
     data() {
@@ -39,6 +45,7 @@ export default {
     methods: {
         updateButton() {
             const btn = this.$refs["switch"];
+            const checkbox = this.$refs["checkbox"];
             const dot = btn.firstElementChild;
 
             if (!this.state) {
@@ -52,6 +59,8 @@ export default {
                 btn.classList.remove("bg-slate-200");
                 btn.classList.add("bg-teal-500");
             }
+
+            checkbox.checked = this.state;
         }
     },
     mounted() {
