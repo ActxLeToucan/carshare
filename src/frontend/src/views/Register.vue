@@ -20,13 +20,20 @@ import Topbar from "../components/topbar/Topbar.vue";
 import Modal from "../components/cards/Modal.vue";
 import InputText from "../components/inputs/InputText.vue";
 import InputSwitch from "../components/inputs/InputSwitch.vue";
+import { Log } from '../scripts/Logs';
 
-function onCancel() {
-
+function onCancel(modal) {
+    return true;
 }
 
-function onValidate() {
-
+function onValidate(modal) {
+    return new Promise((resolve, reject) => {
+        const err_log = modal.log("Erreur : Inscription non implémentée.", Log.ERROR);
+        setTimeout(() => {
+            err_log.delete();
+            setTimeout(() => { resolve(false); }, 500);
+        }, 2000);
+    });
 }
 
 export default {
