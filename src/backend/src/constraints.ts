@@ -7,7 +7,7 @@ const constraints: Record<string, Record<string, any>> = {
         max: 64 // from schema.prisma
     },
     password: {
-        length: 10,
+        min: 10,
         upper: 1,
         lower: 1,
         number: 1,
@@ -65,8 +65,8 @@ function checkPasswordField (password: string | undefined, req: express.Request,
         sendMsg(req, res, error.password.required);
         return false;
     }
-    if (password.length < constraints.password.length) {
-        sendMsg(req, res, error.password.length, constraints.password.length);
+    if (password.length < constraints.password.min) {
+        sendMsg(req, res, error.password.min, constraints.password.min);
         return false;
     }
     const upper = password.match(/[A-Z]/g);
@@ -177,13 +177,9 @@ function sanitizePhone (phone: string | undefined, req: express.Request, res: ex
         sendMsg(req, res, error.phone.required);
         return null;
     }
-    const num = phone.replace(/[^0-9+]/g, '');
-    if (num.match(/^(\+)?[0-9]{10,}$/g) === null) {
+    const num = phone.replace(/(\.|\s|-)/g, '').trim();
+    if (num.match(/^((00[0-9]{2})?0[0-9][0-9]{8}|\+[0-9]{11,12})$/) === null) {
         sendMsg(req, res, error.phone.invalid);
-        return null;
-    }
-    if (num.length > constraints.phone.max) {
-        sendMsg(req, res, error.phone.max, constraints.phone.max);
         return null;
     }
     return num;
