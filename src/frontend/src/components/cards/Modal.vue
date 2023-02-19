@@ -19,6 +19,7 @@
 <script>
 import ButtonBlock from '../inputs/ButtonBlock.vue';
 import ButtonText from '../inputs/ButtonText.vue';
+import { goHome, goToLink } from '../../scripts/redirects.js';
 
 export default {
     components: {
@@ -32,19 +33,36 @@ export default {
             default: '',
             required: false
         },
-        action: {
+        onvalidate: {
             type: Function,
-            default: () => {},
+            default: modal => {},
+            required: false
+        },
+        oncancel: {
+            type: Function,
+            default: modal => {},
+            required: false
+        },
+        onload: {
+            type: Function,
+            default: modal => {},
             required: false
         }
     },
     methods: {
-        onClick() {
-            this.action?.();
+        validate() {
+            this.onvalidate?.(this);
+            if (!goToLink(this)) goHome(this);
+        },
+        cancel() {
+            this.oncancel?.(this);
+            this.$router.go(-1);
         }
     },
     mounted() {
-        this.$refs["validate"].$el.addEventListener("click", this.onClick);
+        this.$refs["validate"].$el.addEventListener("click", () => { this.validate(this); });
+        this.$refs["cancel"].$el.addEventListener("click", () => { this.cancel(this); });
+        this.onload?.(this);
     }
 }
 </script>

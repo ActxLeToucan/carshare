@@ -2,7 +2,7 @@
     <div class="flex grow flex-col">
         <topbar></topbar>
         <div class="flex grow w-fit flex-col justify-center space-y-6 mx-auto">
-            <modal title="S'inscrire">
+            <modal :oncancel="onCancel" :onvalidate="onValidate" title="S'inscrire">
                 <input-text   name="firstname"        label="Nom"          placeholder="Nom de famille"                               ></input-text>
                 <input-text   name="lastname"         label="Prénom"       placeholder="Prénom"                                       ></input-text>
                 <input-text   name="mail"             label="Email"        placeholder="Adresse mail"                 type="email"    ></input-text>
@@ -21,6 +21,14 @@ import Modal from "../components/cards/Modal.vue";
 import InputText from "../components/inputs/InputText.vue";
 import InputSwitch from "../components/inputs/InputSwitch.vue";
 
+function onCancel() {
+
+}
+
+function onValidate() {
+
+}
+
 export default {
     components: {
         Topbar,
@@ -29,6 +37,10 @@ export default {
         InputSwitch
     },
     name: 'Register',
+    methods: {
+        onCancel,
+        onValidate
+    },
     data() {
         return {}
     }
