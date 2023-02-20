@@ -1,8 +1,6 @@
 import type express from 'express';
-import { PrismaClient } from '@prisma/client';
-import { error, displayableUser, sendMsg } from '../messages';
-
-const prisma = new PrismaClient();
+import { prisma } from '../app';
+import { displayableUser, error, sendMsg } from '../messages';
 
 exports.users = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     prisma.user.findMany()

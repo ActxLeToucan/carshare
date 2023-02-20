@@ -11,7 +11,7 @@ function setupLogging () {
 
     function consoleToFile (d: any, type: string = 'info', color: string = '\x1b[0m') {
         const now = new Date();
-        if (process.env.NODE_ENV !== 'development')logFile.write(`${now.toISOString()}\t[${type}]\t${util.format(d)}\n`);
+        if (process.env.NODE_ENV !== 'development') logFile.write(`${now.toISOString()}\t[${type}]\t${util.format(d)}\n`);
         logStdout.write(`${color}[${type}]\x1b[0m\t${util.format(d)}\n`);
     }
 
@@ -26,6 +26,7 @@ function setupLogging () {
         logStdout.write(`\x1b[31m[error]\x1b[0m\t${util.format(d)}\n`);
     };
 }
+
 setupLogging();
 
 if (process.env.NODE_ENV === undefined || process.env.NODE_ENV === '') {
@@ -52,6 +53,7 @@ function normalizePort (val: string) {
 
     return false;
 }
+
 const port = normalizePort(process.env.PORT ?? '3000');
 app.set('port', port);
 

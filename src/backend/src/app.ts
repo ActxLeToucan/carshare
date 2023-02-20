@@ -2,6 +2,8 @@ import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { error, sendMsg } from './messages';
 
+const prisma = new PrismaClient();
+
 const app = express();
 app.use(express.json());
 
@@ -21,12 +23,15 @@ app.use((req, res, next) => {
  * Force Prisma to try to connect to the database at each request.
  */
 app.use((req, res, next) => {
-    const prisma = new PrismaClient();
     prisma.$queryRaw`SELECT 1`
-        .then(() => { next(); })
+        .then(() => {
+            next();
+        })
         .catch(() => {
             prisma.$connect()
-                .then(() => { next(); })
+                .then(() => {
+                    next();
+                })
                 .catch((err) => {
                     console.error(err);
                     sendMsg(req, res, error.db.notReachable)
@@ -42,4 +47,4 @@ app.use('/docs', require('./routes/docs'));
 app.use('/users', require('./routes/users'));
 app.use('/admin', require('./routes/admin'));
 
-export { app };
+export { app, prisma };

@@ -130,7 +130,11 @@ const error: APIMessagesTranslation = {
         insufficientPrivileges: (req: Request) => msgForLang(req, {
             fr: 'Vous n\'avez pas les droits suffisants pour effectuer cette action',
             en: 'You do not have sufficient rights to perform this action'
-        }, 403)
+        }, 403),
+        invalidCredentials: (req: Request) => msgForLang(req, {
+            fr: 'Les identifiants fournis sont invalides',
+            en: 'Invalid credentials provided'
+        }, 401)
     },
     generic: {
         notImplemented: (req: Request) => msgForLang(req, {
@@ -146,12 +150,14 @@ const error: APIMessagesTranslation = {
 
 const info: APIMessagesTranslation = {
     user: {
-        created: (req: Request) => {
-            return msgForLang(req, {
-                fr: 'Utilisateur créé',
-                en: 'User created'
-            }, 201);
-        }
+        created: (req: Request) => msgForLang(req, {
+            fr: 'Utilisateur créé',
+            en: 'User created'
+        }, 201),
+        loggedIn: (req: Request) => msgForLang(req, {
+            fr: 'Utilisateur connecté',
+            en: 'User logged in'
+        }, 200)
     }
 }
 
