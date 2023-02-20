@@ -1,5 +1,9 @@
 export function goBack(obj) {
-    obj.$router.go(-1);
+    if (window.history.state.back != null) {
+        obj.$router.back();
+    } else {
+        goTo(obj, '/');
+    }
 }
 
 export function goHome(obj) {
