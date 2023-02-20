@@ -5,6 +5,9 @@ services:
   db:
     image: mariadb
     restart: always
+    command: [
+      '--lower-case-table-names=1'
+    ]
     ports:
       - "3306:3306"
     networks:
