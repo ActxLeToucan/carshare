@@ -25,6 +25,9 @@ const constraints: Record<string, Record<string, any>> = {
     },
     gender: {
         values: [-1, 0, 1]
+    },
+    userLevel: {
+        admin: 1
     }
 }
 

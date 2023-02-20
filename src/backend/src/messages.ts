@@ -7,156 +7,140 @@ type APIMessagesTranslation = Record<string, Record<string, (req: Request, ...ar
 
 const error: APIMessagesTranslation = {
     email: {
-        required: (req: Request) => {
-            return msgForLang(req, {
-                fr: "L'adresse email est requise",
-                en: 'Email address is required'
-            }, 400);
-        },
-        max: (req: Request, length: number) => {
-            return msgForLang(req, {
-                fr: `L'adresse email doit contenir au plus ${length} caractère${length > 1 ? 's' : ''}`,
-                en: `Email address must contain at most ${length} character${length > 1 ? 's' : ''}`
-            }, 400);
-        },
-        invalid: (req: Request) => {
-            return msgForLang(req, {
-                fr: "L'adresse email est invalide",
-                en: 'Email address is invalid'
-            }, 400);
-        },
-        exists: (req: Request) => {
-            return msgForLang(req, {
-                fr: "L'adresse email est déjà utilisée",
-                en: 'Email address is already in use'
-            }, 400);
-        }
+        required: (req: Request) => msgForLang(req, {
+            fr: "L'adresse email est requise",
+            en: 'Email address is required'
+        }, 400),
+        max: (req: Request, length: number) => msgForLang(req, {
+            fr: `L'adresse email doit contenir au plus ${length} caractère${length > 1 ? 's' : ''}`,
+            en: `Email address must contain at most ${length} character${length > 1 ? 's' : ''}`
+        }, 400),
+        invalid: (req: Request) => msgForLang(req, {
+            fr: "L'adresse email est invalide",
+            en: 'Email address is invalid'
+        }, 400),
+        exists: (req: Request) => msgForLang(req, {
+            fr: "L'adresse email est déjà utilisée",
+            en: 'Email address is already in use'
+        }, 400)
     },
     password: {
-        required: (req: Request) => {
-            return msgForLang(req, {
-                fr: 'Le mot de passe est requis',
-                en: 'Password is required'
-            }, 400);
-        },
-        min: (req: Request, length: number) => {
-            return msgForLang(req, {
-                fr: `Le mot de passe doit contenir au moins ${length} caractère${length > 1 ? 's' : ''}`,
-                en: `Password must contain at least ${length} character${length > 1 ? 's' : ''}`
-            }, 400);
-        },
-        upper: (req: Request, count: number) => {
-            return msgForLang(req, {
-                fr: `Le mot de passe doit contenir au moins ${count} majuscule${count > 1 ? 's' : ''}`,
-                en: `Password must contain at least ${count} uppercase letter${count > 1 ? 's' : ''}`
-            }, 400);
-        },
-        lower: (req: Request, count: number) => {
-            return msgForLang(req, {
-                fr: `Le mot de passe doit contenir au moins ${count} minuscule${count > 1 ? 's' : ''}`,
-                en: `Password must contain at least ${count} lowercase letter${count > 1 ? 's' : ''}`
-            }, 400);
-        },
-        number: (req: Request, count: number) => {
-            return msgForLang(req, {
-                fr: `Le mot de passe doit contenir au moins ${count} chiffre${count > 1 ? 's' : ''}`,
-                en: `Password must contain at least ${count} number${count > 1 ? 's' : ''}`
-            }, 400);
-        },
-        special: (req: Request, count: number) => {
-            return msgForLang(req, {
-                fr: `Le mot de passe doit contenir au moins ${count} caractère spécial${count > 1 ? 's' : ''}`,
-                en: `Password must contain at least ${count} special character${count > 1 ? 's' : ''}`
-            }, 400);
-        }
+        required: (req: Request) => msgForLang(req, {
+            fr: 'Le mot de passe est requis',
+            en: 'Password is required'
+        }, 400),
+        min: (req: Request, length: number) => msgForLang(req, {
+            fr: `Le mot de passe doit contenir au moins ${length} caractère${length > 1 ? 's' : ''}`,
+            en: `Password must contain at least ${length} character${length > 1 ? 's' : ''}`
+        }, 400),
+        upper: (req: Request, count: number) => msgForLang(req, {
+            fr: `Le mot de passe doit contenir au moins ${count} majuscule${count > 1 ? 's' : ''}`,
+            en: `Password must contain at least ${count} uppercase letter${count > 1 ? 's' : ''}`
+        }, 400),
+        lower: (req: Request, count: number) => msgForLang(req, {
+            fr: `Le mot de passe doit contenir au moins ${count} minuscule${count > 1 ? 's' : ''}`,
+            en: `Password must contain at least ${count} lowercase letter${count > 1 ? 's' : ''}`
+        }, 400),
+        number: (req: Request, count: number) => msgForLang(req, {
+            fr: `Le mot de passe doit contenir au moins ${count} chiffre${count > 1 ? 's' : ''}`,
+            en: `Password must contain at least ${count} number${count > 1 ? 's' : ''}`
+        }, 400),
+        special: (req: Request, count: number) => msgForLang(req, {
+            fr: `Le mot de passe doit contenir au moins ${count} caractère spécial${count > 1 ? 's' : ''}`,
+            en: `Password must contain at least ${count} special character${count > 1 ? 's' : ''}`
+        }, 400)
     },
     lastname: {
-        required: (req: Request) => {
-            return msgForLang(req, {
-                fr: 'Le nom est requis',
-                en: 'Last name is required'
-            }, 400);
-        },
-        max: (req: Request, length: number) => {
-            return msgForLang(req, {
-                fr: `Le nom doit contenir au plus ${length} caractère${length > 1 ? 's' : ''}`,
-                en: `Last name must contain at most ${length} character${length > 1 ? 's' : ''}`
-            }, 400);
-        },
-        number: (req: Request) => {
-            return msgForLang(req, {
-                fr: 'Le nom ne peut pas contenir de chiffre',
-                en: 'Last name cannot contain numbers'
-            }, 400);
-        }
+        required: (req: Request) => msgForLang(req, {
+            fr: 'Le nom est requis',
+            en: 'Last name is required'
+        }, 400),
+        max: (req: Request, length: number) => msgForLang(req, {
+            fr: `Le nom doit contenir au plus ${length} caractère${length > 1 ? 's' : ''}`,
+            en: `Last name must contain at most ${length} character${length > 1 ? 's' : ''}`
+        }, 400),
+        number: (req: Request) => msgForLang(req, {
+            fr: 'Le nom ne peut pas contenir de chiffre',
+            en: 'Last name cannot contain numbers'
+        }, 400)
     },
     firstname: {
-        required: (req: Request) => {
-            return msgForLang(req, {
-                fr: 'Le prénom est requis',
-                en: 'First name is required'
-            }, 400);
-        },
-        max: (req: Request, length: number) => {
-            return msgForLang(req, {
-                fr: `Le prénom doit contenir au plus ${length} caractère${length > 1 ? 's' : ''}`,
-                en: `First name must contain at most ${length} character${length > 1 ? 's' : ''}`
-            }, 400);
-        },
-        number: (req: Request) => {
-            return msgForLang(req, {
-                fr: 'Le prénom ne peut pas contenir de chiffre',
-                en: 'First name cannot contain numbers'
-            }, 400);
-        }
+        required: (req: Request) => msgForLang(req, {
+            fr: 'Le prénom est requis',
+            en: 'First name is required'
+        }, 400),
+        max: (req: Request, length: number) => msgForLang(req, {
+            fr: `Le prénom doit contenir au plus ${length} caractère${length > 1 ? 's' : ''}`,
+            en: `First name must contain at most ${length} character${length > 1 ? 's' : ''}`
+        }, 400),
+        number: (req: Request) => msgForLang(req, {
+            fr: 'Le prénom ne peut pas contenir de chiffre',
+            en: 'First name cannot contain numbers'
+        }, 400)
     },
     phone: {
-        required: (req: Request) => {
-            return msgForLang(req, {
-                fr: 'Le numéro de téléphone est requis',
-                en: 'Phone number is required'
-            }, 400);
-        },
-        invalid: (req: Request) => {
-            return msgForLang(req, {
-                fr: 'Le numéro de téléphone est invalide',
-                en: 'Phone number is invalid'
-            }, 400);
-        }
+        required: (req: Request) => msgForLang(req, {
+            fr: 'Le numéro de téléphone est requis',
+            en: 'Phone number is required'
+        }, 400),
+        invalid: (req: Request) => msgForLang(req, {
+            fr: 'Le numéro de téléphone est invalide',
+            en: 'Phone number is invalid'
+        }, 400)
     },
     date: {
-        required: (req: Request) => {
-            return msgForLang(req, {
-                fr: 'La date est requise',
-                en: 'Date is required'
-            }, 400);
-        },
-        invalid: (req: Request) => {
-            return msgForLang(req, {
-                fr: 'La date est invalide',
-                en: 'Date is invalid'
-            }, 400);
-        },
-        tooLate: (req: Request, date: Date) => {
-            return msgForLang(req, {
-                fr: `La date doit être avant le ${date.toLocaleDateString('fr-FR')}`,
-                en: `Date must be before ${date.toLocaleDateString('en-US')}`
-            }, 400);
-        }
+        required: (req: Request) => msgForLang(req, {
+            fr: 'La date est requise',
+            en: 'Date is required'
+        }, 400),
+        invalid: (req: Request) => msgForLang(req, {
+            fr: 'La date est invalide',
+            en: 'Date is invalid'
+        }, 400),
+        tooLate: (req: Request, date: Date) => msgForLang(req, {
+            fr: `La date doit être avant le ${date.toLocaleDateString('fr-FR')}`,
+            en: `Date must be before ${date.toLocaleDateString('en-US')}`
+        }, 400)
+    },
+    user: {
+        notFound: (req: Request) => msgForLang(req, {
+            fr: 'Utilisateur introuvable',
+            en: 'User not found'
+        }, 404)
+    },
+    db: {
+        notReachable: (req: Request) => msgForLang(req, {
+            fr: 'La base de données n\'est pas joignable. Si le problème persiste, veuillez contacter un administrateur',
+            en: 'Database is not reachable. If the problem persists, please contact an administrator'
+        }, 500)
+    },
+    auth: {
+        noToken: (req: Request) => msgForLang(req, {
+            fr: 'Aucun token n\'a été fourni',
+            en: 'No token provided'
+        }, 401),
+        invalidToken: (req: Request) => msgForLang(req, {
+            fr: 'Le token fourni est invalide',
+            en: 'Invalid token provided'
+        }, 498),
+        expiredToken: (req: Request) => msgForLang(req, {
+            fr: 'Le token fourni est expiré',
+            en: 'Expired token provided'
+        }, 498),
+        insufficientPrivileges: (req: Request) => msgForLang(req, {
+            fr: 'Vous n\'avez pas les droits suffisants pour effectuer cette action',
+            en: 'You do not have sufficient rights to perform this action'
+        }, 403)
     },
     generic: {
-        notImplemented: (req: Request) => {
-            return msgForLang(req, {
-                fr: "Cette fonctionnalité n'est pas encore implémentée",
-                en: 'This feature is not yet implemented'
-            }, 501);
-        },
-        internalError: (req: Request) => {
-            return msgForLang(req, {
-                fr: 'Une erreur interne est survenue, veuillez réessayer ultérieurement ou contacter un administrateur',
-                en: 'An internal error has occurred, please try again later or contact an administrator'
-            }, 500);
-        }
+        notImplemented: (req: Request) => msgForLang(req, {
+            fr: "Cette fonctionnalité n'est pas encore implémentée",
+            en: 'This feature is not yet implemented'
+        }, 501),
+        internalError: (req: Request) => msgForLang(req, {
+            fr: 'Une erreur interne est survenue, veuillez réessayer ultérieurement ou contacter un administrateur',
+            en: 'An internal error has occurred, please try again later or contact an administrator'
+        }, 500)
     }
 }
 
