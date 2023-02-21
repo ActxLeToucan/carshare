@@ -37,20 +37,23 @@ const constraints: Record<string, Record<string, any>> = {
  * @param email Email to check
  * @param req Express request
  * @param res Express response
+ * @param checkFormat If true, check if the email is valid
  * @returns true if the email is valid, false otherwise
  */
-function checkEmailField (email: string | undefined, req: express.Request, res: express.Response): boolean {
+function checkEmailField (email: string | undefined, req: express.Request, res: express.Response, checkFormat: boolean = true): boolean {
     if (email === undefined || email === '') {
         sendMsg(req, res, error.email.required);
         return false;
     }
-    if (!IsEmail.validate(email)) {
-        sendMsg(req, res, error.email.invalid);
-        return false;
-    }
-    if (email.length > constraints.email.max) {
-        sendMsg(req, res, error.email.max, constraints.email.max);
-        return false;
+    if (checkFormat) {
+        if (!IsEmail.validate(email)) {
+            sendMsg(req, res, error.email.invalid);
+            return false;
+        }
+        if (email.length > constraints.email.max) {
+            sendMsg(req, res, error.email.max, constraints.email.max);
+            return false;
+        }
     }
     return true;
 }
@@ -61,36 +64,39 @@ function checkEmailField (email: string | undefined, req: express.Request, res: 
  * @param password Password to check
  * @param req Express request
  * @param res Express response
+ * @param checkFormat If true, check if the password is valid
  * @returns true if the password is valid, false otherwise
  */
-function checkPasswordField (password: string | undefined, req: express.Request, res: express.Response): boolean {
+function checkPasswordField (password: string | undefined, req: express.Request, res: express.Response, checkFormat = true): boolean {
     if (password === undefined || password === '') {
         sendMsg(req, res, error.password.required);
         return false;
     }
-    if (password.length < constraints.password.min) {
-        sendMsg(req, res, error.password.min, constraints.password.min);
-        return false;
-    }
-    const upper = password.match(/[A-Z]/g);
-    if (upper === null || upper.length < constraints.password.upper) {
-        sendMsg(req, res, error.password.upper, constraints.password.upper);
-        return false;
-    }
-    const lower = password.match(/[a-z]/g);
-    if (lower === null || lower.length < constraints.password.lower) {
-        sendMsg(req, res, error.password.lower, constraints.password.lower);
-        return false;
-    }
-    const number = password.match(/[0-9]/g);
-    if (number === null || number.length < constraints.password.number) {
-        sendMsg(req, res, error.password.number, constraints.password.number);
-        return false;
-    }
-    const special = password.match(/[^A-Za-z0-9]/g);
-    if (special === null || special.length < constraints.password.special) {
-        sendMsg(req, res, error.password.special, constraints.password.special);
-        return false;
+    if (checkFormat) {
+        if (password.length < constraints.password.min) {
+            sendMsg(req, res, error.password.min, constraints.password.min);
+            return false;
+        }
+        const upper = password.match(/[A-Z]/g);
+        if (upper === null || upper.length < constraints.password.upper) {
+            sendMsg(req, res, error.password.upper, constraints.password.upper);
+            return false;
+        }
+        const lower = password.match(/[a-z]/g);
+        if (lower === null || lower.length < constraints.password.lower) {
+            sendMsg(req, res, error.password.lower, constraints.password.lower);
+            return false;
+        }
+        const number = password.match(/[0-9]/g);
+        if (number === null || number.length < constraints.password.number) {
+            sendMsg(req, res, error.password.number, constraints.password.number);
+            return false;
+        }
+        const special = password.match(/[^A-Za-z0-9]/g);
+        if (special === null || special.length < constraints.password.special) {
+            sendMsg(req, res, error.password.special, constraints.password.special);
+            return false;
+        }
     }
     return true;
 }

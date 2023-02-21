@@ -60,8 +60,8 @@ exports.signup = (req: express.Request, res: express.Response, next: express.Nex
 }
 
 exports.login = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (!constraints.checkEmailField(req.body.email, req, res)) return;
-    if (!constraints.checkPasswordField(req.body.password, req, res)) return;
+    if (!constraints.checkEmailField(req.body.email, req, res, false)) return;
+    if (!constraints.checkPasswordField(req.body.password, req, res, false)) return;
 
     prisma.user.findUnique({ where: { email: req.body.email } })
         .then((user) => {
