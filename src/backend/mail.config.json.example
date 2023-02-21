@@ -10,7 +10,6 @@
     }
   },
   "devMode": {
-    "enabled": true, // true to override all emails to a single address
     "overrideTo": "your_own_email@adress"
   }
 }

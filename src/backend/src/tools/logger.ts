@@ -40,4 +40,4 @@ function setupLogging () {
     };
 }
 
-export { setupLogging }
+export default { setupLogging }

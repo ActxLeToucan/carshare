@@ -1,14 +1,17 @@
 import nodemailer from 'nodemailer';
 import mailConfig from '../../mail.config.json';
 
-const devMode: boolean = mailConfig.devMode.enabled;
 let transporter: nodemailer.Transporter | undefined;
 
-async function init () {
+async function initMailer () {
     const enabled: boolean = mailConfig.enabled;
     if (!enabled) return;
 
-    console.warn('Mailer enabled');
+    if (process.env.NODE_ENV === 'production') {
+        console.warn('Mailer in production mode. Emails will be sent to real recipients.');
+    } else {
+        console.info('Mailer in dev mode, email will be sent to', mailConfig.devMode.overrideTo);
+    }
 
     transporter = nodemailer.createTransport(mailConfig.transporter);
 
@@ -16,18 +19,18 @@ async function init () {
         await transporter.verify();
         console.log('Mailer ready');
     } catch (err) {
-        console.error('Mailer disabled: ', err);
+        console.error('Mailer disabled due to error:\n', err);
         transporter = undefined;
     }
 }
 
-async function send (to: string, subject: string, text: string, html: string) {
+async function sendMail (to: string, subject: string, text: string, html: string) {
     if (transporter === undefined) {
         console.warn('Mailer disabled, cannot send email: ', { to, subject })
         return;
     }
 
-    if (devMode) {
+    if (process.env.NODE_ENV !== 'production') {
         console.log('Mailer in dev mode, email sent to ', mailConfig.devMode.overrideTo);
         subject = '[DEV] ' + subject + ' (original recipient: ' + to + ')';
         to = mailConfig.devMode.overrideTo;
@@ -46,4 +49,4 @@ async function send (to: string, subject: string, text: string, html: string) {
     console.log('Message sent:', { to, subject }, { messageId: info.messageId });
 }
 
-export { init, send }
+export { initMailer, sendMail }

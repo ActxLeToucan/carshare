@@ -161,6 +161,14 @@ const info: APIMessagesTranslation = {
         deleted: (req: Request) => msgForLang(req, {
             fr: 'Utilisateur supprimé',
             en: 'User deleted'
+        }, 200),
+        passwordChanged: (req: Request) => msgForLang(req, {
+            fr: 'Mot de passe modifié',
+            en: 'Password changed'
+        }, 200),
+        passwordResetEmailSent: (req: Request) => msgForLang(req, {
+            fr: 'Si l\'adresse mail fournie correspond à un compte, un email de réinitialisation de mot de passe a été envoyé',
+            en: 'If the provided email address corresponds to an account, a password reset email has been sent'
         }, 200)
     }
 }

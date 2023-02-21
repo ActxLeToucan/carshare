@@ -1,7 +1,7 @@
 import http from 'http';
 import { app } from './app';
-import * as logger from './tools/logger';
-import * as mailer from './tools/mailer';
+import logger from './tools/logger';
+import { initMailer } from './tools/mailer';
 
 const port = normalizePort(process.env.PORT ?? '3000');
 app.set('port', port);
@@ -18,7 +18,7 @@ server.on('listening', () => {
 function main () {
     logger.setupLogging();
     checkEnvVariables();
-    mailer.init()
+    initMailer()
         .then(startServer)
         .catch(err => {
             console.error(err);
@@ -33,6 +33,10 @@ function checkEnvVariables () {
         console.warn('NODE_ENV environment variable is not set.');
     } else {
         console.log('Environment: ' + process.env.NODE_ENV);
+    }
+
+    if (process.env.FRONTEND_URL === undefined || process.env.FRONTEND_URL === '') {
+        console.warn('FRONTEND_URL environment variable is not set.');
     }
 
     if (process.env.JWT_SECRET === undefined || process.env.JWT_SECRET === '' || process.env.JWT_SECRET === '<change_secret>') {

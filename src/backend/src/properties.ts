@@ -2,7 +2,7 @@ import type express from 'express';
 import { error, sendMsg } from './messages';
 import IsEmail from 'isemail';
 
-const constraints: Record<string, Record<string, any>> = {
+const p: Record<string, Record<string, any>> = {
     email: {
         max: 64 // from schema.prisma
     },
@@ -28,6 +28,14 @@ const constraints: Record<string, Record<string, any>> = {
     },
     userLevel: {
         admin: 1
+    },
+    token: {
+        access: {
+            expiration: '24h'
+        },
+        passwordReset: {
+            expiration: '1h'
+        }
     }
 }
 
@@ -50,8 +58,8 @@ function checkEmailField (email: string | undefined, req: express.Request, res: 
             sendMsg(req, res, error.email.invalid);
             return false;
         }
-        if (email.length > constraints.email.max) {
-            sendMsg(req, res, error.email.max, constraints.email.max);
+        if (email.length > p.email.max) {
+            sendMsg(req, res, error.email.max, p.email.max);
             return false;
         }
     }
@@ -73,28 +81,28 @@ function checkPasswordField (password: string | undefined, req: express.Request,
         return false;
     }
     if (checkFormat) {
-        if (password.length < constraints.password.min) {
-            sendMsg(req, res, error.password.min, constraints.password.min);
+        if (password.length < p.password.min) {
+            sendMsg(req, res, error.password.min, p.password.min);
             return false;
         }
         const upper = password.match(/[A-Z]/g);
-        if (upper === null || upper.length < constraints.password.upper) {
-            sendMsg(req, res, error.password.upper, constraints.password.upper);
+        if (upper === null || upper.length < p.password.upper) {
+            sendMsg(req, res, error.password.upper, p.password.upper);
             return false;
         }
         const lower = password.match(/[a-z]/g);
-        if (lower === null || lower.length < constraints.password.lower) {
-            sendMsg(req, res, error.password.lower, constraints.password.lower);
+        if (lower === null || lower.length < p.password.lower) {
+            sendMsg(req, res, error.password.lower, p.password.lower);
             return false;
         }
         const number = password.match(/[0-9]/g);
-        if (number === null || number.length < constraints.password.number) {
-            sendMsg(req, res, error.password.number, constraints.password.number);
+        if (number === null || number.length < p.password.number) {
+            sendMsg(req, res, error.password.number, p.password.number);
             return false;
         }
         const special = password.match(/[^A-Za-z0-9]/g);
-        if (special === null || special.length < constraints.password.special) {
-            sendMsg(req, res, error.password.special, constraints.password.special);
+        if (special === null || special.length < p.password.special) {
+            sendMsg(req, res, error.password.special, p.password.special);
             return false;
         }
     }
@@ -114,8 +122,8 @@ function checkLastNameField (lastname: string | undefined, req: express.Request,
         sendMsg(req, res, error.lastname.required);
         return false;
     }
-    if (lastname.length > constraints.lastname.max) {
-        sendMsg(req, res, error.lastname.max, constraints.lastname.max);
+    if (lastname.length > p.lastname.max) {
+        sendMsg(req, res, error.lastname.max, p.lastname.max);
         return false;
     }
     if (lastname.match(/[0-9]/g) !== null) {
@@ -138,8 +146,8 @@ function checkFirstNameField (firstname: string | undefined, req: express.Reques
         sendMsg(req, res, error.firstname.required);
         return false;
     }
-    if (firstname.length > constraints.firstname.max) {
-        sendMsg(req, res, error.firstname.max, constraints.firstname.max);
+    if (firstname.length > p.firstname.max) {
+        sendMsg(req, res, error.firstname.max, p.firstname.max);
         return false;
     }
     if (firstname.match(/[0-9]/g) !== null) {
@@ -203,14 +211,14 @@ function sanitizeGender (gender: any): number | undefined {
     if (typeof gender !== 'number') {
         return undefined;
     }
-    if (constraints.gender.values.includes(gender) === false) {
+    if (p.gender.values.includes(gender) === false) {
         return undefined;
     }
     return gender;
 }
 
 export {
-    constraints,
+    p,
     checkEmailField,
     checkPasswordField,
     checkLastNameField,

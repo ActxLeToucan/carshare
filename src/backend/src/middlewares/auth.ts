@@ -3,7 +3,17 @@ import type express from 'express';
 import { error, sendMsg } from '../messages';
 import { prisma } from '../app';
 
-module.exports = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+export type AuthType = 'access' | 'resetPassword';
+
+function access (req: express.Request, res: express.Response, next: express.NextFunction) {
+    auth(req, res, next, 'access');
+}
+
+function resetPassword (req: express.Request, res: express.Response, next: express.NextFunction) {
+    auth(req, res, next, 'resetPassword');
+}
+
+function auth (req: express.Request, res: express.Response, next: express.NextFunction, type: AuthType) {
     try {
         const token = req.headers.authorization?.split(' ')[1];
         if (token === undefined) {
@@ -13,7 +23,8 @@ module.exports = (req: express.Request, res: express.Response, next: express.Nex
 
         const decodedToken = jwt.verify(token, process.env.JWT_SECRET ?? 'secret');
         const userId = (decodedToken as jwt.JwtPayload).userId;
-        if (userId === undefined) {
+        const typeToken = (decodedToken as jwt.JwtPayload).type;
+        if (userId === undefined || typeToken !== type) {
             sendMsg(req, res, error.auth.invalidToken);
             return;
         }
@@ -38,4 +49,6 @@ module.exports = (req: express.Request, res: express.Response, next: express.Nex
         console.error(err);
         sendMsg(req, res, error.auth.invalidToken);
     }
-};
+}
+
+export default { access, resetPassword }
