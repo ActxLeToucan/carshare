@@ -2,13 +2,17 @@ import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { error, sendMsg } from './messages';
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient({
+    errorFormat: 'pretty'
+});
 
 const app = express();
 app.use(express.json());
 
 app.use((req, res, next) => {
-    console.log(`${req.method} ${req.url}`, { body: req.body });
+    process.env.NODE_ENV === 'development'
+        ? console.log(`${req.method} ${req.url}`, { body: req.body })
+        : console.log(`${req.method} ${req.url}`); // don't log the body in production to avoid leaking sensitive data
     next();
 });
 
@@ -24,14 +28,10 @@ app.use((req, res, next) => {
  */
 app.use((req, res, next) => {
     prisma.$queryRaw`SELECT 1`
-        .then(() => {
-            next();
-        })
+        .then(() => { next(); })
         .catch(() => {
             prisma.$connect()
-                .then(() => {
-                    next();
-                })
+                .then(() => { next(); })
                 .catch((err) => {
                     console.error(err);
                     sendMsg(req, res, error.db.notReachable)

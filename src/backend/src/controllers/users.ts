@@ -96,3 +96,31 @@ exports.login = (req: express.Request, res: express.Response, next: express.Next
             sendMsg(req, res, error.generic.internalError);
         });
 }
+
+exports.getMe = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    if (res.locals.user === undefined) {
+        sendMsg(req, res, error.auth.noToken);
+        return;
+    }
+
+    res.status(200).json(displayableUser(res.locals.user));
+}
+
+exports.deleteMe = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    if (res.locals.user === undefined) {
+        sendMsg(req, res, error.auth.noToken);
+        return;
+    }
+
+    prisma.user.delete({ where: { id: res.locals.user.id } })
+        .then(() => {
+            sendMsg(req, res, info.user.deleted);
+        }).catch((err) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
+}
+
+exports.updateMe = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    sendMsg(req, res, error.generic.notImplemented);
+}

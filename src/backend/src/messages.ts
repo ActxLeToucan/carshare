@@ -157,6 +157,10 @@ const info: APIMessagesTranslation = {
         loggedIn: (req: Request) => msgForLang(req, {
             fr: 'Utilisateur connecté',
             en: 'User logged in'
+        }, 200),
+        deleted: (req: Request) => msgForLang(req, {
+            fr: 'Utilisateur supprimé',
+            en: 'User deleted'
         }, 200)
     }
 }
