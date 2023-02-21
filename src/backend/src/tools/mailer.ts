@@ -1,6 +1,7 @@
 import nodemailer from 'nodemailer';
 import mailConfig from '../../mail.config.json';
 
+const devMode: boolean = mailConfig.devMode.enabled;
 let transporter: nodemailer.Transporter | undefined;
 
 async function init () {
@@ -26,6 +27,12 @@ async function send (to: string, subject: string, text: string, html: string) {
         return;
     }
 
+    if (devMode) {
+        console.log('Mailer in dev mode, email sent to ', mailConfig.devMode.overrideTo);
+        subject = '[DEV] ' + subject + ' (original recipient: ' + to + ')';
+        to = mailConfig.devMode.overrideTo;
+    }
+
     const user: string = mailConfig.transporter.auth.user;
 
     const info = await transporter.sendMail({
@@ -36,7 +43,7 @@ async function send (to: string, subject: string, text: string, html: string) {
         html // html body
     });
 
-    console.log('Message sent: ', info.messageId);
+    console.log('Message sent:', { to, subject }, { messageId: info.messageId });
 }
 
 export { init, send }
