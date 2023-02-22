@@ -9,6 +9,7 @@
                 <input-text   name="phone"            label="Téléphone"    placeholder="Numéro de téléphone"          type="tel"      ></input-text>
                 <input-text   name="password"         label="Mot de passe" placeholder="Mot de passe"                 type="password" ></input-text>
                 <input-text   name="password-confirm" label="Confirmation" placeholder="Confirmation du mot de passe" type="password" ></input-text>
+                <input-choice name="gender"           label="Genre"        :list="genres"                                             ></input-choice>
                 <input-switch name="is-driver"        label="J'ai une voiture"                                        value="false"   ></input-switch>
             </modal>
         </div>
@@ -16,10 +17,11 @@
 </template>
 
 <script>
-import Topbar from "../components/topbar/Topbar.vue";
-import Modal from "../components/cards/Modal.vue";
-import InputText from "../components/inputs/InputText.vue";
-import InputSwitch from "../components/inputs/InputSwitch.vue";
+import Topbar from '../components/topbar/Topbar.vue';
+import Modal from '../components/cards/Modal.vue';
+import InputText from '../components/inputs/InputText.vue';
+import InputSwitch from '../components/inputs/InputSwitch.vue';
+import InputChoice from '../components/inputs/InputChoice.vue';
 import { Log } from '../scripts/Logs';
 import User from '../scripts/User';
 
@@ -27,6 +29,12 @@ function isPhoneNumber(val) {
     if (!val) return false;
     return val.replace(/(\.|\s|-)/g, "").trim().match(/^((00[0-9]{2})?0[0-9][0-9]{8}|\+[0-9]{11,12})$/) != null;
 }
+
+const genres = [
+    {value: "M", label: "Homme"},
+    {value: "O", label: "Autre", selected: true},
+    {value: "F", label: "Femme"},
+];
 
 const field_checks = [
     {field: "firstname",        check: (value) => value.length > 0, error: "Veuillez renseignez votre nom."},
@@ -84,7 +92,8 @@ export default {
         Topbar,
         Modal,
         InputText,
-        InputSwitch
+        InputSwitch,
+        InputChoice
     },
     name: 'Register',
     methods: {
@@ -92,7 +101,7 @@ export default {
         onValidate
     },
     data() {
-        return { User }
+        return { User, genres }
     }
 }
 </script>
