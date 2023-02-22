@@ -103,9 +103,8 @@ class API {
             path = base + params;
 
             let reqHeaders = {
-                "User-Agent": navigator.userAgent,
                 "Accept": "application/json",
-                "Accept-Language": "fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3"
+                "Accept-Language": "fr"
             };
             if (type != this.TYPE_NONE && type != this.TYPE_FILE) reqHeaders["Content-Type"] = type;
 
