@@ -5,7 +5,7 @@
         </label>
         <input
             class="flex h-fit bg-white border-b-4 border-slate-200 rounded-md px-4 py-2 text-gray-700 font-bold text-lg whitespace-nowrap
-                   text-ellipsis hover:border-slate-300 focus:border-teal-500 transition-all focus:outline outline-transparent"
+                   text-slate-600 text-ellipsis hover:border-slate-300 focus:border-teal-500 transition-all focus:outline outline-transparent"
             :placeholder="placeholder"
             :type="type"
             :name="name"
