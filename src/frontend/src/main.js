@@ -13,6 +13,7 @@ const routes = [
     { path: "/", name: 'Main', component: () => import("./views/Main.vue") },
     { path: "/home", name: 'Home', component: () => import("./views/Home.vue") },
     { path: "/register", name: 'Register', component: () => import("./views/Register.vue") },
+    { path: "/profile", name: 'Profile', component: () => import("./views/Profile.vue") },
     // 404 redirection
     { path: "/:catchAll(.*)", name: 'NotFound', component: () => import("./views/NotFound.vue") }
 ]
