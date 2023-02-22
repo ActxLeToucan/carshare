@@ -40,29 +40,29 @@ const error: TranslationsMessageHTTP = {
     email: {
         required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: "L'adresse email est requise",
-                en: 'Email address is required'
+                fr: "L'adresse email est requise.",
+                en: 'Email address is required.'
             },
             code: 400
         }),
         max: (req: Request, length: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `L'adresse email doit contenir au plus ${length} caractère${length > 1 ? 's' : ''}`,
-                en: `Email address must contain at most ${length} character${length > 1 ? 's' : ''}`
+                fr: `L'adresse email doit contenir au plus ${length} caractère${length > 1 ? 's' : ''}.`,
+                en: `Email address must contain at most ${length} character${length > 1 ? 's' : ''}.`
             },
             code: 400
         }),
         invalid: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: "L'adresse email est invalide",
-                en: 'Email address is invalid'
+                fr: "L'adresse email est invalide.",
+                en: 'Email address is invalid.'
             },
             code: 400
         }),
         exists: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: "L'adresse email est déjà utilisée",
-                en: 'Email address is already used'
+                fr: "L'adresse email est déjà utilisée.",
+                en: 'Email address is already used.'
             },
             code: 400
         })
@@ -70,43 +70,43 @@ const error: TranslationsMessageHTTP = {
     password: {
         required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Le mot de passe est requis',
-                en: 'Password is required'
+                fr: 'Le mot de passe est requis.',
+                en: 'Password is required.'
             },
             code: 400
         }),
         min: (req: Request, length: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Le mot de passe doit contenir au moins ${length} caractère${length > 1 ? 's' : ''}`,
-                en: `Password must contain at least ${length} character${length > 1 ? 's' : ''}`
+                fr: `Le mot de passe doit contenir au moins ${length} caractère${length > 1 ? 's' : ''}.`,
+                en: `Password must contain at least ${length} character${length > 1 ? 's' : ''}.`
             },
             code: 400
         }),
         upper: (req: Request, length: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Le mot de passe doit contenir au moins ${length} majuscule${length > 1 ? 's' : ''}`,
-                en: `Password must contain at least ${length} uppercase character${length > 1 ? 's' : ''}`
+                fr: `Le mot de passe doit contenir au moins ${length} majuscule${length > 1 ? 's' : ''}.`,
+                en: `Password must contain at least ${length} uppercase character${length > 1 ? 's' : ''}.`
             },
             code: 400
         }),
         lower: (req: Request, length: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Le mot de passe doit contenir au moins ${length} minuscule${length > 1 ? 's' : ''}`,
-                en: `Password must contain at least ${length} lowercase character${length > 1 ? 's' : ''}`
+                fr: `Le mot de passe doit contenir au moins ${length} minuscule${length > 1 ? 's' : ''}.`,
+                en: `Password must contain at least ${length} lowercase character${length > 1 ? 's' : ''}.`
             },
             code: 400
         }),
         number: (req: Request, length: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Le mot de passe doit contenir au moins ${length} chiffre${length > 1 ? 's' : ''}`,
-                en: `Password must contain at least ${length} number${length > 1 ? 's' : ''}`
+                fr: `Le mot de passe doit contenir au moins ${length} chiffre${length > 1 ? 's' : ''}.`,
+                en: `Password must contain at least ${length} number${length > 1 ? 's' : ''}.`
             },
             code: 400
         }),
         special: (req: Request, length: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Le mot de passe doit contenir au moins ${length} caractère${length > 1 ? 's' : ''} spécia${length > 1 ? 'ux' : 'l'}`,
-                en: `Password must contain at least ${length} special character${length > 1 ? 's' : ''}`
+                fr: `Le mot de passe doit contenir au moins ${length} caractère${length > 1 ? 's' : ''} spécia${length > 1 ? 'ux' : 'l'}.`,
+                en: `Password must contain at least ${length} special character${length > 1 ? 's' : ''}.`
             },
             code: 400
         })
@@ -114,22 +114,22 @@ const error: TranslationsMessageHTTP = {
     lastname: {
         required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Le nom est requis',
-                en: 'Lastname is required'
+                fr: 'Le nom est requis.',
+                en: 'Lastname is required.'
             },
             code: 400
         }),
         max: (req: Request, length: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Le nom doit contenir au plus ${length} caractère${length > 1 ? 's' : ''}`,
-                en: `Lastname must contain at most ${length} character${length > 1 ? 's' : ''}`
+                fr: `Le nom doit contenir au plus ${length} caractère${length > 1 ? 's' : ''}.`,
+                en: `Lastname must contain at most ${length} character${length > 1 ? 's' : ''}.`
             },
             code: 400
         }),
         number: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Le nom ne peut pas contenir de chiffre',
-                en: 'Lastname cannot contain number'
+                fr: 'Le nom ne peut pas contenir de chiffre.',
+                en: 'Lastname cannot contain number.'
             },
             code: 400
         })
@@ -137,22 +137,22 @@ const error: TranslationsMessageHTTP = {
     firstname: {
         required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Le prénom est requis',
-                en: 'Firstname is required'
+                fr: 'Le prénom est requis.',
+                en: 'Firstname is required.'
             },
             code: 400
         }),
         max: (req: Request, length: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Le prénom doit contenir au plus ${length} caractère${length > 1 ? 's' : ''}`,
-                en: `Firstname must contain at most ${length} character${length > 1 ? 's' : ''}`
+                fr: `Le prénom doit contenir au plus ${length} caractère${length > 1 ? 's' : ''}.`,
+                en: `Firstname must contain at most ${length} character${length > 1 ? 's' : ''}.`
             },
             code: 400
         }),
         number: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Le prénom ne peut pas contenir de chiffre',
-                en: 'Firstname cannot contain number'
+                fr: 'Le prénom ne peut pas contenir de chiffre.',
+                en: 'Firstname cannot contain number.'
             },
             code: 400
         })
@@ -160,15 +160,15 @@ const error: TranslationsMessageHTTP = {
     phone: {
         required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Le numéro de téléphone est requis',
-                en: 'Phone number is required'
+                fr: 'Le numéro de téléphone est requis.',
+                en: 'Phone number is required.'
             },
             code: 400
         }),
         invalid: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Le numéro de téléphone est invalide',
-                en: 'Phone number is invalid'
+                fr: 'Le numéro de téléphone est invalide.',
+                en: 'Phone number is invalid.'
             },
             code: 400
         })
@@ -176,22 +176,22 @@ const error: TranslationsMessageHTTP = {
     date: {
         required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'La date est requise',
-                en: 'Date is required'
+                fr: 'La date est requise.',
+                en: 'Date is required.'
             },
             code: 400
         }),
         invalid: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'La date est invalide',
-                en: 'Date is invalid'
+                fr: 'La date est invalide.',
+                en: 'Date is invalid.'
             },
             code: 400
         }),
         tooLate: (req: Request, date: Date) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `La date doit être antérieure à ${date.toLocaleDateString('fr-FR')}`,
-                en: `Date must be before ${date.toLocaleDateString('en-US')}`
+                fr: `La date doit être antérieure à ${date.toLocaleDateString('fr-FR')}.`,
+                en: `Date must be before ${date.toLocaleDateString('en-US')}.`
             },
             code: 400
         })
@@ -199,8 +199,8 @@ const error: TranslationsMessageHTTP = {
     user: {
         notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Utilisateur introuvable',
-                en: 'User not found'
+                fr: 'Utilisateur introuvable.',
+                en: 'User not found.'
             },
             code: 404
         })
@@ -208,8 +208,8 @@ const error: TranslationsMessageHTTP = {
     db: {
         notReachable: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'La base de données n\'est pas joignable. Si le problème persiste, veuillez contacter l\'administrateur',
-                en: 'Database is not reachable. If the problem persists, please contact the administrator'
+                fr: 'La base de données n\'est pas joignable. Si le problème persiste, veuillez contacter l\'administrateur.',
+                en: 'Database is not reachable. If the problem persists, please contact the administrator.'
             },
             code: 500
         })
@@ -217,36 +217,36 @@ const error: TranslationsMessageHTTP = {
     auth: {
         noToken: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Aucun token n\'a été fourni',
-                en: 'No token provided'
+                fr: 'Aucun token n\'a été fourni.',
+                en: 'No token provided.'
             },
             code: 401
         }),
         invalidToken: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Le token fourni est invalide',
-                en: 'Invalid token provided'
+                fr: 'Le token fourni est invalide.',
+                en: 'Invalid token provided.'
             },
             code: 498
         }),
         expiredToken: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Le token fourni est expiré',
-                en: 'Expired token provided'
+                fr: 'Le token fourni est expiré.',
+                en: 'Expired token provided.'
             },
             code: 498
         }),
         insufficientPrivileges: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Vous n\'avez pas les droits suffisants pour effectuer cette action',
-                en: 'You do not have sufficient privileges to perform this action'
+                fr: 'Vous n\'avez pas les droits suffisants pour effectuer cette action.',
+                en: 'You do not have sufficient privileges to perform this action.'
             },
             code: 403
         }),
         invalidCredentials: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Les identifiants fournis sont invalides',
-                en: 'Invalid credentials provided'
+                fr: 'Les identifiants fournis sont invalides.',
+                en: 'Invalid credentials provided.'
             },
             code: 401
         })
@@ -254,15 +254,15 @@ const error: TranslationsMessageHTTP = {
     generic: {
         notImplemented: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Cette fonctionnalité n\'est pas encore implémentée',
-                en: 'This feature is not yet implemented'
+                fr: 'Cette fonctionnalité n\'est pas encore implémentée.',
+                en: 'This feature is not yet implemented.'
             },
             code: 501
         }),
-        unknownError: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        internalError: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Une erreur inconnue est survenue. Si le problème persiste, veuillez contacter l\'administrateur',
-                en: 'An unknown error occurred. If the problem persists, please contact the administrator'
+                fr: 'Une erreur interne est survenue. Si le problème persiste, veuillez contacter l\'administrateur.',
+                en: 'An internal error occurred. If the problem persists, please contact the administrator.'
             },
             code: 500
         })
@@ -301,8 +301,8 @@ const info: TranslationsMessageHTTP = {
         }),
         passwordResetEmailSent: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Si l\'adresse email fournie correspond à un compte, un email de réinitialisation de mot de passe a été envoyé',
-                en: 'If the provided email address matches an account, a password reset email has been sent'
+                fr: 'Si l\'adresse email fournie correspond à un compte, un email de réinitialisation de mot de passe a été envoyé.',
+                en: 'If the provided email address matches an account, a password reset email has been sent.'
             },
             code: 200
         })
