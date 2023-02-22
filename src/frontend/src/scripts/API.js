@@ -77,7 +77,9 @@ class API {
 
     // API routes
     static ROUTE = {
-        // TODO : add api routes here
+        SIGNUP: "/users/signup",
+        LOGIN: "/users/login",
+        USER: "/users/me",
     };
 
     /**
@@ -131,6 +133,19 @@ class API {
                 reqBody = new FormData();
                 reqBody.append("model", body);
             }
+
+            const sendError = (err) => {
+                if (err.json) {
+                    err.json().then(data => {
+                        reject({
+                            status: err.status,
+                            message: data.message
+                        });
+                    }).catch(err => reject(err));
+                } else {
+                    reject(err);
+                }
+            };
             
             // try with / at the request end
             fetch(API.API_URL + path, {
@@ -141,33 +156,14 @@ class API {
                 referrer: window.location.origin,
                 mode: "cors"
             }).then(response => {
-                if (response.status != 200)
-                    reject(response);
+                if (!response.status.toString().startsWith("2"))
+                    sendError(response);
                 else {
                     response.json().then(data => {
                         resolve(data);
-                    }).catch(err => reject(err));
+                    }).catch(err => sendError(err));
                 }
-            }).catch(err => {
-                // is the request fails, test the same request but without "/" at the end (in case the error it just a 307 shitty redirection)
-                fetch(API.API_URL + path.replace("?", "/?"), {
-                    credentials: "omit",
-                    method: method,
-                    body: method == this.METHOD.GET ? undefined : reqBody,
-                    headers: reqHeaders,
-                    referrer: window.location.origin,
-                    mode: "cors"
-                }).then(response => {
-                    if (response.status != 200)
-                        reject(response);
-                    else {
-                        response.json().then(data => {
-                            resolve(data);
-                        }).catch(reject);
-                    }
-                }).catch(err => reject(err)).finally(() => {
-                });
-            });
+            }).catch(err => sendError(err));
         });
     }
 
