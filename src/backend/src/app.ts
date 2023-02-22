@@ -1,6 +1,6 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-import { error, sendMsg } from './messages';
+import { error, sendMsg } from './tools/translator';
 
 const prisma = new PrismaClient({
     errorFormat: 'pretty'

@@ -1,5 +1,5 @@
 import type express from 'express';
-import { error, sendMsg } from './messages';
+import { error, sendMsg } from './tools/translator';
 import IsEmail from 'isemail';
 
 const p: Record<string, Record<string, any>> = {

@@ -39,6 +39,10 @@ function checkEnvVariables () {
         console.warn('FRONTEND_URL environment variable is not set.');
     }
 
+    if (process.env.FRONTEND_NAME === undefined || process.env.FRONTEND_NAME === '') {
+        console.warn('FRONTEND_NAME environment variable is not set.');
+    }
+
     if (process.env.JWT_SECRET === undefined || process.env.JWT_SECRET === '' || process.env.JWT_SECRET === '<change_secret>') {
         console.error('JWT_SECRET environment variable is not set.');
         process.exit(1);

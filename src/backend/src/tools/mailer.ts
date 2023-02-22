@@ -1,5 +1,6 @@
 import nodemailer from 'nodemailer';
 import mailConfig from '../../mail.config.json';
+import { type Mail } from './translator';
 
 let transporter: nodemailer.Transporter | undefined;
 
@@ -24,7 +25,7 @@ async function initMailer () {
     }
 }
 
-async function sendMail (to: string, subject: string, text: string, html: string) {
+async function sendMail ({ to, subject, text, html }: Mail) {
     if (transporter === undefined) {
         console.warn('Mailer disabled, cannot send email: ', { to, subject })
         return;

@@ -2,9 +2,8 @@ import type express from 'express';
 import { prisma } from '../app';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { displayableUser, error, info, sendMsg } from '../messages';
+import { displayableUser, error, info, mail, sendMail, sendMsg } from '../tools/translator';
 import * as properties from '../properties';
-import { sendMail } from '../tools/mailer';
 
 exports.signup = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     if (!properties.checkEmailField(req.body.email, req, res)) return;
@@ -151,15 +150,9 @@ exports.passwordResetSendEmail = (req: express.Request, res: express.Response, n
                 { expiresIn: properties.p.token.passwordReset.expiration }
             );
 
-            const url = `${String(process.env.FRONTEND_URL)}/password-reset/${token}`;
-            sendMail(
-                req.body.email,
-                'Password reset',
-                `Here is your password reset link: ${url}\n\n
-                This link will expire in ${String(properties.p.token.passwordReset.expiration)}.`,
-                `<p>Here is your password reset link: <a href="${url}">${url}</a></p>
-                <p>This link will expire in ${String(properties.p.token.passwordReset.expiration)}.</p>`
-            )
+            const frontendPath = `${String(process.env.FRONTEND_URL)}/password-reset`;
+
+            sendMail(req, mail._.passwordReset, user, token, frontendPath)
                 .then(() => { sendMsg(req, res, info.user.passwordResetEmailSent); })
                 .catch((err) => {
                     console.error(err);

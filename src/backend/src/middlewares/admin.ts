@@ -1,5 +1,5 @@
 import type express from 'express';
-import { error, sendMsg } from '../messages';
+import { error, sendMsg } from '../tools/translator';
 import { p } from '../properties';
 
 module.exports = (req: express.Request, res: express.Response, next: express.NextFunction) => {

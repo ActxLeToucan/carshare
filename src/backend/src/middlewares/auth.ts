@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import type express from 'express';
-import { error, sendMsg } from '../messages';
+import { error, sendMsg } from '../tools/translator';
 import { prisma } from '../app';
 
 export type AuthType = 'access' | 'resetPassword';
