@@ -24,6 +24,7 @@ import InputSwitch from '../components/inputs/InputSwitch.vue';
 import InputChoice from '../components/inputs/InputChoice.vue';
 import { Log } from '../scripts/Logs';
 import User from '../scripts/User';
+import re from '../scripts/Regex';
 
 function isPhoneNumber(val) {
     if (!val) return false;
@@ -44,17 +45,18 @@ const field_checks = [
     {field: "password",         check: (value) => value.length > 0, error: "Veuillez renseignez votre mot de passe."},
     {field: "password-confirm", check: (value) => value.length > 0, error: "Veuillez confirmer votre mot de passe."},
 
-    {field: "firstname",        check: (value) => value.length <= 50,   error: "Ce nom est trop long."},
-    {field: "lastname",         check: (value) => value.length <= 50,   error: "Ce prénom est trop long."},
-    {field: "mail",             check: (value) => value.length <= 64,   error: "Cette adresse mail est trop longue."},
-    {field: "phone",            check: (value) => isPhoneNumber(value), error: "Ce numéro de téléphone est invalide."},
+    {field: "firstname",        check: (value) => value.length <= 50,               error: "Le nom est trop long."},
+    {field: "lastname",         check: (value) => value.length <= 50,               error: "Le prénom est trop long."},
+    {field: "mail",             check: (value) => value.length <= 64,               error: "L'adresse mail est trop longue."},
+    {field: "mail",             check: (value) => value.match(re.REGEX_EMAIL) != null, error: "L'adresse mail n'est pas valide."},
+    {field: "phone",            check: (value) => isPhoneNumber(value),             error: "Le numéro de téléphone est invalide."},
 
     {field: "password-confirm", check: (value, modal) => value === modal.get("password"), error: "Les mots de passe ne correspondent pas."},
-    {field: "password",         check: (value) => value.length >= 10,                     error: "Votre mot de passe doit faire au moins 10 caractères."},
-    {field: "password",         check: (value) => value.match(/[A-Z]/g) != null,          error: "Votre mot de passe doit contenir au moins une majuscule."},
-    {field: "password",         check: (value) => value.match(/[a-z]/g) != null,          error: "Votre mot de passe doit contenir au moins une minuscule."},
-    {field: "password",         check: (value) => value.match(/[0-9]/g) != null,          error: "Votre mot de passe doit contenir au moins un chiffre."},
-    {field: "password",         check: (value) => value.match(/[^A-Za-z0-9]/g) != null,   error: "Votre mot de passe doit contenir au moins un caractère spécial."}
+    {field: "password",         check: (value) => value.length >= 10,                     error: "Le mot de passe doit faire au moins 10 caractères."},
+    {field: "password",         check: (value) => value.match(/[A-Z]/g) != null,          error: "Le mot de passe doit contenir au moins une majuscule."},
+    {field: "password",         check: (value) => value.match(/[a-z]/g) != null,          error: "Le mot de passe doit contenir au moins une minuscule."},
+    {field: "password",         check: (value) => value.match(/[0-9]/g) != null,          error: "Le mot de passe doit contenir au moins un chiffre."},
+    {field: "password",         check: (value) => value.match(/[^A-Za-z0-9]/g) != null,   error: "Le mot de passe doit contenir au moins un caractère spécial."}
 ];
 
 function onCancel(modal) {
