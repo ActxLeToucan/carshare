@@ -93,7 +93,6 @@ export default {
             executeAfter(
                 this.onvalidate?.(this),
                 (res) => {
-                    this.validate_launched = false;
                     if (!res) return;
                     if (!goToLink(this))
                         goHome(this);
@@ -104,7 +103,6 @@ export default {
             executeAfter(
                 this.oncancel?.(this),
                 (res) => {
-                    this.cancel_launched = false;
                     if (!res) return;
                     goBack(this);
                 }
