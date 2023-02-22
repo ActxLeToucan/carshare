@@ -5,16 +5,11 @@
 </template>
 
 <script>
-
 export default {
     name: "App",
-    components: {
-        
-    },
+    components: {},
     data() {
-        return {
-            year: new Date().getFullYear()
-        }
+        return {}
     },
     mounted() {
 

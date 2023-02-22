@@ -68,7 +68,7 @@ class API {
             NONE: undefined
         }
     }
-    static get AuthorizationHeader() { return "xxx-carshare-auth"; };
+    static get AuthorizationHeader() { return "Authorization"; };
 
     static setURL(url) {
         if (!url) return;

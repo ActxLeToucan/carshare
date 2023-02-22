@@ -1,3 +1,5 @@
+import API from "./API";
+
 class User {
     /** @type {User} */
     static #currentUser = null;
@@ -46,6 +48,10 @@ class User {
     save() {
         localStorage.setItem("user", JSON.stringify(this));
         User.#currentUser = this;
+    }
+
+    getCredentials() {
+        return new API.Credentials({token: "bearer " + this.token, type: API.Credentials.TYPE.TOKEN});
     }
 }
 
