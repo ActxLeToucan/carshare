@@ -18,12 +18,14 @@
                         <div class="flex flex-col grow justify-evenly items-center">
                             <card class="flex flex-col">
                                 <div class="flex flex-col">
-                                    <input-text label="Nom" placeholder="Nom" :value="''"></input-text>
-                                    <input-text label="Prénom" placeholder="Prénom" :value="''"></input-text>
-                                    <input-text label="Email" placeholder="Email" :value="''"></input-text>
-                                    <input-text label="Téléphone" placeholder="Téléphone" :value="''"></input-text>
+                                    <input-text label="Nom" placeholder="Nom" :value="User.CurrentUser.lastName"></input-text>
+                                    <input-text label="Prénom" placeholder="Prénom" :value="User.CurrentUser.firstName"></input-text>
+                                    <input-text label="Email" placeholder="Email" :value="User.CurrentUser.email"></input-text>
+                                    <input-text label="Téléphone" placeholder="Téléphone" :value="User.CurrentUser.phone"></input-text>
+                                    <input-choice name="gender" label="Genre" :list="genres"></input-choice>
+                                    <input-switch name="hasCar" label="J'ai une voiture" :value="User.CurrentUser.hasCar"></input-switch>
                                 </div>
-                                <div class="flex space-x-4">
+                                <div class="flex space-x-4 mt-4">
                                     <button-block :action="disconnect"> Se déconnecter </button-block>
                                     <button-block :action="deleteAccount" color="red"> Supprimer le compte </button-block>
                                     <div class="flex grow justify-end pl-20">
@@ -73,6 +75,8 @@
 import Topbar from '../components/topbar/Topbar.vue';
 import ButtonBlock from '../components/inputs/ButtonBlock.vue';
 import ButtonTab from '../components/inputs/ButtonTab.vue';
+import InputChoice from '../components/inputs/InputChoice.vue';
+import InputSwitch from '../components/inputs/InputSwitch.vue';
 import TabWindow from '../components/cards/TabWindow.vue';
 import TabDiv from '../components/cards/TabDiv.vue';
 import Card from '../components/cards/Card.vue';
@@ -81,6 +85,12 @@ import User from '../scripts/User';
 import Popup from '../components/cards/Popup.vue';
 import API from '../scripts/API';
 import { Log } from '../scripts/Logs';
+
+const genres = [
+    { label: "Homme", value: 1, selected: User.CurrentUser.gender == 1 },
+    { label: "Autre", value: -1, selected: User.CurrentUser.gender == -1 },
+    { label: "Femme", value: 0, selected: User.CurrentUser.gender == 0 },
+];
 
 export default {
     components: {
@@ -91,11 +101,13 @@ export default {
         TabDiv,
         Card,
         InputText,
-        Popup
+        Popup,
+        InputChoice,
+        InputSwitch
     },
     name: 'Home',
     data() {
-        return {}
+        return { User, genres }
     },
     methods: {
         setDeletePopup(popup) {
