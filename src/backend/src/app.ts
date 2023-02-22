@@ -1,6 +1,7 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { error, sendMsg } from './messages';
+import cors from 'cors';
 
 const prisma = new PrismaClient({
     errorFormat: 'pretty'
@@ -8,6 +9,7 @@ const prisma = new PrismaClient({
 
 const app = express();
 app.use(express.json());
+app.use(cors({origin: '*'}));
 
 app.use((req, res, next) => {
     process.env.NODE_ENV === 'development'
