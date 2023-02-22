@@ -73,7 +73,7 @@ function onValidate(modal) {
             if (!result) {
                 modal.focus(check.field);
                 log.update(check.error, Log.WARNING);
-                setTimeout(() => { inputs_log.delete(); }, 2000);
+                setTimeout(() => { log.delete(); }, 2000);
                 resolve(false);
                 return;
             }
