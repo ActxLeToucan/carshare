@@ -1,3 +1,5 @@
+import config from '../config.js';
+
 class Credentials {
     static get TYPE() {
         return {
@@ -66,10 +68,11 @@ class API {
             NONE: undefined
         }
     }
-    static get AuthorizationHeader() { return "x-furwaz-auth"; };
+    static get AuthorizationHeader() { return "xxx-carshare-auth"; };
 
-    static setHost(host) {
-        API.API_URL = "https://" + host;
+    static setURL(url) {
+        if (!url) return;
+        API.API_URL = url;
     }
 
     // API routes
@@ -88,6 +91,9 @@ class API {
      */
     static execute(path, method = this.METHOD.GET, body = {}, type = this.TYPE.JSON, headers = []) {
         return new Promise((resolve, reject) => {
+            if (API.API_URL == null) { API.setURL(config.api.url); }
+            if (API.API_URL == null) reject("Error : API host not set");
+
             path = path.replace("/?", "?").replaceAll("//", "/");
             let urlparts = path.split("?");
             let base = urlparts.splice(0, 1);

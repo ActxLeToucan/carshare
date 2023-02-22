@@ -1,0 +1,9 @@
+/**********************************************
+     Front-end API class configuration file
+ **********************************************/
+
+export default {
+    api: {
+        url: '<change_api_url>'
+    }
+};

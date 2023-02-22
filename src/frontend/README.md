@@ -11,6 +11,15 @@ Vous devez avoir les outils suivants installés sur votre machine :
 ```bash
 npm i
 ```
+3. Indiquer l'URL de l'API dans le fichier `src/config.js`,
+en copiant le fichier `src/config.example.js` vers `src/config.js` et en changeant la valeur de `url` par l'URL de l'API.
+
+Par exemple :
+```bash
+api: {
+    url: 'http://localhost:3000'
+}
+```
 
 ### Développement
 Lorsque vous développez, lancez le serveur avec la commande suivante :
