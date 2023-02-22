@@ -4,7 +4,7 @@ import { type User } from '@prisma/client';
 import { p } from '../properties';
 import { sendMail as mailerSend } from './mailer';
 
-type Variants = Record<string, any>;
+export type Variants = Record<string, any>;
 type TemplateMessage = TemplateMail | TemplateMessageHTTP
 type Message = Mail | MessageHTTP
 type TranslationsMessageHTTP = Record<string, Record<string, (req: Request, ...args: any) => MessageHTTP>>;
@@ -31,6 +31,10 @@ export interface MessageHTTP {
     msg: string
     code: number
 }
+
+const mailHtmlHeader = process.env.FRONTEND_LOGO === undefined || process.env.FRONTEND_LOGO === ''
+    ? ''
+    : `<a href="${process.env.FRONTEND_URL ?? ''}"><img src="${process.env.FRONTEND_LOGO ?? ''}" alt="${process.env.FRONTEND_NAME ?? ''}" style="width: 100px; height: 100px; margin: 0 auto; display: block;"/></a>`;
 
 const error: TranslationsMessageHTTP = {
     email: {
@@ -306,24 +310,26 @@ const info: TranslationsMessageHTTP = {
 }
 
 const mail: TranslationsMail = {
-    _: {
-        passwordReset: (req: Request, user: User, token: string, frontendPath: string) => msgForLang<TemplateMail, Mail>(req, {
+    password: {
+        reset: (req: Request, user: User, token: string, frontendPath: string) => msgForLang<TemplateMail, Mail>(req, {
             to: user.email,
             subject: {
                 fr: 'Réinitialisation de votre mot de passe',
                 en: 'Password reset'
             },
             html: {
-                fr: `<p>Bonjour ${user.firstName ?? ''} ${user.lastName ?? ''},</p>
+                fr: `${mailHtmlHeader}
+                <p>Bonjour ${user.firstName ?? ''} ${user.lastName ?? ''},</p>
                 <p>Vous avez demandé à réinitialiser votre mot de passe. Pour ce faire, veuillez cliquer sur le lien ci-dessous :</p>
                 <p><a href="${frontendPath}/${token}">${frontendPath}/${token}</a></p>
-                <p>Ce lien est valable ${String(p.token.passwordReset.expiration)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.</p>
+                <p>Ce lien est valable ${translate(req, p.token.passwordReset.expirationTxt)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.</p>
                 <p>Cordialement,</p>
                 <p>L'équipe de ${process.env.FRONTEND_NAME ?? ''}</p>`,
-                en: `<p>Hello ${user.firstName ?? ''} ${user.lastName ?? ''},</p>
+                en: `${mailHtmlHeader}
+                <p>Hello ${user.firstName ?? ''} ${user.lastName ?? ''},</p>
                 <p>You requested to reset your password. To do so, please click on the link below :</p>
                 <p><a href="${frontendPath}/${token}">${frontendPath}/${token}</a></p>
-                <p>This link is valid for ${String(p.token.passwordReset.expiration)}. If you did not request this, please ignore this email.</p>
+                <p>This link is valid for ${translate(req, p.token.passwordReset.expirationTxt)}. If you did not request this, please ignore this email.</p>
                 <p>Best regards,</p>
                 <p>The ${process.env.FRONTEND_NAME ?? ''} team</p>`
             },
@@ -332,7 +338,7 @@ const mail: TranslationsMail = {
                 Vous avez demandé à réinitialiser votre mot de passe. Pour ce faire, veuillez cliquer sur le lien ci-dessous :
                 ${frontendPath}/${token}
                 
-                Ce lien est valable ${String(p.token.passwordReset.expiration)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.
+                Ce lien est valable ${translate(req, p.token.passwordReset.expirationTxt)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.
                 
                 Cordialement,
                 L'équipe de ${process.env.FRONTEND_NAME ?? ''}`,
@@ -340,7 +346,7 @@ const mail: TranslationsMail = {
                 You requested to reset your password. To do so, please click on the link below :
                 ${frontendPath}/${token}
                 
-                This link is valid for ${String(p.token.passwordReset.expiration)}. If you did not request this, please ignore this email.
+                This link is valid for ${translate(req, p.token.passwordReset.expirationTxt)}. If you did not request this, please ignore this email.
                 
                 Best regards,
                 The ${process.env.FRONTEND_NAME ?? ''} team`
@@ -361,13 +367,23 @@ function msgForLang<T extends TemplateMessage, U extends Message> (req: Request,
     for (const key in message) {
         if (typeof message[key] === 'object') {
             const variants = message[key] as Variants;
-            newMessage[key] = variants[req.acceptsLanguages().find((lang) => lang in variants) ?? 'en'];
+            newMessage[key] = translate(req, variants);
         } else {
             newMessage[key] = message[key];
         }
     }
 
     return newMessage as U;
+}
+
+/**
+ * Translates a message by choosing the right variant
+ * @param req Express request
+ * @param variants Variants of the message
+ * @returns Translated message
+ */
+function translate (req: Request, variants: Variants): string {
+    return variants[req.acceptsLanguages().find((lang) => lang in variants) ?? 'en'];
 }
 
 /**
@@ -382,6 +398,13 @@ function sendMsg (req: Request, res: Response, message: (req: Request, ...args: 
     res.status(msg.code).json({ message: msg.msg });
 }
 
+/**
+ * Sends an email
+ * @param req Express request
+ * @param message Message to send
+ * @param args Arguments to pass to the message function (if any)
+ * @returns Promise of the mailer response
+ */
 async function sendMail (req: Request, message: (req: Request, ...args: any) => Mail, ...args: any): Promise<any> {
     return mailerSend(message(req, ...args));
 }

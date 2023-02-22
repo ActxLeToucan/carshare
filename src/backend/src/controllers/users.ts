@@ -152,7 +152,7 @@ exports.passwordResetSendEmail = (req: express.Request, res: express.Response, n
 
             const frontendPath = `${String(process.env.FRONTEND_URL)}/password-reset`;
 
-            sendMail(req, mail._.passwordReset, user, token, frontendPath)
+            sendMail(req, mail.password.reset, user, token, frontendPath)
                 .then(() => { sendMsg(req, res, info.user.passwordResetEmailSent); })
                 .catch((err) => {
                     console.error(err);

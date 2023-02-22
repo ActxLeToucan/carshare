@@ -1,6 +1,15 @@
 import type express from 'express';
-import { error, sendMsg } from './tools/translator';
+import { error, sendMsg, type Variants } from './tools/translator';
 import IsEmail from 'isemail';
+
+const txtExpirationTokenAccess: Variants = {
+    fr: '24 heures',
+    en: '24 hours'
+}
+const txtExpirationTokenPasswordReset: Variants = {
+    fr: '1 heure',
+    en: '1 hour'
+}
 
 const p: Record<string, Record<string, any>> = {
     email: {
@@ -31,10 +40,12 @@ const p: Record<string, Record<string, any>> = {
     },
     token: {
         access: {
-            expiration: '24h'
+            expiration: '24h',
+            expirationTxt: txtExpirationTokenAccess
         },
         passwordReset: {
-            expiration: '1h'
+            expiration: '1h',
+            expirationTxt: txtExpirationTokenPasswordReset
         }
     }
 }

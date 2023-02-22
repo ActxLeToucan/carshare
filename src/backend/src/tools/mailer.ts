@@ -11,7 +11,7 @@ async function initMailer () {
     if (process.env.NODE_ENV === 'production') {
         console.warn('Mailer in production mode. Emails will be sent to real recipients.');
     } else {
-        console.info('Mailer in dev mode, email will be sent to', mailConfig.devMode.overrideTo);
+        console.info('Mailer in dev mode, emails will be sent to', mailConfig.devMode.overrideTo);
     }
 
     transporter = nodemailer.createTransport(mailConfig.transporter);
@@ -40,7 +40,7 @@ async function sendMail ({ to, subject, text, html }: Mail) {
     const user: string = mailConfig.transporter.auth.user;
 
     const info = await transporter.sendMail({
-        from: `"Car Share" <${user}>`, // sender address
+        from: `"${process.env.FRONTEND_NAME ?? ''}" <${user}>`, // sender address
         to, // list of receivers
         subject, // Subject line
         text, // plain text body
