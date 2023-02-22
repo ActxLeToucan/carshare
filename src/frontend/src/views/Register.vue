@@ -3,14 +3,14 @@
         <topbar v-if="User.CurrentUser != null"></topbar>
         <div class="flex grow w-fit flex-col justify-center space-y-6 mx-auto">
             <modal :oncancel="onCancel" :onvalidate="onValidate" title="S'inscrire">
-                <input-text   name="firstname"        label="Nom"          placeholder="Nom de famille"                               ></input-text>
-                <input-text   name="lastname"         label="Prénom"       placeholder="Prénom"                                       ></input-text>
-                <input-text   name="mail"             label="Email"        placeholder="Adresse mail"                 type="email"    ></input-text>
+                <input-text   name="firstName"        label="Prénom"       placeholder="Prénom"                                       ></input-text>
+                <input-text   name="lastName"         label="Nom"          placeholder="Nom de famille"                               ></input-text>
+                <input-text   name="email"            label="Email"        placeholder="Adresse mail"                 type="email"    ></input-text>
                 <input-text   name="phone"            label="Téléphone"    placeholder="Numéro de téléphone"          type="tel"      ></input-text>
                 <input-text   name="password"         label="Mot de passe" placeholder="Mot de passe"                 type="password" ></input-text>
                 <input-text   name="password-confirm" label="Confirmation" placeholder="Confirmation du mot de passe" type="password" ></input-text>
                 <input-choice name="gender"           label="Genre"        :list="genres"                                             ></input-choice>
-                <input-switch name="is-driver"        label="J'ai une voiture"                                        value="false"   ></input-switch>
+                <input-switch name="hasCar"           label="J'ai une voiture"                                        value="false"   ></input-switch>
             </modal>
         </div>
     </div>
@@ -25,6 +25,7 @@ import InputChoice from '../components/inputs/InputChoice.vue';
 import { Log } from '../scripts/Logs';
 import User from '../scripts/User';
 import re from '../scripts/Regex';
+import API from '../scripts/API';
 
 function isPhoneNumber(val) {
     if (!val) return false;
@@ -32,23 +33,23 @@ function isPhoneNumber(val) {
 }
 
 const genres = [
-    {value: "M", label: "Homme"},
-    {value: "O", label: "Autre", selected: true},
-    {value: "F", label: "Femme"},
+    {value: 1, label: "Homme"},
+    {value: -1, label: "Autre", selected: true},
+    {value: 0, label: "Femme"},
 ];
 
 const field_checks = [
-    {field: "firstname",        check: (value) => value.length > 0, error: "Veuillez renseignez votre nom."},
-    {field: "lastname",         check: (value) => value.length > 0, error: "Veuillez renseignez votre prénom."},
-    {field: "mail",             check: (value) => value.length > 0, error: "Veuillez renseignez votre adresse mail."},
+    {field: "firstName",        check: (value) => value.length > 0, error: "Veuillez renseignez votre nom."},
+    {field: "lastName",         check: (value) => value.length > 0, error: "Veuillez renseignez votre prénom."},
+    {field: "email",            check: (value) => value.length > 0, error: "Veuillez renseignez votre adresse mail."},
     {field: "phone",            check: (value) => value.length > 0, error: "Veuillez renseignez votre numéro de téléphone."},
     {field: "password",         check: (value) => value.length > 0, error: "Veuillez renseignez votre mot de passe."},
     {field: "password-confirm", check: (value) => value.length > 0, error: "Veuillez confirmer votre mot de passe."},
 
-    {field: "firstname",        check: (value) => value.length <= 50,               error: "Le nom est trop long."},
-    {field: "lastname",         check: (value) => value.length <= 50,               error: "Le prénom est trop long."},
-    {field: "mail",             check: (value) => value.length <= 64,               error: "L'adresse mail est trop longue."},
-    {field: "mail",             check: (value) => value.match(re.REGEX_EMAIL) != null, error: "L'adresse mail n'est pas valide."},
+    {field: "firstName",        check: (value) => value.length <= 50,               error: "Le nom est trop long."},
+    {field: "lastName",         check: (value) => value.length <= 50,               error: "Le prénom est trop long."},
+    {field: "email",            check: (value) => value.length <= 64,               error: "L'adresse mail est trop longue."},
+    {field: "email",            check: (value) => value.match(re.REGEX_EMAIL) != null, error: "L'adresse mail n'est pas valide."},
     {field: "phone",            check: (value) => isPhoneNumber(value),             error: "Le numéro de téléphone est invalide."},
 
     {field: "password-confirm", check: (value, modal) => value === modal.get("password"), error: "Les mots de passe ne correspondent pas."},
@@ -65,27 +66,50 @@ function onCancel(modal) {
 
 function onValidate(modal) {
     return new Promise((resolve, reject) => {
-        
-        const inputs_log = modal.log("Vérification des entrées ...", Log.INFO);
+        const log = modal.log("Vérification des entrées ...", Log.INFO);
         for (let i = 0; i < field_checks.length; i++) {
             const check = field_checks[i];
             const result = check.check(modal.get(check.field), modal);
             if (!result) {
                 modal.focus(check.field);
-                inputs_log.update(check.error, Log.WARNING);
+                log.update(check.error, Log.WARNING);
                 setTimeout(() => { inputs_log.delete(); }, 2000);
                 resolve(false);
                 return;
             }
         }
-        inputs_log.update("Vérification des entrées ... OK", Log.SUCCESS);
-        setTimeout(() => { inputs_log.delete() }, 500);
+        log.update("Envoi des données ...", Log.INFO);
 
-        const err_log = modal.log("Erreur : Inscription non implémentée.", Log.ERROR);
-        setTimeout(() => {
-            err_log.delete();
-            setTimeout(() => { resolve(false); }, 500);
-        }, 2000);
+        const payload = modal.getPayload();
+        const userInfos = {
+            "email": payload.email,
+            "password": payload.password,
+            "firstName": payload.firstName,
+            "lastName": payload.lastName,
+            "phone": payload.phone,
+            "gender": parseInt(payload.gender),
+            "hasCar": payload.hasCar === "true"
+        };
+
+        API.execute(API.ROUTE.SIGNUP, API.METHOD.POST, userInfos, API.TYPE.JSON).then(res => {
+            log.update("Compte créé avec succès !", Log.SUCCESS);
+
+            const user = new User(res.user);
+            user.setInformations({token: res.token});
+            user.save();
+
+            setTimeout(() => {
+                log.delete();
+                resolve(true);
+            }, 2000);
+        }).catch(err => {
+            log.update("Erreur : " + err.message, Log.ERROR);
+            
+            setTimeout(() => {
+                log.delete();
+                resolve(false);
+            }, 4000);
+        });
     });
 }
 
