@@ -113,6 +113,14 @@ export default {
             const log = new Log(msg, type);
             log.attachTo(this.logZone);
             return log;
+        },
+        getPayload() {
+            const payload = {};
+            for (let i = 0; i < this.inputs.length; i++) {
+                const input = this.inputs[i];
+                payload[input.name] = input.value;
+            }
+            return payload;
         }
     },
     mounted() {
