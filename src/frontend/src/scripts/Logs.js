@@ -13,14 +13,8 @@ class Log {
         this.type = type;
         this.dom = document.createElement("p");
         this.dom.innerHTML = msg;
-        this.#applyStyle();
-        setTimeout(() => {
-            this.dom.style.maxHeight = "30px";
-        }, 10);
-    }
-
-    #applyStyle() {
-        applyClasses(this.dom, "text-lg h-fit font-semibold whitespace-nowrap text-ellipsis transition-all overflow-hidden " + this.type);
+        applyClasses(this.dom, "text-lg h-fit font-semibold whitespace-nowrap text-ellipsis transition-all overflow-hidden");
+        this.dom.style.maxHeight = "30px";
     }
 
     attachTo(zone) {
@@ -45,12 +39,13 @@ class Log {
     }
 
     setType(type) {
+        this.dom.classList.remove(this.type);
         this.type = type;
-        this.#applyStyle();
+        this.dom.classList.add(this.type);
     }
 
-    update(msg, type) {
-        this.setText(msg);
+    update(msg, type, animate=true) {
+        this.setText(msg, animate);
         this.setType(type);
     }
 
