@@ -24,7 +24,7 @@
 <script>
 import ButtonBlock from '../inputs/ButtonBlock.vue';
 import ButtonText from '../inputs/ButtonText.vue';
-import { goBack, goHome, goToLink } from '../../scripts/redirects.js';
+import { goBack, goHome, goTo, goToLink } from '../../scripts/redirects.js';
 import { Log, LogZone } from '../../scripts/Logs.js';
 import { executeAfter } from '../../scripts/Promises.js';
 
@@ -99,6 +99,8 @@ export default {
                 this.onvalidate?.(this),
                 (res) => {
                     if (!res) return;
+                    if (typeof res == "string")
+                        return goTo(this, res);
                     if (!goToLink(this))
                         goHome(this);
                 }

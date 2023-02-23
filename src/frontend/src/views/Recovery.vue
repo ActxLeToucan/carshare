@@ -2,10 +2,10 @@
     <div class="flex grow flex-col">
         <topbar v-if="User.CurrentUser != null"></topbar>
         <div class="flex grow w-fit flex-col justify-center space-y-6 mx-auto">
-            <modal :oncancel="onCancel" :onvalidate="onValidate" disabled="true" title="Mot de passe oublié">
+            <modal :oncancel="onCancel" :onvalidate="onValidate" title="Mot de passe oublié">
                 <div class="py-4">
                     <p class="text-lg font-semibold text-slate-500"> Vous avez oublié votre mot de passe ? </p>
-                    <p class="text-lg font-semibold text-slate-500"> Pas de soucis ! Nous vous enverrons un email pour le réinitialiser. </p>
+                    <p class="text-lg font-semibold text-slate-500"> Pas de soucis ! Nous vous enverrons un mail pour le réinitialiser. </p>
                 </div>
                 <input-text   name="email"            label="Email"        placeholder="Adresse mail"                 type="email"    ></input-text>
             </modal>
@@ -23,7 +23,7 @@ import re from '../scripts/Regex';
 import API from '../scripts/API';
 
 const field_checks = [
-    {field: "email",            check: (value) => value.length > 0, error: "Veuillez renseignez votre adresse mail."},
+    {field: "email",            check: (value) => value.length > 0, error: "Veuillez renseignez votre adresse email."},
     {field: "email",            check: (value) => value.length <= 64,               error: "L'adresse mail est trop longue."},
     {field: "email",            check: (value) => value.match(re.REGEX_EMAIL) != null, error: "L'adresse mail n'est pas valide."}
 ];
@@ -41,7 +41,7 @@ function onValidate(modal) {
             if (!result) {
                 modal.focus(check.field);
                 log.update(check.error, Log.WARNING);
-                setTimeout(() => { log.delete(); }, 2000);
+                setTimeout(() => { log.delete(); }, 4000);
                 resolve(false);
                 return;
             }
@@ -49,14 +49,10 @@ function onValidate(modal) {
         log.update("Envoi des données ...", Log.INFO);
 
         const payload = modal.getPayload();
-        const data = { "email": payload.email };
+        const data = { email: payload.email };
 
-        API.execute(API.ROUTE.RECOVERY, API.METHOD.POST, data, API.TYPE.JSON).then(res => {
+        API.execute(API.ROUTE.RESETPWD, API.METHOD.POST, data, API.TYPE.JSON).then(res => {
             log.update("Email envoyé !", Log.SUCCESS);
-
-            const user = new User(res.user);
-            user.setInformations({token: res.token});
-            user.save();
 
             setTimeout(() => {
                 log.delete();
