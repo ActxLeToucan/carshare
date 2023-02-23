@@ -141,10 +141,14 @@ export default {
         const inputs_div = this.$refs["inputs"];
         for (let i = 0; i < inputs_div.children.length; i++) {
             const div = inputs_div.children[i];
-            div.children[0].classList.add("show-right");
-            div.children[1].classList.add("show-left");
-            div.children[0].style.animationDelay = `${i * 0.05}s`;
-            div.children[1].style.animationDelay = `${i * 0.05}s`;
+            if (div.children.length < 2) {
+                div.classList.add("show-right");
+            } else {
+                div.children[0].classList.add("show-right");
+                div.children[1].classList.add("show-left");
+                div.children[0].style.animationDelay = `${i * 0.05}s`;
+                div.children[1].style.animationDelay = `${i * 0.05}s`;
+            }
         }
     }
 }
