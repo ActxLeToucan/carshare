@@ -1,0 +1,15 @@
+{
+  "enabled": true, // true to let the server send emails
+  "transporter": {
+    "host": "<smtp server>",
+    "port": 465,
+    "secure": true, // true if port is 465, false for other ports
+    "auth": {
+      "user": "email@adress",
+      "pass": "password"
+    }
+  },
+  "devMode": {
+    "overrideTo": "your_own_email@adress"
+  }
+}

@@ -1,6 +1,6 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
-import { error, sendMsg } from './messages';
+import { error, sendMsg } from './tools/translator';
 
 const prisma = new PrismaClient({
     errorFormat: 'pretty'
@@ -46,5 +46,9 @@ app.get('/', (req, res) => {
 app.use('/docs', require('./routes/docs'));
 app.use('/users', require('./routes/users'));
 app.use('/admin', require('./routes/admin'));
+
+app.use((req, res) => {
+    sendMsg(req, res, error.generic.routeNotFound);
+});
 
 export { app, prisma };

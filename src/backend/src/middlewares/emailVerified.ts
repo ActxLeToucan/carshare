@@ -1,6 +1,5 @@
 import type express from 'express';
 import { error, sendMsg } from '../tools/translator';
-import { p } from '../properties';
 
 module.exports = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     if (res.locals.user === undefined) {
@@ -8,8 +7,8 @@ module.exports = (req: express.Request, res: express.Response, next: express.Nex
         return;
     }
 
-    if (res.locals.user.level < p.userLevel.admin) {
-        sendMsg(req, res, error.auth.insufficientPrivileges);
+    if (res.locals.user.emailVerifiedOn === null) {
+        sendMsg(req, res, error.auth.emailNotVerified);
         return;
     }
 
