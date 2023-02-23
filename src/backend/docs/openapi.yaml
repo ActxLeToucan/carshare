@@ -78,7 +78,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: Password is required
+                    example: Password is required.
         '500':
           $ref: '#/components/responses/internalError'
 
@@ -128,7 +128,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: Password is required
+                    example: Password is required.
         '401':
           $ref: '#/components/responses/invalidCredentials'
         '500':
@@ -136,29 +136,29 @@ paths:
 
   /users/me:
     get:
-        summary: Get user
-        description: Get the current user
-        tags:
-          - Users
-        parameters:
-          - $ref: '#/components/parameters/Accept-Language'
-        security:
-          - bearerAuth: []
-        responses:
-          '200':
-            description: The current user
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/User'
-          '401':
-            $ref: '#/components/responses/noToken'
-          '404':
-            $ref: '#/components/responses/userNotFound'
-          '498':
-            $ref: '#/components/responses/invalidToken'
-          '500':
-            $ref: '#/components/responses/internalError'
+      summary: Get user
+      description: Get the current user
+      tags:
+        - Users
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: The current user
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          $ref: '#/components/responses/noToken'
+        '404':
+          $ref: '#/components/responses/userNotFound'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
     delete:
       summary: Delete user
       description: Delete the current user
@@ -167,7 +167,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       responses:
         '200':
           description: User deleted
@@ -188,17 +188,157 @@ paths:
         '500':
           $ref: '#/components/responses/internalError'
     patch:
-        summary: Update user
-        description: Update the current user
-        tags:
-          - Users
-        parameters:
-          - $ref: '#/components/parameters/Accept-Language'
-        security:
-          - bearerAuth: []
-        responses: 
-          '501':
-            $ref: '#/components/responses/notImplemented'   
+      summary: Update user
+      description: Update the current user
+      tags:
+        - Users
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '501':
+          $ref: '#/components/responses/notImplemented'
+
+  /users/password-reset:
+    post:
+      summary: Ask for password reset
+      description: Send an email to reset the password
+      tags:
+        - Users
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: john@example.com
+      responses:
+        '200':
+          description: Email sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: If the provided email address matches an account, a password reset email has been sent.
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Email is required.
+        '500':
+          $ref: '#/components/responses/internalError'
+    patch:
+      summary: Password reset
+      description: Change the password
+      tags:
+        - Users
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  example: Password123$
+      responses:
+        '200':
+          description: Password changed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Password changed
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Password is required.
+        '401':
+          $ref: '#/components/responses/noToken'
+        '404':
+          $ref: '#/components/responses/userNotFound'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+
+  /users/email-verification:
+    post:
+      summary: Ask for email verification
+      description: Send an email to verify the email address
+      tags:
+        - Users
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      responses:
+        '200':
+          description: Email sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: A verification link has been sent to your email address.
+        '401':
+          $ref: '#/components/responses/noToken'
+        '404':
+          $ref: '#/components/responses/userNotFound'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+    patch:
+      summary: Email verification
+      description: Verify the email address
+      tags:
+        - Users
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      responses:
+        '200':
+          description: Email verified
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Email address verified
+        '401':
+          $ref: '#/components/responses/noToken'
+        '404':
+          $ref: '#/components/responses/userNotFound'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
 
   /admin/users:
     get:
@@ -209,7 +349,7 @@ paths:
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
       security:
-        - bearerAuth: []
+        - bearerAuth: [ ]
       responses:
         '200':
           description: A list of all users
@@ -255,7 +395,7 @@ components:
             properties:
               message:
                 type: string
-                example: No token provided
+                example: No token provided.
     invalidToken:
       description: Invalid/Expired token
       content:
@@ -265,7 +405,7 @@ components:
             properties:
               message:
                 type: string
-                example: Invalid token
+                example: Invalid token provided.
     insufficientPrivileges:
       description: Insufficient privileges
       content:
@@ -275,7 +415,7 @@ components:
             properties:
               message:
                 type: string
-                example: You do not have sufficient rights to perform this action
+                example: You do not have sufficient rights to perform this action.
     invalidCredentials:
       description: Invalid credentials
       content:
@@ -285,7 +425,7 @@ components:
             properties:
               message:
                 type: string
-                example: Invalid credentials provided
+                example: Invalid credentials provided.
     userNotFound:
       description: Not found
       content:
@@ -295,7 +435,7 @@ components:
             properties:
               message:
                 type: string
-                example: User not found
+                example: User not found.
     internalError:
       description: Internal server error
       content:
@@ -305,7 +445,7 @@ components:
             properties:
               message:
                 type: string
-                example: An internal error has occurred, please try again later or contact an administrator
+                example: An internal error occurred. If the problem persists, please contact the administrator.
     notImplemented:
       description: Not implemented
       content:
@@ -315,7 +455,7 @@ components:
             properties:
               message:
                 type: string
-                example: This feature is not yet implemented
+                example: This feature is not yet implemented.
   schemas:
     User:
       type: object
