@@ -30,7 +30,7 @@ export default {
     },
     methods: {
         onClick() {
-            if (this.href) return;
+            if (this.href || this.disabled) return;
             this.action?.(this);
         }
     },
@@ -41,8 +41,7 @@ export default {
             el.classList.add("text-slate-400", "cursor-default");
         }
 
-        if (this.href) return;
-        this.$refs["btn"].$el.addEventListener("click", this.onClick);
+        el.addEventListener("click", this.onClick);
     }
 }
 </script>
