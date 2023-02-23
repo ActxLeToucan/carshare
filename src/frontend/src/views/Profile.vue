@@ -175,8 +175,9 @@ export default {
                     this.showTabs();
                     this.$router.push({ hash: '' });
                 });
-
-                this.showTabs();
+                if (window.location.hash == '')
+                    this.showTabs();
+                else this.hideTabs();
             } else {
                 tabs.classList.remove("hidden");
                 content.classList.remove("hidden");
