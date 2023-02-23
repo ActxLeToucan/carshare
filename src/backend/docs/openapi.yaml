@@ -266,6 +266,8 @@ paths:
         - Users
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
+      security:
+        - bearerAuth: [ ]
       requestBody:
         content:
           application/json:
@@ -313,6 +315,8 @@ paths:
         - Users
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
+      security:
+        - bearerAuth: [ ]
       responses:
         '200':
           description: Email sent
@@ -339,6 +343,8 @@ paths:
         - Users
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
+      security:
+        - bearerAuth: [ ]
       responses:
         '200':
           description: Email verified
@@ -464,7 +470,7 @@ components:
             properties:
               message:
                 type: string
-                example: An internal error occurred. If the problem persists, please contact the administrator.
+                example: An internal error occurred. If the problem persists, please contact an administrator.
     notImplemented:
       description: Not implemented
       content:

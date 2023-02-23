@@ -208,8 +208,8 @@ const error: TranslationsMessageHTTP = {
     db: {
         notReachable: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'La base de données n\'est pas joignable. Si le problème persiste, veuillez contacter l\'administrateur.',
-                en: 'Database is not reachable. If the problem persists, please contact the administrator.'
+                fr: 'La base de données n\'est pas joignable. Si le problème persiste, veuillez contacter un administrateur.',
+                en: 'Database is not reachable. If the problem persists, please contact an administrator.'
             },
             code: 500
         })
@@ -268,8 +268,8 @@ const error: TranslationsMessageHTTP = {
         }),
         internalError: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Une erreur interne est survenue. Si le problème persiste, veuillez contacter l\'administrateur.',
-                en: 'An internal error occurred. If the problem persists, please contact the administrator.'
+                fr: 'Une erreur interne est survenue. Si le problème persiste, veuillez contacter un administrateur.',
+                en: 'An internal error occurred. If the problem persists, please contact an administrator.'
             },
             code: 500
         }),
