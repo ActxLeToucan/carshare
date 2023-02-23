@@ -137,7 +137,7 @@ exports.passwordResetSendEmail = (req: express.Request, res: express.Response, n
     prisma.user.findUnique({ where: { email: req.body.email } })
         .then((user) => {
             if (user === null) {
-                sendMsg(req, res, info.user.passwordResetEmailSent);
+                sendMsg(req, res, info.mailSent.passwordReset);
                 return;
             }
 
@@ -153,7 +153,7 @@ exports.passwordResetSendEmail = (req: express.Request, res: express.Response, n
             const frontendPath = `${String(process.env.FRONTEND_URL)}/password-reset`;
 
             sendMail(req, mail.password.reset, user, token, frontendPath)
-                .then(() => { sendMsg(req, res, info.user.passwordResetEmailSent); })
+                .then(() => { sendMsg(req, res, info.mailSent.passwordReset); })
                 .catch((err) => {
                     console.error(err);
                     sendMsg(req, res, error.generic.internalError);
@@ -186,4 +186,44 @@ exports.passwordReset = (req: express.Request, res: express.Response, next: expr
             console.error(err);
             sendMsg(req, res, error.generic.internalError);
         });
+}
+
+exports.emailVerificationSendEmail = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    if (res.locals.user === undefined) {
+        sendMsg(req, res, error.auth.noToken);
+        return;
+    }
+
+    const token = jwt.sign(
+        {
+            userId: res.locals.user.id,
+            type: 'verify'
+        },
+        process.env.JWT_SECRET ?? 'secret',
+        { expiresIn: properties.p.token.verify.expiration }
+    );
+
+    sendMail(req, mail.email.verification, res.locals.user, token)
+        .then(() => { sendMsg(req, res, info.mailSent.emailVerification); })
+        .catch((err) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
+}
+
+exports.emailVerification = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    if (res.locals.user === undefined) {
+        sendMsg(req, res, error.auth.noToken);
+        return;
+    }
+
+    prisma.user.update({
+        where: { id: res.locals.user.id },
+        data: { emailVerifiedOn: new Date() }
+    }).then(() => {
+        sendMsg(req, res, info.user.emailVerified);
+    }).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
 }

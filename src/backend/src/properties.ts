@@ -10,6 +10,10 @@ const txtExpirationTokenPasswordReset: Variants = {
     fr: '1 heure',
     en: '1 hour'
 }
+const txtExpirationTokenEmailVerification: Variants = {
+    fr: '4 heures',
+    en: '4 hours'
+}
 
 const p: Record<string, Record<string, any>> = {
     email: {
@@ -46,7 +50,15 @@ const p: Record<string, Record<string, any>> = {
         passwordReset: {
             expiration: '1h',
             expirationTxt: txtExpirationTokenPasswordReset
+        },
+        verify: {
+            expiration: '4h',
+            expirationTxt: txtExpirationTokenEmailVerification
         }
+    },
+    url: {
+        passwordReset: `${String(process.env.FRONTEND_URL)}/reinit?token=`,
+        emailVerification: `${String(process.env.FRONTEND_URL)}/validate?token=`
     }
 }
 

@@ -249,6 +249,13 @@ const error: TranslationsMessageHTTP = {
                 en: 'Invalid credentials provided.'
             },
             code: 401
+        }),
+        emailNotVerified: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Votre adresse email doit être vérifiée avant de pouvoir effectuer cette action.',
+                en: 'Your email address must be verified before you can perform this action.'
+            },
+            code: 401
         })
     },
     generic: {
@@ -265,6 +272,13 @@ const error: TranslationsMessageHTTP = {
                 en: 'An internal error occurred. If the problem persists, please contact the administrator.'
             },
             code: 500
+        }),
+        routeNotFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'La route demandée n\'existe pas.',
+                en: 'The requested route does not exist.'
+            },
+            code: 404
         })
     }
 }
@@ -299,10 +313,26 @@ const info: TranslationsMessageHTTP = {
             },
             code: 200
         }),
-        passwordResetEmailSent: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        emailVerified: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Adresse email vérifiée',
+                en: 'Email address verified'
+            },
+            code: 200
+        })
+    },
+    mailSent: {
+        passwordReset: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Si l\'adresse email fournie correspond à un compte, un email de réinitialisation de mot de passe a été envoyé.',
                 en: 'If the provided email address matches an account, a password reset email has been sent.'
+            },
+            code: 200
+        }),
+        emailVerification: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Un lien de vérification a été envoyé à votre adresse email.',
+                en: 'A verification link has been sent to your email address.'
             },
             code: 200
         })
@@ -311,7 +341,7 @@ const info: TranslationsMessageHTTP = {
 
 const mail: TranslationsMail = {
     password: {
-        reset: (req: Request, user: User, token: string, frontendPath: string) => msgForLang<TemplateMail, Mail>(req, {
+        reset: (req: Request, user: User, token: string) => msgForLang<TemplateMail, Mail>(req, {
             to: user.email,
             subject: {
                 fr: 'Réinitialisation de votre mot de passe',
@@ -321,14 +351,14 @@ const mail: TranslationsMail = {
                 fr: `${mailHtmlHeader}
                 <p>Bonjour ${user.firstName ?? ''} ${user.lastName ?? ''},</p>
                 <p>Vous avez demandé à réinitialiser votre mot de passe. Pour ce faire, veuillez cliquer sur le lien ci-dessous :</p>
-                <p><a href="${frontendPath}/${token}">${frontendPath}/${token}</a></p>
+                <p><a href="${String(p.url.passwordReset)}${token}">${String(p.url.passwordReset)}${token}</a></p>
                 <p>Ce lien est valable ${translate(req, p.token.passwordReset.expirationTxt)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.</p>
                 <p>Cordialement,</p>
                 <p>L'équipe de ${process.env.FRONTEND_NAME ?? ''}</p>`,
                 en: `${mailHtmlHeader}
                 <p>Hello ${user.firstName ?? ''} ${user.lastName ?? ''},</p>
                 <p>You requested to reset your password. To do so, please click on the link below :</p>
-                <p><a href="${frontendPath}/${token}">${frontendPath}/${token}</a></p>
+                <p><a href="${String(p.url.passwordReset)}${token}">${String(p.url.passwordReset)}${token}</a></p>
                 <p>This link is valid for ${translate(req, p.token.passwordReset.expirationTxt)}. If you did not request this, please ignore this email.</p>
                 <p>Best regards,</p>
                 <p>The ${process.env.FRONTEND_NAME ?? ''} team</p>`
@@ -336,7 +366,7 @@ const mail: TranslationsMail = {
             text: {
                 fr: `Bonjour ${user.firstName ?? ''} ${user.lastName ?? ''},
                 Vous avez demandé à réinitialiser votre mot de passe. Pour ce faire, veuillez cliquer sur le lien ci-dessous :
-                ${frontendPath}/${token}
+                ${String(p.url.passwordReset)}${token}
                 
                 Ce lien est valable ${translate(req, p.token.passwordReset.expirationTxt)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.
                 
@@ -344,9 +374,52 @@ const mail: TranslationsMail = {
                 L'équipe de ${process.env.FRONTEND_NAME ?? ''}`,
                 en: `Hello ${user.firstName ?? ''} ${user.lastName ?? ''},
                 You requested to reset your password. To do so, please click on the link below :
-                ${frontendPath}/${token}
+                ${String(p.url.passwordReset)}${token}
                 
                 This link is valid for ${translate(req, p.token.passwordReset.expirationTxt)}. If you did not request this, please ignore this email.
+                
+                Best regards,
+                The ${process.env.FRONTEND_NAME ?? ''} team`
+            }
+        })
+    },
+    email: {
+        verification: (req: Request, user: User, token: string, frontendPath: string) => msgForLang<TemplateMail, Mail>(req, {
+            to: user.email,
+            subject: {
+                fr: 'Vérification de votre adresse email',
+                en: 'Email verification'
+            },
+            html: {
+                fr: `${mailHtmlHeader}
+                <p>Bonjour ${user.firstName ?? ''} ${user.lastName ?? ''},</p>
+                <p>Pour vérifier votre adresse email, veuillez cliquer sur le lien ci-dessous :</p>
+                <p><a href="${String(p.url.emailVerification)}${token}">${String(p.url.emailVerification)}${token}</a></p>
+                <p>Ce lien est valable ${translate(req, p.token.verify.expirationTxt)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.</p>
+                <p>Cordialement,</p>
+                <p>L'équipe de ${process.env.FRONTEND_NAME ?? ''}</p>`,
+                en: `${mailHtmlHeader}
+                <p>Hello ${user.firstName ?? ''} ${user.lastName ?? ''},</p>
+                <p>To verify your email address, please click on the link below :</p>
+                <p><a href="${String(p.url.emailVerification)}${token}">${String(p.url.emailVerification)}${token}</a></p>
+                <p>This link is valid for ${translate(req, p.token.verify.expirationTxt)}. If you did not request this, please ignore this email.</p>
+                <p>Best regards,</p>
+                <p>The ${process.env.FRONTEND_NAME ?? ''} team</p>`
+            },
+            text: {
+                fr: `Bonjour ${user.firstName ?? ''} ${user.lastName ?? ''},
+                Pour vérifier votre adresse email, veuillez cliquer sur le lien ci-dessous :
+                ${String(p.url.emailVerification)}${token}
+                
+                Ce lien est valable ${translate(req, p.token.verify.expirationTxt)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.
+                
+                Cordialement,
+                L'équipe de ${process.env.FRONTEND_NAME ?? ''}`,
+                en: `Hello ${user.firstName ?? ''} ${user.lastName ?? ''},
+                To verify your email address, please click on the link below :
+                ${String(p.url.emailVerification)}${token}
+                
+                This link is valid for ${translate(req, p.token.verify.expirationTxt)}. If you did not request this, please ignore this email.
                 
                 Best regards,
                 The ${process.env.FRONTEND_NAME ?? ''} team`

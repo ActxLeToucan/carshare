@@ -3,7 +3,7 @@ import type express from 'express';
 import { error, sendMsg } from '../tools/translator';
 import { prisma } from '../app';
 
-export type AuthType = 'access' | 'resetPassword';
+export type AuthType = 'access' | 'resetPassword' | 'verify';
 
 function access (req: express.Request, res: express.Response, next: express.NextFunction) {
     auth(req, res, next, 'access');
@@ -11,6 +11,10 @@ function access (req: express.Request, res: express.Response, next: express.Next
 
 function resetPassword (req: express.Request, res: express.Response, next: express.NextFunction) {
     auth(req, res, next, 'resetPassword');
+}
+
+function verify (req: express.Request, res: express.Response, next: express.NextFunction) {
+    auth(req, res, next, 'verify');
 }
 
 function auth (req: express.Request, res: express.Response, next: express.NextFunction, type: AuthType) {
@@ -51,4 +55,4 @@ function auth (req: express.Request, res: express.Response, next: express.NextFu
     }
 }
 
-export default { access, resetPassword }
+export default { access, resetPassword, verify }
