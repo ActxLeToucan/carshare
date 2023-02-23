@@ -1,3 +1,5 @@
+import config from '../config.js';
+
 class Credentials {
     static get TYPE() {
         return {
@@ -66,15 +68,18 @@ class API {
             NONE: undefined
         }
     }
-    static get AuthorizationHeader() { return "x-furwaz-auth"; };
+    static get AuthorizationHeader() { return "Authorization"; };
 
-    static setHost(host) {
-        API.API_URL = "https://" + host;
+    static setURL(url) {
+        if (!url) return;
+        API.API_URL = url;
     }
 
     // API routes
     static ROUTE = {
-        // TODO : add api routes here
+        SIGNUP: "/users/signup",
+        LOGIN: "/users/login",
+        USER: "/users/me",
     };
 
     /**
@@ -88,6 +93,9 @@ class API {
      */
     static execute(path, method = this.METHOD.GET, body = {}, type = this.TYPE.JSON, headers = []) {
         return new Promise((resolve, reject) => {
+            if (API.API_URL == null) { API.setURL(config.api.url); }
+            if (API.API_URL == null) reject("Error : API host not set");
+
             path = path.replace("/?", "?").replaceAll("//", "/");
             let urlparts = path.split("?");
             let base = urlparts.splice(0, 1);
@@ -95,9 +103,8 @@ class API {
             path = base + params;
 
             let reqHeaders = {
-                "User-Agent": navigator.userAgent,
                 "Accept": "application/json",
-                "Accept-Language": "fr,fr-FR;q=0.8,en-US;q=0.5,en;q=0.3"
+                "Accept-Language": "fr"
             };
             if (type != this.TYPE_NONE && type != this.TYPE_FILE) reqHeaders["Content-Type"] = type;
 
@@ -125,6 +132,19 @@ class API {
                 reqBody = new FormData();
                 reqBody.append("model", body);
             }
+
+            const sendError = (err) => {
+                if (err.json) {
+                    err.json().then(data => {
+                        reject({
+                            status: err.status,
+                            message: data.message
+                        });
+                    }).catch(err => reject(err));
+                } else {
+                    reject(err);
+                }
+            };
             
             // try with / at the request end
             fetch(API.API_URL + path, {
@@ -135,33 +155,14 @@ class API {
                 referrer: window.location.origin,
                 mode: "cors"
             }).then(response => {
-                if (response.status != 200)
-                    reject(response);
+                if (!response.status.toString().startsWith("2"))
+                    sendError(response);
                 else {
                     response.json().then(data => {
                         resolve(data);
-                    }).catch(err => reject(err));
+                    }).catch(err => sendError(err));
                 }
-            }).catch(err => {
-                // is the request fails, test the same request but without "/" at the end (in case the error it just a 307 shitty redirection)
-                fetch(API.API_URL + path.replace("?", "/?"), {
-                    credentials: "omit",
-                    method: method,
-                    body: method == this.METHOD.GET ? undefined : reqBody,
-                    headers: reqHeaders,
-                    referrer: window.location.origin,
-                    mode: "cors"
-                }).then(response => {
-                    if (response.status != 200)
-                        reject(response);
-                    else {
-                        response.json().then(data => {
-                            resolve(data);
-                        }).catch(reject);
-                    }
-                }).catch(err => reject(err)).finally(() => {
-                });
-            });
+            }).catch(err => sendError(err));
         });
     }
 

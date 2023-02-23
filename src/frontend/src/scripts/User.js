@@ -1,3 +1,5 @@
+import API from "./API";
+
 class User {
     /** @type {User} */
     static #currentUser = null;
@@ -16,11 +18,18 @@ class User {
         User.#currentUser = null;
     }
 
-    username = "";
+    id = 1;
     email = "";
-    icon = "";
-    token = "";
-    id = 0;
+    firstName = "";
+    lastName = "";
+    phone = "";
+    avatar = null;
+    gender = -1;
+    hasCar = false;
+    mailNotif = false;
+    level = 0;
+    createdAt = null;
+    token = null;
 
     constructor(infos) {
         this.setInformations(infos);
@@ -28,7 +37,7 @@ class User {
     }
 
     setInformations(infos) {
-        const props = ["username", "email", "token", "icon", "id"];
+        const props = ["id", "email", "firstName", "lastName", "phone", "avatar", "gender", "hasCar", "mailNotif", "level", "createdAt", "token"];
         for (const prop of props) {
             if (this[prop] != infos[prop] && infos[prop] !== undefined) {
                 this[prop] = infos[prop];
@@ -39,6 +48,10 @@ class User {
     save() {
         localStorage.setItem("user", JSON.stringify(this));
         User.#currentUser = this;
+    }
+
+    getCredentials() {
+        return new API.Credentials({token: "bearer " + this.token, type: API.Credentials.TYPE.TOKEN});
     }
 }
 

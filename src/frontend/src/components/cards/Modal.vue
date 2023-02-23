@@ -14,8 +14,8 @@
             ></div>
             <span class="flex grow h-1 w-full bg-slate-200 rounded-lg mb-4 mt-2"></span>
             <div style="animation-delay: 0.2s" class="show-down flex grow-0 h-fit w-full justify-between">
-                <button-text ref="cancel"> Annuler </button-text>
-                <button-block ref="validate"> Valider </button-block>
+                <button-text ref="cancel" :action="cancel"> Annuler </button-text>
+                <button-block :disabled="this.disabled != false" ref="validate" :action="validate"> Valider </button-block>
             </div>
         </div>
     </div>
@@ -79,6 +79,11 @@ export default {
             default: modal => {},
             required: false
         },
+        disabled: {
+            type: [Boolean, String],
+            default: false,
+            required: false
+        },
         onload: {
             type: Function,
             default: modal => {},
@@ -93,7 +98,6 @@ export default {
             executeAfter(
                 this.onvalidate?.(this),
                 (res) => {
-                    this.validate_launched = false;
                     if (!res) return;
                     if (!goToLink(this))
                         goHome(this);
@@ -104,7 +108,6 @@ export default {
             executeAfter(
                 this.oncancel?.(this),
                 (res) => {
-                    this.cancel_launched = false;
                     if (!res) return;
                     goBack(this);
                 }
@@ -115,11 +118,23 @@ export default {
             const log = new Log(msg, type);
             log.attachTo(this.logZone);
             return log;
+        },
+        getPayload() {
+            const payload = {};
+            for (let i = 0; i < this.inputs.length; i++) {
+                const input = this.inputs[i];
+                payload[input.name] = input.value;
+            }
+            return payload;
         }
     },
     mounted() {
-        this.$refs["validate"].$el.addEventListener("click", this.validate);
-        this.$refs["cancel"].$el.addEventListener("click", this.cancel);
+        this.$el.addEventListener("keydown", ev => {
+            if (ev.key == "Enter")
+                this.validate();
+            else if (ev.key == "Escape")
+                this.cancel();
+        });
 
         this.logZone = new LogZone(this.$refs["log-zone"]);
 
@@ -129,10 +144,14 @@ export default {
         const inputs_div = this.$refs["inputs"];
         for (let i = 0; i < inputs_div.children.length; i++) {
             const div = inputs_div.children[i];
-            div.children[0].classList.add("show-right");
-            div.children[1].classList.add("show-left");
-            div.children[0].style.animationDelay = `${i * 0.05}s`;
-            div.children[1].style.animationDelay = `${i * 0.05}s`;
+            if (div.children.length < 2) {
+                div.classList.add("show-right");
+            } else {
+                div.children[0].classList.add("show-right");
+                div.children[1].classList.add("show-left");
+                div.children[0].style.animationDelay = `${i * 0.05}s`;
+                div.children[1].style.animationDelay = `${i * 0.05}s`;
+            }
         }
     }
 }

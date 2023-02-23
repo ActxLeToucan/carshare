@@ -3,10 +3,10 @@
         <label class="flex text-xl text-slate-500 font-bold whitespace-nowrap text-ellipsis w-fit">
             {{ label }}
         </label>
-        <div class="flex grow h-fit justify-center items-center">
-            <div ref="switch" class="flex rounded-md bg-slate-200 w-12 h-fit cursor-pointer transition-all">
+        <div class="flex grow h-fit justify-end items-center">
+            <button ref="switch" class="flex rounded-md bg-slate-200 w-12 h-fit cursor-pointer transition-all">
                 <div class="flex bg-white rounded h-6 w-6 translate-x-0 transition-all border border-b-4 border-slate-300"></div>
-            </div>
+            </button>
         </div>
         <input ref="checkbox" type="checkbox" :name="name" class="hidden">
     </div>

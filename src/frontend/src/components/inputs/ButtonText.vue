@@ -21,17 +21,27 @@ export default {
             type: Function,
             default: () => {},
             required: false
+        },
+        disabled: {
+            type: [Boolean, String],
+            default: false,
+            required: false
         }
     },
     methods: {
         onClick() {
-            if (this.href) return;
+            if (this.href || this.disabled) return;
             this.action?.(this);
         }
     },
     mounted() {
-        if (this.href) return;
-        this.$refs["btn"].$el.addEventListener("click", this.onClick);
+        const el = this.$refs["btn"].$el;
+        if (this.disabled) {
+            el.classList.remove("text-slate-500", "hover:bg-slate-100", "hover:text-teal-500", "hover:border-slate-200");
+            el.classList.add("text-slate-400", "cursor-default");
+        }
+
+        el.addEventListener("click", this.onClick);
     }
 }
 </script>
