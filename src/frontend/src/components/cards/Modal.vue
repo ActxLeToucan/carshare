@@ -126,6 +126,12 @@ export default {
     mounted() {
         this.$refs["validate"].$el.addEventListener("click", this.validate);
         this.$refs["cancel"].$el.addEventListener("click", this.cancel);
+        this.$el.addEventListener("keydown", ev => {
+            if (ev.key == "Enter")
+                this.validate();
+            else if (ev.key == "Escape")
+                this.cancel();
+        });
 
         this.logZone = new LogZone(this.$refs["log-zone"]);
 
