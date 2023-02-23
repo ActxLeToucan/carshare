@@ -3,6 +3,9 @@
         <topbar v-if="User.CurrentUser != null"></topbar>
         <div class="flex grow w-fit flex-col justify-center space-y-6 mx-auto">
             <modal :oncancel="onCancel" :onvalidate="onValidate" title="S'inscrire">
+                <div class="py-4">
+                    <p class="text-lg font-semibold text-slate-500"> Veuillez renseigner vos informations pour vous inscrire. </p>
+                </div>
                 <input-text   name="firstName"        label="Prénom"       placeholder="Prénom"                                       ></input-text>
                 <input-text   name="lastName"         label="Nom"          placeholder="Nom de famille"                               ></input-text>
                 <input-text   name="email"            label="Email"        placeholder="Adresse mail"                 type="email"    ></input-text>
@@ -73,7 +76,7 @@ function onValidate(modal) {
             if (!result) {
                 modal.focus(check.field);
                 log.update(check.error, Log.WARNING);
-                setTimeout(() => { log.delete(); }, 2000);
+                setTimeout(() => { log.delete(); }, 4000);
                 resolve(false);
                 return;
             }
@@ -98,10 +101,26 @@ function onValidate(modal) {
             user.setInformations({token: res.token});
             user.save();
 
-            setTimeout(() => {
-                log.delete();
-                resolve(true);
-            }, 2000);
+            const email_log = modal.log("Envoi de l'email de vérification ...", Log.INFO);
+            API.execute_logged(API.ROUTE.VERIFY, API.METHOD.POST, user.getCredentials(), {email: userInfos.email}, API.TYPE.JSON).then(res => {
+                email_log.update("Email envoyé avec succès !", Log.SUCCESS);
+
+                setTimeout(() => {
+                    log.delete();
+                    email_log.delete();
+                    resolve(true);
+                }, 2000);
+
+            }).catch(err => {
+                email_log.update("Erreur : " + err.message, Log.ERROR);
+            
+                setTimeout(() => {
+                    log.delete();
+                    email_log.delete();
+                    resolve(false);
+                }, 4000);
+            });
+
         }).catch(err => {
             log.update("Erreur : " + err.message, Log.ERROR);
             

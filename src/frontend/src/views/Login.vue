@@ -3,6 +3,9 @@
         <topbar v-if="User.CurrentUser != null"></topbar>
         <div class="flex grow w-fit flex-col justify-center space-y-6 mx-auto">
             <modal :oncancel="onCancel" :onvalidate="onValidate" title="Se connecter">
+                <div class="py-4">
+                    <p class="text-lg font-semibold text-slate-500"> Veuillez renseigner vos identifiants pour vous connecter. </p>
+                </div>
                 <input-text   name="email"            label="Email"        placeholder="Adresse mail"                 type="email"    ></input-text>
                 <input-text   name="password"         label="Mot de passe" placeholder="Mot de passe"                 type="password" ></input-text>
                 <router-link to="/recovery" class="flex items-center justify-center w-fit h-fit text-slate-400 hover:text-teal-500 transition-all">
@@ -49,7 +52,7 @@ function onValidate(modal) {
             if (!result) {
                 modal.focus(check.field);
                 log.update(check.error, Log.WARNING);
-                setTimeout(() => { log.delete(); }, 2000);
+                setTimeout(() => { log.delete(); }, 4000);
                 resolve(false);
                 return;
             }
