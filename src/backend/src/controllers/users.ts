@@ -124,3 +124,11 @@ exports.deleteMe = (req: express.Request, res: express.Response, next: express.N
 exports.updateMe = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     sendMsg(req, res, error.generic.notImplemented);
 }
+
+exports.routeList = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    if (res.locals.user === undefined) {
+        sendMsg(req, res, error.auth.noToken);
+        return;
+    }
+    sendMsg(req, res, error.generic.notImplemented);
+}
