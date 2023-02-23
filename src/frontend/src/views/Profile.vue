@@ -1,22 +1,29 @@
 <template>
     <div class="flex grow flex-col">
         <topbar></topbar>
-        <div class="flex grow">
-            <div class="flex flex-col items-center w-min px-8 py-4 space-y-4 border-r-8 border-teal-500">
-                <button-tab href="#infos" :default="true"> Mes informations </button-tab>
+        <div class="flex md:flex-row flex-col grow max-h-full min-h-0">
+            <div ref="tabs-zone" class="flex flex-col items-center md:w-min w-full px-8 py-4 space-y-4 md:border-r-8 border-teal-500 mx-auto md:h-full h-fit overflow-hidden">
+                <button-tab href="#infos" :default="!isMobile"> Mes informations </button-tab>
                 <button-tab href="#trips"> Mes trajets </button-tab>
                 <button-tab href="#evals"> Mes notes </button-tab>
-                <div class="flex grow justify-end items-end">
+                <div class="flex grow justify-end items-end w-full">
                     <button-tab href="#params"> Paramètres </button-tab>
                 </div>
             </div>
-            <div class="flex grow">
-                <tab-window defaultHash="#infos">
+            <div ref="content-zone" class="flex flex-col md:grow overflow-scroll">
+
+                <button ref="backtabs-btn" class="absolute md:hidden flex rounded-md border-2 border-slate-200 bg-white h-fit w-fit p-2 m-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                    </svg>
+                </button>
+
+                <tab-window defaultHash="#infos" class="md:pt-0 pt-5">
 
                     <tab-div hash="#infos" class="flex flex-col items-center">
                         <p class="text-2xl text-teal-500 font-bold mx-auto mt-4"> Mes informations </p>
                         <div class="flex flex-col grow justify-evenly items-center">
-                            <card class="flex flex-col">
+                            <card class="flex flex-col m-4">
                                 <div class="flex flex-col">
                                     <input-text label="Nom" placeholder="Nom" :value="User.CurrentUser.lastName"></input-text>
                                     <input-text label="Prénom" placeholder="Prénom" :value="User.CurrentUser.firstName"></input-text>
@@ -25,7 +32,7 @@
                                     <input-choice name="gender" label="Genre" :list="genres"></input-choice>
                                     <input-switch name="hasCar" label="J'ai une voiture" :value="User.CurrentUser.hasCar"></input-switch>
                                 </div>
-                                <div class="flex space-x-4 mt-4">
+                                <div class="flex md:flex-row flex-col md:space-x-4 md:space-y-0 space-y-2 mt-4">
                                     <button-block :action="disconnect"> Se déconnecter </button-block>
                                     <button-block :action="deleteAccount" color="red"> Supprimer le compte </button-block>
                                     <div class="flex grow justify-end pl-20">
@@ -33,7 +40,7 @@
                                     </div>
                                 </div>
                             </card>
-                            <card class="flex flex-col">
+                            <card class="flex flex-col m-4">
                                 <div class="flex flex-col">
                                     <input-text label="Ancien mot de passe" placeholder="Ancien mot de passe" :value="''"></input-text>
                                     <input-text label="Nouveau mot de passe" placeholder="Nouveau mot de passe" :value="''"></input-text>
@@ -107,7 +114,7 @@ export default {
     },
     name: 'Home',
     data() {
-        return { User, genres }
+        return { User, genres, isMobile: window.innerWidth < 768 }
     },
     methods: {
         setDeletePopup(popup) {
@@ -140,6 +147,53 @@ export default {
                     }, 4000);
                 });
             });
+        },
+        setupView() {
+            const tabs = this.$refs["tabs-zone"];
+            const tabsBtn = this.$refs["backtabs-btn"];
+            const content = this.$refs["content-zone"];
+
+            if (this.isMobile) {
+                this.showTabs = () => {
+                    tabs.classList.remove("hidden");
+                    content.classList.add("hidden");
+
+                    tabs.classList.add("show-right");
+                    content.classList.remove("show-left");
+                    tabsBtn.classList.remove("show-left");
+                };
+                this.hideTabs = () => {
+                    tabs.classList.add("hidden");
+                    content.classList.remove("hidden");
+
+                    tabs.classList.remove("show-right");
+                    content.classList.add("show-left");
+                    tabsBtn.classList.add("show-left");
+                };
+
+                tabsBtn.addEventListener("click", () => {
+                    this.showTabs();
+                    this.$router.push({ hash: '' });
+                });
+
+                this.showTabs();
+            } else {
+                tabs.classList.remove("hidden");
+                content.classList.remove("hidden");
+            }
+        }
+    },
+    mounted() {
+        this.setupView();
+        window.addEventListener("resize", () => {
+            this.isMobile = window.innerWidth < 768;
+            this.setupView();
+        });
+    },
+    watch: {
+        '$route.hash': function (newVal, oldVal) {
+            const isMobile = window.innerWidth < 768;
+            if (isMobile && newVal != '') this.hideTabs();
         }
     }
 }

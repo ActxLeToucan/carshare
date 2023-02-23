@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col grow overflow-hidden">
+    <div class="flex flex-col grow overflow-scroll">
         <slot></slot>
     </div>
 </template>
