@@ -168,6 +168,15 @@ paths:
         - $ref: '#/components/parameters/Accept-Language'
       security:
         - bearerAuth: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  example: Password123$
       responses:
         '200':
           description: User deleted
@@ -179,6 +188,16 @@ paths:
                   message:
                     type: string
                     example: User deleted
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Password is required.
         '401':
           $ref: '#/components/responses/noToken'
         '404':
