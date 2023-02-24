@@ -22,21 +22,11 @@ import Modal from '../components/cards/Modal.vue';
 import InputText from '../components/inputs/InputText.vue';
 import { Log } from '../scripts/Logs';
 import User from '../scripts/User';
-import re from '../scripts/Regex';
 import API from '../scripts/API';
 
 const field_checks = [
     {field: "email",            check: (value) => value.length > 0, error: "Veuillez renseignez votre adresse mail."},
-    {field: "password",         check: (value) => value.length > 0, error: "Veuillez renseignez votre mot de passe."},
-
-    {field: "email",            check: (value) => value.length <= 64,               error: "L'adresse mail est trop longue."},
-    {field: "email",            check: (value) => value.match(re.REGEX_EMAIL) != null, error: "L'adresse mail n'est pas valide."},
-
-    {field: "password",         check: (value) => value.length >= 10,                     error: "Le mot de passe doit faire au moins 10 caractères."},
-    {field: "password",         check: (value) => value.match(/[A-Z]/g) != null,          error: "Le mot de passe doit contenir au moins une majuscule."},
-    {field: "password",         check: (value) => value.match(/[a-z]/g) != null,          error: "Le mot de passe doit contenir au moins une minuscule."},
-    {field: "password",         check: (value) => value.match(/[0-9]/g) != null,          error: "Le mot de passe doit contenir au moins un chiffre."},
-    {field: "password",         check: (value) => value.match(/[^A-Za-z0-9]/g) != null,   error: "Le mot de passe doit contenir au moins un caractère spécial."}
+    {field: "password",         check: (value) => value.length > 0, error: "Veuillez renseignez votre mot de passe."}
 ];
 
 function onCancel(modal) {
