@@ -118,9 +118,21 @@ exports.deleteMe = (req: express.Request, res: express.Response, next: express.N
         return;
     }
 
-    prisma.user.delete({ where: { id: res.locals.user.id } })
-        .then(() => {
-            sendMsg(req, res, info.user.deleted);
+    if (!properties.checkPasswordField(req.body.password, req, res, false)) return;
+
+    bcrypt.compare(req.body.password, res.locals.user.password)
+        .then((valid) => {
+            if (!valid) {
+                sendMsg(req, res, error.auth.invalidCredentials);
+                return;
+            }
+
+            prisma.user.delete({ where: { id: res.locals.user.id } })
+                .then(() => { sendMsg(req, res, info.user.deleted); })
+                .catch((err) => {
+                    console.error(err);
+                    sendMsg(req, res, error.generic.internalError);
+                });
         }).catch((err) => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);
