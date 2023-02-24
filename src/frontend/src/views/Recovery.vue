@@ -19,13 +19,10 @@ import Modal from '../components/cards/Modal.vue';
 import InputText from '../components/inputs/InputText.vue';
 import { Log } from '../scripts/Logs';
 import User from '../scripts/User';
-import re from '../scripts/Regex';
 import API from '../scripts/API';
 
 const field_checks = [
-    {field: "email",            check: (value) => value.length > 0, error: "Veuillez renseignez votre adresse email."},
-    {field: "email",            check: (value) => value.length <= 64,               error: "L'adresse mail est trop longue."},
-    {field: "email",            check: (value) => value.match(re.REGEX_EMAIL) != null, error: "L'adresse mail n'est pas valide."}
+    {field: "email",            check: (value) => value.length > 0, error: "Veuillez renseignez votre adresse email."}
 ];
 
 function onCancel(modal) {
