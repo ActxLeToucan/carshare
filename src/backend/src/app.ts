@@ -2,9 +2,8 @@ import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { error, sendMsg } from './tools/translator';
 
-const prisma = new PrismaClient({
-    errorFormat: 'pretty'
-});
+const dbNeeded = require('./middlewares/dbNeeded');
+const prisma = new PrismaClient({ errorFormat: 'pretty' });
 
 const app = express();
 app.use(express.json());
@@ -23,29 +22,13 @@ app.use((req, res, next) => {
     next();
 });
 
-/**
- * Force Prisma to try to connect to the database at each request.
- */
-app.use((req, res, next) => {
-    prisma.$queryRaw`SELECT 1`
-        .then(() => { next(); })
-        .catch(() => {
-            prisma.$connect()
-                .then(() => { next(); })
-                .catch((err) => {
-                    console.error(err);
-                    sendMsg(req, res, error.db.notReachable)
-                });
-        });
-});
-
 app.get('/', (req, res) => {
     res.redirect('/docs');
 });
 
 app.use('/docs', require('./routes/docs'));
-app.use('/users', require('./routes/users'));
-app.use('/admin', require('./routes/admin'));
+app.use('/users', dbNeeded, require('./routes/users'));
+app.use('/admin', dbNeeded, require('./routes/admin'));
 
 app.use((req, res) => {
     sendMsg(req, res, error.generic.routeNotFound);

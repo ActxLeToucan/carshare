@@ -16,6 +16,7 @@ paths:
     post:
       summary: Sign up
       description: Create a new user
+      operationId: signup
       tags:
         - Users
       parameters:
@@ -86,6 +87,7 @@ paths:
     post:
       summary: Login
       description: Login to the API
+      operationId: login
       tags:
         - Users
       parameters:
@@ -138,6 +140,7 @@ paths:
     get:
       summary: Get user
       description: Get the current user
+      operationId: getCurrentUser
       tags:
         - Users
       parameters:
@@ -162,6 +165,7 @@ paths:
     delete:
       summary: Delete user
       description: Delete the current user
+      operationId: deleteCurrentUser
       tags:
         - Users
       parameters:
@@ -209,6 +213,7 @@ paths:
     patch:
       summary: Update user
       description: Update the current user
+      operationId: updateCurrentUser
       tags:
         - Users
       parameters:
@@ -223,6 +228,7 @@ paths:
     post:
       summary: Ask for password reset
       description: Send an email to reset the password
+      operationId: askForPasswordReset
       tags:
         - Users
       parameters:
@@ -262,6 +268,7 @@ paths:
     patch:
       summary: Password reset
       description: Change the password
+      operationId: passwordReset
       tags:
         - Users
       parameters:
@@ -311,6 +318,7 @@ paths:
     post:
       summary: Ask for email verification
       description: Send an email to verify the email address
+      operationId: askForEmailVerification
       tags:
         - Users
       parameters:
@@ -339,6 +347,7 @@ paths:
     patch:
       summary: Email verification
       description: Verify the email address
+      operationId: emailVerification
       tags:
         - Users
       parameters:
@@ -369,6 +378,7 @@ paths:
     get:
       summary: Get all users
       description: Get all users. Only available to admins.
+      operationId: getAllUsers
       tags:
         - Admin
       parameters:
