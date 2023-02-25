@@ -256,5 +256,8 @@ exports.routeList = (req: express.Request, res: express.Response, next: express.
 
     }).then(travel => {
         res.status(200).json(travel);
+    }).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
     });
 }
