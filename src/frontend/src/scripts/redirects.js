@@ -19,13 +19,12 @@ export function goTo(obj, link) {
 }
 
 export function goToLink(obj) {
-    const url = window.location.href;
-    const params = new URLSearchParams(url);
-    const link = params.get('link');
+    const link = obj.$route.query.token;
     
     if (!link) {
         console.info("No link found in URL");
-        return;
+        return false;
     }
     goTo(link);
+    return true;
 }

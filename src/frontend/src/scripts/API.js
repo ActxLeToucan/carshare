@@ -80,6 +80,8 @@ class API {
         SIGNUP: "/users/signup",
         LOGIN: "/users/login",
         USER: "/users/me",
+        VERIFY: "/users/email-verification",
+        RESETPWD: "/users/password-reset",
     };
 
     /**
@@ -146,7 +148,6 @@ class API {
                 }
             };
             
-            // try with / at the request end
             fetch(API.API_URL + path, {
                 credentials: "omit",
                 method: method,

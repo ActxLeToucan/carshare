@@ -1,5 +1,5 @@
 <template>
-    <div class="absolute top-0 left-0 w-screen h-screen flex justify-center items-center bg-slate-900/[0.3] opacity-0 pointer-events-none transition-all">
+    <div class="absolute top-0 left-0 w-screen h-screen flex justify-center items-center bg-slate-900/[0.3] opacity-0 pointer-events-none transition-all px-4">
         <div ref="popup" class="flex flex-col rounded-lg shadow-lg border-4 border-slate-200 bg-slate-50 p-4 space-y-4">
             <h1 class="text-xl font-bold text-teal-500 text-center"> {{ title }} </h1>
             <div class="flex flex-col">

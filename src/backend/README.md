@@ -18,11 +18,13 @@ npm i -g nodemon
 ```
 3. Copier le fichier [`.env.example`](.env.example) et le renommer en `.env`
 4. Modifier les variables d'environnement du fichier `.env` pour qu'elles correspondent à votre configuration
-5. Initialiser la base de données
+5. Copier le fichier [`mail.config.json.example`](mail.config.json.example) et le renommer en `mail.config.json`
+6. Compléter le fichier `mail.config.json` avec les informations de votre serveur SMTP, ou désactiver l'envoi d'emails en mettant `enabled` à `false`
+7. Initialiser la base de données
 ```bash
 npx prisma migrate dev
 ```
-6. Lancer le serveur
+8. Lancer le serveur
 ```bash
 npm run dev
 ```
@@ -65,11 +67,13 @@ Vous devez avoir les outils suivants installés sur votre machine :
    * `DATABASE_URL` du conteneur `node`
    * `JWT_SECRET` du conteneur `node`
 4. (optionnel) Modifier les ports des conteneurs si vous avez déjà des services qui utilisent ces ports
-5. Lancer les conteneurs
+5. Copier le fichier [`mail.config.json.example`](mail.config.json.example) et le renommer en `mail.config.json`
+6. Compléter le fichier `mail.config.json` avec les informations de votre serveur SMTP
+7. Lancer les conteneurs
 ```bash
 docker-compose up -d
 ```
-6. Configurer le serveur web pour qu'il redirige les requêtes vers le serveur Node.js (reverse proxy)
+8. Configurer le serveur web pour qu'il redirige les requêtes vers le serveur Node.js (reverse proxy)
 
 
 
@@ -93,19 +97,21 @@ npm i -g pm2
 3. Copier le fichier [`.env.example`](.env.example) et le renommer en `.env`
 4. Modifier les variables d'environnement du fichier `.env` pour qu'elles correspondent à votre configuration
 5. Modifier la variable d'environnement `NODE_ENV` pour qu'elle vaille `production`
-6. Initialiser la base de données
+6. Copier le fichier [`mail.config.json.example`](mail.config.json.example) et le renommer en `mail.config.json`
+7. Compléter le fichier `mail.config.json` avec les informations de votre serveur SMTP
+8. Initialiser la base de données
 ```bash
 npx prisma migrate dev
 ```
-7. Générer les fichiers pour le mode production
+9. Générer les fichiers pour le mode production
 ```bash
 npm run build
 ```
-8. Lancer le serveur
+10. Lancer le serveur
 ```bash
-pm2 start dist/index.js --name "backend"
+pm2 start dist/src/server.js --name "backend"
 ```
-9. Configurer le serveur web pour qu'il redirige les requêtes vers le serveur Node.js (reverse proxy)
+11. Configurer le serveur web pour qu'il redirige les requêtes vers le serveur Node.js (reverse proxy)
 
 #### Quelques commandes utiles
 Pour lancer le serveur en mode production sans pm2, exécuter la commande suivante :

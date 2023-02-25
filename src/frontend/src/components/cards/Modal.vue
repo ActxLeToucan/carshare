@@ -14,8 +14,8 @@
             ></div>
             <span class="flex grow h-1 w-full bg-slate-200 rounded-lg mb-4 mt-2"></span>
             <div style="animation-delay: 0.2s" class="show-down flex grow-0 h-fit w-full justify-between">
-                <button-text ref="cancel"> Annuler </button-text>
-                <button-block ref="validate"> Valider </button-block>
+                <button-text ref="cancel" :action="cancel"> Annuler </button-text>
+                <button-block :disabled="this.disabled != false" ref="validate" :action="validate"> Valider </button-block>
             </div>
         </div>
     </div>
@@ -24,7 +24,7 @@
 <script>
 import ButtonBlock from '../inputs/ButtonBlock.vue';
 import ButtonText from '../inputs/ButtonText.vue';
-import { goBack, goHome, goToLink } from '../../scripts/redirects.js';
+import { goBack, goHome, goTo, goToLink } from '../../scripts/redirects.js';
 import { Log, LogZone } from '../../scripts/Logs.js';
 import { executeAfter } from '../../scripts/Promises.js';
 
@@ -79,6 +79,11 @@ export default {
             default: modal => {},
             required: false
         },
+        disabled: {
+            type: [Boolean, String],
+            default: false,
+            required: false
+        },
         onload: {
             type: Function,
             default: modal => {},
@@ -94,6 +99,8 @@ export default {
                 this.onvalidate?.(this),
                 (res) => {
                     if (!res) return;
+                    if (typeof res == "string")
+                        return goTo(this, res);
                     if (!goToLink(this))
                         goHome(this);
                 }
@@ -124,8 +131,6 @@ export default {
         }
     },
     mounted() {
-        this.$refs["validate"].$el.addEventListener("click", this.validate);
-        this.$refs["cancel"].$el.addEventListener("click", this.cancel);
         this.$el.addEventListener("keydown", ev => {
             if (ev.key == "Enter")
                 this.validate();

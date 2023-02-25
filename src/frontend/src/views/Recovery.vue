@@ -2,15 +2,12 @@
     <div class="flex grow flex-col">
         <topbar v-if="User.CurrentUser != null"></topbar>
         <div class="flex grow w-fit flex-col justify-center space-y-6 mx-auto">
-            <modal :oncancel="onCancel" :onvalidate="onValidate" title="Se connecter">
+            <modal :oncancel="onCancel" :onvalidate="onValidate" title="Mot de passe oublié">
                 <div class="py-4">
-                    <p class="text-lg font-semibold text-slate-500"> Veuillez renseigner vos identifiants pour vous connecter. </p>
+                    <p class="text-lg font-semibold text-slate-500"> Vous avez oublié votre mot de passe ? </p>
+                    <p class="text-lg font-semibold text-slate-500"> Pas de soucis ! Nous vous enverrons un mail pour le réinitialiser. </p>
                 </div>
                 <input-text   name="email"            label="Email"        placeholder="Adresse mail"                 type="email"    ></input-text>
-                <input-text   name="password"         label="Mot de passe" placeholder="Mot de passe"                 type="password" ></input-text>
-                <router-link to="/recovery" class="flex items-center justify-center w-fit h-fit text-slate-400 hover:text-teal-500 transition-all">
-                    <p class="text-md font-bold whitespace-nowrap text-ellipsis max-w-full min-w-0 w-fit h-fit max-h-full min-h-0"> Mot de passe oublié ? </p>
-                </router-link>
             </modal>
         </div>
     </div>
@@ -25,8 +22,7 @@ import User from '../scripts/User';
 import API from '../scripts/API';
 
 const field_checks = [
-    {field: "email",            check: (value) => value.length > 0, error: "Veuillez renseignez votre adresse mail."},
-    {field: "password",         check: (value) => value.length > 0, error: "Veuillez renseignez votre mot de passe."}
+    {field: "email",            check: (value) => value.length > 0, error: "Veuillez renseignez votre adresse email."}
 ];
 
 function onCancel(modal) {
@@ -50,16 +46,10 @@ function onValidate(modal) {
         log.update("Envoi des données ...", Log.INFO);
 
         const payload = modal.getPayload();
-        const userInfos = {
-            "email": payload.email,
-            "password": payload.password
-        };
+        const data = { email: payload.email };
 
-        API.execute(API.ROUTE.LOGIN, API.METHOD.POST, userInfos, API.TYPE.JSON).then(res => {
-            log.update("Connecté avec succès !", Log.SUCCESS);
-
-            const user = new User({id: res.userId, token: res.token});
-            user.save();
+        API.execute(API.ROUTE.RESETPWD, API.METHOD.POST, data, API.TYPE.JSON).then(res => {
+            log.update("Email envoyé !", Log.SUCCESS);
 
             setTimeout(() => {
                 log.delete();
@@ -82,7 +72,7 @@ export default {
         Modal,
         InputText
     },
-    name: 'Login',
+    name: 'Recover',
     methods: {
         onCancel,
         onValidate

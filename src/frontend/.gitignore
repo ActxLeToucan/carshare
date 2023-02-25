@@ -1,3 +1,5 @@
 node_modules/
 dist/
+.idea/
 config.js
+docker-compose.yml
