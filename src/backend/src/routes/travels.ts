@@ -4,7 +4,7 @@ import auth from '../middlewares/auth';
 
 const router = express.Router();
 
-const controller = require('../controllers/travel');
-router.get('/listroute', auth.access, controller.routeList);
+const controller = require('../controllers/travels');
+router.get('/my', auth.access, controller.myTravels);
 
 module.exports = router;

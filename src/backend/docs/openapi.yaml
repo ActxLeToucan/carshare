@@ -373,10 +373,11 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
-  /travel/listroute:
+
+  /travels/my:
     get:
-      summary: List of travel
-      description: Get all the trips of the current user. The trips where he is the driver or the passenger.
+      summary: My travels
+      description: Get all the trips of the current user (as a driver or a passenger).
       tags:
         - Travel
       parameters:
@@ -385,7 +386,7 @@ paths:
         - bearerAuth: [ ]
       responses:
         '200':
-          description: The travel he has made or will make, depending on the status of the journey
+          description: The travel he has made or will make, depending on the status of the travel.
           content:
             application/json:
               schema:
