@@ -280,7 +280,18 @@ const error: TranslationsMessageHTTP = {
             },
             code: 404
         })
+    },
+    userId: {
+
+        invalid: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Le numéro de l\'utilisateur est invalide.',
+                en: 'Id user is invalid.'
+            },
+            code: 400
+        })
     }
+
 }
 
 const info: TranslationsMessageHTTP = {

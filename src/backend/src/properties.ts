@@ -239,6 +239,21 @@ function sanitizeGender (gender: any): number | undefined {
     }
     return gender;
 }
+/**
+ * Sanitize the id of user
+ * @param gender id to sanitize
+ * @param req Express request
+ * @param res Express response
+ * @returns The id number if it is valid, null otherwise
+ */
+function sanitizeId (id: number | undefined, req: express.Request, res: express.Response): number | null {
+    if (typeof id !== 'number' || id === undefined) {
+        sendMsg(req, res, error.userId.invalid);
+        return null;
+    }
+
+    return id;
+}
 
 export {
     p,
@@ -248,5 +263,6 @@ export {
     checkFirstNameField,
     checkDateField,
     sanitizePhone,
-    sanitizeGender
+    sanitizeGender,
+    sanitizeId
 };
