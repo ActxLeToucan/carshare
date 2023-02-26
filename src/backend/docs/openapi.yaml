@@ -373,6 +373,31 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
+  /travel/listroute:
+    get:
+      summary: List of travel
+      description: Get all the trips of the current user. The trips where he is the driver or the passenger.
+      tags:
+        - Travel
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: The travel he has made or will make, depending on the status of the journey
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListRoute'
+        '401':
+          $ref: '#/components/responses/noToken'
+        '404':
+          $ref: '#/components/responses/userNotFound'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
 
   /admin/users:
     get:
@@ -556,3 +581,36 @@ components:
           mailNotif: true
           level: 1
           createdAt: 2023-02-18T13:19:23.636Z
+    ListRoute:
+      type: object
+      properties:
+        travelAsDriver:
+          type: object
+          example: [ {
+           id: 2,
+           departureDate: "2023-02-26T10:00:58.000Z",
+           arrivalDate: "2023-02-28T02:32:22.000Z",
+           maxPassengers: 3,
+           price: 86,
+           description: null,
+           status: 0,
+           driverId: 1,
+           groupeId: null,
+           createdAt: "2023-02-23T00:00:00.000Z"
+
+          } ]
+        travelAsPassenger:
+          type: object
+          example: [ {
+            id: 1,
+            departureDate: "2023-02-25T10:00:58.000Z",
+            arrivalDate: "2023-02-25T21:00:58.000Z",
+            maxPassengers: 7,
+            price: 89,
+            description: null,
+            status: 1,
+            driverId: 2,
+            groupeId: null,
+            createdAt: "2023-02-21T10:03:07.000Z"
+
+          } ]
