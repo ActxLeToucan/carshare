@@ -241,18 +241,18 @@ function sanitizeGender (gender: any): number | undefined {
 }
 /**
  * Sanitize the id of user
- * @param gender id to sanitize
+ * @param id id to sanitize
  * @param req Express request
  * @param res Express response
  * @returns The id number if it is valid, null otherwise
  */
-function sanitizeId (id: number | undefined, req: express.Request, res: express.Response): number | null {
-    if (typeof id !== 'number' || id === undefined) {
+function sanitizeId (id: string | undefined, req: express.Request, res: express.Response): number | null {
+    if (id === '' || Number.isNaN(Number(id))) {
         sendMsg(req, res, error.userId.invalid);
         return null;
     }
 
-    return id;
+    return Number(id);
 }
 
 export {

@@ -15,12 +15,16 @@ exports.users = (req: express.Request, res: express.Response, next: express.Next
 }
 
 exports.deleteUser = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (!properties.sanitizeId(req.body.userId, req, res)) return;
+    const userId = properties.sanitizeId(req.params.id, req, res);
 
-    prisma.user.delete({ where: { id: req.body.userId } })
-        .then(() => { sendMsg(req, res, info.user.deleted); })
-        .catch((err) => {
-            console.error(err);
-            sendMsg(req, res, error.generic.internalError);
-        });
+    if (userId != null) {
+        prisma.user.delete({ where: { id: userId } })
+            .then(() => { sendMsg(req, res, info.user.deleted); })
+            .catch((err) => {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
+            });
+    } else {
+        return null;
+    }
 }

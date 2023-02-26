@@ -432,10 +432,10 @@ paths:
         '500':
           $ref: '#/components/responses/internalError'
 
-  /admin/deleteuser:
+  /admin/user/{id} :
     delete:
       summary: Delete an user
-      description: Delete a user from his id.
+      description: Delete a user from his id in the route.
       operationId: deleteUser
       tags:
         - Admin
@@ -443,15 +443,6 @@ paths:
         - $ref: '#/components/parameters/Accept-Language'
       security:
         - bearerAuth: [ ]
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                userID:
-                  type: integer
-                  example: 3
       responses:
         '200':
           description: User deleted
