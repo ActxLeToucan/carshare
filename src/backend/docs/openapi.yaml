@@ -382,7 +382,7 @@ paths:
       summary: My travels
       description: Get all the trips of the current user (as a driver or a passenger).
       tags:
-        - Travel
+        - Travels
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
       security:
@@ -432,15 +432,21 @@ paths:
         '500':
           $ref: '#/components/responses/internalError'
 
-  /admin/user/{id} :
+  /admin/user/:id :
     delete:
       summary: Delete an user
-      description: Delete a user from his id in the route.
+      description: Delete an user. Only available to admins.
       operationId: deleteUser
       tags:
         - Admin
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
+        - name: id
+          in: path
+          description: The id of the user to delete
+          required: true
+          schema:
+            type: integer
       security:
         - bearerAuth: [ ]
       responses:
