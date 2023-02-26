@@ -1,6 +1,7 @@
 import type express from 'express';
 import { prisma } from '../app';
-import { displayableUser, error, sendMsg } from '../tools/translator';
+import { displayableUser, info, error, sendMsg } from '../tools/translator';
+import * as properties from '../properties';
 
 exports.users = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     prisma.user.findMany()
@@ -8,6 +9,21 @@ exports.users = (req: express.Request, res: express.Response, next: express.Next
             res.status(200).json(users.map(displayableUser));
         })
         .catch(err => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
+}
+
+exports.deleteUser = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const userId = properties.sanitizeId(req.params.id, req, res);
+    if (userId == null) {
+        sendMsg(req, res, error.userId.invalid);
+        return;
+    }
+
+    prisma.user.delete({ where: { id: userId } })
+        .then(() => { sendMsg(req, res, info.user.deleted); })
+        .catch((err) => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);
         });

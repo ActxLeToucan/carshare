@@ -8,5 +8,6 @@ const admin = require('../middlewares/admin');
 const emailVerified = require('../middlewares/emailVerified');
 
 router.get('/users', auth.access, emailVerified, admin, controller.users);
+router.delete('/user/:id', auth.access, emailVerified, admin, controller.deleteUser);
 
 module.exports = router;

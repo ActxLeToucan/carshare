@@ -196,6 +196,15 @@ const error: TranslationsMessageHTTP = {
             code: 400
         })
     },
+    userId: {
+        invalid: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'L\'identifiant de l\'utilisateur est invalide.',
+                en: 'User id is invalid.'
+            },
+            code: 400
+        })
+    },
     user: {
         notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
@@ -281,6 +290,7 @@ const error: TranslationsMessageHTTP = {
             code: 404
         })
     }
+
 }
 
 const info: TranslationsMessageHTTP = {
