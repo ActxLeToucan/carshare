@@ -239,5 +239,3 @@ exports.emailVerification = (req: express.Request, res: express.Response, next: 
         sendMsg(req, res, error.generic.internalError);
     });
 }
-
-

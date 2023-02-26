@@ -373,12 +373,12 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
-  /users/listroute:
+  /travel/listroute:
     get:
       summary: List of travel
       description: Get all the trips of the current user. The trips where he is the driver or the passenger.
       tags:
-        - Users
+        - Travel
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
       security:
