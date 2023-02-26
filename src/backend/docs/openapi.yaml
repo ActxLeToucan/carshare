@@ -4,13 +4,16 @@ info:
   description: This is the API for the Car Share project.
   version: 0.0.1
   contact:
-    name: Car Share
+    name: Car Share, backend team
     email: 'contoux1u@etu.univ-lorraine.fr'
   license:
     name: GNU General Public License v3.0
     url: 'https://www.gnu.org/licenses/gpl-3.0.en.html'
 servers:
   - url: 'https://carshare.api.antoinectx.fr'
+    description: Antoine's server
+  - url: 'https://carshare.apis.furwaz.fr'
+    description: Paul's server
 paths:
   /users/signup:
     post:

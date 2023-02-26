@@ -1,4 +1,9 @@
 # Back-end
+## Documentation
+Vous pouvez trouver la documentation de l'API [ici](https://carshare.api.antoinectx.fr/docs).
+
+Si le serveur n'est pas accessible, vous pouvez trouver la source de la documentation [ici](./docs/openapi.yaml).
+
 ## Développement
 ### Prérequis
 Vous devez avoir les outils suivants installés sur votre machine :
