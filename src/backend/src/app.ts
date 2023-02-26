@@ -29,6 +29,7 @@ app.get('/', (req, res) => {
 app.use('/docs', require('./routes/docs'));
 app.use('/users', dbNeeded, require('./routes/users'));
 app.use('/admin', dbNeeded, require('./routes/admin'));
+app.use('/travel', dbNeeded, require('./routes/travel'));
 
 app.use((req, res) => {
     sendMsg(req, res, error.generic.routeNotFound);
