@@ -4,18 +4,22 @@ info:
   description: This is the API for the Car Share project.
   version: 0.0.1
   contact:
-    name: Car Share
+    name: Car Share, backend team
     email: 'contoux1u@etu.univ-lorraine.fr'
   license:
     name: GNU General Public License v3.0
     url: 'https://www.gnu.org/licenses/gpl-3.0.en.html'
 servers:
   - url: 'https://carshare.api.antoinectx.fr'
+    description: Antoine's server
+  - url: 'https://carshare.apis.furwaz.fr'
+    description: Paul's server
 paths:
   /users/signup:
     post:
       summary: Sign up
       description: Create a new user
+      operationId: signup
       tags:
         - Users
       parameters:
@@ -86,6 +90,7 @@ paths:
     post:
       summary: Login
       description: Login to the API
+      operationId: login
       tags:
         - Users
       parameters:
@@ -138,6 +143,7 @@ paths:
     get:
       summary: Get user
       description: Get the current user
+      operationId: getCurrentUser
       tags:
         - Users
       parameters:
@@ -162,6 +168,7 @@ paths:
     delete:
       summary: Delete user
       description: Delete the current user
+      operationId: deleteCurrentUser
       tags:
         - Users
       parameters:
@@ -209,6 +216,7 @@ paths:
     patch:
       summary: Update user
       description: Update the current user
+      operationId: updateCurrentUser
       tags:
         - Users
       parameters:
@@ -223,6 +231,7 @@ paths:
     post:
       summary: Ask for password reset
       description: Send an email to reset the password
+      operationId: askForPasswordReset
       tags:
         - Users
       parameters:
@@ -262,6 +271,7 @@ paths:
     patch:
       summary: Password reset
       description: Change the password
+      operationId: passwordReset
       tags:
         - Users
       parameters:
@@ -311,6 +321,7 @@ paths:
     post:
       summary: Ask for email verification
       description: Send an email to verify the email address
+      operationId: askForEmailVerification
       tags:
         - Users
       parameters:
@@ -339,6 +350,7 @@ paths:
     patch:
       summary: Email verification
       description: Verify the email address
+      operationId: emailVerification
       tags:
         - Users
       parameters:
@@ -365,10 +377,37 @@ paths:
         '500':
           $ref: '#/components/responses/internalError'
 
+  /travels/my:
+    get:
+      summary: My travels
+      description: Get all the trips of the current user (as a driver or a passenger).
+      tags:
+        - Travels
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: The travel he has made or will make, depending on the status of the travel.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListRoute'
+        '401':
+          $ref: '#/components/responses/noToken'
+        '404':
+          $ref: '#/components/responses/userNotFound'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+
   /admin/users:
     get:
       summary: Get all users
       description: Get all users. Only available to admins.
+      operationId: getAllUsers
       tags:
         - Admin
       parameters:
@@ -382,6 +421,55 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ArrayOfUsers'
+        '401':
+          $ref: '#/components/responses/noToken'
+        '403':
+          $ref: '#/components/responses/insufficientPrivileges'
+        '404':
+          $ref: '#/components/responses/userNotFound'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+
+  /admin/user/:id :
+    delete:
+      summary: Delete an user
+      description: Delete an user. Only available to admins.
+      operationId: deleteUser
+      tags:
+        - Admin
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - name: id
+          in: path
+          description: The id of the user to delete
+          required: true
+          schema:
+            type: integer
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: User deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User deleted
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Id user is invalid
         '401':
           $ref: '#/components/responses/noToken'
         '403':
@@ -546,3 +634,36 @@ components:
           mailNotif: true
           level: 1
           createdAt: 2023-02-18T13:19:23.636Z
+    ListRoute:
+      type: object
+      properties:
+        travelAsDriver:
+          type: object
+          example: [ {
+           id: 2,
+           departureDate: "2023-02-26T10:00:58.000Z",
+           arrivalDate: "2023-02-28T02:32:22.000Z",
+           maxPassengers: 3,
+           price: 86,
+           description: null,
+           status: 0,
+           driverId: 1,
+           groupeId: null,
+           createdAt: "2023-02-23T00:00:00.000Z"
+
+          } ]
+        travelAsPassenger:
+          type: object
+          example: [ {
+            id: 1,
+            departureDate: "2023-02-25T10:00:58.000Z",
+            arrivalDate: "2023-02-25T21:00:58.000Z",
+            maxPassengers: 7,
+            price: 89,
+            description: null,
+            status: 1,
+            driverId: 2,
+            groupeId: null,
+            createdAt: "2023-02-21T10:03:07.000Z"
+
+          } ]
