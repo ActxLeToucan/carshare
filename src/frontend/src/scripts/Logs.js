@@ -13,8 +13,16 @@ class Log {
         this.type = type;
         this.dom = document.createElement("p");
         this.dom.innerHTML = msg;
-        applyClasses(this.dom, "text-lg h-fit font-semibold whitespace-nowrap text-ellipsis transition-all overflow-hidden " + this.type);
-        this.dom.style.maxHeight = "30px";
+        applyClasses(this.dom, "text-lg h-fit font-semibold transition-all " + this.type);
+        this.dom.style.maxHeight = "100px";
+    }
+
+    resize() {
+        this.resizeTimeout = setTimeout(() => {
+            this.dom.style.maxHeight = this.dom.getBoundingClientRect().height + "px";
+            if (this.zone !== null) this.zone.render();
+            this.resizeTimeout = null;
+        }, 200);
     }
 
     attachTo(zone) {
@@ -27,14 +35,22 @@ class Log {
     }
 
     setText(msg, animate=true) {
+        if (this.resizeTimeout !== null) {
+            clearTimeout(this.resizeTimeout);
+            this.resizeTimeout = null;
+        }
+
+        this.dom.style.maxHeight = "100px";
         if (animate) {
             this.dom.style.opacity = "0";
             setTimeout(() => {
                 this.dom.innerHTML = msg;
                 this.dom.style.opacity = "1";
+                this.resize();
             }, 200);
         } else {
             this.dom.innerHTML = msg;
+            this.resize();
         }
     }
 
@@ -72,7 +88,7 @@ class LogZone {
                 return this.dom.children[1].getBoundingClientRect().top -
                        this.dom.children[0].getBoundingClientRect().top;
             default:
-                return 28;
+                return 56;
         }
     }
 

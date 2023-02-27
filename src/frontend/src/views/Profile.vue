@@ -2,12 +2,13 @@
     <div class="flex grow flex-col">
         <topbar></topbar>
         <div class="flex md:flex-row flex-col grow max-h-full min-h-0">
-            <div ref="tabs-zone" class="flex flex-col items-center md:w-min w-full px-8 py-4 space-y-4 md:border-r-8 border-teal-500 mx-auto md:h-full h-fit overflow-hidden">
+            <div ref="tabs-zone" class="flex flex-col items-center h-full md:w-min w-full px-8 py-4 space-y-4 md:border-r-8 border-teal-500 mx-auto overflow-hidden">
                 <button-tab href="#infos" :default="!isMobile"> Mes informations </button-tab>
                 <button-tab href="#trips"> Mes trajets </button-tab>
                 <button-tab href="#evals"> Mes notes </button-tab>
-                <div class="flex grow justify-end items-end w-full">
-                    <button-tab href="#params"> Paramètres </button-tab>
+                <button-tab href="#params"> Paramètres </button-tab>
+                <div class="flex grow justify-end items-end mx-auto">
+                    <button-block :action="disconnect"> Se déconnecter </button-block>
                 </div>
             </div>
             <div ref="content-zone" class="flex flex-col md:grow overflow-scroll">
@@ -33,7 +34,6 @@
                                     <input-switch name="hasCar" label="J'ai une voiture" :value="User.CurrentUser.hasCar"></input-switch>
                                 </div>
                                 <div class="flex md:flex-row flex-col md:space-x-4 md:space-y-0 space-y-2 mt-4">
-                                    <button-block :action="disconnect"> Se déconnecter </button-block>
                                     <button-block :action="deleteAccount" color="red"> Supprimer le compte </button-block>
                                     <div class="flex grow justify-end pl-20">
                                         <button-block :action="() => {}" disabled="true"> Modifier </button-block>
@@ -68,13 +68,14 @@
             </div>
         </div>
         <popup
+            color="red"
             title="Supprimer le compte"
             content="Êtes-vous sûr de vouloir supprimer votre compte ?\nCette action est irréversible."
             cancelLabel="Annuler"
             validateLabel="Supprimer"
             :onload="setDeletePopup"
             :onvalidate="removeAccount"
-        ></popup>
+        > <input-text label="Mot de passe" placeholder="Mot de passe" name="password"></input-text> </popup>
     </div>
 </template>
 
@@ -131,7 +132,7 @@ export default {
         removeAccount(popup) {
             return new Promise((resolve, reject) => {
                 const log = popup.log("Suppression du compte...", Log.INFO);
-                API.execute_logged(API.ROUTE.USER, API.METHOD.DELETE, User.CurrentUser.getCredentials()).then(res => {
+                API.execute_logged(API.ROUTE.USER, API.METHOD.DELETE, User.CurrentUser.getCredentials(), {password: popup.get("password")}).then(res => {
                     log.update("Compte supprimé avec succès !", Log.SUCCESS);
                     setTimeout(() => {
                         log.delete();
@@ -140,7 +141,7 @@ export default {
                     }, 1000);
                 }).catch(err => {
                     console.error(err);
-                    log.update("Erreur : " + err.message, Log.SUCCESS);
+                    log.update("Erreur : " + err.message, Log.ERROR);
                     setTimeout(() => {
                         log.delete();
                         resolve(false);

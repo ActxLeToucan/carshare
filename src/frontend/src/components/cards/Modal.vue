@@ -1,5 +1,5 @@
 <template>
-    <div class="show-up flex flex-col w-fit h-fit rounded-lg shadow-lg bg-teal-500 overflow-hidden">
+    <div class="show-up flex flex-col w-fit h-fit max-w-full min-w-0 rounded-lg shadow-lg bg-teal-500 overflow-hidden m-2">
         <div class="flex grow-0 h-fit justify-center items-center px-8 py-1">
             <h2 class="text-2xl text-teal-50 font-bold"> {{ title }} </h2>
         </div>
@@ -9,7 +9,7 @@
             </div>
             <div
                 ref="log-zone"
-                class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
+                class="flex flex-col max-w-full min-w-0 w-full items-center h-fit overflow-hidden transition-all"
                 style="max-height: 0px;"
             ></div>
             <span class="flex grow h-1 w-full bg-slate-200 rounded-lg mb-4 mt-2"></span>
@@ -27,35 +27,7 @@ import ButtonText from '../inputs/ButtonText.vue';
 import { goBack, goHome, goTo, goToLink } from '../../scripts/redirects.js';
 import { Log, LogZone } from '../../scripts/Logs.js';
 import { executeAfter } from '../../scripts/Promises.js';
-
-function retreiveFields(modal) {
-    /**@type {HTMLDivElement} */
-    const inputs_div = modal.$refs["inputs"];
-    const inputs = [];
-    for (let i = 0; i < inputs_div.children.length; i++) {
-        const div = inputs_div.children[i];
-        const input = div.querySelector("input");
-        if (!input) continue;
-
-        if (input.type == "checkbox")
-            input.value = input.checked ? true : false;
-
-        inputs.push(input);
-    }
-
-    modal.inputs = inputs;
-    modal.get = (name) => {
-        const input = inputs.find(input => input.name == name);
-        if (!input) return null;
-        return input.value;
-    };
-    modal.focus = (name) => {
-        const input = inputs.find(input => input.name == name);
-        if (!input) return false;
-        input.focus();
-        return true;
-    };
-}
+import { retreiveFields } from '../../scripts/data.js';
 
 export default {
     components: {
