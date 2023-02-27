@@ -1,7 +1,8 @@
 import type express from 'express';
 import { prisma } from '../app';
-import { displayableUser, info, error, sendMsg } from '../tools/translator';
+import { displayableUser, error, info, sendMsg } from '../tools/translator';
 import * as properties from '../properties';
+import bcrypt from 'bcrypt';
 
 exports.users = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     prisma.user.findMany()
@@ -15,15 +16,78 @@ exports.users = (req: express.Request, res: express.Response, next: express.Next
 }
 
 exports.deleteUser = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const userId = properties.sanitizeId(req.params.id, req, res);
-    if (userId == null) {
-        sendMsg(req, res, error.userId.invalid);
-        return;
-    }
+    const userId = properties.sanitizeUserId(req.params.id, req, res);
+    if (userId == null) return;
 
     prisma.user.delete({ where: { id: userId } })
         .then(() => { sendMsg(req, res, info.user.deleted); })
         .catch((err) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
+}
+
+exports.updateUser = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const userId = properties.sanitizeUserId(req.params.id, req, res);
+    if (userId == null) return;
+
+    const { email, lastName, firstName, phone, hasCar, gender, mailNotif, level, password } = req.body;
+
+    if (email !== undefined && !properties.checkEmailField(email, req, res)) return;
+    if (password !== undefined && !properties.checkPasswordField(password, req, res)) return;
+    if (lastName !== undefined && !properties.checkLastNameField(lastName, req, res)) return;
+    if (firstName !== undefined && !properties.checkFirstNameField(firstName, req, res)) return;
+    if (hasCar !== undefined && !properties.checkBooleanField(hasCar, req, res, 'hasCar')) return;
+    if (mailNotif !== undefined && !properties.checkBooleanField(mailNotif, req, res, 'mailNotif')) return;
+    if (level !== undefined && !properties.checkLevelField(level, req, res)) return;
+    let _phoneSanitized;
+    if (phone !== undefined) {
+        _phoneSanitized = properties.sanitizePhone(phone, req, res);
+        if (_phoneSanitized === null) return;
+    }
+    const phoneSanitized = _phoneSanitized;
+    const genderSanitized = properties.sanitizeGender(gender);
+
+    const data = {
+        email,
+        lastName,
+        firstName,
+        phone: phoneSanitized,
+        hasCar,
+        mailNotif,
+        gender: genderSanitized,
+        emailVerifiedOn: email !== undefined ? null : undefined,
+        level,
+        password
+    };
+
+    if (password !== undefined) {
+        try {
+            data.password = await bcrypt.hash(password, properties.p.password.salt);
+        } catch (err) {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+            return;
+        }
+    }
+
+    if (email !== undefined) {
+        try {
+            if (await prisma.user.count({ where: { email, id: { not: userId } } }) > 0) {
+                sendMsg(req, res, error.email.exists);
+                return;
+            }
+        } catch (err) {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+            return;
+        }
+    }
+
+    prisma.user.update({ where: { id: userId }, data })
+        .then(() => {
+            sendMsg(req, res, info.user.updated);
+        }).catch((err) => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);
         });

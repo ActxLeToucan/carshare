@@ -6,33 +6,36 @@ import { displayableUser, error, info, mail, sendMail, sendMsg } from '../tools/
 import * as properties from '../properties';
 
 exports.signup = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (!properties.checkEmailField(req.body.email, req, res)) return;
-    if (!properties.checkPasswordField(req.body.password, req, res)) return;
-    if (!properties.checkLastNameField(req.body.lastName, req, res)) return;
-    if (!properties.checkFirstNameField(req.body.firstName, req, res)) return;
-    const phoneNum = properties.sanitizePhone(req.body.phone, req, res);
-    if (phoneNum === null) return;
-    const gender = properties.sanitizeGender(req.body.gender);
+    const { email, password, lastName, firstName, phone, hasCar, gender } = req.body;
 
-    prisma.user.count({ where: { email: req.body.email } })
+    if (!properties.checkEmailField(email, req, res)) return;
+    if (!properties.checkPasswordField(password, req, res)) return;
+    if (!properties.checkLastNameField(lastName, req, res)) return;
+    if (!properties.checkFirstNameField(firstName, req, res)) return;
+    const phoneSanitized = properties.sanitizePhone(phone, req, res);
+    if (phoneSanitized === null) return;
+    if (hasCar !== undefined && !properties.checkBooleanField(hasCar, req, res, 'hasCar')) return;
+    const genderSanitized = properties.sanitizeGender(gender);
+
+    prisma.user.count({ where: { email } })
         .then((count) => {
             if (count > 0) {
                 sendMsg(req, res, error.email.exists);
                 return;
             }
 
-            bcrypt.hash(req.body.password, properties.p.password.salt)
+            bcrypt.hash(password, properties.p.password.salt)
                 .then((hash) => {
                     prisma.user.create({
                         data: {
-                            email: req.body.email,
+                            email,
                             password: hash,
-                            firstName: req.body.firstName,
-                            lastName: req.body.lastName,
-                            phone: phoneNum,
+                            firstName,
+                            lastName,
+                            phone: phoneSanitized,
                             avatar: null,
-                            gender,
-                            hasCar: req.body.hasCar
+                            hasCar,
+                            gender: genderSanitized
                         }
                     }).then((user) => {
                         const msg = info.user.created(req, res);
