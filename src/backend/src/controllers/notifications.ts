@@ -8,7 +8,7 @@ exports.myNotifications = (req: express.Request, res: express.Response, next: ex
         return;
     }
 
-    prisma.user.findMany({
+    prisma.user.findUnique({
         where: { id: res.locals.user.id },
         select: {
             notifications: true
