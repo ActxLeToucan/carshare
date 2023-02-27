@@ -496,7 +496,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: Id user is invalid
+                    example: User id is invalid.
         '401':
           $ref: '#/components/responses/noToken'
         '403':
@@ -507,6 +507,98 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
+    patch:
+      summary: Update an user
+      description: Update an user. Only available to admins. Only the fields to update are required.
+      operationId: updateUser
+      tags:
+        - Admin
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - name: id
+          in: path
+          description: The id of the user to update
+          required: true
+          schema:
+            type: integer
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        description: The user to update
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  required: false
+                  example: john@example.com
+                password:
+                  type: string
+                  required: false
+                  example: Password123$
+                firstName:
+                  type: string
+                  required: false
+                  example: John
+                lastName:
+                  type: string
+                  required: false
+                  example: Doe
+                phone:
+                  type: string
+                  required: false
+                  example: 0123456789
+                gender:
+                  type: integer
+                  required: false
+                  example: 1
+                hasCar:
+                  type: boolean
+                  required: false
+                  example: true
+                mailNotif:
+                  type: boolean
+                  required: false
+                  example: true
+                level:
+                  type: integer
+                  required: false
+                  example: 1
+      responses:
+        '200':
+          description: User updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                    message:
+                      type: string
+                      example: User updated
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                      type: string
+                      example: User id is invalid.
+        '401':
+          $ref: '#/components/responses/noToken'
+        '403':
+          $ref: '#/components/responses/insufficientPrivileges'
+        '404':
+          $ref: '#/components/responses/userNotFound'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+
 components:
   securitySchemes:
     bearerAuth: # arbitrary name for the security scheme

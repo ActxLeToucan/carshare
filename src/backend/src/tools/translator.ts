@@ -45,6 +45,13 @@ const error: TranslationsMessageHTTP = {
             },
             code: 400
         }),
+        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: "L'adresse email doit être une chaîne de caractères.",
+                en: 'Email address must be a string.'
+            },
+            code: 400
+        }),
         max: (req: Request, length: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: `L'adresse email doit contenir au plus ${length} caractère${length > 1 ? 's' : ''}.`,
@@ -72,6 +79,13 @@ const error: TranslationsMessageHTTP = {
             msg: {
                 fr: 'Le mot de passe est requis.',
                 en: 'Password is required.'
+            },
+            code: 400
+        }),
+        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Le mot de passe doit être une chaîne de caractères.',
+                en: 'Password must be a string.'
             },
             code: 400
         }),
@@ -119,6 +133,13 @@ const error: TranslationsMessageHTTP = {
             },
             code: 400
         }),
+        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Le nom doit être une chaîne de caractères.',
+                en: 'Lastname must be a string.'
+            },
+            code: 400
+        }),
         max: (req: Request, length: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: `Le nom doit contenir au plus ${length} caractère${length > 1 ? 's' : ''}.`,
@@ -139,6 +160,13 @@ const error: TranslationsMessageHTTP = {
             msg: {
                 fr: 'Le prénom est requis.',
                 en: 'Firstname is required.'
+            },
+            code: 400
+        }),
+        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Le prénom doit être une chaîne de caractères.',
+                en: 'Firstname must be a string.'
             },
             code: 400
         }),
@@ -165,10 +193,56 @@ const error: TranslationsMessageHTTP = {
             },
             code: 400
         }),
+        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Le numéro de téléphone doit être une chaîne de caractères.',
+                en: 'Phone number must be a string.'
+            },
+            code: 400
+        }),
         invalid: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Le numéro de téléphone est invalide.',
                 en: 'Phone number is invalid.'
+            },
+            code: 400
+        })
+    },
+    level: {
+        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Le niveau est requis.',
+                en: 'Level is required.'
+            },
+            code: 400
+        }),
+        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Le niveau doit être un nombre.',
+                en: 'Level must be a number.'
+            },
+            code: 400
+        }),
+        tooHigh: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'a mountain too [H]igh | Le niveau est plus élevé que votre propre niveau.',
+                en: 'Level is higher than your own level.'
+            },
+            code: 403
+        })
+    },
+    boolean: {
+        required: (req: Request, fieldName: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Le champ "${fieldName}" est requis.`,
+                en: `Field "${fieldName}" is required.`
+            },
+            code: 400
+        }),
+        type: (req: Request, fieldName: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Le champ "${fieldName}" doit être un booléen.`,
+                en: `Field "${fieldName}" must be a boolean.`
             },
             code: 400
         })
@@ -196,15 +270,6 @@ const error: TranslationsMessageHTTP = {
             code: 400
         })
     },
-    userId: {
-        invalid: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'L\'identifiant de l\'utilisateur est invalide.',
-                en: 'User id is invalid.'
-            },
-            code: 400
-        })
-    },
     user: {
         notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
@@ -212,6 +277,13 @@ const error: TranslationsMessageHTTP = {
                 en: 'User not found.'
             },
             code: 404
+        }),
+        invalidId: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'L\'identifiant de l\'utilisateur est invalide.',
+                en: 'User id is invalid.'
+            },
+            code: 400
         })
     },
     db: {
@@ -327,6 +399,13 @@ const info: TranslationsMessageHTTP = {
             msg: {
                 fr: 'Adresse email vérifiée',
                 en: 'Email address verified'
+            },
+            code: 200
+        }),
+        updated: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Utilisateur mis à jour',
+                en: 'User updated'
             },
             code: 200
         })
