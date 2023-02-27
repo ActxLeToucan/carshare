@@ -1,5 +1,5 @@
 <template>
-    <div class="show-up flex flex-col w-fit h-fit max-w-full min-w-0 rounded-lg shadow-lg bg-teal-500 overflow-hidden">
+    <div class="show-up flex flex-col w-fit h-fit max-w-full min-w-0 rounded-lg shadow-lg bg-teal-500 overflow-hidden m-2">
         <div class="flex grow-0 h-fit justify-center items-center px-8 py-1">
             <h2 class="text-2xl text-teal-50 font-bold"> {{ title }} </h2>
         </div>
