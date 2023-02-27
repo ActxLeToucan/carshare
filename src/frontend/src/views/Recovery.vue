@@ -49,7 +49,7 @@ function onValidate(modal) {
         const data = { email: payload.email };
 
         API.execute(API.ROUTE.RESETPWD, API.METHOD.POST, data, API.TYPE.JSON).then(res => {
-            log.update("Email envoyé !", Log.SUCCESS);
+            log.update(res.message, Log.SUCCESS);
 
             setTimeout(() => {
                 log.delete();
