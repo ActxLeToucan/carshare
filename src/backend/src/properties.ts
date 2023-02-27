@@ -71,9 +71,13 @@ const p: Record<string, Record<string, any>> = {
  * @param checkFormat If true, check if the email is valid
  * @returns true if the email is valid, false otherwise
  */
-function checkEmailField (email: string | undefined, req: express.Request, res: express.Response, checkFormat: boolean = true): boolean {
+function checkEmailField (email: any, req: express.Request, res: express.Response, checkFormat: boolean = true): boolean {
     if (email === undefined || email === '') {
         sendMsg(req, res, error.email.required);
+        return false;
+    }
+    if (typeof email !== 'string') {
+        sendMsg(req, res, error.email.type);
         return false;
     }
     if (checkFormat) {
@@ -98,9 +102,13 @@ function checkEmailField (email: string | undefined, req: express.Request, res: 
  * @param checkFormat If true, check if the password is valid
  * @returns true if the password is valid, false otherwise
  */
-function checkPasswordField (password: string | undefined, req: express.Request, res: express.Response, checkFormat = true): boolean {
+function checkPasswordField (password: any, req: express.Request, res: express.Response, checkFormat = true): boolean {
     if (password === undefined || password === '') {
         sendMsg(req, res, error.password.required);
+        return false;
+    }
+    if (typeof password !== 'string') {
+        sendMsg(req, res, error.password.type);
         return false;
     }
     if (checkFormat) {
@@ -140,9 +148,13 @@ function checkPasswordField (password: string | undefined, req: express.Request,
  * @param res Express response
  * @returns true if the lastname is valid, false otherwise
  */
-function checkLastNameField (lastname: string | undefined, req: express.Request, res: express.Response): boolean {
+function checkLastNameField (lastname: any, req: express.Request, res: express.Response): boolean {
     if (lastname === undefined || lastname === '') {
         sendMsg(req, res, error.lastname.required);
+        return false;
+    }
+    if (typeof lastname !== 'string') {
+        sendMsg(req, res, error.lastname.type);
         return false;
     }
     if (lastname.length > p.lastname.max) {
@@ -164,9 +176,13 @@ function checkLastNameField (lastname: string | undefined, req: express.Request,
  * @param res Express response
  * @returns true if the firstname is valid, false otherwise
  */
-function checkFirstNameField (firstname: string | undefined, req: express.Request, res: express.Response): boolean {
+function checkFirstNameField (firstname: any, req: express.Request, res: express.Response): boolean {
     if (firstname === undefined || firstname === '') {
         sendMsg(req, res, error.firstname.required);
+        return false;
+    }
+    if (typeof firstname !== 'string') {
+        sendMsg(req, res, error.firstname.type);
         return false;
     }
     if (firstname.length > p.firstname.max) {
@@ -181,6 +197,49 @@ function checkFirstNameField (firstname: string | undefined, req: express.Reques
 }
 
 /**
+ * Sanitize the level of a user
+ * @param level Level to sanitize
+ * @param req Express request
+ * @param res Express response
+ * @returns The number value if it is valid, null otherwise
+ */
+function checkLevelField (level: any, req: express.Request, res: express.Response): boolean {
+    if (level === undefined || level === '') {
+        sendMsg(req, res, error.level.required);
+        return false;
+    }
+    if (typeof level !== 'number') {
+        sendMsg(req, res, error.level.type);
+        return false;
+    }
+    if (res.locals.user.level < level) {
+        sendMsg(req, res, error.level.tooHigh);
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Check if a boolean field is valid
+ * @param value Value to sanitize
+ * @param req Express request
+ * @param res Express response
+ * @param fieldName Name of the field
+ * @returns true if the value is valid, false otherwise
+ */
+function checkBooleanField (value: any, req: express.Request, res: express.Response, fieldName: string): boolean {
+    if (value === undefined || value === '') {
+        sendMsg(req, res, error.boolean.required, fieldName);
+        return false;
+    }
+    if (typeof value !== 'boolean') {
+        sendMsg(req, res, error.boolean.type, fieldName);
+        return false;
+    }
+    return true;
+}
+
+/**
  * Check if a date is in a valid format
  * If the date is not valid, send an error message to the client
  * @param date Date to check
@@ -188,7 +247,7 @@ function checkFirstNameField (firstname: string | undefined, req: express.Reques
  * @param res Express response
  * @returns true if the date is valid, false otherwise
  */
-function checkDateField (date: string | undefined, req: express.Request, res: express.Response): boolean {
+function checkDateField (date: any, req: express.Request, res: express.Response): boolean {
     if (date === undefined || date === '') {
         sendMsg(req, res, error.date.required);
         return false;
@@ -212,9 +271,13 @@ function checkDateField (date: string | undefined, req: express.Request, res: ex
  * @param res Express response
  * @returns The phone number if it is valid, null otherwise
  */
-function sanitizePhone (phone: string | undefined, req: express.Request, res: express.Response): string | null {
+function sanitizePhone (phone: any, req: express.Request, res: express.Response): string | null {
     if (phone === undefined || phone === '') {
         sendMsg(req, res, error.phone.required);
+        return null;
+    }
+    if (typeof phone !== 'string') {
+        sendMsg(req, res, error.phone.type);
         return null;
     }
     const num = phone.replace(/(\.|\s|-)/g, '').trim();
@@ -239,6 +302,7 @@ function sanitizeGender (gender: any): number | undefined {
     }
     return gender;
 }
+
 /**
  * Sanitize the id of user
  * @param id id to sanitize
@@ -246,9 +310,9 @@ function sanitizeGender (gender: any): number | undefined {
  * @param res Express response
  * @returns The id number if it is valid, null otherwise
  */
-function sanitizeId (id: string | undefined, req: express.Request, res: express.Response): number | null {
+function sanitizeUserId (id: any, req: express.Request, res: express.Response): number | null {
     if (id === '' || Number.isNaN(Number(id))) {
-        sendMsg(req, res, error.userId.invalid);
+        sendMsg(req, res, error.user.invalidId);
         return null;
     }
 
@@ -261,8 +325,10 @@ export {
     checkPasswordField,
     checkLastNameField,
     checkFirstNameField,
+    checkLevelField,
+    checkBooleanField,
     checkDateField,
     sanitizePhone,
     sanitizeGender,
-    sanitizeId
+    sanitizeUserId
 };
