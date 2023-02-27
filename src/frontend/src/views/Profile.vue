@@ -2,12 +2,13 @@
     <div class="flex grow flex-col">
         <topbar></topbar>
         <div class="flex md:flex-row flex-col grow max-h-full min-h-0">
-            <div ref="tabs-zone" class="flex flex-col items-center md:w-min w-full px-8 py-4 space-y-4 md:border-r-8 border-teal-500 mx-auto md:h-full h-fit overflow-hidden">
+            <div ref="tabs-zone" class="flex flex-col items-center h-full md:w-min w-full px-8 py-4 space-y-4 md:border-r-8 border-teal-500 mx-auto overflow-hidden">
                 <button-tab href="#infos" :default="!isMobile"> Mes informations </button-tab>
                 <button-tab href="#trips"> Mes trajets </button-tab>
                 <button-tab href="#evals"> Mes notes </button-tab>
-                <div class="flex grow justify-end items-end w-full">
-                    <button-tab href="#params"> Paramètres </button-tab>
+                <button-tab href="#params"> Paramètres </button-tab>
+                <div class="flex grow justify-end items-end mx-auto">
+                    <button-block :action="disconnect"> Se déconnecter </button-block>
                 </div>
             </div>
             <div ref="content-zone" class="flex flex-col md:grow overflow-scroll">
@@ -33,7 +34,6 @@
                                     <input-switch name="hasCar" label="J'ai une voiture" :value="User.CurrentUser.hasCar"></input-switch>
                                 </div>
                                 <div class="flex md:flex-row flex-col md:space-x-4 md:space-y-0 space-y-2 mt-4">
-                                    <button-block :action="disconnect"> Se déconnecter </button-block>
                                     <button-block :action="deleteAccount" color="red"> Supprimer le compte </button-block>
                                     <div class="flex grow justify-end pl-20">
                                         <button-block :action="() => {}" disabled="true"> Modifier </button-block>

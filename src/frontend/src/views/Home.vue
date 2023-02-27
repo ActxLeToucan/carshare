@@ -12,8 +12,8 @@
                 <p style="animation-delay: 0.2s" class="show-down md:text-2xl text-xl text-slate-400 text-center font-bold mx-auto"> Pour commencer à utiliser l'application, veuillez vous inscrire ou vous connecter. </p>
             </div>
             <div style="animation-delay: 0.3s" class="show-down flex md:flex-row flex-col justify-evenly md:mt-20 mt-10 md:space-x-24 md:space-y-0 space-y-4 mx-auto">
-                <button-block class="mx-auto w-full" href="/register"> S'inscrire </button-block>
-                <button-block class="mx-auto w-full" href="/login"> Se connecter </button-block>
+                <button-block class="mx-auto w-fit" href="/register"> S'inscrire </button-block>
+                <button-block class="mx-auto w-fit" href="/login"> Se connecter </button-block>
             </div>
         </div>
     </div>
