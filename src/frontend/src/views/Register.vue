@@ -37,7 +37,7 @@ function isPhoneNumber(val) {
 
 const genres = [
     {value: 1, label: "Homme"},
-    {value: -1, label: "Autre", selected: true},
+    {value: -1, label: "Non spécifié", selected: true},
     {value: 0, label: "Femme"},
 ];
 
