@@ -1,7 +1,7 @@
 <template>
     <div class="absolute top-0 left-0 w-screen h-screen flex justify-center items-center bg-slate-900/[0.3] opacity-0 pointer-events-none transition-all px-4">
         <div ref="popup" class="flex flex-col rounded-lg shadow-lg border-4 border-slate-200 bg-slate-50 p-4 space-y-4">
-            <h1 class="text-xl font-bold text-teal-500 text-center"> {{ title }} </h1>
+            <h1 class="text-xl font-bold text-center" :class="'text-'+color+'-500'"> {{ title }} </h1>
             <div class="flex flex-col">
                 <p v-for="line in content.split('\\n')" :key="line" class="text-lg font-semibold text-slate-500"> {{ line }} </p>
             </div>
@@ -10,16 +10,20 @@
                 class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
                 style="max-height: 0px;"
             ></div>
+            <div ref="inputs" class="flex flex-col">
+                <slot></slot>
+            </div>
             <span class="flex grow h-1 w-full bg-slate-200 rounded-lg mb-4 mt-2"></span>
             <div class="flex justify-between">
                 <button-text ref="btn-cancel"> {{ cancelLabel }} </button-text>
-                <button-block ref="btn-validate"> {{ validateLabel }} </button-block>
+                <button-block :color="color" ref="btn-validate"> {{ validateLabel }} </button-block>
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import { retreiveFields } from '../../scripts/data';
 import { Log, LogZone } from '../../scripts/Logs';
 import { executeAfter } from '../../scripts/Promises';
 import ButtonBlock from '../inputs/ButtonBlock.vue';
@@ -40,6 +44,11 @@ export default {
         content: {
             type: String,
             default: '',
+            required: false
+        },
+        color: {
+            type: String,
+            default: 'teal',
             required: false
         },
         cancelLabel: {
@@ -99,12 +108,27 @@ export default {
             const log = new Log(msg, type);
             log.attachTo(this.logZone);
             return log;
+        },
+        cancel() {
+            return this.oncancel(this);
+        },
+        validate() {
+            retreiveFields(this);
+            return this.onvalidate(this);
+        },
+        getPayload() {
+            const payload = {};
+            for (let i = 0; i < this.inputs.length; i++) {
+                const input = this.inputs[i];
+                payload[input.name] = input.value;
+            }
+            return payload;
         }
     },
     mounted() {
         this.$refs["btn-cancel"].$el.addEventListener("click", () => {
             executeAfter(
-                this.oncancel?.(this),
+                this.cancel?.(this),
                 res => {
                     if (res) this.hide();
                 }
@@ -112,7 +136,7 @@ export default {
         });
         this.$refs["btn-validate"].$el.addEventListener("click", () => {
             executeAfter(
-                this.onvalidate?.(this),
+                this.validate?.(this),
                 res => {
                     if (res) this.hide();
                 }

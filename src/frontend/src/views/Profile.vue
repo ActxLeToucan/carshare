@@ -68,13 +68,14 @@
             </div>
         </div>
         <popup
+            color="red"
             title="Supprimer le compte"
             content="Êtes-vous sûr de vouloir supprimer votre compte ?\nCette action est irréversible."
             cancelLabel="Annuler"
             validateLabel="Supprimer"
             :onload="setDeletePopup"
             :onvalidate="removeAccount"
-        ></popup>
+        > <input-text label="Mot de passe" placeholder="Mot de passe" name="password"></input-text> </popup>
     </div>
 </template>
 
@@ -131,7 +132,7 @@ export default {
         removeAccount(popup) {
             return new Promise((resolve, reject) => {
                 const log = popup.log("Suppression du compte...", Log.INFO);
-                API.execute_logged(API.ROUTE.USER, API.METHOD.DELETE, User.CurrentUser.getCredentials()).then(res => {
+                API.execute_logged(API.ROUTE.USER, API.METHOD.DELETE, User.CurrentUser.getCredentials(), {password: popup.get("password")}).then(res => {
                     log.update("Compte supprimé avec succès !", Log.SUCCESS);
                     setTimeout(() => {
                         log.delete();
@@ -140,7 +141,7 @@ export default {
                     }, 1000);
                 }).catch(err => {
                     console.error(err);
-                    log.update("Erreur : " + err.message, Log.SUCCESS);
+                    log.update("Erreur : " + err.message, Log.ERROR);
                     setTimeout(() => {
                         log.delete();
                         resolve(false);
