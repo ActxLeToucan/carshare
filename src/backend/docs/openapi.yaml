@@ -403,6 +403,53 @@ paths:
         '500':
           $ref: '#/components/responses/internalError'
 
+  /settings/notifications:
+    get:
+      summary: Setting for mail notification
+      description: True to have notification sent by mail or false to not be sent mail.
+      tags:
+        - Settings
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: The present value of this setting.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User/mailNotif'
+        '401':
+          $ref: '#/components/responses/noToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+    patch:
+      summary: Update setting
+      description: Update the setting to have mail sent or not by mail when receiving a notification
+      operationId: updateNotificationSetting
+      tags:
+        - Users
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Update the mailNotif setting
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: mailNotif updated
+        '401':
+          $ref: '#/components/responses/noToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+
   /admin/users:
     get:
       summary: Get all users
