@@ -1,7 +1,7 @@
 <template>
     <div class="flex grow flex-col">
         <topbar v-if="User.CurrentUser != null"></topbar>
-        <div class="flex grow w-fit flex-col justify-center space-y-6 mx-auto">
+        <div class="flex grow w-fit flex-col justify-center space-y-6 mx-auto min-w-0 max-w-full">
             <modal :oncancel="onCancel" :onvalidate="onValidate" title="Se connecter">
                 <div class="py-4">
                     <p class="text-lg font-semibold text-slate-500"> Veuillez renseigner vos identifiants pour vous connecter. </p>
