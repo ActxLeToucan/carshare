@@ -8,11 +8,8 @@ exports.myNotifications = (req: express.Request, res: express.Response, next: ex
         return;
     }
 
-    prisma.user.findUnique({
-        where: { id: res.locals.user.id },
-        select: {
-            notifications: true
-        }
+    prisma.notification.findMany({
+        where: { userId: res.locals.user.id }
 
     }).then(notifications => {
         res.status(200).json(notifications);

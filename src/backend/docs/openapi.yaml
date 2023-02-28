@@ -786,30 +786,26 @@ components:
             createdAt: "2023-02-21T10:03:07.000Z"
 
           } ]
-
     ArrayOfNotifications:
-      type: object
-      properties:
-        notifications:
-          type: array
-          items:
-            $ref: '#/components/schemas/Notification'
-          example:
-            - id: 1
-              action: null
-              title: Bienvenue sur car share
-              message: Car share, vous souhaite la bienvenue et un agréable moment sur son site
-              userId: 1
-              travelId: null
-              createdAt: 2023-02-27T17:52:29.000Z
-            - id: 2
-              action: null
-              title: Groupe rejoint
-              message: "Vous avez rejoint le groupe : les bg du 54"
-              userId: 1
-              travelId: null
-              createdAt: 2023-02-27T18:00:09.000Z
-
+      type: array
+      items:
+        $ref: '#/components/schemas/Notification'
+      example:
+        - id: 1
+          action: null
+          title: Bienvenue sur car share
+          message: Car share, vous souhaite la bienvenue et un agréable moment sur son site
+          userId: 1
+          travelId: null
+          createdAt: 2023-02-27T17:52:29.000Z
+        - id: 2
+          action: null
+          title: Groupe rejoint
+          message: Vous avez rejoint le groupe des bg du 54
+          userId: 1
+          travelId: null
+          createdAt: 2023-02-27T18:00:09.000Z
+    
     Notification:
       type: object
       properties:
@@ -827,3 +823,4 @@ components:
           type: integer
         createdAt:
           type: string
+          format: date-time
