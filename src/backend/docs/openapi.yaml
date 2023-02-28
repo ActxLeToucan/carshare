@@ -445,6 +445,8 @@ paths:
                   message:
                     type: string
                     example: mailNotif updated
+        '400':
+          $ref: '#/components/responses/type'
         '401':
           $ref: '#/components/responses/noToken'
           
