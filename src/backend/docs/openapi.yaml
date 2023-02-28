@@ -419,9 +419,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User/mailNotif'
+                type: boolean              
         '401':
           $ref: '#/components/responses/noToken'
+        '498':
+          $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
     patch:
@@ -444,11 +446,15 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: mailNotif updated
+                    example: Settings saved
         '400':
           $ref: '#/components/responses/type'
         '401':
           $ref: '#/components/responses/noToken'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
           
   /notifications/my:
     get:
