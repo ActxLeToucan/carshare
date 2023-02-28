@@ -415,7 +415,7 @@ paths:
         - bearerAuth: [ ]
       responses:
         '200':
-        description: The present value of this setting.
+          description: The present value of this setting.
           content:
             application/json:
               schema:
@@ -452,7 +452,7 @@ paths:
                     type: string
                     example: Settings saved
         '400':
-          $ref: '#/components/responses/type'
+          $ref: '#/components/responses/typeError'
         '401':
           $ref: '#/components/responses/noToken'
         '498':
@@ -725,6 +725,16 @@ components:
               message:
                 type: string
                 example: User not found.
+    typeError:
+      description: Invalid type of value
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Invalid type of value provided.
     internalError:
       description: Internal server error
       content:
