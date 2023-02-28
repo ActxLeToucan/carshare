@@ -26,12 +26,12 @@
                         <div class="flex flex-col grow justify-evenly items-center">
                             <card class="flex flex-col m-4">
                                 <div class="flex flex-col">
-                                    <input-text label="Nom" placeholder="Nom" :value="User.CurrentUser.lastName"></input-text>
-                                    <input-text label="Prénom" placeholder="Prénom" :value="User.CurrentUser.firstName"></input-text>
-                                    <input-text label="Email" placeholder="Email" :value="User.CurrentUser.email"></input-text>
-                                    <input-text label="Téléphone" placeholder="Téléphone" :value="User.CurrentUser.phone"></input-text>
-                                    <input-choice name="gender" label="Genre" :list="genres"></input-choice>
-                                    <input-switch name="hasCar" label="J'ai une voiture" :value="User.CurrentUser.hasCar"></input-switch>
+                                    <input-text   name="lastName"  label="Nom" placeholder="Nom" :value="User.CurrentUser.lastName"></input-text>
+                                    <input-text   name="firstName" label="Prénom" placeholder="Prénom" :value="User.CurrentUser.firstName"></input-text>
+                                    <input-text   name="email"     label="Email" placeholder="Email" :value="User.CurrentUser.email"></input-text>
+                                    <input-text   name="phone"     label="Téléphone" placeholder="Téléphone" :value="User.CurrentUser.phone"></input-text>
+                                    <input-choice name="gender"    label="Genre" :list="genres"></input-choice>
+                                    <input-switch name="hasCar"    label="J'ai une voiture" :value="User.CurrentUser.hasCar"></input-switch>
                                 </div>
                                 <div class="flex md:flex-row flex-col md:space-x-4 md:space-y-0 space-y-2 mt-4">
                                     <button-block :action="deleteAccount" color="red"> Supprimer le compte </button-block>
@@ -190,6 +190,22 @@ export default {
         window.addEventListener("resize", () => {
             this.isMobile = window.innerWidth < 768;
             this.setupView();
+        });
+
+        const setInputValue = (name, value) => {
+            const input = this.$el.querySelector(`input[name="${name}"]`);
+            if (input) input.value = value;
+        }
+
+        API.execute_logged(API.ROUTE.USER, API.METHOD.GET, User.CurrentUser.getCredentials()).then(res => {
+            User.CurrentUser.setInformations(res);
+            User.CurrentUser.save();
+            
+            const fields = ["lastName", "firstName", "email", "phone", "gender", "hasCar"];
+            fields.forEach(field => setInputValue(field, User.CurrentUser[field]));
+
+        }).catch(err => {
+            console.error(err);
         });
     },
     watch: {
