@@ -419,7 +419,11 @@ paths:
           content:
             application/json:
               schema:
-                type: boolean              
+                type: object
+                properties:
+                  message:
+                    type: boolean
+                    example: True 
         '401':
           $ref: '#/components/responses/noToken'
         '498':
