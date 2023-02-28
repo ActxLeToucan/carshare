@@ -30,6 +30,7 @@ app.use('/docs', require('./routes/docs'));
 app.use('/users', dbNeeded, require('./routes/users'));
 app.use('/admin', dbNeeded, require('./routes/admin'));
 app.use('/travels', dbNeeded, require('./routes/travels'));
+app.use('/notifications', dbNeeded, require('./routes/notifications'));
 
 app.use((req, res) => {
     sendMsg(req, res, error.generic.routeNotFound);
