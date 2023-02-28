@@ -8,18 +8,7 @@ exports.getSettingsNotifications = (req: express.Request, res: express.Response,
         return;
     }
 
-    prisma.user.findUnique({
-        where: { id: res.locals.user.id },
-        select: {
-            mailNotif: true
-        }
-
-    }).then((mailNotif) => {
-        res.status(200).json(mailNotif);
-    }).catch((err) => {
-        console.error(err);
-        sendMsg(req, res, error.generic.internalError);
-    });
+    res.status(200).json({value: res.locals.user.mailNotif});
 }
 
 exports.updateSettingsNotifications = (req: express.Request, res: express.Response, next: express.NextFunction) => {
