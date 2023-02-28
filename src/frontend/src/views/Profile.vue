@@ -75,7 +75,7 @@
             validateLabel="Supprimer"
             :onload="setDeletePopup"
             :onvalidate="removeAccount"
-        > <input-text label="Mot de passe" placeholder="Mot de passe" name="password"></input-text> </popup>
+        > <input-text label="Mot de passe" placeholder="Mot de passe" name="password" type="password"></input-text> </popup>
     </div>
 </template>
 
