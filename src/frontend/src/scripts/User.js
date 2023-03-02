@@ -30,6 +30,7 @@ class User {
     level = 0;
     createdAt = null;
     token = null;
+    emailVerifiedOn = null;
 
     constructor(infos) {
         this.setInformations(infos);
@@ -37,11 +38,20 @@ class User {
     }
 
     setInformations(infos) {
-        const props = ["id", "email", "firstName", "lastName", "phone", "avatar", "gender", "hasCar", "mailNotif", "level", "createdAt", "token"];
+        const props = ["id", "email", "firstName", "lastName", "phone", "avatar", "gender", "hasCar", "mailNotif", "level", "createdAt", "token", "emailVerifiedOn"];
         for (const prop of props) {
             if (this[prop] != infos[prop] && infos[prop] !== undefined) {
                 this[prop] = infos[prop];
             }
+        }
+        if (this.token != null) { // verify token
+            API.execute_logged(API.ROUTE.USER, API.METHOD.GET, this.getCredentials()).then(res => {
+                this.setInformations(res);
+            }).catch(err => {
+                if (err.status === 498) { // token expired, disconnect
+                    User.forget();
+                }
+            })
         }
     }
 

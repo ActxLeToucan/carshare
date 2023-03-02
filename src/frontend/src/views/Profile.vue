@@ -28,7 +28,16 @@
                                 <div class="flex flex-col">
                                     <input-text   name="lastName"  label="Nom" placeholder="Nom" :value="User.CurrentUser.lastName"></input-text>
                                     <input-text   name="firstName" label="Prénom" placeholder="Prénom" :value="User.CurrentUser.firstName"></input-text>
-                                    <input-text   name="email"     label="Email" placeholder="Email" :value="User.CurrentUser.email"></input-text>
+                                    <input-text   name="email"     label="Email" placeholder="Email" :value="User.CurrentUser.email" class="mb-0"></input-text>
+                                    <div class="flex space-x-4">
+                                        <p v-if="emailVerified == 'false'" class="ml-auto text-md text-slate-500"> Adresse non verifiée : </p>
+                                        <p v-if="emailVerified == 'true'" class="ml-auto text-md text-slate-500"> Adresse verifiée </p>
+                                        <p v-if="emailVerified == 'pending'" class="ml-auto text-md text-slate-500"> Un mail de vérification vous a été envoyé </p>
+                                        <button
+                                            v-on:click="verifyEmail"
+                                            v-if="emailVerified == 'false'"
+                                            class="ml-auto font-semibold text-md text-slate-500 hover:text-teal-500 cursor-pointer"> Vérifier </button>
+                                    </div>
                                     <input-text   name="phone"     label="Téléphone" placeholder="Téléphone" :value="User.CurrentUser.phone"></input-text>
                                     <input-choice name="gender"    label="Genre" :list="genres"></input-choice>
                                     <input-switch name="hasCar"    label="J'ai une voiture" :value="User.CurrentUser.hasCar"></input-switch>
@@ -115,7 +124,7 @@ export default {
     },
     name: 'Home',
     data() {
-        return { User, genres, isMobile: window.innerWidth < 768 }
+        return { User, genres, isMobile: window.innerWidth < 768, emailVerified: (User.CurrentUser.emailVerifiedOn != null).toString() }
     },
     methods: {
         setDeletePopup(popup) {
@@ -153,6 +162,7 @@ export default {
             const tabs = this.$refs["tabs-zone"];
             const tabsBtn = this.$refs["backtabs-btn"];
             const content = this.$refs["content-zone"];
+            if (tabs == null || tabsBtn == null || content == null) return;
 
             if (this.isMobile) {
                 this.showTabs = () => {
@@ -183,6 +193,13 @@ export default {
                 tabs.classList.remove("hidden");
                 content.classList.remove("hidden");
             }
+        },
+        verifyEmail() {
+            API.execute_logged(API.ROUTE.VERIFY, API.METHOD.POST, User.CurrentUser.getCredentials()).then(res => {
+                this.emailVerified = 'pending';
+            }).catch(err => {
+                console.error(err);
+            });
         }
     },
     mounted() {
