@@ -1,11 +1,23 @@
 import type express from 'express';
 import { prisma } from '../app';
+import { type Prisma } from '@prisma/client';
 import { displayableUser, error, info, sendMsg } from '../tools/translator';
 import * as properties from '../properties';
 import bcrypt from 'bcrypt';
 
 exports.users = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    prisma.user.findMany()
+    const offset = Number.isNaN(req.query.offset) ? 0 : Math.max(0, Number(req.query.offset)); // default 0, min 0
+    const limit = Number.isNaN(req.query.limit) ? 50 : Math.max(0, Number(req.query.limit)); // default 50, min 0
+
+    prisma.user.findMany<Prisma.UserFindManyArgs>({
+        skip: offset,
+        take: limit,
+        orderBy: [
+            {
+                id: 'asc'
+            }
+        ]
+    })
         .then(users => {
             res.status(200).json(users.map(displayableUser));
         })
