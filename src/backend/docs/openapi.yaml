@@ -435,7 +435,7 @@ paths:
       description: Update the setting to have mail sent or not by mail when receiving a notification
       operationId: updateNotificationSetting
       tags:
-        - Users
+        - Settings
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
       security:
