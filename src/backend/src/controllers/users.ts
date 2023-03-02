@@ -38,7 +38,7 @@ exports.signup = (req: express.Request, res: express.Response, next: express.Nex
                             gender: genderSanitized
                         }
                     }).then((user) => {
-                        const msg = info.user.created(req, res);
+                        const msg = info.user.created(req);
                         res.status(msg.code).json({
                             message: msg.msg,
                             user: displayableUser(user),
@@ -83,7 +83,7 @@ exports.login = (req: express.Request, res: express.Response, next: express.Next
                         return;
                     }
 
-                    const msg = info.user.loggedIn(req, res);
+                    const msg = info.user.loggedIn(req);
                     res.status(msg.code).json({
                         message: msg.msg,
                         userId: user.id,
