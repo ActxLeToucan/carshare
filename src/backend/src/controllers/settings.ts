@@ -20,14 +20,7 @@ exports.updateSettingsNotifications = (req: express.Request, res: express.Respon
 
     const value = req.body.value;
 
-    if (value !== undefined && !properties.checkBooleanField(value, req, res, 'mailNotif')) {
-        sendMsg(req, res, error.boolean.type);
-        return;
-    }
-    if (value == undefined) {
-        sendMsg(req, res, error.boolean.required);
-        return;
-    }
+    if (!properties.checkBooleanField(value, req, res, 'mailNotif')) return;
 
     prisma.user.update({
         where: { id: res.locals.user.id },
