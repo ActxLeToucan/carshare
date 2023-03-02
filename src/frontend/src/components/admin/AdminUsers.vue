@@ -129,8 +129,10 @@ export default {
             return search(this);
         },
         deleteAccount() {
-            API.execute_logged(API.ROUTE.ADMIN.USERS + API.createParameters({id: this.selectedUser.id}), API.METHOD.DELETE, User.CurrentUser?.getCredentials()).then((data) => {
+            API.execute_logged(API.ROUTE.ADMIN.USER + "/" + this.selectedUser.id, API.METHOD.DELETE, User.CurrentUser?.getCredentials()).then((data) => {
                 this.displayPage(PAGE.QUERY);
+                this.usersList.splice(this.usersList.indexOf(this.selectedUser), 1);
+                this.selectedUser = null;
             });
         },
         updateAccount() {

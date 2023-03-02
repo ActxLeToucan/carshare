@@ -76,6 +76,9 @@ export default {
                     name: 'Admin',
                     link: '/admin'
                 })
+        } else {
+            if ( buttons.find( button => button.name === 'Admin' ) )
+                buttons.splice( buttons.findIndex( button => button.name === 'Admin' ), 1 )
         }
 
         return { buttons }
