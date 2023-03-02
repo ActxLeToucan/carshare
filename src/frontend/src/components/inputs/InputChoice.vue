@@ -12,7 +12,7 @@
                 <option v-for="el in this.elements" :value="el.value" :key="el.value"> {{ el.label }} </option>
             </select>
         </div>
-        <input ref="input" :name="name" type="text" class="hidden">
+        <input ref="input" :name="name" type="number" :value="value" class="hidden">
     </div>
 </template>
 
@@ -66,8 +66,8 @@ export default {
             required: false
         },
         value: {
-            type: String,
-            default: "",
+            type: Number,
+            default: 0,
             required: false
         },
         list: {
@@ -99,6 +99,11 @@ export default {
         this.selectEl.addEventListener("change", (e) => {
             this.setSelected(e.target.value);
         });
+    },
+    watch: {
+        value: function (val) {
+            this.setSelected(val);
+        }
     }
 }
 </script>
