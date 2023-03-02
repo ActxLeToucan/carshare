@@ -421,11 +421,13 @@ paths:
               schema:
                 type: object
                 properties:
-                  message:
+                  value:
                     type: boolean
                     example: True 
         '401':
           $ref: '#/components/responses/noToken'
+        '404':
+          $ref: '#/components/responses/userNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
@@ -452,9 +454,19 @@ paths:
                     type: string
                     example: Settings saved
         '400':
-          $ref: '#/components/responses/typeError'
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Field "value" is required.
         '401':
           $ref: '#/components/responses/noToken'
+        '404':
+          $ref: '#/components/responses/userNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
