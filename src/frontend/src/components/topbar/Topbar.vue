@@ -62,15 +62,23 @@ export default {
     },
     name: 'Topbar',
     data() {
-        return { buttons }
-    },
-    mounted() {
         // if the topbar is displayed, it's a page that requires authentication
         // so we check if the user is logged in, if not we redirect him to the home page
         // (with buttons to login or register)
         if (User.CurrentUser === null) {
             goTo(this, '/home');
         }
+
+        if (User.CurrentUser.level > 0) { // is admin
+            if ( !buttons.find( button => button.name === 'Admin' ) )
+                buttons.push({
+                    name: 'Admin',
+                    link: '/admin'
+                })
+        }
+        return { buttons }
+    },
+    mounted() {
 
         const btn = this.$refs["btn-mobile"];
         const menu = this.$refs["menu-mobile"];

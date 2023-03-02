@@ -7,8 +7,7 @@ export function retreiveFields(el) {
         const input = div.querySelector("input");
         if (!input) continue;
 
-        if (input.type == "checkbox")
-            input.value = input.checked ? true : false;
+        input.value = getTypedValue(input);
 
         inputs.push(input);
     }
@@ -25,4 +24,15 @@ export function retreiveFields(el) {
         input.focus();
         return true;
     };
+}
+
+export function getTypedValue(input) {
+    switch (input.type) {
+        case "number":
+            return Number(input.value);
+        case "checkbox":
+            return input.checked;
+        default:
+            return input.value;
+    }
 }
