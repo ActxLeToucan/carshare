@@ -24,6 +24,10 @@ exports.updateSettingsNotifications = (req: express.Request, res: express.Respon
         sendMsg(req, res, error.boolean.type);
         return;
     }
+    if (value == undefined) {
+        sendMsg(req, res, error.boolean.required);
+        return;
+    }
 
     prisma.user.update({
         where: { id: res.locals.user.id },
