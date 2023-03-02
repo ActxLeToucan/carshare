@@ -61,6 +61,7 @@ import InputChoice from '../inputs/InputChoice.vue';
 import ButtonBlock from '../inputs/ButtonBlock.vue';
 import AdminUserCard from './AdminUserCard.vue';
 import Card from '../cards/Card.vue';
+import { genres } from '../../scripts/data';
 
 import {
     MagnifyingGlassIcon
@@ -77,12 +78,6 @@ function search(obj) {
         console.log(data)
     });
 }
-
-const genres = [
-    { label: "Homme", value: 1, selected: User.CurrentUser?.gender == 1 },
-    { label: "Autre", value: -1, selected: User.CurrentUser?.gender == -1 },
-    { label: "Femme", value: 0, selected: User.CurrentUser?.gender == 0 },
-];
 
 export default {
     name: 'AdminUsers',

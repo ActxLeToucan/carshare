@@ -40,7 +40,7 @@
                                             class="ml-auto font-semibold text-md text-slate-500 hover:text-teal-500 cursor-pointer"> Vérifier </button>
                                     </div>
                                     <input-text   name="phone"     label="Téléphone" placeholder="Téléphone" :value="User.CurrentUser?.phone"></input-text>
-                                    <input-choice name="gender"    label="Genre" :list="genres"></input-choice>
+                                    <input-choice name="gender"    label="Genre" :value="User.CurrentUser?.gender" :list="genres"></input-choice>
                                     <input-switch name="hasCar"    label="J'ai une voiture" :value="User.CurrentUser?.hasCar"></input-switch>
                                 </div>
                                 <div class="flex md:flex-row flex-col md:space-x-4 md:space-y-0 space-y-2 mt-4">
@@ -103,12 +103,7 @@ import User from '../scripts/User';
 import Popup from '../components/cards/Popup.vue';
 import API from '../scripts/API';
 import { Log } from '../scripts/Logs';
-
-const genres = [
-    { label: "Homme", value: 1, selected: User.CurrentUser?.gender == 1 },
-    { label: "Autre", value: -1, selected: User.CurrentUser?.gender == -1 },
-    { label: "Femme", value: 0, selected: User.CurrentUser?.gender == 0 },
-];
+import { genres } from '../scripts/data';
 
 export default {
     components: {

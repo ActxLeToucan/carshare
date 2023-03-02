@@ -36,3 +36,9 @@ export function getTypedValue(input) {
             return input.value;
     }
 }
+
+export const genres = [
+    {value: 1,  label: "Homme"},
+    {value: -1, label: "Non spécifié"},
+    {value: 0,  label: "Femme"},
+];

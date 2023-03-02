@@ -12,7 +12,7 @@
                 <option v-for="el in this.elements" :value="el.value" :key="el.value"> {{ el.label }} </option>
             </select>
         </div>
-        <input ref="input" :name="name" type="number" :value="value" class="hidden">
+        <input ref="input" :name="name" type="number" class="hidden">
     </div>
 </template>
 
@@ -86,6 +86,7 @@ export default {
         }
     },
     mounted() {
+        this.selected = this.value;
         this.elements.forEach(item => {
             if (item.selected) {
                 this.selected = item.value;
