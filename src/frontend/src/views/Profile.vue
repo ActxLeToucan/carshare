@@ -3,6 +3,7 @@
         <topbar></topbar>
         <div class="flex md:flex-row flex-col grow max-h-full min-h-0">
             <div ref="tabs-zone" class="flex flex-col items-center h-full md:w-min w-full px-8 py-4 space-y-4 md:border-r-8 border-teal-500 mx-auto overflow-hidden">
+                <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> Profile </p>
                 <button-tab href="#infos" :default="!isMobile"> Mes informations </button-tab>
                 <button-tab href="#trips"> Mes trajets </button-tab>
                 <button-tab href="#evals"> Mes notes </button-tab>

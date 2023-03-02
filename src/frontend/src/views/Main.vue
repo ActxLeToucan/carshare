@@ -13,7 +13,7 @@ import Topbar from "../components/topbar/Topbar.vue"
 
 export default {
     components: { Topbar },
-    name: 'Home',
+    name: 'Main',
     data() {
         return {}
     }
