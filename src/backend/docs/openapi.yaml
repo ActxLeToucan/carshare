@@ -793,6 +793,11 @@ components:
         createdAt:
           type: string
           format: date-time
+        emailVerifiedOn:
+          type: string
+          format: date-time
+          nullable: true
+          default: null
     ArrayOfUsers:
       type: array
       items:
@@ -809,6 +814,7 @@ components:
           mailNotif: true
           level: 3
           createdAt: 2023-01-26T15:26:31.144Z
+          emailVerifiedOn: 2023-01-26T15:26:31.144Z
         - id: 2
           email: laia@cat.world
           firstName: Laia
@@ -820,6 +826,7 @@ components:
           mailNotif: true
           level: 1
           createdAt: 2023-02-18T13:19:23.636Z
+          emailVerifiedOn: 2023-02-18T13:19:23.636Z
     ListRoute:
       type: object
       properties:
