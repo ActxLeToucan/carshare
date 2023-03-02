@@ -67,19 +67,20 @@ export default {
         // (with buttons to login or register)
         if (User.CurrentUser === null) {
             goTo(this, '/home');
+            return {};
         }
 
-        if (User.CurrentUser.level > 0) { // is admin
+        if (User.CurrentUser?.level > 0) { // is admin
             if ( !buttons.find( button => button.name === 'Admin' ) )
                 buttons.push({
                     name: 'Admin',
                     link: '/admin'
                 })
         }
+
         return { buttons }
     },
     mounted() {
-
         const btn = this.$refs["btn-mobile"];
         const menu = this.$refs["menu-mobile"];
         const child = menu.firstElementChild;

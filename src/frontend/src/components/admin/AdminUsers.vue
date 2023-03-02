@@ -72,16 +72,16 @@ const PAGE = { QUERY: 1, RESULTS: 2 };
 function search(obj) {
     const value = obj.$refs['query-zone'].querySelector('input').value;
 
-    API.execute_logged(API.ROUTE.ADMIN.USERS, API.METHOD.GET, User.CurrentUser.getCredentials(), { search: value }).then((data) => {
+    API.execute_logged(API.ROUTE.ADMIN.USERS, API.METHOD.GET, User.CurrentUser?.getCredentials(), { search: value }).then((data) => {
         obj.usersList = data;
         console.log(data)
     });
 }
 
 const genres = [
-    { label: "Homme", value: 1, selected: User.CurrentUser.gender == 1 },
-    { label: "Autre", value: -1, selected: User.CurrentUser.gender == -1 },
-    { label: "Femme", value: 0, selected: User.CurrentUser.gender == 0 },
+    { label: "Homme", value: 1, selected: User.CurrentUser?.gender == 1 },
+    { label: "Autre", value: -1, selected: User.CurrentUser?.gender == -1 },
+    { label: "Femme", value: 0, selected: User.CurrentUser?.gender == 0 },
 ];
 
 export default {
@@ -129,7 +129,7 @@ export default {
             return search(this);
         },
         deleteAccount() {
-            API.execute_logged(API.ROUTE.ADMIN.USERS + API.createParameters({id: this.selectedUser.id}), API.METHOD.DELETE, User.CurrentUser.getCredentials()).then((data) => {
+            API.execute_logged(API.ROUTE.ADMIN.USERS + API.createParameters({id: this.selectedUser.id}), API.METHOD.DELETE, User.CurrentUser?.getCredentials()).then((data) => {
                 this.displayPage(PAGE.QUERY);
             });
         },
@@ -141,7 +141,7 @@ export default {
                 newData[prop] = getTypedValue(input);
             }
 
-            API.execute_logged(API.ROUTE.ADMIN.USER + "/" + this.selectedUser.id, API.METHOD.PATCH, User.CurrentUser.getCredentials(), newData).then((data) => {
+            API.execute_logged(API.ROUTE.ADMIN.USER + "/" + this.selectedUser.id, API.METHOD.PATCH, User.CurrentUser?.getCredentials(), newData).then((data) => {
                 for (const prop of props) {
                     this.selectedUser[prop] = newData[prop];
                 }

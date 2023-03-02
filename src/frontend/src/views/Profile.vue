@@ -27,9 +27,9 @@
                         <div class="flex flex-col grow justify-evenly items-center">
                             <card class="flex flex-col m-4">
                                 <div class="flex flex-col">
-                                    <input-text   name="lastName"  label="Nom" placeholder="Nom" :value="User.CurrentUser.lastName"></input-text>
-                                    <input-text   name="firstName" label="Prénom" placeholder="Prénom" :value="User.CurrentUser.firstName"></input-text>
-                                    <input-text   name="email"     label="Email" placeholder="Email" :value="User.CurrentUser.email" class="mb-0"></input-text>
+                                    <input-text   name="lastName"  label="Nom" placeholder="Nom" :value="User.CurrentUser?.lastName"></input-text>
+                                    <input-text   name="firstName" label="Prénom" placeholder="Prénom" :value="User.CurrentUser?.firstName"></input-text>
+                                    <input-text   name="email"     label="Email" placeholder="Email" :value="User.CurrentUser?.email" class="mb-0"></input-text>
                                     <div class="flex space-x-4">
                                         <p v-if="emailVerified == 'false'" class="ml-auto text-md text-slate-500"> Adresse non verifiée : </p>
                                         <p v-if="emailVerified == 'true'" class="ml-auto text-md text-slate-500"> Adresse verifiée </p>
@@ -39,9 +39,9 @@
                                             v-if="emailVerified == 'false'"
                                             class="ml-auto font-semibold text-md text-slate-500 hover:text-teal-500 cursor-pointer"> Vérifier </button>
                                     </div>
-                                    <input-text   name="phone"     label="Téléphone" placeholder="Téléphone" :value="User.CurrentUser.phone"></input-text>
+                                    <input-text   name="phone"     label="Téléphone" placeholder="Téléphone" :value="User.CurrentUser?.phone"></input-text>
                                     <input-choice name="gender"    label="Genre" :list="genres"></input-choice>
-                                    <input-switch name="hasCar"    label="J'ai une voiture" :value="User.CurrentUser.hasCar"></input-switch>
+                                    <input-switch name="hasCar"    label="J'ai une voiture" :value="User.CurrentUser?.hasCar"></input-switch>
                                 </div>
                                 <div class="flex md:flex-row flex-col md:space-x-4 md:space-y-0 space-y-2 mt-4">
                                     <button-block :action="deleteAccount" color="red"> Supprimer le compte </button-block>
@@ -105,9 +105,9 @@ import API from '../scripts/API';
 import { Log } from '../scripts/Logs';
 
 const genres = [
-    { label: "Homme", value: 1, selected: User.CurrentUser.gender == 1 },
-    { label: "Autre", value: -1, selected: User.CurrentUser.gender == -1 },
-    { label: "Femme", value: 0, selected: User.CurrentUser.gender == 0 },
+    { label: "Homme", value: 1, selected: User.CurrentUser?.gender == 1 },
+    { label: "Autre", value: -1, selected: User.CurrentUser?.gender == -1 },
+    { label: "Femme", value: 0, selected: User.CurrentUser?.gender == 0 },
 ];
 
 export default {
@@ -125,7 +125,7 @@ export default {
     },
     name: 'Home',
     data() {
-        return { User, genres, isMobile: window.innerWidth < 768, emailVerified: (User.CurrentUser.emailVerifiedOn != null).toString() }
+        return { User, genres, isMobile: window.innerWidth < 768, emailVerified: (User.CurrentUser?.emailVerifiedOn != null).toString() }
     },
     methods: {
         setDeletePopup(popup) {
@@ -142,7 +142,7 @@ export default {
         removeAccount(popup) {
             return new Promise((resolve, reject) => {
                 const log = popup.log("Suppression du compte...", Log.INFO);
-                API.execute_logged(API.ROUTE.USER, API.METHOD.DELETE, User.CurrentUser.getCredentials(), {password: popup.get("password")}).then(res => {
+                API.execute_logged(API.ROUTE.USER, API.METHOD.DELETE, User.CurrentUser?.getCredentials(), {password: popup.get("password")}).then(res => {
                     log.update("Compte supprimé avec succès !", Log.SUCCESS);
                     setTimeout(() => {
                         log.delete();
@@ -196,7 +196,7 @@ export default {
             }
         },
         verifyEmail() {
-            API.execute_logged(API.ROUTE.VERIFY, API.METHOD.POST, User.CurrentUser.getCredentials()).then(res => {
+            API.execute_logged(API.ROUTE.VERIFY, API.METHOD.POST, User.CurrentUser?.getCredentials()).then(res => {
                 this.emailVerified = 'pending';
             }).catch(err => {
                 console.error(err);
@@ -215,9 +215,9 @@ export default {
             if (input) input.value = value;
         }
 
-        API.execute_logged(API.ROUTE.USER, API.METHOD.GET, User.CurrentUser.getCredentials()).then(res => {
-            User.CurrentUser.setInformations(res);
-            User.CurrentUser.save();
+        API.execute_logged(API.ROUTE.USER, API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
+            User.CurrentUser?.setInformations(res);
+            User.CurrentUser?.save();
             
             const fields = ["lastName", "firstName", "email", "phone", "gender", "hasCar"];
             fields.forEach(field => setInputValue(field, User.CurrentUser[field]));
