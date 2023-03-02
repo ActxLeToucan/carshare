@@ -403,6 +403,75 @@ paths:
         '500':
           $ref: '#/components/responses/internalError'
 
+  /settings/notifications:
+    get:
+      summary: Setting for mail notification
+      description: True to have notification sent by mail or false to not be sent mail.
+      tags:
+        - Settings
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: The present value of this setting.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: boolean
+                    example: True 
+        '401':
+          $ref: '#/components/responses/noToken'
+        '404':
+          $ref: '#/components/responses/userNotFound'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+    patch:
+      summary: Update setting
+      description: Update the setting to have mail sent or not by mail when receiving a notification
+      operationId: updateNotificationSetting
+      tags:
+        - Settings
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Update the mailNotif setting
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Settings saved
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Field "value" is required.
+        '401':
+          $ref: '#/components/responses/noToken'
+        '404':
+          $ref: '#/components/responses/userNotFound'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+          
   /notifications/my:
     get:
       summary: Get the list of notifications
@@ -668,6 +737,16 @@ components:
               message:
                 type: string
                 example: User not found.
+    typeError:
+      description: Invalid type of value
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Invalid type of value provided.
     internalError:
       description: Internal server error
       content:

@@ -425,6 +425,15 @@ const info: TranslationsMessageHTTP = {
             },
             code: 200
         })
+    },
+    settings: {
+        saved: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Paramètres enregistrés',
+                en: 'Settings saved'
+            },
+            code: 200
+        })
     }
 }
 
