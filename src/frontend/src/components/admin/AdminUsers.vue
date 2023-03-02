@@ -75,7 +75,6 @@ function search(obj) {
 
     API.execute_logged(API.ROUTE.ADMIN.USERS, API.METHOD.GET, User.CurrentUser?.getCredentials(), { search: value }).then((data) => {
         obj.usersList = data;
-        console.log(data)
     });
 }
 
