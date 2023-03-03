@@ -53,4 +53,6 @@ http-server ./dist -p 8080
 ```
 
 ## Informations
+Une page d'informations sur la charte graphique utilisée sur le site web est disponible [Ici](./docs/Charte%20graphique.md) pour plus d'informations sur le développement et l'élaboration de l'Interface Utilisateur (UI).
+
 Le site contient dans ses métadonnées (balise `<head>` du fichier `index.html`) l'URL du site web sur lequel il est hébergé. Veuillez à modifier cet URL pour qu'elle corresponde à l'URL de votre site.
