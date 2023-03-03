@@ -7,7 +7,11 @@ import bcrypt from 'bcrypt';
 
 exports.users = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const offset = Number.isNaN(req.query.offset) ? 0 : Math.max(0, Number(req.query.offset)); // default 0, min 0
-    const limit = Number.isNaN(req.query.limit) ? 50 : Math.max(0, Number(req.query.limit)); // default 50, min 0
+    const limit = Number.isNaN(req.query.limit)
+        ? properties.p.query.maxLimit // default
+        : Math.min(properties.p.query.maxLimit,
+            Math.max(properties.p.query.minLimit, Number(req.query.limit))
+        ); // default max, min p.query.minLimit, max p.query.maxLimit
 
     prisma.user.findMany<Prisma.UserFindManyArgs>({
         skip: offset,

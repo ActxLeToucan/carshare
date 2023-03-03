@@ -59,6 +59,10 @@ const p: Record<string, Record<string, any>> = {
     url: {
         passwordReset: `${String(process.env.FRONTEND_URL)}/reinit?token=`,
         emailVerification: `${String(process.env.FRONTEND_URL)}/validate?token=`
+    },
+    query: {
+        minLimit: 1, // in database queries, the minimum value allowed for LIMIT statements
+        maxLimit: 50 // the max value allowed for LIMIT statements
     }
 }
 

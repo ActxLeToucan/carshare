@@ -444,8 +444,9 @@ paths:
           schema:
             type: integer
             default: 50
-            minimum: 0
-          description: The number of users to return (0 means no limit)
+            minimum: 1
+            maximum: 50
+          description: The number of users to return
         - in: query
           name: offset
           schema:
