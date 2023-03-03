@@ -201,11 +201,12 @@ function checkFirstNameField (firstname: any, req: express.Request, res: express
 }
 
 /**
- * Sanitize the level of a user
+ * Check if the level is in a valid format
+ * If the level is not valid, send an error message to the client
  * @param level Level to sanitize
  * @param req Express request
  * @param res Express response
- * @returns The number value if it is valid, null otherwise
+ * @returns true if the level is valid, false otherwise
  */
 function checkLevelField (level: any, req: express.Request, res: express.Response): boolean {
     if (level === undefined || level === '') {
@@ -225,6 +226,7 @@ function checkLevelField (level: any, req: express.Request, res: express.Respons
 
 /**
  * Check if a boolean field is valid
+ * If the boolean is not valid, send an error message to the client
  * @param value Value to sanitize
  * @param req Express request
  * @param res Express response

@@ -1,6 +1,6 @@
 <template>
-    <div class="flex grow h-fit w-full md:flex-row flex-col justify-between md:space-x-8 md:items-center my-2">
-        <label class="flex text-xl text-slate-500 font-bold whitespace-nowrap text-ellipsis w-fit">
+    <div class="flex grow h-fit w-full md:flex-row min-w-0 flex-col justify-between md:space-x-8 md:items-center my-2">
+        <label v-if="label != ''" class="flex text-xl text-slate-500 font-bold whitespace-nowrap text-ellipsis w-fit">
             {{ label }}
         </label>
         <input
