@@ -270,6 +270,15 @@ const error: TranslationsMessageHTTP = {
             code: 400
         })
     },
+    ville: {
+        type: (req: Request, fieldName: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Le champ "${fieldName}" doit être une chaîne de charactères.`,
+                en: `Field "${fieldName}" must be a string.`
+            },
+            code: 400
+        })
+    },
     user: {
         notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
