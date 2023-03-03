@@ -33,20 +33,20 @@ class User {
     emailVerifiedOn = null;
 
     constructor(infos) {
-        this.setInformations(infos);
+        this.setInformations(infos, true);
         User.#currentUser = this;
     }
 
-    setInformations(infos) {
+    setInformations(infos, checkToken = false) {
         const props = ["id", "email", "firstName", "lastName", "phone", "avatar", "gender", "hasCar", "mailNotif", "level", "createdAt", "token", "emailVerifiedOn"];
         for (const prop of props) {
             if (this[prop] != infos[prop] && infos[prop] !== undefined) {
                 this[prop] = infos[prop];
             }
         }
-        if (this.token != null) { // verify token
+        if (this.token != null && checkToken) { // verify token
             API.execute_logged(API.ROUTE.USER, API.METHOD.GET, this.getCredentials()).then(res => {
-                this.setInformations(res);
+                this.setInformations(res, false);
             }).catch(err => {
                 if (err.status === 498) { // token expired, disconnect
                     User.forget();

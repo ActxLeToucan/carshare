@@ -7,8 +7,7 @@ export function retreiveFields(el) {
         const input = div.querySelector("input");
         if (!input) continue;
 
-        if (input.type == "checkbox")
-            input.value = input.checked ? true : false;
+        input.value = getTypedValue(input);
 
         inputs.push(input);
     }
@@ -26,3 +25,20 @@ export function retreiveFields(el) {
         return true;
     };
 }
+
+export function getTypedValue(input) {
+    switch (input.type) {
+        case "number":
+            return Number(input.value);
+        case "checkbox":
+            return input.checked;
+        default:
+            return input.value;
+    }
+}
+
+export const genres = [
+    {value: 1,  label: "Homme"},
+    {value: -1, label: "Non spécifié"},
+    {value: 0,  label: "Femme"},
+];

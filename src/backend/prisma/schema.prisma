@@ -72,6 +72,7 @@ model Etape {
   lng      Float // ex: 6.161877
   travel   Travel @relation(fields: [travelId], references: [id])
   travelId Int
+  order    Int
 }
 
 model Evaluation {
