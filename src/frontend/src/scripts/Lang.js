@@ -2,15 +2,15 @@ import en from "../langs/en.js";
 import fr from "../langs/fr.js";
 
 class Lang {
+    static Langs = [
+        {label: "English", value: "en", data: en},
+        {label: "Français", value: "fr", data: fr},
+    ];
+
     static callbackIndex = 0;
     static callbacks = [];
     static current_lang = null;
     static current_code = null;
-
-    static langs = [
-        {label: "English", value: "en", data: en},
-        {label: "Français", value: "fr", data: fr},
-    ];
     static defaultLanguage = fr;
 
     static get CurrentLang() {
