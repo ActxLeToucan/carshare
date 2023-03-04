@@ -1,8 +1,12 @@
 import express from 'express';
 import { PrismaClient } from '@prisma/client';
 import { error, sendMsg } from './tools/translator';
+import auth from './middlewares/auth';
 
 const dbNeeded = require('./middlewares/dbNeeded');
+const emailVerified = require('./middlewares/emailVerified');
+const admin = require('./middlewares/admin');
+
 const prisma = new PrismaClient({ errorFormat: 'pretty' });
 
 const app = express();
@@ -28,7 +32,7 @@ app.get('/', (req, res) => {
 
 app.use('/docs', require('./routes/docs'));
 app.use('/users', dbNeeded, require('./routes/users'));
-app.use('/admin', dbNeeded, require('./routes/admin'));
+app.use('/admin', dbNeeded, auth.access, emailVerified, admin, require('./routes/admin'));
 app.use('/travels', dbNeeded, require('./routes/travels'));
 app.use('/notifications', dbNeeded, require('./routes/notifications'));
 app.use('/settings', dbNeeded, require('./routes/settings'));

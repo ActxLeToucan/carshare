@@ -2,7 +2,7 @@ import type express from 'express';
 import { prisma } from '../app';
 import { displayableUser, error, info, sendMsg } from '../tools/translator';
 import * as properties from '../properties';
-import * as _user from './_user';
+import * as _user from './_common/user';
 
 exports.users = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     prisma.user.findMany()
