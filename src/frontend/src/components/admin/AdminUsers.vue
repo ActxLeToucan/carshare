@@ -96,6 +96,7 @@ export default {
         displayPage(page) {
             const queryZone = this.$refs['query-zone'];
             const resultZone = this.$refs['result-zone'];
+            if (!queryZone || !resultZone) return;
             if (!page) page = this.displayedPage;
 
             if (this.isMobile) {
