@@ -27,10 +27,10 @@ class Lang {
 
 
     static loadLang(code) {
-        if (this.langs.map(l => l.value).indexOf(code) === -1)
+        if (this.Langs.map(l => l.value).indexOf(code) === -1)
             return false;
         
-        this.current_lang = this.langs.find(l => l.value === code).data;
+        this.current_lang = this.Langs.find(l => l.value === code).data;
         for (const key in Lang.defaultLanguage) {
             if (!this.current_lang[key])
                 this.current_lang[key] = Lang.defaultLanguage[key];
