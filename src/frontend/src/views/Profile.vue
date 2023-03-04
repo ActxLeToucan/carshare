@@ -34,6 +34,7 @@
                                         <p v-if="emailVerified == 'false'" class="ml-auto text-md text-slate-500"> Adresse non verifiée : </p>
                                         <p v-if="emailVerified == 'true'" class="ml-auto text-md text-slate-500"> Adresse verifiée </p>
                                         <p v-if="emailVerified == 'pending'" class="ml-auto text-md text-slate-500"> Un mail de vérification vous a été envoyé </p>
+                                        <p v-if="emailVerified == 'error'" class="ml-auto text-md text-red-500"> Une erreur s'est produite, veuillez réessayer. </p>
                                         <button
                                             v-on:click="verifyEmail"
                                             v-if="emailVerified == 'false'"
@@ -194,7 +195,7 @@ export default {
             API.execute_logged(API.ROUTE.VERIFY, API.METHOD.POST, User.CurrentUser?.getCredentials()).then(res => {
                 this.emailVerified = 'pending';
             }).catch(err => {
-                console.error(err);
+                this.emailVerified = 'error';
             });
         }
     },
