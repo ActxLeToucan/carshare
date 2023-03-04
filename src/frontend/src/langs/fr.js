@@ -12,6 +12,10 @@ export default {
     UNSPECIFIED: "Non spécifié",
     FEMALE: "Femme",
 
+    // 404 page
+    WOOPS: "Woops !",
+    NOT_FOUND: "La page que vous cherchez n'existe pas 🤔",
+
     // actions
     LOGIN: "Se connecter",
     REGISTER: "S'inscrire",
@@ -25,6 +29,7 @@ export default {
     SEARCH: "Rechercher",
     VERIFY: "Vérifier",
     CHANGE: "Changer",
+    BACK: "Retour",
     DISCONNECT: "Se déconnecter",
 
     // register
