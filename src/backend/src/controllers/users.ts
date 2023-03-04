@@ -4,7 +4,6 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { displayableUser, error, info, mail, sendMail, sendMsg } from '../tools/translator';
 import * as properties from '../properties';
-import * as _user from './_user';
 
 exports.signup = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const { email, password, lastName, firstName, phone, hasCar, gender } = req.body;
@@ -107,51 +106,6 @@ exports.login = (req: express.Request, res: express.Response, next: express.Next
         });
 }
 
-exports.getMe = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
-
-    res.status(200).json(displayableUser(res.locals.user));
-}
-
-exports.deleteMe = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
-
-    if (!properties.checkPasswordField(req.body.password, req, res, false)) return;
-
-    bcrypt.compare(req.body.password, res.locals.user.password)
-        .then((valid) => {
-            if (!valid) {
-                sendMsg(req, res, error.auth.invalidCredentials);
-                return;
-            }
-
-            prisma.user.delete({ where: { id: res.locals.user.id } })
-                .then(() => { sendMsg(req, res, info.user.deleted); })
-                .catch((err) => {
-                    console.error(err);
-                    sendMsg(req, res, error.generic.internalError);
-                });
-        }).catch((err) => {
-            console.error(err);
-            sendMsg(req, res, error.generic.internalError);
-        });
-}
-
-exports.updateMe = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
-
-    _user.update(req, res, res.locals.user.id, false);
-}
-
 exports.passwordResetSendEmail = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     if (!properties.checkEmailField(req.body.email, req, res, false)) return;
 
@@ -199,7 +153,7 @@ exports.passwordResetSendEmail = (req: express.Request, res: express.Response, n
         });
 }
 
-exports.passwordReset = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+exports.updatePassword = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     if (res.locals.user === undefined) {
         sendMsg(req, res, error.auth.noToken);
         return;

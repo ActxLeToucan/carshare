@@ -296,6 +296,57 @@ paths:
         '500':
           $ref: '#/components/responses/internalError'
 
+  /users/me/password:
+    patch:
+      summary: Update password
+      description: Update the current user's password
+      operationId: updateCurrentUserPassword
+      tags:
+        - Users
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  example: Password123$
+      responses:
+        '200':
+          description: Password changed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Password changed
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Password is required.
+        '401':
+          $ref: '#/components/responses/noToken'
+        '404':
+          $ref: '#/components/responses/userNotFound'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+
+
   /users/password-reset:
     post:
       summary: Ask for password reset
@@ -496,7 +547,7 @@ paths:
                 properties:
                   value:
                     type: boolean
-                    example: True 
+                    example: True
         '401':
           $ref: '#/components/responses/noToken'
         '404':
@@ -544,7 +595,7 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
-          
+
   /notifications/my:
     get:
       summary: Get the list of notifications
