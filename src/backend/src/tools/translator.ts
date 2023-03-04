@@ -4,7 +4,9 @@ import { type User } from '@prisma/client';
 import { p } from '../properties';
 import { sendMail as mailerSend } from './mailer';
 
-export type Variants = Record<string, any>;
+export type Variants = {
+    en: any
+} & Record<string, any>;
 type TemplateMessage = TemplateMail | TemplateMessageHTTP
 type Message = Mail | MessageHTTP
 type TranslationsMessageHTTP = Record<string, Record<string, (req: Request, ...args: any) => MessageHTTP>>;
@@ -70,6 +72,13 @@ const error = {
             msg: {
                 fr: "L'adresse email est déjà utilisée.",
                 en: 'Email address is already used.'
+            },
+            code: 400
+        }),
+        alreadyVerified: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: "L'adresse email a déjà été vérifiée.",
+                en: 'Email address is already verified.'
             },
             code: 400
         })
@@ -360,6 +369,15 @@ const error = {
                 en: 'The requested route does not exist.'
             },
             code: 404
+        })
+    },
+    mailer: {
+        cooldown: (req: Request, cooldown: Variants) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Un mail a déjà été envoyé à cette adresse il y a moins de ${translate(req, cooldown)}. Veuillez patienter avant d'essayer à nouveau.`,
+                en: `A mail has already been sent to this address less than ${translate(req, cooldown)} ago. Please wait before trying again.`
+            },
+            code: 429
         })
     }
 } satisfies TranslationsMessageHTTP;

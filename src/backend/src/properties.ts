@@ -2,19 +2,6 @@ import type express from 'express';
 import { error, sendMsg, type Variants } from './tools/translator';
 import IsEmail from 'isemail';
 
-const txtExpirationTokenAccess = {
-    fr: '24 heures',
-    en: '24 hours'
-} satisfies Variants;
-const txtExpirationTokenPasswordReset = {
-    fr: '1 heure',
-    en: '1 hour'
-} satisfies Variants;
-const txtExpirationTokenEmailVerification = {
-    fr: '4 heures',
-    en: '4 hours'
-} satisfies Variants;
-
 const p = {
     email: {
         max: 64 // from schema.prisma
@@ -45,20 +32,45 @@ const p = {
     token: {
         access: {
             expiration: '24h',
-            expirationTxt: txtExpirationTokenAccess
+            expirationTxt: {
+                fr: '24 heures',
+                en: '24 hours'
+            } satisfies Variants
         },
         passwordReset: {
             expiration: '1h',
-            expirationTxt: txtExpirationTokenPasswordReset
+            expirationTxt: {
+                fr: '1 heure',
+                en: '1 hour'
+            } satisfies Variants
         },
         verify: {
             expiration: '4h',
-            expirationTxt: txtExpirationTokenEmailVerification
+            expirationTxt: {
+                fr: '4 heures',
+                en: '4 hours'
+            } satisfies Variants
         }
     },
     url: {
         passwordReset: `${String(process.env.FRONTEND_URL)}/reinit?token=`,
         emailVerification: `${String(process.env.FRONTEND_URL)}/validate?token=`
+    },
+    mailer: {
+        passwordReset: {
+            cooldown: 10 * 60 * 1000, // 10 minutes
+            cooldownTxt: {
+                fr: '10 minutes',
+                en: '10 minutes'
+            } satisfies Variants
+        },
+        emailVerification: {
+            cooldown: 10 * 60 * 1000, // 10 minutes
+            cooldownTxt: {
+                fr: '10 minutes',
+                en: '10 minutes'
+            } satisfies Variants
+        }
     }
 } satisfies Record<string, Record<string, any>>;
 

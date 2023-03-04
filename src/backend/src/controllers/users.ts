@@ -162,6 +162,11 @@ exports.passwordResetSendEmail = (req: express.Request, res: express.Response, n
                 return;
             }
 
+            if (user.lastPasswordResetEmailedOn !== null && user.lastPasswordResetEmailedOn > new Date(Date.now() - properties.p.mailer.passwordReset.cooldown)) {
+                sendMsg(req, res, error.mailer.cooldown, properties.p.mailer.passwordReset.cooldownTxt);
+                return;
+            }
+
             const token = jwt.sign(
                 {
                     userId: user.id,
@@ -174,8 +179,17 @@ exports.passwordResetSendEmail = (req: express.Request, res: express.Response, n
             const frontendPath = `${String(process.env.FRONTEND_URL)}/password-reset`;
 
             sendMail(req, mail.password.reset, user, token, frontendPath)
-                .then(() => { sendMsg(req, res, info.mailSent.passwordReset); })
-                .catch((err) => {
+                .then(() => {
+                    prisma.user.update({
+                        where: { id: user.id },
+                        data: { lastPasswordResetEmailedOn: new Date() }
+                    }).then(() => {
+                        sendMsg(req, res, info.mailSent.passwordReset);
+                    }).catch((err) => {
+                        console.error(err);
+                        sendMsg(req, res, error.generic.internalError);
+                    });
+                }).catch((err) => {
                     console.error(err);
                     sendMsg(req, res, error.generic.internalError);
                 });
@@ -215,6 +229,16 @@ exports.emailVerificationSendEmail = (req: express.Request, res: express.Respons
         return;
     }
 
+    if (res.locals.user.emailVerifiedOn !== null) {
+        sendMsg(req, res, error.email.alreadyVerified);
+        return;
+    }
+
+    if (res.locals.user.lastEmailVerificationEmailedOn !== null && res.locals.user.lastEmailVerificationEmailedOn > new Date(Date.now() - properties.p.mailer.emailVerification.cooldown)) {
+        sendMsg(req, res, error.mailer.cooldown, properties.p.mailer.emailVerification.cooldownTxt);
+        return;
+    }
+
     const token = jwt.sign(
         {
             userId: res.locals.user.id,
@@ -225,8 +249,17 @@ exports.emailVerificationSendEmail = (req: express.Request, res: express.Respons
     );
 
     sendMail(req, mail.email.verification, res.locals.user, token)
-        .then(() => { sendMsg(req, res, info.mailSent.emailVerification); })
-        .catch((err) => {
+        .then(() => {
+            prisma.user.update({
+                where: { id: res.locals.user.id },
+                data: { lastEmailVerificationEmailedOn: new Date() }
+            }).then(() => {
+                sendMsg(req, res, info.mailSent.emailVerification);
+            }).catch((err) => {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
+            });
+        }).catch((err) => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);
         });
