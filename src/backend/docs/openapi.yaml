@@ -223,9 +223,78 @@ paths:
         - $ref: '#/components/parameters/Accept-Language'
       security:
         - bearerAuth: [ ]
+      requestBody:
+        description: The user to update
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  required: false
+                  example: john@example.com
+                firstName:
+                  type: string
+                  required: false
+                  example: John
+                lastName:
+                  type: string
+                  required: false
+                  example: Doe
+                phone:
+                  type: string
+                  required: false
+                  example: 0123456789
+                gender:
+                  type: integer
+                  required: false
+                  example: 1
+                hasCar:
+                  type: boolean
+                  required: false
+                  example: true
+                mailNotif:
+                  type: boolean
+                  required: false
+                  example: true
       responses:
-        '501':
-          $ref: '#/components/responses/notImplemented'
+        '200':
+          description: User updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: User updated
+                      user:
+                        $ref: '#/components/schemas/User'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Field "hasCar" must be a boolean.
+        '401':
+          $ref: '#/components/responses/noToken'
+        '403':
+          $ref: '#/components/responses/insufficientPrivileges'
+        '404':
+          $ref: '#/components/responses/userNotFound'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
 
   /users/password-reset:
     post:
@@ -604,10 +673,6 @@ paths:
                   type: string
                   required: false
                   example: john@example.com
-                password:
-                  type: string
-                  required: false
-                  example: Password123$
                 firstName:
                   type: string
                   required: false
@@ -645,8 +710,13 @@ paths:
                 type: object
                 properties:
                   message:
-                    type: string
-                    example: User updated
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: User updated
+                      user:
+                        $ref: '#/components/schemas/User'
         '400':
           description: Bad request
           content:
