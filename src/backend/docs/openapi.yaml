@@ -335,6 +335,8 @@ paths:
                   message:
                     type: string
                     example: Email is required.
+        '429':
+          $ref: '#/components/responses/tooManyRequests'
         '500':
           $ref: '#/components/responses/internalError'
     patch:
@@ -412,6 +414,8 @@ paths:
           $ref: '#/components/responses/noToken'
         '404':
           $ref: '#/components/responses/userNotFound'
+        '429':
+          $ref: '#/components/responses/tooManyRequests'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
@@ -817,6 +821,16 @@ components:
               message:
                 type: string
                 example: Invalid type of value provided.
+    tooManyRequests:
+      description: Too many requests
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: An email has already been sent to this address less than 10 minutes ago. Please wait before trying again.
     internalError:
       description: Internal server error
       content:

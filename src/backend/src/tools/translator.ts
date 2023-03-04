@@ -374,8 +374,8 @@ const error = {
     mailer: {
         cooldown: (req: Request, cooldown: Variants) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Un mail a déjà été envoyé à cette adresse il y a moins de ${translate(req, cooldown)}. Veuillez patienter avant d'essayer à nouveau.`,
-                en: `A mail has already been sent to this address less than ${translate(req, cooldown)} ago. Please wait before trying again.`
+                fr: `Un email a déjà été envoyé à cette adresse il y a moins de ${translate(req, cooldown)}. Veuillez patienter avant d'essayer à nouveau.`,
+                en: `An email has already been sent to this address less than ${translate(req, cooldown)} ago. Please wait before trying again.`
             },
             code: 429
         })
