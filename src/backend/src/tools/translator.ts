@@ -36,7 +36,7 @@ const mailHtmlHeader = process.env.FRONTEND_LOGO === undefined || process.env.FR
     ? ''
     : `<a href="${process.env.FRONTEND_URL ?? ''}"><img src="${process.env.FRONTEND_LOGO ?? ''}" alt="${process.env.FRONTEND_NAME ?? ''}" style="width: 100px; height: 100px; margin: 0 auto; display: block;"/></a>`;
 
-const error: TranslationsMessageHTTP = {
+const error = {
     email: {
         required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
@@ -362,10 +362,9 @@ const error: TranslationsMessageHTTP = {
             code: 404
         })
     }
+} satisfies TranslationsMessageHTTP;
 
-}
-
-const info: TranslationsMessageHTTP = {
+const info = {
     user: {
         created: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
@@ -435,9 +434,9 @@ const info: TranslationsMessageHTTP = {
             code: 200
         })
     }
-}
+} satisfies TranslationsMessageHTTP;
 
-const mail: TranslationsMail = {
+const mail = {
     password: {
         reset: (req: Request, user: User, token: string) => msgForLang<TemplateMail, Mail>(req, {
             to: user.email,
@@ -524,7 +523,7 @@ const mail: TranslationsMail = {
             }
         })
     }
-}
+} satisfies TranslationsMail;
 
 /**
  * Returns the message for the language of the request

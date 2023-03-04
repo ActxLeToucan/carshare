@@ -2,20 +2,20 @@ import type express from 'express';
 import { error, sendMsg, type Variants } from './tools/translator';
 import IsEmail from 'isemail';
 
-const txtExpirationTokenAccess: Variants = {
+const txtExpirationTokenAccess = {
     fr: '24 heures',
     en: '24 hours'
-}
-const txtExpirationTokenPasswordReset: Variants = {
+} satisfies Variants;
+const txtExpirationTokenPasswordReset = {
     fr: '1 heure',
     en: '1 hour'
-}
-const txtExpirationTokenEmailVerification: Variants = {
+} satisfies Variants;
+const txtExpirationTokenEmailVerification = {
     fr: '4 heures',
     en: '4 hours'
-}
+} satisfies Variants;
 
-const p: Record<string, Record<string, any>> = {
+const p = {
     email: {
         max: 64 // from schema.prisma
     },
@@ -60,7 +60,7 @@ const p: Record<string, Record<string, any>> = {
         passwordReset: `${String(process.env.FRONTEND_URL)}/reinit?token=`,
         emailVerification: `${String(process.env.FRONTEND_URL)}/validate?token=`
     }
-}
+} satisfies Record<string, Record<string, any>>;
 
 /**
  * Check if the email is in a valid format
@@ -299,7 +299,7 @@ function sanitizeGender (gender: any): number | undefined {
     if (typeof gender !== 'number') {
         return undefined;
     }
-    if (p.gender.values.includes(gender) === false) {
+    if (!p.gender.values.includes(gender)) {
         return undefined;
     }
     return gender;

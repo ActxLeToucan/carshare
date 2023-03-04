@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { displayableUser, error, info, mail, sendMail, sendMsg } from '../tools/translator';
 import * as properties from '../properties';
+import * as _user from './_user';
 
 exports.signup = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const { email, password, lastName, firstName, phone, hasCar, gender } = req.body;
@@ -38,7 +39,7 @@ exports.signup = (req: express.Request, res: express.Response, next: express.Nex
                             gender: genderSanitized
                         }
                     }).then((user) => {
-                        const msg = info.user.created(req, res);
+                        const msg = info.user.created(req);
                         res.status(msg.code).json({
                             message: msg.msg,
                             user: displayableUser(user),
@@ -83,7 +84,7 @@ exports.login = (req: express.Request, res: express.Response, next: express.Next
                         return;
                     }
 
-                    const msg = info.user.loggedIn(req, res);
+                    const msg = info.user.loggedIn(req);
                     res.status(msg.code).json({
                         message: msg.msg,
                         userId: user.id,
@@ -143,7 +144,12 @@ exports.deleteMe = (req: express.Request, res: express.Response, next: express.N
 }
 
 exports.updateMe = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    sendMsg(req, res, error.generic.notImplemented);
+    if (res.locals.user === undefined) {
+        sendMsg(req, res, error.auth.noToken);
+        return;
+    }
+
+    _user.update(req, res, res.locals.user.id, false);
 }
 
 exports.passwordResetSendEmail = (req: express.Request, res: express.Response, next: express.NextFunction) => {
