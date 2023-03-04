@@ -2,7 +2,7 @@ import type express from 'express';
 import { prisma } from '../app';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { displayableUser, error, info, mail, sendMail, sendMsg } from '../tools/translator';
+import { error, info, mail, sendMail, sendMsg } from '../tools/translator';
 import * as properties from '../properties';
 
 exports.signup = (req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -38,19 +38,15 @@ exports.signup = (req: express.Request, res: express.Response, next: express.Nex
                             gender: genderSanitized
                         }
                     }).then((user) => {
-                        const msg = info.user.created(req);
-                        res.status(msg.code).json({
-                            message: msg.msg,
-                            user: displayableUser(user),
-                            token: jwt.sign(
-                                {
-                                    userId: user.id,
-                                    type: 'access'
-                                },
-                                process.env.JWT_SECRET ?? 'secret',
-                                { expiresIn: properties.p.token.access.expiration }
-                            )
-                        });
+                        const token = jwt.sign(
+                            {
+                                userId: user.id,
+                                type: 'access'
+                            },
+                            process.env.JWT_SECRET ?? 'secret',
+                            { expiresIn: properties.p.token.access.expiration }
+                        );
+                        sendMsg(req, res, info.user.created, user, token);
                     }).catch((err) => {
                         console.error(err);
                         sendMsg(req, res, error.generic.internalError);
@@ -83,19 +79,15 @@ exports.login = (req: express.Request, res: express.Response, next: express.Next
                         return;
                     }
 
-                    const msg = info.user.loggedIn(req);
-                    res.status(msg.code).json({
-                        message: msg.msg,
-                        userId: user.id,
-                        token: jwt.sign(
-                            {
-                                userId: user.id,
-                                type: 'access'
-                            },
-                            process.env.JWT_SECRET ?? 'secret',
-                            { expiresIn: properties.p.token.access.expiration }
-                        )
-                    });
+                    const token = jwt.sign(
+                        {
+                            userId: user.id,
+                            type: 'access'
+                        },
+                        process.env.JWT_SECRET ?? 'secret',
+                        { expiresIn: properties.p.token.access.expiration }
+                    );
+                    sendMsg(req, res, info.user.loggedIn, user.id, token);
                 }).catch((err) => {
                     console.error(err);
                     sendMsg(req, res, error.generic.internalError);

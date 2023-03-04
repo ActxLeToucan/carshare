@@ -1,13 +1,12 @@
 import type express from 'express';
 import fs from 'fs';
+import { error, sendRaw } from '../tools/translator';
 
 exports.getDocs = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     if (fs.existsSync('docs/out/index.html')) {
         res.sendFile('docs/out/index.html', { root: '.' });
     } else {
-        res.status(404).send('<h1>Documentation not found</h1>' +
-            '<p>If you are the owner of the server, run "npm run docs" to generate it.</p>' +
-            '<p>You can also find the documentation file (YAML) <a href="/docs/yaml">here</a>.</p>');
+        sendRaw(req, res, error.documentation.notFound);
     }
 }
 
