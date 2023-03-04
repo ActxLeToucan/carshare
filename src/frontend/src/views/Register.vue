@@ -6,14 +6,15 @@
                 <div class="py-4">
                     <p class="text-lg font-semibold text-slate-500"> Veuillez renseigner vos informations pour vous inscrire. </p>
                 </div>
-                <input-text   name="firstName"        label="Prénom"       placeholder="Prénom"                                       ></input-text>
-                <input-text   name="lastName"         label="Nom"          placeholder="Nom de famille"                               ></input-text>
-                <input-text   name="email"            label="Email"        placeholder="Adresse mail"                 type="email"    ></input-text>
-                <input-text   name="phone"            label="Téléphone"    placeholder="Numéro de téléphone"          type="tel"      ></input-text>
-                <input-text   name="password"         label="Mot de passe" placeholder="Mot de passe"                 type="password" ></input-text>
-                <input-text   name="password-confirm" label="Confirmation" placeholder="Confirmation du mot de passe" type="password" ></input-text>
+                <input-text   name="firstName"        label="Prénom*"       placeholder="Prénom"                                       ></input-text>
+                <input-text   name="lastName"         label="Nom*"          placeholder="Nom de famille"                               ></input-text>
+                <input-text   name="email"            label="Email*"        placeholder="Adresse mail"                 type="email"    ></input-text>
+                <input-text   name="phone"            label="Téléphone*"    placeholder="Numéro de téléphone"          type="tel"      ></input-text>
+                <input-text   name="password"         label="Mot de passe*" placeholder="Mot de passe"                 type="password" ></input-text>
+                <input-text   name="password-confirm" label="Confirmation*" placeholder="Confirmation du mot de passe" type="password" ></input-text>
                 <input-choice name="gender"           label="Genre"        :list="genres"                             :value="-1"   ></input-choice>
                 <input-switch name="hasCar"           label="J'ai une voiture"                                        value="false"   ></input-switch>
+                <p class="text-md font-semibold text-slate-500"> * Champs obligatoires. </p>
             </modal>
         </div>
     </div>
