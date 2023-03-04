@@ -2,7 +2,7 @@
     <div class="flex grow flex-col">
         <topbar></topbar>
         <div class="flex md:flex-row flex-col grow max-h-full min-h-0">
-            <div ref="tabs-zone" class="flex flex-col items-center h-full md:w-min w-full px-8 py-4 space-y-4 md:border-r-8 border-teal-500 mx-auto overflow-hidden">
+            <div ref="tabs-zone" class="show-right flex flex-col items-center h-full md:w-min w-full px-8 py-4 space-y-4 md:border-r-8 border-teal-500 mx-auto overflow-hidden">
                 <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> Profil </p>
                 <button-tab href="#infos" :default="!isMobile"> Mes informations </button-tab>
                 <button-tab href="#trips"> Mes trajets </button-tab>
@@ -12,7 +12,7 @@
                     <button-block :action="disconnect"> Se déconnecter </button-block>
                 </div>
             </div>
-            <div ref="content-zone" class="flex flex-col md:grow overflow-scroll">
+            <div ref="content-zone" class="show-up flex flex-col md:grow overflow-scroll">
 
                 <button ref="backtabs-btn" class="absolute md:hidden flex rounded-md border-2 border-slate-200 bg-white h-fit w-fit p-2 m-4">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">

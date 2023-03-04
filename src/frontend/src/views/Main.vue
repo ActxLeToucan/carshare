@@ -3,51 +3,57 @@
         <topbar></topbar>
         <div class="flex grow flex-col">
             
-            <div class="relative flex w-full min-h-[60%] bg-teal-500">
+            <div class="show-down relative flex w-full min-h-[60vh] bg-teal-500">
                 <img class="z-0 object-cover" src="../assets/img/landscape.svg" alt="">
-                <div class="z-10 absolute top-0 flex flex-col w-full h-0 justify-center items-center pt-32">
-                    <h1 class="md:text-8xl text-6xl font-extrabold text-white shadow-3D"> Car Share </h1>
-                    <p class="md:text-[1.7em] text-lg font-bold text-white italic shadow-3D"> Covoiturez entre amis ou inconnus ! </p>
+                <div class="z-10 absolute top-0 flex flex-col w-full h-0 justify-center items-center md:pt-32 pt-16">
+                    <h1 class="show-down md:text-8xl text-6xl font-extrabold text-white shadow-3D"> Car Share </h1>
+                    <p style="animation-delay: 200ms;" class="show-down md:text-[1.7em] text-lg font-bold text-white italic shadow-3D"> Covoiturez entre amis ou inconnus ! </p>
                 </div>
-                <div class="z-10 absolute bottom-0 flex w-full h-0 overflow-visible mx-auto">
-                    <div class="flex md:flex-wrap md:flex-row flex-col justify-center items-center h-fit w-fit mx-auto rounded-md shadow-lg border-2 border-b-4 border-teal-600 bg-teal-500 px-4 py-2 md:-translate-y-full -translate-y-[50%] md:space-x-4 md:space-y-0 space-y-4">
+                <div style="animation-delay: 200ms;" class="show-up z-10 absolute bottom-0 flex w-full h-0 overflow-visible">
+                    <div class="flex flex-col w-fit h-fit mx-auto md:-translate-y-full -translate-y-[50%]">
+                        <div class="flex md:flex-wrap md:flex-row flex-col justify-center items-center h-fit w-fit mx-auto rounded-md shadow-lg border-2 border-b-4 border-teal-600 bg-teal-500 px-4 py-2 md:space-x-4 md:space-y-0 space-y-4">
                     
-                        <div class="relative h-0 w-0 md:flex hidden">
-                            <div class="absolute bottom-11 left-0">
-                                <div> <!-- FOR CAR MOVEMENTS -->
-                                    <div> <!-- FOR CAR SHAKES -->
-                                        <car ref="car" class="car w-20 text-white drop-shadow-md cursor-pointer"
-                                            style="transform: scale(-1, 1);"
-                                            fill="currentColor"
-                                            stroke="none"
-                                            v-on:click="tuttut">
-                                        </car>
+                            <div class="relative h-0 w-0 md:flex hidden">
+                                <div class="absolute bottom-11 left-0">
+                                    <div> <!-- FOR CAR MOVEMENTS -->
+                                        <div> <!-- FOR CAR SHAKES -->
+                                            <car ref="car" class="car w-20 text-white drop-shadow-md cursor-pointer"
+                                                style="transform: scale(-1, 1);"
+                                                fill="currentColor"
+                                                stroke="none"
+                                                v-on:click="tuttut">
+                                            </car>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div class="flex md:flex-row flex-col md:space-x-2 items-center w-min">
-                            <selector ref="startSelector" :oncompletion="searchCities" :onclick="onstartselected" x="1" y="4"></selector>
-                            <input-text name="startpoint" class="w-48 mx-auto max-w-fit" placeholder="Départ" dark="true"></input-text>
-                            <!-- <div class="flex justify-center items-center"> -->
-                                <!-- <div class="h-0 w-0"> -->
-                                    <button-block class="w-fit" color="slate" :action="reverseInputs"> <!-- -translate-x-[50%] -translate-y-[50%] -->
-                                        <arrows-right-left-icon class="md:block hidden h-7 w-7"></arrows-right-left-icon>
-                                        <arrows-up-down-icon class="md:hidden block h-7 w-7"></arrows-up-down-icon>
-                                    </button-block>
+                            <div class="flex md:flex-row flex-col md:space-x-2 items-center w-min">
+                                <selector ref="startSelector" :oncompletion="searchCities" :onclick="onstartselected" x="1" y="4"></selector>
+                                <input-text name="startpoint" class="w-48 mx-auto max-w-fit" placeholder="Départ" dark="true"></input-text>
+                                <!-- <div class="flex justify-center items-center"> -->
+                                    <!-- <div class="h-0 w-0"> -->
+                                        <button-block class="w-fit" color="slate" :action="reverseInputs"> <!-- -translate-x-[50%] -translate-y-[50%] -->
+                                            <arrows-right-left-icon class="md:block hidden h-7 w-7"></arrows-right-left-icon>
+                                            <arrows-up-down-icon class="md:hidden block h-7 w-7"></arrows-up-down-icon>
+                                        </button-block>
+                                    <!-- </div> -->
                                 <!-- </div> -->
-                            <!-- </div> -->
-                            <selector ref="endSelector" :oncompletion="searchCities" :onclick="onendselected" x="1" y="4"></selector>
-                            <input-text name="endpoint" class="w-48 mx-auto max-w-fit" placeholder="Arrivée" dark="true"></input-text>
+                                <selector ref="endSelector" :oncompletion="searchCities" :onclick="onendselected" x="1" y="4"></selector>
+                                <input-text name="endpoint" class="w-48 mx-auto max-w-fit" placeholder="Arrivée" dark="true"></input-text>
+                            </div>
+                            <span class="md:block hidden bg-teal-600 w-1 h-14 rounded-lg"></span>
+                            <div class="flex md:flex-row flex-col md:space-x-2 md:space-y-2 space-y-0 w-min">
+                                <input-text name="datepoint" class="w-48 mx-auto max-w-fit" placeholder="date" dark="true" type="date"></input-text>
+                                <input-text name="timepoint" class="w-48 mx-auto max-w-fit" placeholder="heure" dark="true" type=time></input-text>
+                            </div>
+                            <span class="md:block hidden bg-teal-600 w-1 h-14 rounded-lg"></span>
+                            <button-block color="slate" class="mx-auto"> Rechercher </button-block>
+
                         </div>
-                        <span class="md:block hidden bg-teal-600 w-1 h-14 rounded-lg"></span>
-                        <div class="flex md:flex-row flex-col md:space-x-2 md:space-y-2 space-y-0 w-min">
-                            <input-text name="datepoint" class="w-48 mx-auto max-w-fit" placeholder="date" dark="true" type="date"></input-text>
-                            <input-text name="timepoint" class="w-48 mx-auto max-w-fit" placeholder="heure" dark="true" type=time></input-text>
+                        <div style="animation-delay: 400ms;" class="show-up flex w-full justify-end mt-4">
+                            <button-block class="shadow-lg" href="/trips/new"> Créer un trajet </button-block>
                         </div>
-                        <span class="md:block hidden bg-teal-600 w-1 h-14 rounded-lg"></span>
-                        <button-block color="slate" class="mx-auto"> Rechercher </button-block>
                     </div>
                 </div>
             </div>
@@ -243,9 +249,9 @@ export default {
 
 @keyframes tutshake {
     0% { transform: translateY(0); }
-    25% { transform: translateY(-0.2em) rotate(2deg); }
+    25% { transform: translateY(-0.2em) rotate(-2deg); }
     50% { transform: translateY(0); }
-    75% { transform: translateY(-0.1em) rotate(-2deg); }
+    75% { transform: translateY(-0.1em) rotate(2deg); }
     100% { transform: translateY(0); }
 }
 
