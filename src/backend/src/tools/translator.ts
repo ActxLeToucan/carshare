@@ -341,6 +341,13 @@ const error = {
             },
             code: 401
         }),
+        wrongPassword: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Mot de passe incorrect',
+                en: 'Wrong password'
+            },
+            code: 401
+        }),
         emailNotVerified: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Votre adresse email doit être vérifiée avant de pouvoir effectuer cette action.',
