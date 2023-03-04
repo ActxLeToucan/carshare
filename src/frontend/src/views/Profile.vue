@@ -3,7 +3,7 @@
         <topbar></topbar>
         <div class="flex md:flex-row flex-col grow max-h-full min-h-0">
             <div ref="tabs-zone" class="flex flex-col items-center h-full md:w-min w-full px-8 py-4 space-y-4 md:border-r-8 border-teal-500 mx-auto overflow-hidden">
-                <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> Profile </p>
+                <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> Profil </p>
                 <button-tab href="#infos" :default="!isMobile"> Mes informations </button-tab>
                 <button-tab href="#trips"> Mes trajets </button-tab>
                 <button-tab href="#evals"> Mes notes </button-tab>
@@ -34,6 +34,7 @@
                                         <p v-if="emailVerified == 'false'" class="ml-auto text-md text-slate-500"> Adresse non verifiée : </p>
                                         <p v-if="emailVerified == 'true'" class="ml-auto text-md text-slate-500"> Adresse verifiée </p>
                                         <p v-if="emailVerified == 'pending'" class="ml-auto text-md text-slate-500"> Un mail de vérification vous a été envoyé </p>
+                                        <p v-if="emailVerified == 'error'" class="ml-auto text-md text-red-500"> Une erreur s'est produite, veuillez réessayer. </p>
                                         <button
                                             v-on:click="verifyEmail"
                                             v-if="emailVerified == 'false'"
@@ -194,7 +195,7 @@ export default {
             API.execute_logged(API.ROUTE.VERIFY, API.METHOD.POST, User.CurrentUser?.getCredentials()).then(res => {
                 this.emailVerified = 'pending';
             }).catch(err => {
-                console.error(err);
+                this.emailVerified = 'error';
             });
         }
     },

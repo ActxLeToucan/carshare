@@ -1,7 +1,7 @@
 <template>
     <div class="h-0 w-0 pointer-events-none">
         <div
-            v-show="_data.length > 1"
+            v-show="_data.length > 0 && showing"
             class="absolute pointer-events-auto flex flex-col rounded-md border-2 border-slate-200 bg-white shadow-md"
             :style="'margin-top: ' + y/2 + 'em; margin-left: ' + x/2 + 'em;'">
             <p v-for="el in _data" :key="el.id" v-on:click="() => {onclicked(el);}"
@@ -16,7 +16,7 @@ export default {
     name: 'Selector',
     components: {},
     data() {
-        return {_data: []};
+        return {_data: [], showing: true, mouse: {x: 0, y: 0}, _selection: 0};
     },
     methods: {
         setData(data) {
@@ -41,6 +41,14 @@ export default {
         },
         attachInput(input) {
             let timeout = null;
+            input.addEventListener("focus", ev => this.showing = true);
+            input.addEventListener("blur", ev => {
+                console.log(ev)
+                const rect = this.$el.firstElementChild.getBoundingClientRect();
+                if (this.mouse.x < rect.left || this.mouse.x > rect.left + rect.width || this.mouse.y < rect.top || this.mouse.y > rect.top + rect.height) {
+                    this.showing = false;
+                }
+            });
             input.addEventListener('keyup', ev => {
                 if (ev.key === "ArrowDown" || ev.key === "ArrowUp" || ev.key === "Enter") return;
                 
@@ -124,6 +132,10 @@ export default {
     mounted() {
         this.setData(this.data);
         this.setSelection(this.selection);
+        window.addEventListener("mousemove", ev => {
+            this.mouse.x = ev.clientX;
+            this.mouse.y = ev.clientY;
+        });
     }
 }
 </script>
