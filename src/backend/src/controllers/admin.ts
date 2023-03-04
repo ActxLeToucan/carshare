@@ -4,7 +4,7 @@ import { displayableUser, error, info, sendMsg } from '../tools/translator';
 import * as properties from '../properties';
 import * as _user from './_common/user';
 
-exports.users = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+exports.getAllUsers = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     prisma.user.findMany()
         .then(users => {
             res.status(200).json(users.map(displayableUser));

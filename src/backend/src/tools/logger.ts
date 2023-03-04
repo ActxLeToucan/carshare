@@ -11,9 +11,10 @@ function setupLogging () {
         const now = new Date();
         const argsStr = args.map((arg) => util.format(arg)).join(' ');
         if (process.env.NODE_ENV !== 'development') {
-            logFile.write(`${now.toISOString()}\t[${type}]\t${util.format(d)}`);
-            if (argsStr !== '') logFile.write(` ${argsStr}`);
-            logFile.write('\n');
+            let strLogFile = `${now.toISOString()}\t[${type}]\t${util.format(d)}`;
+            if (argsStr !== '') strLogFile += ` ${argsStr}`;
+            strLogFile += '\n';
+            logFile.write(strLogFile);
         }
         logStdout.write(`${color}[${type}]\x1b[0m\t${util.format(d)}`);
         if (argsStr !== '') logStdout.write(` ${argsStr}`);
@@ -30,9 +31,11 @@ function setupLogging () {
         const argsStr = args.map((arg) => util.format(arg)).join(' ');
         if (process.env.NODE_ENV !== 'development') {
             logFile.write(`${now.toISOString()}\t[error]\t${str.split('\n')[0]}${str.split('\n').length > 1 || argsStr !== '' ? '…' : ''}\n`);
-            logFileError.write(`${now.toISOString()}\n\n${str}`);
-            if (argsStr !== '') logFileError.write(` ${argsStr}`);
-            logFileError.write('\n\n====================\n\n');
+
+            let strLogFileError = `${now.toISOString()}\n\n${str}`;
+            if (argsStr !== '') strLogFileError += ` ${argsStr}`;
+            strLogFileError += '\n\n====================\n\n';
+            logFileError.write(strLogFileError);
         }
         logStdout.write(`\x1b[31m[error]\x1b[0m\t${str}`);
         if (argsStr !== '') logStdout.write(` ${argsStr}`);
