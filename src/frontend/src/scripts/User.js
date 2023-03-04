@@ -61,7 +61,7 @@ class User {
     }
 
     getCredentials() {
-        return new API.Credentials({token: "bearer " + this.token, type: API.Credentials.TYPE.TOKEN});
+        return new API.Credentials({token: "Bearer " + this.token, type: API.Credentials.TYPE.TOKEN});
     }
 }
 

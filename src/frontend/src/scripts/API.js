@@ -72,6 +72,7 @@ class API {
 
     static setURL(url) {
         if (!url) return;
+        if (url.endsWith("/")) url = url.substring(0, url.length - 1);
         API.API_URL = url;
     }
 
@@ -102,7 +103,7 @@ class API {
             if (API.API_URL == null) { API.setURL(config.api.url); }
             if (API.API_URL == null) reject("Error : API host not set");
 
-            path = path.replace("/?", "?").replaceAll("//", "/");
+            path = path.replace("/?", "?").replace(/\/\//g, "/");
             let urlparts = path.split("?");
             let base = urlparts.splice(0, 1);
             let params = (urlparts.length > 0)? ("?" + urlparts.join("&")) : "";
