@@ -59,7 +59,10 @@ exports.updateUser = (req: express.Request, res: express.Response, next: express
                 return;
             }
 
-            _user.update(req, res, userId, true);
+            _user.update(req, res, userId, true).catch((err) => {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
+            });
         }).catch((err) => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);
