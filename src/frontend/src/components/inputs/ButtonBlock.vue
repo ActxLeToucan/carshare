@@ -16,7 +16,7 @@
             <p class="whitespace-nowrap text-ellipsis max-w-full min-w-0 w-fit h-fit max-h-full min-h-0"> <slot></slot> </p>
         </button>
         <!-- Just for tailwind to generate classes, not showing nor useful -->
-        <span class="hidden hover:bg-teal-500 hover:bg-red-500 hover:bg-orange-500 hover:border-teal-600 hover:border-red-600 hover:border-orange-600"></span>
+        <span class="hidden hover:bg-teal-500 hover:bg-red-500 hover:bg-orange-500 hover:bg-blue-500 hover:bg-slate-500 hover:border-teal-600 hover:border-red-600 hover:border-orange-600 hover:border-blue-600 hover:border-slate-600"></span>
     </div>
 </template>
 

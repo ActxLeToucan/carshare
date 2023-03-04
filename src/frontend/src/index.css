@@ -82,3 +82,7 @@
     opacity: 0;
     animation: hide-right var(--animation-time) var(--animation-ease) forwards;
 }
+
+.shadow-3D {
+    text-shadow: 0px 2px 0px #0d9488, 0px 4px 0px #0d9488, 0px 6px 0px #0d9488;
+}
