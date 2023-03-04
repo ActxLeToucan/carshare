@@ -12,7 +12,7 @@
                 <div class="z-10 absolute bottom-0 flex w-full h-0 overflow-visible mx-auto">
                     <div class="flex md:flex-wrap md:flex-row flex-col justify-center items-center h-fit w-fit mx-auto rounded-md shadow-lg border-2 border-b-4 border-teal-600 bg-teal-500 px-4 py-2 md:-translate-y-full -translate-y-[50%] md:space-x-4 md:space-y-0 space-y-4">
                     
-                        <div class="relative h-0 w-0">
+                        <div class="relative h-0 w-0 md:flex hidden">
                             <div class="absolute bottom-11 left-0">
                                 <div> <!-- FOR CAR MOVEMENTS -->
                                     <div> <!-- FOR CAR SHAKES -->
