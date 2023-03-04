@@ -1,41 +1,41 @@
 <template>
     <div class="show-up flex flex-col grow">
-        <p class="text-2xl text-teal-500 font-bold mx-auto mt-4"> Mes informations </p>
+        <p class="text-2xl text-teal-500 font-bold mx-auto mt-4"> {{ lang.MY_INFOS }} </p>
         <div class="flex flex-col grow justify-evenly items-center">
             <card class="flex flex-col m-4">
                 <div class="flex flex-col">
-                    <input-text   name="lastName"  label="Nom" placeholder="Nom" :value="User.CurrentUser?.lastName"></input-text>
-                    <input-text   name="firstName" label="Prénom" placeholder="Prénom" :value="User.CurrentUser?.firstName"></input-text>
-                    <input-text   name="email"     label="Email" placeholder="Email" :value="User.CurrentUser?.email" class="mb-0"></input-text>
+                    <input-text   name="lastName"  :label="lang.LASTNAME"  :placeholder="lang.LASTNAME"  :value="User.CurrentUser?.lastName"></input-text>
+                    <input-text   name="firstName" :label="lang.FIRSTNAME" :placeholder="lang.FIRSTNAME" :value="User.CurrentUser?.firstName"></input-text>
+                    <input-text   name="email"     :label="lang.EMAIL"     :placeholder="lang.EMAIL"     :value="User.CurrentUser?.email" class="mb-0"></input-text>
                     <div class="flex space-x-4">
-                        <p v-if="emailVerified == 'false'" class="ml-auto text-md text-slate-500"> Adresse non verifiée : </p>
-                        <p v-if="emailVerified == 'true'" class="ml-auto text-md text-slate-500"> Adresse verifiée </p>
-                        <p v-if="emailVerified == 'pending'" class="ml-auto text-md text-slate-500"> Un mail de vérification vous a été envoyé </p>
-                        <p v-if="emailVerified == 'error'" class="ml-auto text-md text-red-500"> Une erreur s'est produite, veuillez réessayer. </p>
+                        <p v-if="emailVerified == 'false'" class="ml-auto text-md text-slate-500"> {{ lang.ADDRESS_NOT_VERIFIED }}. </p>
+                        <p v-if="emailVerified == 'true'" class="ml-auto text-md text-slate-500"> {{ lang.ADDRESS_VERIFIED }}. </p>
+                        <p v-if="emailVerified == 'pending'" class="ml-auto text-md text-slate-500"> {{ lang.ADDRESS_VERIFICATION }}. </p>
+                        <p v-if="emailVerified == 'error'" class="ml-auto text-md text-red-500"> {{ lang.ADDRESS_ERROR }}. </p>
                         <button
                             v-on:click="verifyEmail"
                             v-if="emailVerified == 'false'"
-                            class="ml-auto font-semibold text-md text-slate-500 hover:text-teal-500 cursor-pointer"> Vérifier </button>
+                            class="ml-auto font-semibold text-md text-slate-500 hover:text-teal-500 cursor-pointer"> {{ lang.VERIFY }} </button>
                     </div>
-                    <input-text   name="phone"     label="Téléphone" placeholder="Téléphone" :value="User.CurrentUser?.phone"></input-text>
-                    <input-choice name="gender"    label="Genre" :value="User.CurrentUser?.gender" :list="genres"></input-choice>
-                    <input-switch name="hasCar"    label="J'ai une voiture" :value="User.CurrentUser?.hasCar"></input-switch>
+                    <input-text   name="phone"    :label="lang.PHONE"          :placeholder="lang.PHONE" :value="User.CurrentUser?.phone"></input-text>
+                    <input-choice name="gender"   :label="lang.GENDER"         :value="User.CurrentUser?.gender" :list="genres"></input-choice>
+                    <input-switch name="hasCar"   :label="lang.I_HAVE_A_CAR"   :value="User.CurrentUser?.hasCar"></input-switch>
                 </div>
                 <div class="flex md:flex-row flex-col md:space-x-4 md:space-y-0 space-y-2 mt-4">
-                    <button-block :action="deleteAccount" color="red"> Supprimer le compte </button-block>
+                    <button-block :action="deleteAccount" color="red"> {{ lang.DELETE_ACCOUNT }} </button-block>
                     <div class="flex grow justify-end pl-20">
-                        <button-block :action="() => {}" disabled="true"> Modifier </button-block>
+                        <button-block :action="() => {}" disabled="true"> {{ lang.EDIT }} </button-block>
                     </div>
                 </div>
             </card>
             <card class="flex flex-col m-4">
                 <div class="flex flex-col">
-                    <input-text label="Ancien mot de passe" placeholder="Ancien mot de passe" :value="''"></input-text>
-                    <input-text label="Nouveau mot de passe" placeholder="Nouveau mot de passe" :value="''"></input-text>
-                    <input-text label="Confirmation" placeholder="Confirmation du mot de passe" :value="''"></input-text>
+                    <input-text :label="lang.OLD_PASSWORD" :placeholder="lang.OLD_PASSWORD" :value="''"></input-text>
+                    <input-text :label="lang.NEW_PASSWORD" :placeholder="lang.NEW_PASSWORD" :value="''"></input-text>
+                    <input-text :label="lang.PWD_CONFIRM" :placeholder="lang.PASSWORD_CONFIRM" :value="''"></input-text>
                 </div>
                 <div class="flex grow justify-end">
-                    <button-block :action="() => {}" disabled="true"> Changer </button-block>
+                    <button-block :action="() => {}" disabled="true"> {{ lang.CHANGE }} </button-block>
                 </div>
             </card>
         </div>
@@ -60,9 +60,9 @@ import InputChoice from '../inputs/InputChoice.vue';
 import InputSwitch from '../inputs/InputSwitch.vue';
 import Card from '../cards/Card.vue';
 import Popup from '../cards/Popup.vue';
-
 import { Log } from '../../scripts/Logs';
 import { genres } from '../../scripts/data';
+import Lang from '../../scripts/Lang';
 
 export default {
     name: "UserInfos",
@@ -75,7 +75,7 @@ export default {
         InputSwitch
     },
     data() {
-        return { User, genres, isMobile: window.innerWidth < 768, emailVerified: (User.CurrentUser?.emailVerifiedOn != null).toString() }
+        return { User, genres, isMobile: window.innerWidth < 768, emailVerified: (User.CurrentUser?.emailVerifiedOn != null).toString(), lang: Lang.CurrentLang }
     },
     methods: {
         setDeletePopup(popup) {
@@ -114,6 +114,8 @@ export default {
         }
     },
     mounted() {
+        Lang.addCallback(lang => this.lang = lang);
+
         const setInputValue = (name, value) => {
             const input = this.$el.querySelector(`input[name="${name}"]`);
             if (input) input.value = value;

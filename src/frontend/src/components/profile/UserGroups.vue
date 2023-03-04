@@ -1,6 +1,6 @@
 <template>
     <div class="show-up flex flex-col grow">
-        <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> {{ lang.MY_EVALS }} </p>
+        <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> {{ lang.MY_GROUPS }} </p>
     </div>
 </template>
 
@@ -8,7 +8,7 @@
 import Lang from '../../scripts/Lang'
 
 export default {
-    name: "UserEvals",
+    name: "UserGroups",
     components: {},
     data() {
         return { lang: Lang.CurrentLang }

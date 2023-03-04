@@ -1,9 +1,9 @@
 <template>
     <div class="flex md:flex-row flex-col grow max-h-full min-h-0 max-w-full min-w-0">
         <div ref="query-zone" class="flex flex-col items-center h-full md:w-min w-full min-w-0 max-w-full p-4 md:border-r-8 border-teal-500 mx-auto overflow-hidden">
-            <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> Utilisateurs </p>
+            <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> {{ lang.USERS }} </p>
 
-            <p class="text-lg text-slate-500 pt-2 font-semibold mx-auto"> Rechercher un utilisateur </p>
+            <p class="text-lg text-slate-500 pt-2 font-semibold mx-auto"> {{ lang.SEARCH_USER }} </p>
             <div class="flex max-w-full min-w-0 items-center space-x-2">
                 <input-text class="w-full flex grow" placeholder="Rechercher"></input-text>
                 <button-block :action="search">
@@ -29,17 +29,17 @@
                 <p class="text-2xl text-teal-500 py-2 font-bold mx-auto w-fit"> {{ selectedUser.firstName }} {{ selectedUser.lastName }} </p>
                 <card class="flex flex-col m-4 mx-auto">
                     <div class="flex flex-col">
-                        <input-text   name="lastName"  label="Nom" placeholder="Nom" :value="selectedUser.lastName"></input-text>
-                        <input-text   name="firstName" label="Prénom" placeholder="Prénom" :value="selectedUser.firstName"></input-text>
-                        <input-text   name="email"     label="Email" placeholder="Email" :value="selectedUser.email" class="mb-0"></input-text>
-                        <input-text   name="phone"     label="Téléphone" placeholder="Téléphone" :value="selectedUser.phone"></input-text>
-                        <input-choice name="gender"    label="Genre" :value="selectedUser.gender" :list="genres"></input-choice>
-                        <input-switch name="hasCar"    label="J'ai une voiture" :value="selectedUser.hasCar"></input-switch>
+                        <input-text   name="lastName"  :label="lang.LASTNAME"  :placeholder="lang.LASTNAME" :value="selectedUser.lastName"></input-text>
+                        <input-text   name="firstName" :label="lang.FIRSTNAME" :placeholder="lang.FIRSTNAME" :value="selectedUser.firstName"></input-text>
+                        <input-text   name="email"     :label="lang.EMAIL"     :placeholder="lang.EMAIL" :value="selectedUser.email" class="mb-0"></input-text>
+                        <input-text   name="phone"     :label="lang.PHONE"          :placeholder="lang.PHONE" :value="selectedUser.phone"></input-text>
+                        <input-choice name="gender"    :label="lang.GENDER"         :value="selectedUser.gender" :list="genres"></input-choice>
+                        <input-switch name="hasCar"    :label="lang.I_HAVE_A_CAR"   :value="selectedUser.hasCar"></input-switch>
                     </div>
                     <div class="flex md:flex-row flex-col md:space-x-4 md:space-y-0 space-y-2 mt-4">
-                        <button-block :action="deleteAccount" color="red"> Supprimer le compte </button-block>
+                        <button-block :action="deleteAccount" color="red"> {{ lang.DELETE_ACCOUNT }} </button-block>
                         <div class="flex grow justify-end pl-20">
-                            <button-block :action="updateAccount"> Modifier </button-block>
+                            <button-block :action="updateAccount"> {{ lang.EDIT }} </button-block>
                         </div>
                     </div>
                 </card>
@@ -147,9 +147,10 @@ export default {
         }
     },
     data() {
-        return { User, usersList: [], selectedUser: null, isMobile: window.innerWidth < 768, genres }
+        return { User, usersList: [], selectedUser: null, isMobile: window.innerWidth < 768, genres, lang: Lang.CurrentLang }
     },
     mounted() {
+        Lang.addCallback(lang => this.lang = lang);
         const backbtn = this.$refs['backbtn'];
         backbtn.addEventListener('click', () => {
             this.displayPage(PAGE.QUERY);

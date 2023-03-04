@@ -2,14 +2,14 @@
     <div class="flex grow flex-col">
         <topbar v-if="User.CurrentUser != null"></topbar>
         <div class="flex grow w-fit flex-col justify-center space-y-6 mx-auto min-w-0 max-w-full">
-            <modal :oncancel="onCancel" :onvalidate="onValidate" title="Se connecter">
+            <modal :oncancel="onCancel" :onvalidate="onValidate" :title="lang.LOGIN_TITLE">
                 <div class="py-4">
-                    <p class="text-lg font-semibold text-slate-500"> Veuillez renseigner vos identifiants pour vous connecter. </p>
+                    <p class="text-lg font-semibold text-slate-500"> {{ lang.LOGIN_DESC }}. </p>
                 </div>
-                <input-text   name="email"            label="Email"        placeholder="Adresse mail"                 type="email"    ></input-text>
-                <input-text   name="password"         label="Mot de passe" placeholder="Mot de passe"                 type="password" ></input-text>
+                <input-text   name="email"            :label="lang.EMAIL"        :placeholder="lang.EMAIL"           type="email"    ></input-text>
+                <input-text   name="password"         :label="lang.PASSWORD"     :placeholder="lang.PASSWORD"        type="password" ></input-text>
                 <router-link to="/recovery" class="flex items-center justify-center w-fit h-fit text-slate-400 hover:text-teal-500 transition-all">
-                    <p class="text-md font-bold whitespace-nowrap text-ellipsis max-w-full min-w-0 w-fit h-fit max-h-full min-h-0"> Mot de passe oublié ? </p>
+                    <p class="text-md font-bold whitespace-nowrap text-ellipsis max-w-full min-w-0 w-fit h-fit max-h-full min-h-0"> {{ lang.FORGOT_PASSWORD }} ? </p>
                 </router-link>
             </modal>
         </div>
@@ -23,6 +23,7 @@ import InputText from '../components/inputs/InputText.vue';
 import { Log } from '../scripts/Logs';
 import User from '../scripts/User';
 import API from '../scripts/API';
+import Lang from '../scripts/Lang';
 
 const field_checks = [
     {field: "email",            check: (value) => value.length > 0, error: "Veuillez renseignez votre adresse mail."},
@@ -88,7 +89,10 @@ export default {
         onValidate
     },
     data() {
-        return { User }
+        return { User, lang: Lang.CurrentLang }
+    },
+    mounted() {
+        Lang.addCallback(lang => this.lang = lang);
     }
 }
 </script>

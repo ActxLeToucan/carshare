@@ -3,13 +3,14 @@
         <topbar></topbar>
         <div class="flex md:flex-row flex-col grow max-h-full min-h-0">
             <div ref="tabs-zone" class="show-right flex flex-col items-center h-full md:w-min w-full min-h-0 px-8 py-4 space-y-4 md:border-r-8 border-teal-500 mx-auto overflow-hidden">
-                <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> Profil </p>
-                <button-tab href="#infos" :default="!isMobile"> Mes informations </button-tab>
-                <button-tab href="#trips"> Mes trajets </button-tab>
-                <button-tab href="#evals"> Mes notes </button-tab>
-                <button-tab href="#params"> Paramètres </button-tab>
+                <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> {{ lang.PROFILE }} </p>
+                <button-tab href="#infos" :default="!isMobile"> {{ lang.MY_INFOS }} </button-tab>
+                <button-tab href="#trips"> {{ lang.MY_TRIPS }} </button-tab>
+                <button-tab href="#groups"> {{ lang.MY_GROUPS }} </button-tab>
+                <button-tab href="#evals"> {{ lang.MY_EVALS }} </button-tab>
+                <button-tab href="#params"> {{ lang.PARAMS }} </button-tab>
                 <div class="flex grow justify-end items-end mx-auto">
-                    <button-block :action="disconnect"> Se déconnecter </button-block>
+                    <button-block :action="disconnect"> {{ lang.DISCONNECT }} </button-block>
                 </div>
             </div>
             <div ref="content-zone" class="flex flex-col md:grow min-h-0 max-h-full">
@@ -28,6 +29,10 @@
 
                     <tab-div hash="#trips">
                         <user-trips></user-trips>
+                    </tab-div>
+
+                    <tab-div hash="#groups">
+                        <user-groups></user-groups>
                     </tab-div>
 
                     <tab-div hash="#evals">
@@ -53,7 +58,9 @@ import UserInfos from '../components/profile/UserInfos.vue';
 import UserTrips from '../components/profile/UserTrips.vue';
 import UserEvals from '../components/profile/UserEvals.vue';
 import UserParams from '../components/profile/UserParams.vue';
+import UserGroups from '../components/profile/UserGroups.vue';
 import User from '../scripts/User';
+import Lang from '../scripts/Lang';
 
 export default {
     name: 'Home',
@@ -67,9 +74,10 @@ export default {
         UserTrips,
         UserEvals,
         UserParams,
+        UserGroups
     },
     data() {
-        return { isMobile: window.innerWidth < 768 }
+        return { isMobile: window.innerWidth < 768, lang: Lang.CurrentLang }
     },
     methods: {
         disconnect() {
@@ -114,6 +122,8 @@ export default {
         }
     },
     mounted() {
+        Lang.addCallback(lang => this.lang = lang);
+
         this.setupView();
         window.addEventListener("resize", () => {
             this.isMobile = window.innerWidth < 768;
