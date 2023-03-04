@@ -12,7 +12,7 @@
                 <input-text   name="phone"            label="Téléphone"    placeholder="Numéro de téléphone"          type="tel"      ></input-text>
                 <input-text   name="password"         label="Mot de passe" placeholder="Mot de passe"                 type="password" ></input-text>
                 <input-text   name="password-confirm" label="Confirmation" placeholder="Confirmation du mot de passe" type="password" ></input-text>
-                <input-choice name="gender"           label="Genre"        :list="genres"                                             ></input-choice>
+                <input-choice name="gender"           label="Genre"        :list="genres"                             :value="-1"   ></input-choice>
                 <input-switch name="hasCar"           label="J'ai une voiture"                                        value="false"   ></input-switch>
             </modal>
         </div>
