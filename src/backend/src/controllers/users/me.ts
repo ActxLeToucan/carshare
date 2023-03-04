@@ -47,5 +47,8 @@ exports.updateMe = (req: express.Request, res: express.Response, next: express.N
         return;
     }
 
-    _user.update(req, res, res.locals.user.id, false);
+    _user.update(req, res, res.locals.user.id, false).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
 }

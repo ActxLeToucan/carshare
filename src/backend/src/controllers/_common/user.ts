@@ -11,7 +11,7 @@ import type express from 'express';
  * @param userId ID of the user to update
  * @param asAdmin Weather to update as an admin or not (admin can update level)
  */
-function update (req: express.Request, res: express.Response, userId: number, asAdmin: boolean) {
+async function update (req: express.Request, res: express.Response, userId: number, asAdmin: boolean) {
     const { email, lastName, firstName, phone, hasCar, gender, mailNotif, level } = req.body;
 
     if (email !== undefined && !properties.checkEmailField(email, req, res)) return;
@@ -41,23 +41,15 @@ function update (req: express.Request, res: express.Response, userId: number, as
     };
 
     if (email !== undefined) {
-        prisma.user.count({ where: { email, id: { not: userId } } })
-            .then((count) => {
-                if (count > 0) {
-                    sendMsg(req, res, error.email.exists);
-                    return;
-                }
-
-                prisma.user.update({ where: { id: userId }, data })
-                    .then(() => { sendMsg(req, res, info.user.updated) })
-                    .catch((err) => {
-                        console.error(err);
-                        sendMsg(req, res, error.generic.internalError);
-                    });
-            }).catch((err) => {
-                console.error(err);
-                sendMsg(req, res, error.generic.internalError);
-            });
+        try {
+            if (await prisma.user.count({ where: { email, id: { not: userId } } }) > 0) {
+                sendMsg(req, res, error.email.exists);
+                return;
+            }
+        } catch (err) {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        }
     }
 
     prisma.user.update({ where: { id: userId }, data })
@@ -72,8 +64,7 @@ function update (req: express.Request, res: express.Response, userId: number, as
                 message: msg.msg,
                 user: displayableUser(user)
             });
-        })
-        .catch((err) => {
+        }).catch((err) => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);
         });
