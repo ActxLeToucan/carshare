@@ -117,6 +117,10 @@ export default {
                 else
                     this.emailVerified = 'error';
             });
+        },
+        disconnect() {
+            User.forget();
+            this.$router.push('/');
         }
     },
     mounted() {
@@ -127,6 +131,7 @@ export default {
             if (input) input.value = value;
         }
 
+        if (User.CurrentUser == null) return;
         API.execute_logged(API.ROUTE.USER, API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
             User.CurrentUser?.setInformations(res);
             User.CurrentUser?.save();

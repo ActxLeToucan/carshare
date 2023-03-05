@@ -68,7 +68,7 @@ export default {
         // (with buttons to login or register)
         if (User.CurrentUser === null) {
             goTo(this, '/home');
-            return {};
+            return { lang: Lang.CurrentLang };
         }
 
         if (User.CurrentUser?.level > 0) { // is admin
