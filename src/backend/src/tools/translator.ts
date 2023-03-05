@@ -533,7 +533,7 @@ const info = {
     notification: {
         deletedAll: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Toutes les notifications ont été supprimé',
+                fr: 'Toutes les notifications ont été supprimées',
                 en: 'All notifications have been removed'
             },
             code: 200
