@@ -36,16 +36,18 @@ exports.createTravels = async (req: express.Request, res: express.Response, next
     if (!properties.checkDateDepartArrivalField(departureDate, req, res)) return;
     if (!properties.checkDateDepartArrivalField(arrivalDate, req, res)) return;
 
-    if( maxPassengers !== undefined && maxPassengers !== null && typeof maxPassengers !== 'number'){
+    if (maxPassengers !== undefined && maxPassengers !== null && typeof maxPassengers !== 'number') {
         sendMsg(req, res, error.number.type, 'maxPassengers');
-        return false;    }
+        return false;
+    }
 
-    if( price !== undefined && price !== null && typeof price !== 'number'){
+    if (price !== undefined && price !== null && typeof price !== 'number') {
         sendMsg(req, res, error.number.type, 'price');
-        return false;    }
+        return false;
+    }
 
-    if( typeof description !== "string" && description !== undefined && description !== null){
-        sendMsg(req, res, error.string.type, "description");
+    if (typeof description !== 'string' && description !== undefined && description !== null) {
+        sendMsg(req, res, error.string.type, 'description');
         return false;
     }
 
@@ -85,7 +87,6 @@ exports.createTravels = async (req: express.Request, res: express.Response, next
         prisma.etape.createMany({
             data
         }).then((etape) => {
-
             sendMsg(req, res, info.travel.created, travel, etape);
         }).catch((err) => {
             console.error(err);

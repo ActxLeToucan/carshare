@@ -417,11 +417,11 @@ function checkListOfEtapeField (value: any, req: express.Request, res: express.R
         sendMsg(req, res, error.etape.type);
         return false;
     }
-    if (value.length <2) {
+    if (value.length < 2) {
         sendMsg(req, res, error.etape.etapeMin);
         return false;
     }
-    for(const i in value ) {
+    for (const i in value) {
         if (!checkStringField(value[i].label, req, res, 'label')) return false;
         if (!checkStringField(value[i].city, req, res, 'city')) return false;
         if (!checkStringField(value[i].context, req, res, 'context')) return false;

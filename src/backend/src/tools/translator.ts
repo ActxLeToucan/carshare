@@ -455,22 +455,22 @@ const error = {
     etape: {
         required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Le champ listOfEtape est requis.`,
-                en: `Field listOfEtape is required.`
+                fr: 'Le champ listOfEtape est requis.',
+                en: 'Field listOfEtape is required.'
             },
             code: 400
         }),
         etapeMin: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Le champ listOfEtape doit avoir une taille supérieur à 2.`,
-                en: `Field listOfEtape field must have a size greater than 2.`
+                fr: 'Le champ listOfEtape doit avoir une taille supérieur à 2.',
+                en: 'Field listOfEtape field must have a size greater than 2.'
             },
             code: 400
         }),
         type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Le champ listOfEtape doit être un objet.`,
-                en: `Field listOfEtape must be a object.`
+                fr: 'Le champ listOfEtape doit être un objet.',
+                en: 'Field listOfEtape must be a object.'
             },
             code: 400
         })
@@ -566,7 +566,7 @@ const info = {
             },
             code: 201,
             data: {
-                travel: travel,
+                travel,
                 numberOfEtape: etape
             }
         })
