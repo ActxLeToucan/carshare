@@ -1,6 +1,6 @@
 import * as properties from '../../properties';
 import { prisma } from '../../app';
-import { displayableUserPrivate, error, info, sendMsg } from '../../tools/translator';
+import { error, info, sendMsg } from '../../tools/translator';
 import type express from 'express';
 
 /**
