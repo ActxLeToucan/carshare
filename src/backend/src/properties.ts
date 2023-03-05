@@ -253,6 +253,18 @@ function checkBooleanField (value: any, req: express.Request, res: express.Respo
     return true;
 }
 
+function checkGroupNameField (name: any, req: express.Request, res: express.Response): boolean {
+    if (name === undefined || name === '') {
+        sendMsg(req, res, error.groupName.required);
+        return false;
+    }
+    if (typeof name !== 'string') {
+        sendMsg(req, res, error.groupName.type);
+        return false;
+    }
+    return true;
+}
+
 /**
  * Check if a date is in a valid format
  * If the date is not valid, send an error message to the client
@@ -438,6 +450,7 @@ export {
     checkLastNameField,
     checkFirstNameField,
     checkLevelField,
+    checkGroupNameField,
     checkBooleanField,
     checkDateField,
     sanitizePhone,

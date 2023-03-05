@@ -29,7 +29,7 @@
                             </div>
 
                             <div class="flex md:flex-row flex-col md:space-x-2 items-center w-min">
-                                <selector ref="startSelector" :oncompletion="searchCities" :onclick="onstartselected" x="1" y="4"></selector>
+                                <selector ref="startSelector" :oncompletion="searchCities" :onclick="onstartselected" :x="isMobile?-17:1" :y="isMobile?8:4"></selector>
                                 <input-text name="startpoint" class="w-48 mx-auto max-w-fit" :placeholder="lang.STARTING_POINT" dark="true"></input-text>
                                 <!-- <div class="flex justify-center items-center"> -->
                                     <!-- <div class="h-0 w-0"> -->
@@ -39,7 +39,7 @@
                                         </button-block>
                                     <!-- </div> -->
                                 <!-- </div> -->
-                                <selector ref="endSelector" :oncompletion="searchCities" :onclick="onendselected" x="1" y="4"></selector>
+                                <selector ref="endSelector" :oncompletion="searchCities" :onclick="onendselected" :x="isMobile?-17:1" :y="isMobile?8:4"></selector>
                                 <input-text name="endpoint" class="w-48 mx-auto max-w-fit" :placeholder="lang.ENDING_POINT" dark="true"></input-text>
                             </div>
                             <span class="md:block hidden bg-teal-600 w-1 h-14 rounded-lg"></span>
@@ -182,7 +182,7 @@ export default {
     },
     name: 'Main',
     data() {
-        return { startCities, lang: Lang.CurrentLang }
+        return { startCities, lang: Lang.CurrentLang, isMobile: window.innerWidth < 768 }
     },
     methods: {
         onstartselected(city) {
@@ -224,6 +224,10 @@ export default {
     },
     mounted() {
         Lang.addCallback(lang => this.lang = lang);
+
+        window.addEventListener("resize", ev => {
+            this.isMobile = window.innerWidth < 768;
+        });
 
         this.startInput = this.$el.querySelector('input[name="startpoint"]');
         this.endInput = this.$el.querySelector('input[name="endpoint"]');

@@ -1,4 +1,5 @@
 import config from '../config.js';
+import Lang from './Lang.js';
 
 class Credentials {
     static get TYPE() {
@@ -111,7 +112,7 @@ class API {
 
             let reqHeaders = {
                 "Accept": "application/json",
-                "Accept-Language": "fr"
+                "Accept-Language": Lang.CurrentCode
             };
             if (type != this.TYPE_NONE && type != this.TYPE_FILE) reqHeaders["Content-Type"] = type;
 

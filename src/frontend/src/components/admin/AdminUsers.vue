@@ -10,9 +10,9 @@
                     <magnifying-glass-icon class="w-7 h-7"></magnifying-glass-icon>
                 </button-block>
             </div>
-            <div class="flex w-full flex-col px-8 space-y-4 pt-4">
+            <div class="flex w-full flex-col px-8 space-y-4 pt-4 max-w-full min-w-0">
                 <admin-user-card
-                    class="w-full show-up" v-for="user in usersList"
+                    class="min-w-0 w-full show-up" v-for="user in usersList"
                     :data="user" :key="user.id" :onclick="onCardClicked">
                 </admin-user-card>
             </div>
@@ -25,7 +25,7 @@
                 </svg>
             </button>
 
-            <div v-if="selectedUser != null" class="flex flex-col justify-center">
+            <div v-if="selectedUser != null" class="md:show-up flex flex-col justify-center">
                 <p class="text-2xl text-teal-500 py-2 font-bold mx-auto w-fit"> {{ selectedUser.firstName }} {{ selectedUser.lastName }} </p>
                 <card class="flex flex-col m-4 mx-auto">
                     <div class="flex flex-col">
@@ -37,7 +37,7 @@
                         <input-switch name="hasCar"    :label="lang.I_HAVE_A_CAR"   :value="selectedUser.hasCar"></input-switch>
                     </div>
                     <div class="flex md:flex-row flex-col md:space-x-4 md:space-y-0 space-y-2 mt-4">
-                        <button-block :action="deleteAccount" color="red"> {{ lang.DELETE_ACCOUNT }} </button-block>
+                        <button-block :action="showDeletePopup" color="red"> {{ lang.DELETE_ACCOUNT }} </button-block>
                         <div class="flex grow justify-end pl-20">
                             <button-block :action="updateAccount"> {{ lang.EDIT }} </button-block>
                         </div>
@@ -46,6 +46,17 @@
             </div>
 
         </div>
+        <popup
+            color="red"
+            :title="lang.DELETE + ' ' + selectedUser?.firstName + ' ' + selectedUser?.lastName"
+            :content="lang.ACCOUNT_DELETE_VERIFY"
+            :cancelLabel="lang.CANCEL"
+            :validateLabel="lang.DELETE"
+            :onload="setDeletePopup"
+            :onvalidate="deleteAccount"
+        >
+            <input-text :label="lang.ACCOUNT_EMAIL" :placeholder="lang.EMAIL" name="email" type="email"></input-text>
+        </popup>
     </div>
 </template>
 
@@ -60,7 +71,9 @@ import InputSwitch from '../inputs/InputSwitch.vue';
 import InputChoice from '../inputs/InputChoice.vue';
 import ButtonBlock from '../inputs/ButtonBlock.vue';
 import AdminUserCard from './AdminUserCard.vue';
+import Popup from '../cards/Popup.vue';
 import Card from '../cards/Card.vue';
+import { Log } from '../../scripts/Logs.js';
 import { genres } from '../../scripts/data';
 
 import {
@@ -91,6 +104,7 @@ export default {
         InputChoice,
         Card,
         MagnifyingGlassIcon,
+        Popup
     },
     methods: {
         displayPage(page) {
@@ -123,11 +137,39 @@ export default {
         search() {
             return search(this);
         },
-        deleteAccount() {
+        deleteAccount(popup) {
+            const pop_log = popup.log(this.lang.EMAIL_VERIFICATION, Log.INFO);
+            const email = popup.get("email");
+            if (email == "") {
+                pop_log.update(this.lang.EMAIL_SPECIFY, Log.WARNING);
+                popup.focus("email");
+                setTimeout(() => pop_log.delete(), 4000);
+                return;
+            }
+            if (email != this.selectedUser.email) {
+                pop_log.update(this.lang.EMAIL_UNMATCHING, Log.ERROR);
+                setTimeout(() => pop_log.delete(), 4000);
+                return;
+            }
+            pop_log.update(this.lang.ACCOUNT_DELETION, Log.INFO);
+
+            // Setting popup title to static string to avoid seing (Delete undefined undefined)
+            popup.setTitle(this.lang.DELETE + ' ' + this.selectedUser?.firstName + ' ' + this.selectedUser?.lastName);
+
             API.execute_logged(API.ROUTE.ADMIN.USER + "/" + this.selectedUser.id, API.METHOD.DELETE, User.CurrentUser?.getCredentials()).then((data) => {
                 this.displayPage(PAGE.QUERY);
                 this.usersList.splice(this.usersList.indexOf(this.selectedUser), 1);
                 this.selectedUser = null;
+                pop_log.update(this.lang.ACCOUNT_DELETED, Log.SUCCESS);
+                setTimeout(() => {
+                    pop_log.delete();
+                    popup.hide();
+                }, 2000);
+            }).catch(err => {
+                pop_log.update(this.lang.ERROR + " : " + err.message, Log.ERROR);
+                setTimeout(() => {
+                    pop_log.delete();
+                }, 4000);
             });
         },
         updateAccount() {
@@ -144,6 +186,13 @@ export default {
                 }
                 this.displayPage(PAGE.RESULTS);
             });
+        },
+        setDeletePopup(popup) {
+            this.deletePopup = popup;
+        },
+        showDeletePopup() {
+            this.deletePopup.setTitle(this.lang.DELETE + ' ' + this.selectedUser?.firstName + ' ' + this.selectedUser?.lastName);
+            this.deletePopup.show();
         }
     },
     data() {

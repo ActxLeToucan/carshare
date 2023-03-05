@@ -1,9 +1,9 @@
 <template>
     <div class="fixed top-0 left-0 w-screen h-screen flex justify-center items-center bg-slate-900/[0.3] opacity-0 pointer-events-none transition-all px-4">
         <div ref="popup" class="flex flex-col rounded-lg shadow-lg border-4 border-slate-200 bg-slate-50 p-4 space-y-4">
-            <h1 class="text-xl font-bold text-center" :class="'text-'+color+'-500'"> {{ title }} </h1>
+            <h1 class="text-xl font-bold text-center" :class="'text-'+color+'-500'"> {{ _title }} </h1>
             <div class="flex flex-col">
-                <p v-for="line in content.split('\\n')" :key="line" class="text-lg font-semibold text-slate-500"> {{ line }} </p>
+                <p v-for="line in content.split(/\n|\\n/g)" :key="line" class="text-lg font-semibold text-slate-500"> {{ line }} </p>
             </div>
             <div
                 ref="log-zone"
@@ -78,7 +78,7 @@ export default {
         }
     },
     data() {
-        return {}
+        return { _title: "" }
     },
     methods: {
         show() {
@@ -87,8 +87,8 @@ export default {
                 this.$el.classList.add("pointer-events-all");
                 this.$el.classList.remove("pointer-events-none");
                 this.$el.classList.remove("opacity-0");
-                this.$refs["popup"].classList.add("show-up");
-                this.$refs["popup"].classList.remove("hide-down");
+                this.$refs["popup"]?.classList.add("show-up");
+                this.$refs["popup"]?.classList.remove("hide-down");
                 setTimeout(resolve, 250);
                 
                 const rect = this.$el.getBoundingClientRect();
@@ -102,8 +102,8 @@ export default {
                 this.$el.classList.add("pointer-events-none");
                 this.$el.classList.remove("pointer-events-all");
                 this.$el.classList.remove("opacity-1");
-                this.$refs["popup"].classList.add("hide-down");
-                this.$refs["popup"].classList.remove("show-up");
+                this.$refs["popup"]?.classList.add("hide-down");
+                this.$refs["popup"]?.classList.remove("show-up");
                 setTimeout(resolve, 250);
             });
         },
@@ -127,9 +127,13 @@ export default {
                 payload[input.name] = input.value;
             }
             return payload;
-        }
+        },
+        setTitle(title) {
+            this._title = title;
+        },
     },
     mounted() {
+        this._title = this.title;
         document.body.appendChild(this.$el);
 
         this.$refs["btn-cancel"].$el.addEventListener("click", () => {

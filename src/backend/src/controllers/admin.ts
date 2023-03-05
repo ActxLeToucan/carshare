@@ -1,13 +1,13 @@
 import type express from 'express';
 import { prisma } from '../app';
-import { displayableUser, error, info, sendMsg } from '../tools/translator';
+import { displayableUserPrivate, error, info, sendMsg } from '../tools/translator';
 import * as properties from '../properties';
 import * as _user from './_common/user';
 
 exports.getAllUsers = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     prisma.user.findMany()
         .then(users => {
-            res.status(200).json(users.map(displayableUser));
+            res.status(200).json(users.map(displayableUserPrivate));
         })
         .catch(err => {
             console.error(err);

@@ -54,7 +54,7 @@ function onValidate(modal) {
             setTimeout(() => {
                 log.delete();
                 resolve(true);
-            }, 4000);
+            }, 6000);
         }).catch(err => {
             log.update("Erreur : " + err.message, Log.ERROR);
             
