@@ -2,18 +2,24 @@
     <div class="flex grow flex-col">
         <topbar v-if="User.CurrentUser != null"></topbar>
         <button-block class="show-right flex flex-col items-center md:w-min w-full  mx-auto overflow-hidden text-xl" style="margin-top: 1em"> Nouveau trajet </button-block>
-        <p class="show-down text-xl text-xl text-slate-400 text-left font-bold position: left  ml-4"> Type de trajet </p>
         <div class="flex items-center">
-            <p class="text-xl text-slate-400 font-bold  ml-4 "> Nombre de places </p>
-            <button class="bg-gray-300  text-white font-bold py-2 px-4 rounded ml-4" @click="incrementCounter">{{ compteur }}</button>
+        <p class="show-down text-xl text-xl text-slate-400 text-left font-bold position: left  ml-4" style="margin-top: 5em"> Type de trajet </p>
+        <button-block class="text-xl text-slate-400 font-bold ml-10" style="margin-top: 4.6em"> Public </button-block>
+        <button-block class="text-xl text-slate-400 font-bold" style="margin-top: 4.6em"> Privé </button-block>
         </div>
 
 
-        <div>
-            <div class="flex items-center">
-                <p class="show-down text-xl text-xl text-slate-400 text-left font-bold position: left  ml-4"> Départ </p>
+        <div class="flex items-center">
+            <p class="text-xl text-slate-400 font-bold  ml-4 " style="margin-top: 5em"> Nombre de places </p>
+            <button class="bg-gray-300  text-white font-bold py-2 px-4 rounded ml-4" style="margin-top: 6em" @click="incrementCounter">{{ compteur }}</button>
+        </div>
+       
+
+        <div  class="show-down text-xl text-xl text-slate-400 text-left font-bold position: left  ml-auto" >
+            <div class="flex items-center" style="margin-top: -8em">
+                <p class="show-down text-xl text-xl  text-slate-400 text-left font-bold position: left  ml-4"> Départ </p>
                 <selector ref="startSelector" :oncompletion="searchCities" :onclick="onstartselected" x="1" y="4"></selector>
-                <input-text name="startpoint" class="w-45 mx-auto max-w-fit" placeholder="Nancy" dark="true"></input-text>
+                <input-text name="startpoint" class="w-50 mx-10 max-w-fit" placeholder="Nancy" dark="true" style="margin-right: 8em"></input-text>
             </div>
        <!-- <button-block class="w-fit" color="slate" :action="reverseInputs"> 
             <arrows-right-left-icon class="md:block hidden h-7 w-7"></arrows-right-left-icon>
@@ -22,15 +28,18 @@
             <div class="flex items-center">
                 <p class="show-down text-xl text-xl text-slate-400 text-left font-bold position: left  ml-4"> Arrivée </p>
                 <selector ref="endSelector" :oncompletion="searchCities" :onclick="onendselected" x="1" y="4"></selector>
-                <input-text name="endpoint" class="w-45 mx-auto max-w-fit" placeholder="Paris" dark="true"></input-text>
+                <input-text name="endpoint" class="w-45 mx-10 max-w-fit" placeholder="Paris" dark="true"></input-text>
             </div>
         </div>
 
 
-        <p class="show-down text-xl text-xl text-slate-400 text-left font-bold position: left  ml-4"> Groupe de trajet </p>
-        <button-block > Créer le trajet </button-block>
-        <button-block > Annuler </button-block>
+        <p class="show-down text-xl text-xl text-slate-400 text-left font-bold position: left  ml-4" style="margin-top: 8em"> Groupe de trajet </p>
+        <div class="flex items-center">
+        <button-block class="show-right flex flex-col items-center md:w-min w-full  mx-auto overflow-hidden text-xl" style="margin-top: 3em"> Annuler </button-block>
+        <button-block class="show-right flex flex-col items-center md:w-min w-full  mx-auto overflow-hidden text-xl" style="margin-top: 3em" > Créer le trajet </button-block>
+        </div>
     </div>
+    
 </template>
 
 

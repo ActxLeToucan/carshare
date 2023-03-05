@@ -59,11 +59,7 @@ async function update (req: express.Request, res: express.Response, userId: numb
                 return;
             }
 
-            const msg = info.user.updated(req);
-            res.status(msg.code).json({
-                message: msg.msg,
-                user: displayableUser(user)
-            });
+            sendMsg(req, res, info.user.updated, user);
         }).catch((err) => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);

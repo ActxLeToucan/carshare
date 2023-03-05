@@ -6,8 +6,8 @@
             <div class="show-down relative flex w-full min-h-[60vh] bg-teal-500">
                 <img class="z-0 object-cover" src="../assets/img/landscape.svg" alt="">
                 <div class="z-10 absolute top-0 flex flex-col w-full h-0 justify-center items-center md:pt-32 pt-16">
-                    <h1 class="show-down md:text-8xl text-6xl font-extrabold text-white shadow-3D"> Car Share </h1>
-                    <p style="animation-delay: 200ms;" class="show-down md:text-[1.7em] text-lg font-bold text-white italic shadow-3D"> Covoiturez entre amis ou inconnus ! </p>
+                    <h1 class="show-down md:text-8xl text-6xl font-extrabold text-white shadow-3D"> {{ lang.CARSHARE }} </h1>
+                    <p style="animation-delay: 200ms;" class="show-down md:text-[1.7em] text-lg font-bold text-white italic shadow-3D"> {{ lang.CARSHARE_DESC }} </p>
                 </div>
                 <div style="animation-delay: 200ms;" class="show-up z-10 absolute bottom-0 flex w-full h-0 overflow-visible">
                     <div class="flex flex-col w-fit h-fit mx-auto md:-translate-y-full -translate-y-[50%]">
@@ -30,7 +30,7 @@
 
                             <div class="flex md:flex-row flex-col md:space-x-2 items-center w-min">
                                 <selector ref="startSelector" :oncompletion="searchCities" :onclick="onstartselected" x="1" y="4"></selector>
-                                <input-text name="startpoint" class="w-48 mx-auto max-w-fit" placeholder="Départ" dark="true"></input-text>
+                                <input-text name="startpoint" class="w-48 mx-auto max-w-fit" :placeholder="lang.STARTING_POINT" dark="true"></input-text>
                                 <!-- <div class="flex justify-center items-center"> -->
                                     <!-- <div class="h-0 w-0"> -->
                                         <button-block class="w-fit" color="slate" :action="reverseInputs"> <!-- -translate-x-[50%] -translate-y-[50%] -->
@@ -40,7 +40,7 @@
                                     <!-- </div> -->
                                 <!-- </div> -->
                                 <selector ref="endSelector" :oncompletion="searchCities" :onclick="onendselected" x="1" y="4"></selector>
-                                <input-text name="endpoint" class="w-48 mx-auto max-w-fit" placeholder="Arrivée" dark="true"></input-text>
+                                <input-text name="endpoint" class="w-48 mx-auto max-w-fit" :placeholder="lang.ENDING_POINT" dark="true"></input-text>
                             </div>
                             <span class="md:block hidden bg-teal-600 w-1 h-14 rounded-lg"></span>
                             <div class="flex md:flex-row flex-col md:space-x-2 md:space-y-2 space-y-0 w-min">
@@ -48,11 +48,13 @@
                                 <input-text name="timepoint" class="w-48 mx-auto max-w-fit" placeholder="heure" dark="true" type=time></input-text>
                             </div>
                             <span class="md:block hidden bg-teal-600 w-1 h-14 rounded-lg"></span>
-                            <button-block color="slate" class="mx-auto"> Rechercher </button-block>
+                            <button-block color="slate" class="mx-auto"> {{ lang.SEARCH }} </button-block>
 
                         </div>
                         <div style="animation-delay: 400ms;" class="show-up flex w-full justify-end mt-4">
+
                             <button-block class="shadow-lg" href="createTrip"> Créer un trajet </button-block>
+
                         </div>
                     </div>
                 </div>
@@ -72,6 +74,7 @@ import Topbar from "../components/topbar/Topbar.vue";
 import Selector from '../components/inputs/Selector.vue';
 import Car from '../components/Car.vue';
 import BAN from '../scripts/BAN.js';
+import Lang from '../scripts/Lang.js';
 
 import {
     ArrowsRightLeftIcon,
@@ -123,6 +126,7 @@ function addtof(dom) {
 
     setTimeout(() => {
         txt.remove();
+        txtcontainer.remove();
     }, 500);
 }
 
@@ -180,7 +184,7 @@ export default {
     },
     name: 'Main',
     data() {
-        return { startCities }
+        return { startCities, lang: Lang.CurrentLang }
     },
     methods: {
         onstartselected(city) {
@@ -221,6 +225,8 @@ export default {
         }
     },
     mounted() {
+        Lang.addCallback(lang => this.lang = lang);
+
         this.startInput = this.$el.querySelector('input[name="startpoint"]');
         this.endInput = this.$el.querySelector('input[name="endpoint"]');
         this.dateInput = this.$el.querySelector('input[name="datepoint"]');

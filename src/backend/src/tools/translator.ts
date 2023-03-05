@@ -7,8 +7,8 @@ import { sendMail as mailerSend } from './mailer';
 export type Variants = {
     en: any
 } & Record<string, any>;
-type TemplateMessage = TemplateMail | TemplateMessageHTTP
-type Message = Mail | MessageHTTP
+type TemplateMessage = TemplateMail | TemplateMessageHTTP;
+type Message = Mail | MessageHTTP;
 type TranslationsMessageHTTP = Record<string, Record<string, (req: Request, ...args: any) => MessageHTTP>>;
 type TranslationsMail = Record<string, Record<string, (req: Request, ...args: any) => Mail>>;
 
@@ -18,7 +18,6 @@ interface TemplateMail {
     text: Variants
     html: Variants
 }
-
 export interface Mail {
     to: string
     subject: string
@@ -28,10 +27,12 @@ export interface Mail {
 interface TemplateMessageHTTP {
     msg: Variants
     code: number
+    data?: any
 }
 export interface MessageHTTP {
     msg: string
     code: number
+    data?: any
 }
 
 const mailHtmlHeader = process.env.FRONTEND_LOGO === undefined || process.env.FRONTEND_LOGO === ''
@@ -340,6 +341,13 @@ const error = {
             },
             code: 401
         }),
+        wrongPassword: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Mot de passe incorrect',
+                en: 'Wrong password'
+            },
+            code: 401
+        }),
         emailNotVerified: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Votre adresse email doit être vérifiée avant de pouvoir effectuer cette action.',
@@ -379,24 +387,47 @@ const error = {
             },
             code: 429
         })
+    },
+    documentation: {
+        notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: '<head><title>Documentation introuvable</title></head>' +
+                    '<h1>Documentation introuvable</h1>' +
+                    '<p>Si vous êtes le propriétaire du serveur, exécutez "npm run docs" pour la générer.</p>' +
+                    '<p>Vous pouvez également trouver le fichier de documentation (YAML) <a href="/docs/yaml">ici</a>.</p>',
+                en: '<head><title>Documentation not found</title></head>' +
+                    '<h1>Documentation not found</h1>' +
+                    '<p>If you are the owner of the server, run "npm run docs" to generate it.</p>' +
+                    '<p>You can also find the documentation file (YAML) <a href="/docs/yaml">here</a>.</p>'
+            },
+            code: 404
+        })
     }
 } satisfies TranslationsMessageHTTP;
 
 const info = {
     user: {
-        created: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        created: (req: Request, user: User, token: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Utilisateur créé',
                 en: 'User created'
             },
-            code: 201
+            code: 201,
+            data: {
+                user: displayableUser(user),
+                token
+            }
         }),
-        loggedIn: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        loggedIn: (req: Request, userId: number, token: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Utilisateur connecté',
                 en: 'User logged in'
             },
-            code: 200
+            code: 200,
+            data: {
+                userId,
+                token
+            }
         }),
         deleted: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
@@ -419,12 +450,15 @@ const info = {
             },
             code: 200
         }),
-        updated: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        updated: (req: Request, user: User) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Utilisateur mis à jour',
                 en: 'User updated'
             },
-            code: 200
+            code: 200,
+            data: {
+                user: displayableUser(user)
+            }
         })
     },
     mailSent: {
@@ -553,15 +587,19 @@ function msgForLang<T extends TemplateMessage, U extends Message> (req: Request,
     const newMessage: Record<any, any> = {};
 
     for (const key in message) {
-        if (typeof message[key] === 'object') {
-            const variants = message[key] as Variants;
-            newMessage[key] = translate(req, variants);
+        const value = message[key];
+        if (areVariants(value)) {
+            newMessage[key] = translate(req, value);
         } else {
             newMessage[key] = message[key];
         }
     }
 
     return newMessage as U;
+}
+
+function areVariants (obj: any): obj is Variants {
+    return typeof obj === 'object' && 'en' in obj;
 }
 
 /**
@@ -583,7 +621,22 @@ function translate (req: Request, variants: Variants): string {
  */
 function sendMsg (req: Request, res: Response, message: (req: Request, ...args: any) => MessageHTTP, ...args: any) {
     const msg = message(req, ...args);
-    res.status(msg.code).json({ message: msg.msg });
+    res.status(msg.code).json({
+        message: msg.msg,
+        ...msg.data
+    });
+}
+
+/**
+ * Sends a raw text with the given message
+ * @param req Express request
+ * @param res Express response
+ * @param page Message to send
+ * @param args Arguments to pass to the message function (if any)
+ */
+function sendRaw (req: Request, res: Response, page: (req: Request, ...args: any) => MessageHTTP, ...args: any) {
+    const p = page(req, ...args);
+    res.status(p.code).send(p.msg);
 }
 
 /**
@@ -608,4 +661,4 @@ function displayableUser (user: User) {
     return u;
 }
 
-export { error, info, mail, sendMsg, sendMail, displayableUser }
+export { error, info, mail, sendMsg, sendMail, sendRaw, displayableUser };

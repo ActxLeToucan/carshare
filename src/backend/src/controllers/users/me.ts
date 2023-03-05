@@ -25,7 +25,7 @@ exports.deleteMe = (req: express.Request, res: express.Response, next: express.N
     bcrypt.compare(req.body.password, res.locals.user.password)
         .then((valid) => {
             if (!valid) {
-                sendMsg(req, res, error.auth.invalidCredentials);
+                sendMsg(req, res, error.auth.wrongPassword);
                 return;
             }
 

@@ -1,18 +1,19 @@
 <template>
-    <div class="flex grow flex-col">
+    <div class="flex grow flex-col min-h-0 max-h-full">
         <topbar></topbar>
         <div class="flex md:flex-row flex-col grow max-h-full min-h-0">
-            <div ref="tabs-zone" class="show-right flex flex-col items-center h-full md:w-min w-full px-8 py-4 space-y-4 md:border-r-8 border-teal-500 mx-auto overflow-hidden">
-                <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> Profil </p>
-                <button-tab href="#infos" :default="!isMobile"> Mes informations </button-tab>
-                <button-tab href="#trips"> Mes trajets </button-tab>
-                <button-tab href="#evals"> Mes notes </button-tab>
-                <button-tab href="#params"> Paramètres </button-tab>
+            <div ref="tabs-zone" class="show-right flex flex-col items-center h-full md:w-min w-full min-h-0 px-8 py-4 space-y-4 md:border-r-8 border-teal-500 mx-auto overflow-hidden">
+                <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> {{ lang.PROFILE }} </p>
+                <button-tab href="#infos" :default="!isMobile"> {{ lang.MY_INFOS }} </button-tab>
+                <button-tab href="#trips"> {{ lang.MY_TRIPS }} </button-tab>
+                <button-tab href="#groups"> {{ lang.MY_GROUPS }} </button-tab>
+                <button-tab href="#evals"> {{ lang.MY_EVALS }} </button-tab>
+                <button-tab href="#params"> {{ lang.PARAMS }} </button-tab>
                 <div class="flex grow justify-end items-end mx-auto">
-                    <button-block :action="disconnect"> Se déconnecter </button-block>
+                    <button-block :action="disconnect"> {{ lang.DISCONNECT }} </button-block>
                 </div>
             </div>
-            <div ref="content-zone" class="show-up flex flex-col md:grow overflow-scroll">
+            <div ref="content-zone" class="flex flex-col md:grow min-h-0 max-h-full">
 
                 <button ref="backtabs-btn" class="absolute md:hidden flex rounded-md border-2 border-slate-200 bg-white h-fit w-fit p-2 m-4">
                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
@@ -23,70 +24,27 @@
                 <tab-window defaultHash="#infos" class="md:pt-0 pt-5">
 
                     <tab-div hash="#infos" class="flex flex-col items-center">
-                        <p class="text-2xl text-teal-500 font-bold mx-auto mt-4"> Mes informations </p>
-                        <div class="flex flex-col grow justify-evenly items-center">
-                            <card class="flex flex-col m-4">
-                                <div class="flex flex-col">
-                                    <input-text   name="lastName"  label="Nom" placeholder="Nom" :value="User.CurrentUser?.lastName"></input-text>
-                                    <input-text   name="firstName" label="Prénom" placeholder="Prénom" :value="User.CurrentUser?.firstName"></input-text>
-                                    <input-text   name="email"     label="Email" placeholder="Email" :value="User.CurrentUser?.email" class="mb-0"></input-text>
-                                    <div class="flex space-x-4">
-                                        <p v-if="emailVerified == 'false'" class="ml-auto text-md text-slate-500"> Adresse non verifiée : </p>
-                                        <p v-if="emailVerified == 'true'" class="ml-auto text-md text-slate-500"> Adresse verifiée </p>
-                                        <p v-if="emailVerified == 'pending'" class="ml-auto text-md text-slate-500"> Un mail de vérification vous a été envoyé </p>
-                                        <p v-if="emailVerified == 'error'" class="ml-auto text-md text-red-500"> Une erreur s'est produite, veuillez réessayer. </p>
-                                        <button
-                                            v-on:click="verifyEmail"
-                                            v-if="emailVerified == 'false'"
-                                            class="ml-auto font-semibold text-md text-slate-500 hover:text-teal-500 cursor-pointer"> Vérifier </button>
-                                    </div>
-                                    <input-text   name="phone"     label="Téléphone" placeholder="Téléphone" :value="User.CurrentUser?.phone"></input-text>
-                                    <input-choice name="gender"    label="Genre" :value="User.CurrentUser?.gender" :list="genres"></input-choice>
-                                    <input-switch name="hasCar"    label="J'ai une voiture" :value="User.CurrentUser?.hasCar"></input-switch>
-                                </div>
-                                <div class="flex md:flex-row flex-col md:space-x-4 md:space-y-0 space-y-2 mt-4">
-                                    <button-block :action="deleteAccount" color="red"> Supprimer le compte </button-block>
-                                    <div class="flex grow justify-end pl-20">
-                                        <button-block :action="() => {}" disabled="true"> Modifier </button-block>
-                                    </div>
-                                </div>
-                            </card>
-                            <card class="flex flex-col m-4">
-                                <div class="flex flex-col">
-                                    <input-text label="Ancien mot de passe" placeholder="Ancien mot de passe" :value="''"></input-text>
-                                    <input-text label="Nouveau mot de passe" placeholder="Nouveau mot de passe" :value="''"></input-text>
-                                    <input-text label="Confirmation" placeholder="Confirmation du mot de passe" :value="''"></input-text>
-                                </div>
-                                <div class="flex grow justify-end">
-                                    <button-block :action="() => {}" disabled="true"> Changer </button-block>
-                                </div>
-                            </card>
-                        </div>
+                        <user-infos></user-infos>
                     </tab-div>
 
                     <tab-div hash="#trips">
-                        <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> Mes trajets </p>
+                        <user-trips></user-trips>
+                    </tab-div>
+
+                    <tab-div hash="#groups">
+                        <user-groups></user-groups>
                     </tab-div>
 
                     <tab-div hash="#evals">
-                        <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> Mes notes </p>
+                        <user-evals></user-evals>
                     </tab-div>
 
                     <tab-div hash="#params">
-                        <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> Paramètres </p>
+                        <user-params></user-params>
                     </tab-div>
                 </tab-window>
             </div>
         </div>
-        <popup
-            color="red"
-            title="Supprimer le compte"
-            content="Êtes-vous sûr de vouloir supprimer votre compte ?\nCette action est irréversible."
-            cancelLabel="Annuler"
-            validateLabel="Supprimer"
-            :onload="setDeletePopup"
-            :onvalidate="removeAccount"
-        > <input-text label="Mot de passe" placeholder="Mot de passe" name="password" type="password"></input-text> </popup>
     </div>
 </template>
 
@@ -94,66 +52,37 @@
 import Topbar from '../components/topbar/Topbar.vue';
 import ButtonBlock from '../components/inputs/ButtonBlock.vue';
 import ButtonTab from '../components/inputs/ButtonTab.vue';
-import InputChoice from '../components/inputs/InputChoice.vue';
-import InputSwitch from '../components/inputs/InputSwitch.vue';
 import TabWindow from '../components/cards/TabWindow.vue';
 import TabDiv from '../components/cards/TabDiv.vue';
-import Card from '../components/cards/Card.vue';
-import InputText from '../components/inputs/InputText.vue';
+import UserInfos from '../components/profile/UserInfos.vue';
+import UserTrips from '../components/profile/UserTrips.vue';
+import UserEvals from '../components/profile/UserEvals.vue';
+import UserParams from '../components/profile/UserParams.vue';
+import UserGroups from '../components/profile/UserGroups.vue';
 import User from '../scripts/User';
-import Popup from '../components/cards/Popup.vue';
-import API from '../scripts/API';
-import { Log } from '../scripts/Logs';
-import { genres } from '../scripts/data';
+import Lang from '../scripts/Lang';
 
 export default {
+    name: 'Home',
     components: {
         Topbar,
         ButtonBlock,
         ButtonTab,
         TabWindow,
         TabDiv,
-        Card,
-        InputText,
-        Popup,
-        InputChoice,
-        InputSwitch
+        UserInfos,
+        UserTrips,
+        UserEvals,
+        UserParams,
+        UserGroups
     },
-    name: 'Home',
     data() {
-        return { User, genres, isMobile: window.innerWidth < 768, emailVerified: (User.CurrentUser?.emailVerifiedOn != null).toString() }
+        return { isMobile: window.innerWidth < 768, lang: Lang.CurrentLang }
     },
     methods: {
-        setDeletePopup(popup) {
-            this.deletePopup = popup;
-        },
         disconnect() {
             User.forget();
             this.$router.push('/');
-        },
-        deleteAccount() {
-            if (!this.deletePopup) return;
-            this.deletePopup.show();
-        },
-        removeAccount(popup) {
-            return new Promise((resolve, reject) => {
-                const log = popup.log("Suppression du compte...", Log.INFO);
-                API.execute_logged(API.ROUTE.USER, API.METHOD.DELETE, User.CurrentUser?.getCredentials(), {password: popup.get("password")}).then(res => {
-                    log.update("Compte supprimé avec succès !", Log.SUCCESS);
-                    setTimeout(() => {
-                        log.delete();
-                        this.disconnect();
-                        resolve(true);
-                    }, 1000);
-                }).catch(err => {
-                    console.error(err);
-                    log.update("Erreur : " + err.message, Log.ERROR);
-                    setTimeout(() => {
-                        log.delete();
-                        resolve(false);
-                    }, 4000);
-                });
-            });
         },
         setupView() {
             const tabs = this.$refs["tabs-zone"];
@@ -190,36 +119,15 @@ export default {
                 tabs.classList.remove("hidden");
                 content.classList.remove("hidden");
             }
-        },
-        verifyEmail() {
-            API.execute_logged(API.ROUTE.VERIFY, API.METHOD.POST, User.CurrentUser?.getCredentials()).then(res => {
-                this.emailVerified = 'pending';
-            }).catch(err => {
-                this.emailVerified = 'error';
-            });
         }
     },
     mounted() {
+        Lang.addCallback(lang => this.lang = lang);
+
         this.setupView();
         window.addEventListener("resize", () => {
             this.isMobile = window.innerWidth < 768;
             this.setupView();
-        });
-
-        const setInputValue = (name, value) => {
-            const input = this.$el.querySelector(`input[name="${name}"]`);
-            if (input) input.value = value;
-        }
-
-        API.execute_logged(API.ROUTE.USER, API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
-            User.CurrentUser?.setInformations(res);
-            User.CurrentUser?.save();
-            
-            const fields = ["lastName", "firstName", "email", "phone", "gender", "hasCar"];
-            fields.forEach(field => setInputValue(field, User.CurrentUser[field]));
-
-        }).catch(err => {
-            console.error(err);
         });
     },
     watch: {

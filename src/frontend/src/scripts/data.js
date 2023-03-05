@@ -1,3 +1,5 @@
+import Lang from "./Lang";
+
 export function retreiveFields(el) {
     /**@type {HTMLDivElement} */
     const inputs_div = el.$refs["inputs"];
@@ -38,7 +40,7 @@ export function getTypedValue(input) {
 }
 
 export const genres = [
-    {value: 1,  label: "Homme"},
-    {value: -1, label: "Non spécifié"},
-    {value: 0,  label: "Femme"},
+    {value: 1,  id: 'MALE'},
+    {value: -1, id: 'UNSPECIFIED'},
+    {value: 0,  id: 'FEMALE'},
 ];

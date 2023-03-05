@@ -2,19 +2,19 @@
     <div class="flex grow flex-col">
         <topbar v-if="User.CurrentUser != null"></topbar>
         <div class="flex grow w-fit flex-col justify-center space-y-6 mx-auto min-w-0 max-w-full">
-            <modal :oncancel="onCancel" :onvalidate="onValidate" title="S'inscrire">
+            <modal :oncancel="onCancel" :onvalidate="onValidate" :title="lang.REGISTER_TITLE">
                 <div class="py-4">
-                    <p class="text-lg font-semibold text-slate-500"> Veuillez renseigner vos informations pour vous inscrire. </p>
+                    <p class="text-lg font-semibold text-slate-500"> {{ lang.REGISTER_DESC }}. </p>
                 </div>
-                <input-text   name="firstName"        label="Prénom*"       placeholder="Prénom"                                       ></input-text>
-                <input-text   name="lastName"         label="Nom*"          placeholder="Nom de famille"                               ></input-text>
-                <input-text   name="email"            label="Email*"        placeholder="Adresse mail"                 type="email"    ></input-text>
-                <input-text   name="phone"            label="Téléphone*"    placeholder="Numéro de téléphone"          type="tel"      ></input-text>
-                <input-text   name="password"         label="Mot de passe*" placeholder="Mot de passe"                 type="password" ></input-text>
-                <input-text   name="password-confirm" label="Confirmation*" placeholder="Confirmation du mot de passe" type="password" ></input-text>
-                <input-choice name="gender"           label="Genre"        :list="genres"                             :value="-1"   ></input-choice>
-                <input-switch name="hasCar"           label="J'ai une voiture"                                        value="false"   ></input-switch>
-                <p class="text-md font-semibold text-slate-500"> * Champs obligatoires. </p>
+                <input-text   name="firstName"        :label="lang.FIRSTNAME+'*'"   :placeholder="lang.FIRSTNAME"                        ></input-text>
+                <input-text   name="lastName"         :label="lang.LASTNAME+'*'"    :placeholder="lang.LASTNAME"                         ></input-text>
+                <input-text   name="email"            :label="lang.EMAIL+'*'"       :placeholder="lang.EMAIL"            type="email"    ></input-text>
+                <input-text   name="phone"            :label="lang.PHONE+'*'"       :placeholder="lang.PHONE"            type="tel"      ></input-text>
+                <input-text   name="password"         :label="lang.PASSWORD+'*'"    :placeholder="lang.PASSWORD"         type="password" ></input-text>
+                <input-text   name="password-confirm" :label="lang.PWD_CONFIRM+'*'" :placeholder="lang.PASSWORD_CONFIRM" type="password" ></input-text>
+                <input-choice name="gender"           :label="lang.GENDER"          :list="genres"                       :value="-1"     ></input-choice>
+                <input-switch name="hasCar"           :label="lang.I_HAVE_A_CAR"                                         value="false"   ></input-switch>
+                <p class="text-md font-semibold text-slate-500"> * {{ lang.REQUIRED_FIELDS }}. </p>
             </modal>
         </div>
     </div>
@@ -26,10 +26,11 @@ import Modal from '../components/cards/Modal.vue';
 import InputText from '../components/inputs/InputText.vue';
 import InputSwitch from '../components/inputs/InputSwitch.vue';
 import InputChoice from '../components/inputs/InputChoice.vue';
-import { Log } from '../scripts/Logs';
 import User from '../scripts/User';
 import re from '../scripts/Regex';
 import API from '../scripts/API';
+import Lang from '../scripts/Lang';
+import { Log } from '../scripts/Logs';
 import { genres } from '../scripts/data';
 
 function isPhoneNumber(val) {
@@ -142,7 +143,10 @@ export default {
         onValidate
     },
     data() {
-        return { User, genres }
+        return { User, genres, lang: Lang.CurrentLang }
+    },
+    mounted() {
+        Lang.addCallback(lang => this.lang = lang);
     }
 }
 </script>
