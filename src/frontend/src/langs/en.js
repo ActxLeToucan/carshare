@@ -73,6 +73,7 @@ export default {
     ADDRESS_ERROR: "An error occured, try again later",
     OLD_PASSWORD: "Old password",
     NEW_PASSWORD: "New password",
+    ACCOUNT_DELETE_CONFIRMATION: "Are you sure you want to delete your account ?\nThis action is irreversible.",
 
     // administration
     ADMINISTRATION: "Administration",

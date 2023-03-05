@@ -41,14 +41,14 @@
         </div>
         <popup
             color="red"
-            title="Supprimer le compte"
-            content="Êtes-vous sûr de vouloir supprimer votre compte ?\nCette action est irréversible."
-            cancelLabel="Annuler"
-            validateLabel="Supprimer"
+            :title="lang.DELETE_ACCOUNT"
+            :content="lang.ACCOUNT_DELETE_CONFIRMATION"
+            :cancelLabel="lang.CANCEL"
+            :validateLabel="lang.DELETE"
             :onload="setDeletePopup"
             :onvalidate="removeAccount"
         >
-            <input-text label="Mot de passe" placeholder="Mot de passe" name="password" type="password"></input-text>
+            <input-text :label="lang.PASSWORD" :placeholder="lang.PASSWORD" name="password" type="password"></input-text>
         </popup>
     </div>
 </template>

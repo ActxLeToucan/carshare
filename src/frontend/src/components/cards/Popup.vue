@@ -3,7 +3,7 @@
         <div ref="popup" class="flex flex-col rounded-lg shadow-lg border-4 border-slate-200 bg-slate-50 p-4 space-y-4">
             <h1 class="text-xl font-bold text-center" :class="'text-'+color+'-500'"> {{ title }} </h1>
             <div class="flex flex-col">
-                <p v-for="line in content.split('\\n')" :key="line" class="text-lg font-semibold text-slate-500"> {{ line }} </p>
+                <p v-for="line in content.split(/\n|\\n/g)" :key="line" class="text-lg font-semibold text-slate-500"> {{ line }} </p>
             </div>
             <div
                 ref="log-zone"
