@@ -529,6 +529,15 @@ const info = {
                 group: displayableGroup(group)
             }
         })
+    },
+    notification: {
+        deletedAll: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Toutes les notifications ont été supprimé',
+                en: 'All notifications have been removed'
+            },
+            code: 200
+        })
     }
 } satisfies TranslationsMessageHTTP;
 
