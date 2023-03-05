@@ -675,6 +675,7 @@ function translate (req: Request, variants: Variants): string {
 function sendMsg (req: Request, res: Response, message: (req: Request, ...args: any) => MessageHTTP, ...args: any) {
     const msg = message(req, ...args);
     res.status(msg.code).json({
+        message: msg.msg,
         ...msg.data
     });
 }
