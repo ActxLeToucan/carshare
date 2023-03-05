@@ -792,6 +792,36 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
+  /notifications/all:
+    delete:
+      summary: Delete all the notification
+      description: Delete all the notification of the current user
+      operationId: deleteAllNotification
+      tags:
+        - Notifications
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: All notifications deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: All notifications have been removed
+        '401':
+          $ref: '#/components/responses/noToken'
+        '404':
+          $ref: '#/components/responses/userNotFound'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
 
   /groups/my:
     post:
