@@ -103,13 +103,13 @@ export default {
             required: false
         },
         x: {
-            type: String,
-            default: "0",
+            type: [Number, String],
+            default: 0,
             required: false
         },
         y: {
-            type: String,
-            default: "0",
+            type: [Number, String],
+            default: 0,
             required: false
         },
         selection: {
