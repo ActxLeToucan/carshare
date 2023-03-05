@@ -10,9 +10,9 @@
                     <magnifying-glass-icon class="w-7 h-7"></magnifying-glass-icon>
                 </button-block>
             </div>
-            <div class="flex w-full flex-col px-8 space-y-4 pt-4">
+            <div class="flex w-full flex-col px-8 space-y-4 pt-4 max-w-full min-w-0">
                 <admin-user-card
-                    class="w-full show-up" v-for="user in usersList"
+                    class="min-w-0 w-full show-up" v-for="user in usersList"
                     :data="user" :key="user.id" :onclick="onCardClicked">
                 </admin-user-card>
             </div>
@@ -25,7 +25,7 @@
                 </svg>
             </button>
 
-            <div v-if="selectedUser != null" class="show-up flex flex-col justify-center">
+            <div v-if="selectedUser != null" class="md:show-up flex flex-col justify-center">
                 <p class="text-2xl text-teal-500 py-2 font-bold mx-auto w-fit"> {{ selectedUser.firstName }} {{ selectedUser.lastName }} </p>
                 <card class="flex flex-col m-4 mx-auto">
                     <div class="flex flex-col">
@@ -140,7 +140,12 @@ export default {
         deleteAccount(popup) {
             const pop_log = popup.log(this.lang.EMAIL_VERIFICATION, Log.INFO);
             const email = popup.get("email");
-            if (email == "") return;
+            if (email == "") {
+                pop_log.update(this.lang.EMAIL_SPECIFY, Log.WARNING);
+                popup.focus("email");
+                setTimeout(() => pop_log.delete(), 4000);
+                return;
+            }
             if (email != this.selectedUser.email) {
                 pop_log.update(this.lang.EMAIL_UNMATCHING, Log.ERROR);
                 setTimeout(() => pop_log.delete(), 4000);

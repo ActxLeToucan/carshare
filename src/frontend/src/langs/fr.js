@@ -52,11 +52,39 @@ export default {
     GENDER: "Genre",
     I_HAVE_A_CAR: "J'ai une voiture",
     REQUIRED_FIELDS: "Champs obligatoires",
+    INPUT_VERIFICATION: "Vérification des entrées",
+    DATA_SENDING: "Envoi des données",
+    REGISTER_SUCCESS: "Compte créé avec succès",
+    SENDING_EMAILVERIF: "Envoi de l'email de vérification",
+    SENDING_EMAIL_SUCCESS: "Email envoyé avec succès",
+
+        // checks errors
+        FIRSTNAME_SPECIFY: "Veuillez renseignez votre nom",
+        LASTNAME_SPECIFY: "Veuillez renseignez votre prénom",
+        EMAIL_SPECIFY: "Veuillez renseignez votre adresse mail",
+        PHONE_SPECIFY: "Veuillez renseignez votre numéro de téléphone",
+        PASSWORD_SPECIFY: "Veuillez renseignez votre mot de passe",
+        PASSWORD_CONFIRM_SPECIFY: "Veuillez confirmer votre mot de passe",
+
+        FIRSTNAME_TOOLONG: "Le nom est trop long",
+        LASTNAME_TOOLONG: "Le prénom est trop long",
+        EMAIL_TOOLONG: "L'adresse mail est trop longue",
+
+        EMAIL_INVALID: "L'adresse mail est invalide",
+        PHONE_INVALID: "Le numéro de téléphone est invalide",
+        PASSWORD_UNMATCH: "Les mots de passe ne correspondent pas",
+
+        PASSWORD_ERRLEN: "Le mot de passe doit faire au moins 10 caractères",
+        PASSWORD_ERRMAJ: "Le mot de passe doit contenir au moins une majuscule",
+        PASSWORD_ERRMIN: "Le mot de passe doit contenir au moins une minuscule",
+        PASSWORD_ERRNBR: "Le mot de passe doit contenir au moins un chiffre",
+        PASSWORD_ERRSPE: "Le mot de passe doit contenir au moins un caractère spécial",
 
     // login
     LOGIN_TITLE: "Connexion",
     LOGIN_DESC: "Veuillez remplir les champs ci-dessous pour vous connecter",
     FORGOT_PASSWORD: "Mot de passe oublié",
+    LOGIN_SUCCESS: "Connecté avec succès",
 
     // main screen
     STARTING_POINT: "Départ",
@@ -72,6 +100,11 @@ export default {
     MY_TRIPS: "Mes trajets",
     MY_GROUPS: "Mes groupes",
     PARAMS: "Paramètres",
+
+        // groups
+        NO_GROUPS: "Vous n'avez encore aucun groupe",
+        NO_GROUPS_DESC: "Créez un groupe pour pouvoir partager vos trajets avec vos amis",
+
 
     // informations
     ADDRESS_NOT_VERIFIED: "Adresse non vérifiée",

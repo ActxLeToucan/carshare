@@ -52,7 +52,7 @@ const buttons = [
     },
     {
         id: 'GROUPS',
-        link: '/groups'
+        link: '/profile#groups'
     }
 ];
 
