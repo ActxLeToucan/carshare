@@ -11,10 +11,18 @@ export default {
     MALE: "Male",
     UNSPECIFIED: "Not specified",
     FEMALE: "Female",
+    ERROR: "Error",
 
     // 404 page
     WOOPS: "Oops",
     NOT_FOUND: "The page you are looking for does not exist 🤔",
+
+    // validation page
+    VALIDATION_TITLE: "Account validation",
+    VALIDATION_LOADING: "Validating account",
+    VALIDATION_SUCCESS: "Account validated successfully !\nYou can close this page.",
+    VALIDATION_NO_TOKEN: "No token provided in the link,\nplease check the link you received by email.",
+
 
     // actions
     LOGIN: "Login",
@@ -71,8 +79,10 @@ export default {
     ADDRESS_VERIFIED: "Address verified",
     ADDRESS_VERIFICATION: "A verification email has been sent to you",
     ADDRESS_ERROR: "An error occured, try again later",
+    ADDRESS_ERROR_SPAM: "Email already sent, please wait 10 minutes",
     OLD_PASSWORD: "Old password",
     NEW_PASSWORD: "New password",
+    ACCOUNT_DELETE_CONFIRMATION: "Are you sure you want to delete your account ?\nThis action is irreversible.",
 
     // administration
     ADMINISTRATION: "Administration",

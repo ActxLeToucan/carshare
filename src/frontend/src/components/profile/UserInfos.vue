@@ -11,10 +11,12 @@
                         <p v-if="emailVerified == 'false'" class="ml-auto text-md text-slate-500"> {{ lang.ADDRESS_NOT_VERIFIED }}. </p>
                         <p v-if="emailVerified == 'true'" class="ml-auto text-md text-slate-500"> {{ lang.ADDRESS_VERIFIED }}. </p>
                         <p v-if="emailVerified == 'pending'" class="ml-auto text-md text-slate-500"> {{ lang.ADDRESS_VERIFICATION }}. </p>
+                        <p v-if="emailVerified == '429'" class="ml-auto text-md text-red-500"> {{ lang.ADDRESS_ERROR_SPAM }}. </p>
                         <p v-if="emailVerified == 'error'" class="ml-auto text-md text-red-500"> {{ lang.ADDRESS_ERROR }}. </p>
+                        <p v-if="emailVerified == 'loading'" class="ml-auto text-md text-slate-500"> Sending ... </p>
                         <button
                             v-on:click="verifyEmail"
-                            v-if="emailVerified == 'false'"
+                            v-if="emailVerified !== 'true'"
                             class="ml-auto font-semibold text-md text-slate-500 hover:text-teal-500 cursor-pointer"> {{ lang.VERIFY }} </button>
                     </div>
                     <input-text   name="phone"    :label="lang.PHONE"          :placeholder="lang.PHONE" :value="User.CurrentUser?.phone"></input-text>
@@ -41,14 +43,14 @@
         </div>
         <popup
             color="red"
-            title="Supprimer le compte"
-            content="Êtes-vous sûr de vouloir supprimer votre compte ?\nCette action est irréversible."
-            cancelLabel="Annuler"
-            validateLabel="Supprimer"
+            :title="lang.DELETE_ACCOUNT"
+            :content="lang.ACCOUNT_DELETE_CONFIRMATION"
+            :cancelLabel="lang.CANCEL"
+            :validateLabel="lang.DELETE"
             :onload="setDeletePopup"
             :onvalidate="removeAccount"
         >
-            <input-text label="Mot de passe" placeholder="Mot de passe" name="password" type="password"></input-text>
+            <input-text :label="lang.PASSWORD" :placeholder="lang.PASSWORD" name="password" type="password"></input-text>
         </popup>
     </div>
 </template>
@@ -106,10 +108,14 @@ export default {
             });
         },
         verifyEmail() {
+            this.emailVerified = 'loading';
             API.execute_logged(API.ROUTE.VERIFY, API.METHOD.POST, User.CurrentUser?.getCredentials()).then(res => {
                 this.emailVerified = 'pending';
             }).catch(err => {
-                this.emailVerified = 'error';
+                if (err.status == 429) // too many requests
+                    this.emailVerified = '429';
+                else
+                    this.emailVerified = 'error';
             });
         }
     },
