@@ -1,5 +1,5 @@
 import { type Request, type Response } from 'express';
-import { type User } from '@prisma/client';
+import { type Group, type User } from '@prisma/client';
 
 import { p } from '../properties';
 import { sendMail as mailerSend } from './mailer';
@@ -80,6 +80,22 @@ const error = {
             msg: {
                 fr: "L'adresse email a déjà été vérifiée.",
                 en: 'Email address is already verified.'
+            },
+            code: 400
+        })
+    },
+    users: {
+        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Les utilisateurs doivent être un tableau de chaînes de caractères.',
+                en: 'Users must be an array of strings.'
+            },
+            code: 400
+        }),
+        maxPerRequest: (req: Request, length: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Vous ne pouvez pas ajouter plus de ${length} utilisateur${length > 1 ? 's' : ''} à la fois.`,
+                en: `You can't add more than ${length} user${length > 1 ? 's' : ''} at once.`
             },
             code: 400
         })
@@ -239,6 +255,22 @@ const error = {
                 en: 'Level is higher than your own level.'
             },
             code: 403
+        })
+    },
+    groupName: {
+        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Le nom du groupe est requis.',
+                en: 'Group name is required.'
+            },
+            code: 400
+        }),
+        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Le nom du groupe doit être une chaîne de caractères.',
+                en: 'Group name must be a string.'
+            },
+            code: 400
         })
     },
     boolean: {
@@ -414,7 +446,7 @@ const info = {
             },
             code: 201,
             data: {
-                user: displayableUser(user),
+                user: displayableUserPrivate(user),
                 token
             }
         }),
@@ -457,7 +489,7 @@ const info = {
             },
             code: 200,
             data: {
-                user: displayableUser(user)
+                user: displayableUserPrivate(user)
             }
         })
     },
@@ -484,6 +516,18 @@ const info = {
                 en: 'Settings saved'
             },
             code: 200
+        })
+    },
+    group: {
+        created: (req: Request, group: Group & { users: User[] }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Groupe créé',
+                en: 'Group created'
+            },
+            code: 201,
+            data: {
+                group: displayableGroup(group)
+            }
         })
     }
 } satisfies TranslationsMessageHTTP;
@@ -622,7 +666,6 @@ function translate (req: Request, variants: Variants): string {
 function sendMsg (req: Request, res: Response, message: (req: Request, ...args: any) => MessageHTTP, ...args: any) {
     const msg = message(req, ...args);
     res.status(msg.code).json({
-        message: msg.msg,
         ...msg.data
     });
 }
@@ -655,10 +698,25 @@ async function sendMail (req: Request, message: (req: Request, ...args: any) => 
  * @param user User to display
  * @returns User without the password
  */
-function displayableUser (user: User) {
+function displayableUserPrivate (user: User) {
     const u = user as any;
     delete u.password;
     return u;
 }
 
-export { error, info, mail, sendMsg, sendMail, sendRaw, displayableUser };
+function displayableUserPublic (user: User) {
+    const u = displayableUserPrivate(user);
+    delete u.mailNotif;
+    delete u.createdAt;
+    delete u.lastPasswordResetEmailedOn;
+    delete u.lastEmailVerificationEmailedOn;
+    return u;
+}
+
+function displayableGroup (group: Group & { users: User[] }) {
+    const g = group as any;
+    g.users = g.users.map(displayableUserPublic);
+    return g;
+}
+
+export { error, info, mail, sendMsg, sendMail, sendRaw, displayableUserPrivate, displayableGroup };
