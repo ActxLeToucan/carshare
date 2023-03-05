@@ -20,13 +20,13 @@ class Log {
     resize() {
         this.resizeTimeout = setTimeout(() => {
             this.dom.style.maxHeight = this.dom.getBoundingClientRect().height + "px";
-            if (this.zone !== null) this.zone.render();
+            if (this.zone) this.zone.render();
             this.resizeTimeout = null;
         }, 200);
     }
 
     attachTo(zone) {
-        if (this.zone !== null)
+        if (this.zone)
             this.zone.removeLog(this);
 
         this.zone = zone;
@@ -66,7 +66,7 @@ class Log {
     }
 
     delete() {
-        if (this.zone !== null) {
+        if (this.zone) {
             this.zone.removeLog(this);
         } else console.error("Log not attached to a zone", this.dom);
     }

@@ -92,4 +92,10 @@ export default {
 
         // users
         SEARCH_USER: "Search user",
+        ACCOUNT_DELETE_VERIFY: "Are you sure you want to delete this account ?\nThis action is irreversible.",
+        ACCOUNT_EMAIL: "Account Email",
+        EMAIL_VERIFICATION: "Email verification",
+        EMAIL_UNMATCHING: "Emails do not match",
+        ACCOUNT_DELETION: "Account deletion",
+        ACCOUNT_DELETED: "Account deleted",
 }

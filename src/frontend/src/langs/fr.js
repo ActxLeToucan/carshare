@@ -91,4 +91,10 @@ export default {
 
         // users
         SEARCH_USER: "Rechercher un utilisateur",
+        ACCOUNT_DELETE_VERIFY: "Êtes-vous sûr de vouloir supprimer ce compte ?\nCette action est irréversible.",
+        ACCOUNT_EMAIL: "Email du compte",
+        EMAIL_VERIFICATION: "Vérification de l'Email",
+        EMAIL_UNMATCHING: "L'Email ne correspond pas",
+        ACCOUNT_DELETION: "Suppression du compte",
+        ACCOUNT_DELETED: "Compte supprimé",
 }
