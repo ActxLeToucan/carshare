@@ -29,6 +29,9 @@ const p = {
     userLevel: {
         admin: 1
     },
+    groups: {
+        maxPerRequest: 10
+    },
     token: {
         access: {
             expiration: '24h',
@@ -253,6 +256,35 @@ function checkBooleanField (value: any, req: express.Request, res: express.Respo
     return true;
 }
 
+function checkGroupNameField (name: any, req: express.Request, res: express.Response): boolean {
+    if (name === undefined || name === '') {
+        sendMsg(req, res, error.groupName.required);
+        return false;
+    }
+    if (typeof name !== 'string') {
+        sendMsg(req, res, error.groupName.type);
+        return false;
+    }
+    return true;
+}
+
+function checkUsersField (users: any, req: express.Request, res: express.Response): boolean {
+    if (!Array.isArray(users)) {
+        sendMsg(req, res, error.users.type);
+        return false;
+    }
+    if (users.length > p.groups.maxPerRequest) {
+        sendMsg(req, res, error.users.maxPerRequest, p.groups.maxPerRequest);
+        return false;
+    }
+    for (const email of users) {
+        if (!checkEmailField(email, req, res)) {
+            return false;
+        }
+    }
+    return true;
+}
+
 /**
  * Check if a date is in a valid format
  * If the date is not valid, send an error message to the client
@@ -340,6 +372,8 @@ export {
     checkLastNameField,
     checkFirstNameField,
     checkLevelField,
+    checkGroupNameField,
+    checkUsersField,
     checkBooleanField,
     checkDateField,
     sanitizePhone,
