@@ -1,5 +1,5 @@
 import type express from 'express';
-import { error, info, sendMsg } from '../tools/translator';
+import { displayableGroup, error, info, sendMsg } from '../tools/translator';
 import * as properties from '../properties';
 import { prisma } from '../app';
 
@@ -9,42 +9,22 @@ exports.createGroup = (req: express.Request, res: express.Response, next: expres
         return;
     }
 
-    let { name, users } = req.body;
+    const { name } = req.body;
     if (!properties.checkGroupNameField(name, req, res)) return;
-    users ??= [];
-    if (!properties.checkUsersField(users, req, res)) return;
-
-    prisma.user.findMany({
-        where: {
-            email: {
-                in: users
+    prisma.group.create({
+        data: {
+            name,
+            creator: {
+                connect: {
+                    id: res.locals.user.id
+                }
             }
         },
-        select: {
-            id: true
+        include: {
+            users: true
         }
-    }).then((userIds) => {
-        prisma.group.create({
-            data: {
-                name,
-                creator: {
-                    connect: {
-                        id: res.locals.user.id
-                    }
-                },
-                users: {
-                    connect: userIds
-                }
-            },
-            include: {
-                users: true
-            }
-        }).then((group) => {
-            sendMsg(req, res, info.group.created, group);
-        }).catch((err) => {
-            console.error(err);
-            sendMsg(req, res, error.generic.internalError);
-        });
+    }).then((group) => {
+        sendMsg(req, res, info.group.created, group);
     }).catch((err) => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
@@ -60,9 +40,12 @@ exports.getMyGroups = (req: express.Request, res: express.Response, next: expres
     prisma.group.findMany({
         where: {
             creatorId: res.locals.user.id
+        },
+        include: {
+            users: true
         }
     }).then((groups) => {
-        res.status(200).json(groups);
+        res.status(200).json(groups.map(displayableGroup));
     }).catch((err) => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
