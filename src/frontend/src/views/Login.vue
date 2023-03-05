@@ -26,8 +26,8 @@ import API from '../scripts/API';
 import Lang from '../scripts/Lang';
 
 const field_checks = [
-    {field: "email",            check: (value) => value.length > 0, error: "Veuillez renseignez votre adresse mail."},
-    {field: "password",         check: (value) => value.length > 0, error: "Veuillez renseignez votre mot de passe."}
+    {field: "email",            check: (value) => value.length > 0, error: Lang.CurrentLang.EMAIL_SPECIFY},
+    {field: "password",         check: (value) => value.length > 0, error: Lang.CurrentLang.PASSWORD_SPECIFY}
 ];
 
 function onCancel(modal) {
@@ -36,7 +36,7 @@ function onCancel(modal) {
 
 function onValidate(modal) {
     return new Promise((resolve, reject) => {
-        const log = modal.log("Vérification des entrées ...", Log.INFO);
+        const log = modal.log(Lang.CurrentLang.INPUT_VERIFICATION + " ...", Log.INFO);
         for (let i = 0; i < field_checks.length; i++) {
             const check = field_checks[i];
             const result = check.check(modal.get(check.field), modal);
@@ -48,7 +48,7 @@ function onValidate(modal) {
                 return;
             }
         }
-        log.update("Envoi des données ...", Log.INFO);
+        log.update(Lang.CurrentLang.DATA_SENDING + " ...", Log.INFO);
 
         const payload = modal.getPayload();
         const userInfos = {
@@ -57,7 +57,7 @@ function onValidate(modal) {
         };
 
         API.execute(API.ROUTE.LOGIN, API.METHOD.POST, userInfos, API.TYPE.JSON).then(res => {
-            log.update("Connecté avec succès !", Log.SUCCESS);
+            log.update(Lang.CurrentLang.LOGIN_SUCCESS + " !", Log.SUCCESS);
 
             const user = new User({id: res.userId, token: res.token});
             user.save();
@@ -67,7 +67,7 @@ function onValidate(modal) {
                 resolve(true);
             }, 2000);
         }).catch(err => {
-            log.update("Erreur : " + err.message, Log.ERROR);
+            log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
             
             setTimeout(() => {
                 log.delete();
