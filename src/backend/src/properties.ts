@@ -333,6 +333,104 @@ function sanitizeUserId (id: any, req: express.Request, res: express.Response): 
     return Number(id);
 }
 
+/**
+ * Check if depart and arrival date is in a valid format
+ * If the date is not valid, send an error message to the client
+ * @param date Date to check
+ * @param req Express request
+ * @param res Express response
+ * @returns true if the date is valid, false otherwise
+ */
+function checkDateDepartArrivalField (date: any, req: express.Request, res: express.Response): boolean {
+    if (date === undefined || date === '') {
+        sendMsg(req, res, error.date.required);
+        return false;
+    }
+    if (isNaN(new Date(date).getTime())) {
+        sendMsg(req, res, error.date.invalid);
+        return false;
+    }
+    if (new Date(date) < new Date()) {
+        sendMsg(req, res, error.date.tooSoon, new Date());
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Check if a number field is valid
+ * If the number is not valid, send an error message to the client
+ * @param value Value to sanitize
+ * @param req Express request
+ * @param res Express response
+ * @param fieldName Name of the field
+ * @returns true if the value is valid, false otherwise
+ */
+function checkNumberField (value: any, req: express.Request, res: express.Response, fieldName: string): boolean {
+    if (value === undefined || value === '') {
+        sendMsg(req, res, error.number.required, fieldName);
+        return false;
+    }
+    if (typeof value !== 'number') {
+        sendMsg(req, res, error.number.type, fieldName);
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Check if a string field is valid
+ * If the string is not valid, send an error message to the client
+ * @param value Value to sanitize
+ * @param req Express request
+ * @param res Express response
+ * @param fieldName Name of the field
+ * @returns true if the value is valid, false otherwise
+ */
+function checkStringField (value: any, req: express.Request, res: express.Response, fieldName: string): boolean {
+    if (value === undefined || value === '') {
+        sendMsg(req, res, error.string.required, fieldName);
+        return false;
+    }
+    if (typeof value !== 'string') {
+        sendMsg(req, res, error.string.type, fieldName);
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Check if a listOfEtape field is valid
+ * If the string is not valid, send an error message to the client
+ * @param value Value to sanitize
+ * @param req Express request
+ * @param res Express response
+ * @param fieldName Name of the field
+ * @returns true if the value is valid, false otherwise
+ */
+function checkListOfEtapeField (value: any, req: express.Request, res: express.Response): boolean {
+    if (value === undefined || value === '') {
+        sendMsg(req, res, error.etape.required);
+        return false;
+    }
+    if (typeof value !== 'object') {
+        sendMsg(req, res, error.etape.type);
+        return false;
+    }
+    if (value.length <2) {
+        sendMsg(req, res, error.etape.etapeMin);
+        return false;
+    }
+    for(const i in value ) {
+        if (!checkStringField(value[i].label, req, res, 'label')) return false;
+        if (!checkStringField(value[i].city, req, res, 'city')) return false;
+        if (!checkStringField(value[i].context, req, res, 'context')) return false;
+        if (!checkNumberField(value[i].lat, req, res, 'lat')) return false;
+        if (!checkNumberField(value[i].lng, req, res, 'lng')) return false;
+    }
+    return true;
+}
+
 export {
     p,
     checkEmailField,
@@ -344,5 +442,9 @@ export {
     checkDateField,
     sanitizePhone,
     sanitizeGender,
-    sanitizeUserId
+    sanitizeUserId,
+    checkDateDepartArrivalField,
+    checkNumberField,
+    checkStringField,
+    checkListOfEtapeField
 };
