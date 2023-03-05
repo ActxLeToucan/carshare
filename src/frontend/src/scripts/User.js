@@ -48,9 +48,8 @@ class User {
             API.execute_logged(API.ROUTE.USER, API.METHOD.GET, this.getCredentials()).then(res => {
                 this.setInformations(res, false);
             }).catch(err => {
-                if (err.status === 498) { // token expired, disconnect
-                    User.forget();
-                }
+                // token expired or user deleted
+                User.forget();
             })
         }
     }
