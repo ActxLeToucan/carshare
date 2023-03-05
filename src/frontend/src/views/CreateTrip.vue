@@ -29,7 +29,7 @@
                 <p class="show-down text-xl text-xl text-slate-400 text-left font-bold position: left  ml-4"> Arrivée </p>
                 <selector ref="endSelector" :oncompletion="searchCities" :onclick="onendselected" x="1" y="4"></selector>
                 <input-text name="endpoint" class="w-45 mx-10 max-w-fit" placeholder="Paris" dark="true"></input-text>
-            </div>
+            </div>   
         </div>
 
 
