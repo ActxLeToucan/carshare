@@ -159,8 +159,6 @@ paths:
                 $ref: '#/components/schemas/PrivateUser'
         '401':
           $ref: '#/components/responses/noToken'
-        '404':
-          $ref: '#/components/responses/userNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
@@ -207,8 +205,6 @@ paths:
                     example: Password is required.
         '401':
           $ref: '#/components/responses/noToken'
-        '404':
-          $ref: '#/components/responses/userNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
@@ -289,8 +285,6 @@ paths:
           $ref: '#/components/responses/noToken'
         '403':
           $ref: '#/components/responses/insufficientPrivileges'
-        '404':
-          $ref: '#/components/responses/userNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
@@ -339,8 +333,6 @@ paths:
                     example: Password is required.
         '401':
           $ref: '#/components/responses/noToken'
-        '404':
-          $ref: '#/components/responses/userNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
@@ -432,8 +424,6 @@ paths:
                     example: Password is required.
         '401':
           $ref: '#/components/responses/noToken'
-        '404':
-          $ref: '#/components/responses/userNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
@@ -463,8 +453,6 @@ paths:
                     example: A verification link has been sent to your email address.
         '401':
           $ref: '#/components/responses/noToken'
-        '404':
-          $ref: '#/components/responses/userNotFound'
         '429':
           $ref: '#/components/responses/tooManyRequests'
         '498':
@@ -494,8 +482,6 @@ paths:
                     example: Email address verified
         '401':
           $ref: '#/components/responses/noToken'
-        '404':
-          $ref: '#/components/responses/userNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
@@ -523,8 +509,6 @@ paths:
           $ref: '#/components/responses/noToken'
         '403':
           $ref: '#/components/responses/insufficientPrivileges'
-        '404':
-          $ref: '#/components/responses/userNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
@@ -690,8 +674,6 @@ paths:
                 $ref: '#/components/schemas/ListRoute'
         '401':
           $ref: '#/components/responses/noToken'
-        '404':
-          $ref: '#/components/responses/userNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
@@ -720,8 +702,6 @@ paths:
                     example: True
         '401':
           $ref: '#/components/responses/noToken'
-        '404':
-          $ref: '#/components/responses/userNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
@@ -759,8 +739,6 @@ paths:
                     example: Field "value" is required.
         '401':
           $ref: '#/components/responses/noToken'
-        '404':
-          $ref: '#/components/responses/userNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
@@ -786,8 +764,6 @@ paths:
                 $ref: '#/components/schemas/ArrayOfNotifications'
         '401':
           $ref: '#/components/responses/noToken'
-        '404':
-          $ref: '#/components/responses/userNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
@@ -816,8 +792,6 @@ paths:
                     example: All notifications have been removed
         '401':
           $ref: '#/components/responses/noToken'
-        '404':
-          $ref: '#/components/responses/userNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
@@ -871,8 +845,6 @@ paths:
                     example: Group name is required.
         '401':
           $ref: '#/components/responses/noToken'
-        '404':
-          $ref: '#/components/responses/userNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
@@ -898,8 +870,6 @@ paths:
                   $ref: '#/components/schemas/Group'
         '401':
           $ref: '#/components/responses/noToken'
-        '404':
-          $ref: '#/components/responses/userNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
