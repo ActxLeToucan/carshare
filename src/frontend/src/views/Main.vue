@@ -30,7 +30,7 @@
 
                             <div class="flex md:flex-row flex-col md:space-x-2 items-center w-min">
                                 <selector ref="startSelector" :oncompletion="searchCities" :onclick="onstartselected" :x="isMobile?-17:1" :y="isMobile?8:4"></selector>
-                                <input-text name="startpoint" class="w-48 mx-auto max-w-fit" :placeholder="lang.STARTING_POINT" dark="true"></input-text>
+                                <input-text name="startingpoint" class="w-48 mx-auto max-w-fit" :placeholder="lang.STARTING_POINT" dark="true"></input-text>
                                 <!-- <div class="flex justify-center items-center"> -->
                                     <!-- <div class="h-0 w-0"> -->
                                         <button-block class="w-fit" color="slate" :action="reverseInputs"> <!-- -translate-x-[50%] -translate-y-[50%] -->
@@ -40,7 +40,7 @@
                                     <!-- </div> -->
                                 <!-- </div> -->
                                 <selector ref="endSelector" :oncompletion="searchCities" :onclick="onendselected" :x="isMobile?-17:1" :y="isMobile?8:4"></selector>
-                                <input-text name="endpoint" class="w-48 mx-auto max-w-fit" :placeholder="lang.ENDING_POINT" dark="true"></input-text>
+                                <input-text name="endingpoint" class="w-48 mx-auto max-w-fit" :placeholder="lang.ENDING_POINT" dark="true"></input-text>
                             </div>
                             <span class="md:block hidden bg-teal-600 w-1 h-14 rounded-lg"></span>
                             <div class="flex md:flex-row flex-col md:space-x-2 md:space-y-2 space-y-0 w-min">
@@ -57,7 +57,7 @@
                     </div>
                 </div>
             </div>
-            <div class="flex grow">
+            <div class="flex grow min-h-[50vh]">
 
             </div>
 
@@ -208,7 +208,7 @@ export default {
         searchCities(selector, search) {
             BAN.searchCities(search).then(cities => {
                 let index = 0;
-                startCities = cities.map(city => ({ id: index++, value: city.city }));
+                startCities = cities.map(city => ({ id: index++, value: city.city, desc: city.context }));
                 selector.setData(startCities);
             }).catch(err => {
                 startCities = [];
@@ -223,14 +223,14 @@ export default {
         }
     },
     mounted() {
-        Lang.addCallback(lang => this.lang = lang);
+        Lang.AddCallback(lang => this.lang = lang);
 
         window.addEventListener("resize", ev => {
             this.isMobile = window.innerWidth < 768;
         });
 
-        this.startInput = this.$el.querySelector('input[name="startpoint"]');
-        this.endInput = this.$el.querySelector('input[name="endpoint"]');
+        this.startInput = this.$el.querySelector('input[name="startingpoint"]');
+        this.endInput = this.$el.querySelector('input[name="endingpoint"]');
         this.dateInput = this.$el.querySelector('input[name="datepoint"]');
         this.timeInput = this.$el.querySelector('input[name="timepoint"]');
         this.startSelector = this.$refs["startSelector"];

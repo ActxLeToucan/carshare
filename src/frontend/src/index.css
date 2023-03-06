@@ -66,6 +66,13 @@
     animation: show var(--animation-time) var(--animation-ease) forwards;
 }
 
+@media (min-width: 768px) {
+    .md\:show-up {
+        opacity: 0;
+        animation: show-up var(--animation-time) var(--animation-ease) forwards;
+    }
+}
+
 .hide-up {
     opacity: 0;
     animation: hide-up var(--animation-time) var(--animation-ease) forwards;

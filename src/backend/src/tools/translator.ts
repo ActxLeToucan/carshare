@@ -648,6 +648,15 @@ const info = {
                 group: displayableGroup(group)
             }
         })
+    },
+    notification: {
+        deletedAll: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Toutes les notifications ont été supprimées',
+                en: 'All notifications have been removed'
+            },
+            code: 200
+        })
     }
 
 } satisfies TranslationsMessageHTTP;
@@ -786,6 +795,7 @@ function translate (req: Request, variants: Variants): string {
 function sendMsg (req: Request, res: Response, message: (req: Request, ...args: any) => MessageHTTP, ...args: any) {
     const msg = message(req, ...args);
     res.status(msg.code).json({
+        message: msg.msg,
         ...msg.data
     });
 }

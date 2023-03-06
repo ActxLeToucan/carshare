@@ -45,7 +45,7 @@ class User {
             }
         }
         if (this.token != null && checkToken) { // verify token
-            API.execute_logged(API.ROUTE.USER, API.METHOD.GET, this.getCredentials()).then(res => {
+            API.execute_logged(API.ROUTE.ME, API.METHOD.GET, this.getCredentials()).then(res => {
                 this.setInformations(res, false);
             }).catch(err => {
                 // token expired or user deleted

@@ -5,20 +5,29 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
 
+    <!-- META WEBSITE INFOS -->
     <meta property="og:title" content="Car Share">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://carshare.projects.antoinectx.fr/">
-    <meta property="og:image" content="/assets/car.9c8ee21b.png">
+    <meta property="og:image" content="img/car.png">
     <meta property="og:description" content="Car Share | Application">
-    <meta name="description" content="Car Share | Application - Carpool with friends or strangers!">
+    
+    <!-- WPA APP INFOS -->
     <meta name="theme-color" content="#14b8a6">
-
+    <meta name="author" content="FurWaz" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-title" content="Car share">
+    <link rel="apple-touch-icon" href="img/car.png">
+    <link rel="icon" href="img/car.png" type="image/png">
+    <meta name="description" content="Car share | Application - Carpool with friends or strangers!">
+    <link rel="manifest" href="/app.webmanifest" crossorigin="use-credentials" />
+    
     <title> Car Share | Application </title>
-    <link rel="shortcut icon" href="./src/assets/img/car.png" type="image/png">
+    <link rel="shortcut icon" href="img/car.png" type="image/png">
 </head>
 
-<body class="flex bg-white w-screen min-h-screen md:h-screen h-min overflow-x-hidden">
-    <div id="app" class="flex grow min-w-0 min-h-0"></div>
+<body class="flex bg-white w-screen h-screen min-h-screen h-fit overflow-x-hidden">
+    <div id="app" class="flex grow min-w-full w-fit h-fit min-h-full"></div>
     <script type="module" src="/src/main.js"></script>
     
     <noscript>

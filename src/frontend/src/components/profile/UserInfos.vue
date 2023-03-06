@@ -1,5 +1,5 @@
 <template>
-    <div class="show-up flex flex-col grow">
+    <div class="md:show-up flex flex-col grow">
         <p class="text-2xl text-teal-500 font-bold mx-auto mt-4"> {{ lang.MY_INFOS }} </p>
         <div class="flex flex-col grow justify-evenly items-center">
             <card class="flex flex-col m-4">
@@ -90,7 +90,7 @@ export default {
         removeAccount(popup) {
             return new Promise((resolve, reject) => {
                 const log = popup.log("Suppression du compte...", Log.INFO);
-                API.execute_logged(API.ROUTE.USER, API.METHOD.DELETE, User.CurrentUser?.getCredentials(), {password: popup.get("password")}).then(res => {
+                API.execute_logged(API.ROUTE.ME, API.METHOD.DELETE, User.CurrentUser?.getCredentials(), {password: popup.get("password")}).then(res => {
                     log.update("Compte supprimé avec succès !", Log.SUCCESS);
                     setTimeout(() => {
                         log.delete();
@@ -124,7 +124,10 @@ export default {
         }
     },
     mounted() {
-        Lang.addCallback(lang => this.lang = lang);
+        Lang.AddCallback(lang => {
+            this.lang = lang;
+            this.deletePopup.setTitle(lang.DELETE_ACCOUNT);
+        });
 
         const setInputValue = (name, value) => {
             const input = this.$el.querySelector(`input[name="${name}"]`);
@@ -132,7 +135,7 @@ export default {
         }
 
         if (User.CurrentUser == null) return;
-        API.execute_logged(API.ROUTE.USER, API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
+        API.execute_logged(API.ROUTE.ME, API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
             User.CurrentUser?.setInformations(res);
             User.CurrentUser?.save();
             
