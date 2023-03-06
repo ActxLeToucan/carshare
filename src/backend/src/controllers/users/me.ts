@@ -3,7 +3,7 @@ import { displayableUserPrivate, error, info, sendMsg } from '../../tools/transl
 import * as properties from '../../properties';
 import bcrypt from 'bcrypt';
 import { prisma } from '../../app';
-import * as _user from '../_common/user';
+import * as _user from './_common';
 
 exports.getMe = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     if (res.locals.user === undefined) {

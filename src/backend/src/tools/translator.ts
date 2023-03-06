@@ -529,6 +529,15 @@ const info = {
                 group: displayableGroup(group)
             }
         })
+    },
+    notification: {
+        deletedAll: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Toutes les notifications ont été supprimées',
+                en: 'All notifications have been removed'
+            },
+            code: 200
+        })
     }
 } satisfies TranslationsMessageHTTP;
 
@@ -666,6 +675,7 @@ function translate (req: Request, variants: Variants): string {
 function sendMsg (req: Request, res: Response, message: (req: Request, ...args: any) => MessageHTTP, ...args: any) {
     const msg = message(req, ...args);
     res.status(msg.code).json({
+        message: msg.msg,
         ...msg.data
     });
 }
@@ -694,22 +704,29 @@ async function sendMail (req: Request, message: (req: Request, ...args: any) => 
 }
 
 /**
- * Returns a user without the password
+ * Returns a user without some properties for display to the user itself or to admins
  * @param user User to display
- * @returns User without the password
+ * @returns User without some properties
+ * @see displayableUserPublic
  */
 function displayableUserPrivate (user: User) {
     const u = user as any;
     delete u.password;
+    delete u.lastPasswordResetEmailedOn;
+    delete u.lastEmailVerificationEmailedOn;
     return u;
 }
 
+/**
+ * Returns a user without some properties for display to other users
+ * @param user User to display
+ * @returns User without some properties
+ * @see displayableUserPrivate
+ */
 function displayableUserPublic (user: User) {
     const u = displayableUserPrivate(user);
     delete u.mailNotif;
     delete u.createdAt;
-    delete u.lastPasswordResetEmailedOn;
-    delete u.lastEmailVerificationEmailedOn;
     return u;
 }
 

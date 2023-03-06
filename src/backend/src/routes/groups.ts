@@ -6,7 +6,7 @@ const controller = require('../controllers/groups');
 const emailVerified = require('../middlewares/emailVerified');
 
 router.use(auth.access, emailVerified);
-router.post('/', controller.createGroup);
-router.get('/', controller.getMyGroups);
+router.post('/my', controller.createGroup);
+router.get('/my', controller.getMyGroups);
 
 module.exports = router;
