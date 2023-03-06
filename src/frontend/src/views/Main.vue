@@ -57,7 +57,7 @@
                     </div>
                 </div>
             </div>
-            <div class="flex grow">
+            <div class="flex grow min-h-[50vh]">
 
             </div>
 

@@ -37,6 +37,7 @@ export default {
     VERIFY: "Verify",
     CHANGE: "Change",
     BACK: "Back",
+    CREATE: "Create",
     DISCONNECT: "Disconnect",
 
     // register
@@ -105,9 +106,11 @@ export default {
         NO_GROUPS: "You don't have any group yet",
         NO_GROUPS_DESC: "Create a group to start sharing your trips with your friends !",
         CREATE_GROUP: "Create a new group",
+        GROUP_CREATE_CONFIRMATION: "Please specify the group informations to create it",
         MEMBERS: "Members",
         DELETE_GROUP: "Delete group",
         GROUP_DELETE_CONFIRMATION: "Are you sure you want to delete this group ?\nThis action is irreversible.",
+        GROUP_NAME: "Group name",
 
     // informations
     ADDRESS_NOT_VERIFIED: "Address not verified",

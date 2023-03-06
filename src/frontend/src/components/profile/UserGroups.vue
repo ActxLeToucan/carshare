@@ -1,16 +1,16 @@
 <template>
-    <div class="show-up flex flex-col grow">
+    <div class="md:show-up flex flex-col grow">
         <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> {{ lang.MY_GROUPS }} </p>
         <div class="flex flex-col grow justify-evenly">
 
-            <div class="flex flex-col w-fit mx-auto">
-                <p class="text-2xl text-slate-500 py-2 font-semibold"> {{ lang.MY_GROUPS }} </p>
-                <card class="min-w-[60vw] max-w-[60vw]">
+            <div class="flex flex-col w-fit md:mx-auto mx-4">
+                <p class="text-xl text-slate-500 py-2 font-semibold"> {{ lang.MY_GROUPS }} </p>
+                <card class="flex grow h-fit min-w-[60vw] md:max-w-[70vw]">
                     <div v-if="groups.length == 0" class="flex flex-col justify-center mx-auto">
 
                         <div class="flex flex-col justify-center py-4 my-4 rounded-lg bg-slate-100 px-4">
-                            <p class="text-2xl text-slate-500 font-bold mx-auto"> {{ lang.NO_GROUPS }} </p>
-                            <p class="text-2xl text-slate-500 mx-auto"> {{ lang.NO_GROUPS_DESC }} </p>
+                            <p class="text-xl text-center text-slate-500 font-bold mx-auto"> {{ lang.NO_GROUPS }} </p>
+                            <p class="text-xl text-center text-slate-500 mx-auto"> {{ lang.NO_GROUPS_DESC }} </p>
                         </div>
                         
                     </div>
@@ -77,18 +77,16 @@
             :validateLabel="lang.DELETE"
             :onload="setDeletePopup"
             :onvalidate="removeGroup"
-        >
-            <input-text :label="lang.PASSWORD" :placeholder="lang.PASSWORD" name="password" type="password"></input-text>
-        </popup>
+        ></popup>
         <popup
             ref="create-popup"
-            :title="lang.DELETE_GROUP"
-            :content="lang.GROUP_DELETE_CONFIRMATION"
+            :title="lang.CREATE_GROUP"
+            :content="lang.GROUP_CREATE_CONFIRMATION+'.'"
             :cancelLabel="lang.CANCEL"
-            :validateLabel="lang.DELETE"
+            :validateLabel="lang.CREATE"
             :onvalidate="createGroup"
         >
-            <input-text :label="lang.PASSWORD" :placeholder="lang.PASSWORD" name="password" type="password"></input-text>
+            <input-text :label="lang.GROUP_NAME" :placeholder="lang.GROUP_NAME" name="name"></input-text>
         </popup>
     </div>
 </template>
@@ -97,6 +95,7 @@
 import Lang from '../../scripts/Lang';
 import Card from '../cards/Card.vue';
 import ButtonBlock from '../inputs/ButtonBlock.vue';
+import InputText from '../inputs/InputText.vue';
 import Popup from '../cards/Popup.vue';
 
 import {
@@ -104,10 +103,10 @@ import {
 } from '@heroicons/vue/24/outline';
 
 const groups = [
-    {name: "Groupe des super zamis", members: [
-        {email: "jean.dupont@gmail.com", firstName: "Jean", lastName: "Dupont"},
-        {email: "jean.dupond@gmail.com", firstName: "Jean", lastName: "Dupond"},
-    ]}
+    // {name: "Groupe des super zamis", members: [
+    //     {email: "jean.dupont@gmail.com", firstName: "Jean", lastName: "Dupont"},
+    //     {email: "jean.dupond@gmail.com", firstName: "Jean", lastName: "Dupond"},
+    // ]}
 ];
 
 export default {
@@ -116,7 +115,8 @@ export default {
         Card,
         ButtonBlock,
         XMarkIcon,
-        Popup
+        Popup,
+        InputText
     },
     data() {
         return { groups, lang: Lang.CurrentLang, selectedGroup: null, deletePopup: null, createPopup: null }
@@ -141,6 +141,9 @@ export default {
         },
         removeGroup() {
             this.selectedGroup
+        },
+        createGroup() {
+
         }
     },
     mounted() {

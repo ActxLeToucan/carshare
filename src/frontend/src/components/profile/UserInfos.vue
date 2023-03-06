@@ -1,5 +1,5 @@
 <template>
-    <div class="show-up flex flex-col grow">
+    <div class="md:show-up flex flex-col grow">
         <p class="text-2xl text-teal-500 font-bold mx-auto mt-4"> {{ lang.MY_INFOS }} </p>
         <div class="flex flex-col grow justify-evenly items-center">
             <card class="flex flex-col m-4">
