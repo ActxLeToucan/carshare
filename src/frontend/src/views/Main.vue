@@ -208,7 +208,7 @@ export default {
         searchCities(selector, search) {
             BAN.searchCities(search).then(cities => {
                 let index = 0;
-                startCities = cities.map(city => ({ id: index++, value: city.city }));
+                startCities = cities.map(city => ({ id: index++, value: city.city, desc: city.context }));
                 selector.setData(startCities);
             }).catch(err => {
                 startCities = [];
@@ -223,7 +223,7 @@ export default {
         }
     },
     mounted() {
-        Lang.addCallback(lang => this.lang = lang);
+        Lang.AddCallback(lang => this.lang = lang);
 
         window.addEventListener("resize", ev => {
             this.isMobile = window.innerWidth < 768;

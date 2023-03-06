@@ -4,9 +4,12 @@
             v-show="_data.length > 0 && showing"
             class="absolute pointer-events-auto flex flex-col rounded-md border-2 border-slate-200 bg-white shadow-md"
             :style="'margin-top: ' + y/2 + 'em; margin-left: ' + x/2 + 'em;'">
-            <p v-for="el in _data" :key="el.id" v-on:click="() => {onclicked(el);}"
-               class="text-lg text-slate-500 font-semibold p-2 cursor-pointer hover:bg-slate-100"
-            > {{ el.value }} </p>
+            <div v-for="el in _data" :key="el.id" v-on:click="() => {onclicked(el);}"
+                class="cursor-pointer hover:bg-slate-100 px-2 py-1"
+            >
+                <p class="text-lg text-slate-500 font-semibold"> {{ el.value }} </p>
+                <p class="text-sm text-slate-400 italic"> {{ el.desc }} </p>
+            </div>
         </div>
     </div>
 </template>

@@ -124,7 +124,10 @@ export default {
         }
     },
     mounted() {
-        Lang.addCallback(lang => this.lang = lang);
+        Lang.AddCallback(lang => {
+            this.lang = lang;
+            this.deletePopup.setTitle(lang.DELETE_ACCOUNT);
+        });
 
         const setInputValue = (name, value) => {
             const input = this.$el.querySelector(`input[name="${name}"]`);
