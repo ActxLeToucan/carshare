@@ -30,7 +30,7 @@
 
                             <div class="flex md:flex-row flex-col md:space-x-2 items-center w-min">
                                 <selector ref="startSelector" :oncompletion="searchCities" :onclick="onstartselected" :x="isMobile?-17:1" :y="isMobile?8:4"></selector>
-                                <input-text name="startpoint" class="w-48 mx-auto max-w-fit" :placeholder="lang.STARTING_POINT" dark="true"></input-text>
+                                <input-text name="startingpoint" class="w-48 mx-auto max-w-fit" :placeholder="lang.STARTING_POINT" dark="true"></input-text>
                                 <!-- <div class="flex justify-center items-center"> -->
                                     <!-- <div class="h-0 w-0"> -->
                                         <button-block class="w-fit" color="slate" :action="reverseInputs"> <!-- -translate-x-[50%] -translate-y-[50%] -->
@@ -40,7 +40,7 @@
                                     <!-- </div> -->
                                 <!-- </div> -->
                                 <selector ref="endSelector" :oncompletion="searchCities" :onclick="onendselected" :x="isMobile?-17:1" :y="isMobile?8:4"></selector>
-                                <input-text name="endpoint" class="w-48 mx-auto max-w-fit" :placeholder="lang.ENDING_POINT" dark="true"></input-text>
+                                <input-text name="endingpoint" class="w-48 mx-auto max-w-fit" :placeholder="lang.ENDING_POINT" dark="true"></input-text>
                             </div>
                             <span class="md:block hidden bg-teal-600 w-1 h-14 rounded-lg"></span>
                             <div class="flex md:flex-row flex-col md:space-x-2 md:space-y-2 space-y-0 w-min">
