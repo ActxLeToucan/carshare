@@ -103,10 +103,16 @@ class API {
             if (API.API_URL == null) { API.setURL(config.api.url); }
             if (API.API_URL == null) reject("Error : API host not set");
 
+           console.log("path " + path)
             path = path.replace("/?", "?").replace(/\/\//g, "/");
+            console.log("path " + path)
+          
             let urlparts = path.split("?");
+            console.log("url " +urlparts )
             let base = urlparts.splice(0, 1);
+            console.log("base " + base)
             let params = (urlparts.length > 0)? ("?" + urlparts.join("&")) : "";
+            console.log("params " + params)
             path = base + params;
 
             let reqHeaders = {
@@ -152,7 +158,9 @@ class API {
                     reject(err);
                 }
             };
-            
+             console.log("path " + path )
+             console.log('api' + this.API_URL)
+
             fetch(API.API_URL + path, {
                 credentials: "omit",
                 method: method,
