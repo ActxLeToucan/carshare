@@ -1,5 +1,5 @@
 <template>
-    <div class="flex grow flex-col max-w-full min-w-0">
+    <div class="flex grow flex-col max-w-full min-w-0 max-h-screen">
         <topbar></topbar>
         <div class="flex md:flex-row flex-col grow max-h-full min-h-0">
             <div ref="tabs-zone" class="flex flex-col items-center h-full md:w-min w-full px-8 py-4 space-y-4 md:border-r-8 border-teal-500 mx-auto overflow-hidden">

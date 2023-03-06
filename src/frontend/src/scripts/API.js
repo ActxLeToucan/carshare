@@ -1,5 +1,6 @@
 import config from '../config.js';
 import Lang from './Lang.js';
+import User from './User.js';
 
 class Credentials {
     static get TYPE() {
@@ -159,9 +160,13 @@ class API {
                 referrer: window.location.origin,
                 mode: "cors"
             }).then(response => {
-                if (!response.status.toString().startsWith("2"))
+                if (!response.status.toString().startsWith("2")) {
+                    if (response.status === 498) { // token expired
+                        User.forget();
+                        window.location.reload();
+                    }
                     sendError(response);
-                else {
+                } else {
                     response.json().then(data => {
                         resolve(data);
                     }).catch(err => sendError(err));
