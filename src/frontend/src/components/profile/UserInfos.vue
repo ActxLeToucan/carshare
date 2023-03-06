@@ -90,7 +90,7 @@ export default {
         removeAccount(popup) {
             return new Promise((resolve, reject) => {
                 const log = popup.log("Suppression du compte...", Log.INFO);
-                API.execute_logged(API.ROUTE.USER, API.METHOD.DELETE, User.CurrentUser?.getCredentials(), {password: popup.get("password")}).then(res => {
+                API.execute_logged(API.ROUTE.ME, API.METHOD.DELETE, User.CurrentUser?.getCredentials(), {password: popup.get("password")}).then(res => {
                     log.update("Compte supprimé avec succès !", Log.SUCCESS);
                     setTimeout(() => {
                         log.delete();
@@ -132,7 +132,7 @@ export default {
         }
 
         if (User.CurrentUser == null) return;
-        API.execute_logged(API.ROUTE.USER, API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
+        API.execute_logged(API.ROUTE.ME, API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
             User.CurrentUser?.setInformations(res);
             User.CurrentUser?.save();
             

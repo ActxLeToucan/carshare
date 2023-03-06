@@ -81,13 +81,10 @@ class API {
     static ROUTE = {
         SIGNUP: "/users/signup",
         LOGIN: "/users/login",
-        USER: "/users/me",
+        ME: "/users/me",
         VERIFY: "/users/email-verification",
         RESETPWD: "/users/password-reset",
-        ADMIN: {
-            USER: "/admin/user",
-            USERS: "/admin/users",
-        }
+        USERS: "/users"
     };
 
     /**
