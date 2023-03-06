@@ -208,7 +208,7 @@ export default {
         searchCities(selector, search) {
             BAN.searchCities(search).then(cities => {
                 let index = 0;
-                startCities = cities.map(city => ({ id: index++, value: city.city }));
+                startCities = cities.map(city => ({ id: index++, value: city.city, desc: city.context }));
                 selector.setData(startCities);
             }).catch(err => {
                 startCities = [];
