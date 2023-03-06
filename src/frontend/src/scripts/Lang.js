@@ -45,6 +45,11 @@ class Lang {
 
 
     static LoadLang(code, save = true) {
+        if (code == null) {
+            code = this.DefaultCode;
+            save = false;
+        }
+
         code = this.#sanitizeCode(code);
         if (this.Langs.map(l => l.value).indexOf(code) === -1)
             return false;
