@@ -34,7 +34,7 @@ class Lang {
 
     static get CurrentLang() {
         if (this.#current_lang == null)
-            this.LoadLang( localStorage.getItem("lang") || this.DefaultCode );
+            this.LoadLang( localStorage.getItem("lang") || this.DefaultCode, false );
         return this.#current_lang;
     }
 
@@ -44,7 +44,7 @@ class Lang {
     }
 
 
-    static LoadLang(code) {
+    static LoadLang(code, save = true) {
         code = this.#sanitizeCode(code);
         if (this.Langs.map(l => l.value).indexOf(code) === -1)
             return false;
@@ -61,7 +61,7 @@ class Lang {
         });
 
         this.#current_code = code;
-        localStorage.setItem("lang", code);
+        if (save) localStorage.setItem("lang", code);
         return true;
     }
 
