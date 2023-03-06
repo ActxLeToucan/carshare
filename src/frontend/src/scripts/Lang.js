@@ -11,17 +11,18 @@ class Lang {
     static callbacks = [];
     static current_lang = null;
     static current_code = null;
-    static defaultLanguage = fr;
+    static defaultCode = navigator.language || navigator.userLanguage;
+    static defaultLanguage = Langs.find(l => l.value === defaultCode).data ?? Langs[0].data;
 
     static get CurrentLang() {
         if (this.current_lang == null)
-            this.loadLang( localStorage.getItem("lang") || "fr" );
+            this.loadLang( localStorage.getItem("lang") || this.defaultCode );
         return this.current_lang;
     }
 
     static get CurrentCode() {
         if (this.current_code == null)
-            this.loadLang( localStorage.getItem("lang") || "fr" );
+            this.loadLang( localStorage.getItem("lang") || this.defaultCode );
         return this.current_code;
     }
 
