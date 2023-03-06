@@ -34,7 +34,7 @@ class Lang {
 
     static get CurrentLang() {
         if (this.#current_lang == null)
-            this.LoadLang( localStorage.getItem("lang") || this.#defaultCode );
+            this.LoadLang( localStorage.getItem("lang") || this.DefaultCode );
         return this.#current_lang;
     }
 
