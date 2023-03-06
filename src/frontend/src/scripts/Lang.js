@@ -12,7 +12,7 @@ class Lang {
     static current_lang = null;
     static current_code = null;
     static defaultCode = navigator.language || navigator.userLanguage;
-    static defaultLanguage = Langs.find(l => l.value === defaultCode).data ?? Langs[0].data;
+    static defaultLanguage = this.Langs.find(l => l.value === defaultCode).data ?? this.Langs[0].data;
 
     static get CurrentLang() {
         if (this.current_lang == null)
