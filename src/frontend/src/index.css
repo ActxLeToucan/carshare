@@ -66,6 +66,13 @@
     animation: show var(--animation-time) var(--animation-ease) forwards;
 }
 
+@media (min-width: 768px) {
+    .md\:show-up {
+        opacity: 0;
+        animation: show-up var(--animation-time) var(--animation-ease) forwards;
+    }
+}
+
 .hide-up {
     opacity: 0;
     animation: hide-up var(--animation-time) var(--animation-ease) forwards;
@@ -81,4 +88,8 @@
 .hide-right {
     opacity: 0;
     animation: hide-right var(--animation-time) var(--animation-ease) forwards;
+}
+
+.shadow-3D {
+    text-shadow: 0px 2px 0px #0d9488, 0px 4px 0px #0d9488, 0px 6px 0px #0d9488;
 }

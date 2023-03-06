@@ -1,12 +1,12 @@
 <template>
-    <div class="flex grow flex-col">
+    <div class="flex grow flex-col max-w-full min-w-0 max-h-screen">
         <topbar></topbar>
         <div class="flex md:flex-row flex-col grow max-h-full min-h-0">
             <div ref="tabs-zone" class="flex flex-col items-center h-full md:w-min w-full px-8 py-4 space-y-4 md:border-r-8 border-teal-500 mx-auto overflow-hidden">
-                <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> Administration </p>
-                <button-tab href="#users" :default="!isMobile"> Utilisateurs </button-tab>
-                <button-tab href="#groups"> Groupes </button-tab>
-                <button-tab href="#trips"> Trajets </button-tab>
+                <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> {{ lang.ADMINISTRATION }} </p>
+                <button-tab href="#users" :default="!isMobile"> {{ lang.USERS }} </button-tab>
+                <button-tab href="#groups"> {{ lang.GROUPS }} </button-tab>
+                <button-tab href="#trips"> {{ lang.TRIPS }} </button-tab>
             </div>
             <div ref="content-zone" class="flex flex-col md:grow overflow-scroll">
 
@@ -44,6 +44,7 @@ import TabDiv from '../components/cards/TabDiv.vue';
 import AdminUsers from '../components/admin/AdminUsers.vue';
 import AdminGroups from '../components/admin/AdminGroups.vue';
 import AdminTrips from '../components/admin/AdminTrips.vue';
+import Lang from '../scripts/Lang';
 
 export default {
     name: 'Admin',
@@ -96,9 +97,11 @@ export default {
         },
     },
     data() {
-        return { User, isMobile: window.innerWidth < 768 }
+        return { User, isMobile: window.innerWidth < 768, lang: Lang.CurrentLang }
     },
     mounted() {
+        Lang.AddCallback(lang => this.lang = lang);
+
         this.setupView();
         window.addEventListener("resize", () => {
             this.isMobile = window.innerWidth < 768;

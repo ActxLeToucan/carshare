@@ -69,7 +69,7 @@ paths:
                     type: string
                     example: User created
                   user:
-                    $ref: '#/components/schemas/User'
+                    $ref: '#/components/schemas/PrivateUser'
                   token:
                     type: string
                     example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
@@ -156,11 +156,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/PrivateUser'
         '401':
           $ref: '#/components/responses/noToken'
-        '404':
-          $ref: '#/components/responses/userNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
@@ -207,8 +205,6 @@ paths:
                     example: Password is required.
         '401':
           $ref: '#/components/responses/noToken'
-        '404':
-          $ref: '#/components/responses/userNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
@@ -223,9 +219,125 @@ paths:
         - $ref: '#/components/parameters/Accept-Language'
       security:
         - bearerAuth: [ ]
+      requestBody:
+        description: The user to update
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  required: false
+                  example: john@example.com
+                firstName:
+                  type: string
+                  required: false
+                  example: John
+                lastName:
+                  type: string
+                  required: false
+                  example: Doe
+                phone:
+                  type: string
+                  required: false
+                  example: 0123456789
+                gender:
+                  type: integer
+                  required: false
+                  example: 1
+                hasCar:
+                  type: boolean
+                  required: false
+                  example: true
+                mailNotif:
+                  type: boolean
+                  required: false
+                  example: true
       responses:
-        '501':
-          $ref: '#/components/responses/notImplemented'
+        '200':
+          description: User updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: User updated
+                      user:
+                        $ref: '#/components/schemas/PrivateUser'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Field "hasCar" must be a boolean.
+        '401':
+          $ref: '#/components/responses/noToken'
+        '403':
+          $ref: '#/components/responses/insufficientPrivileges'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+
+  /users/me/password:
+    patch:
+      summary: Update password
+      description: Update the current user's password
+      operationId: updateCurrentUserPassword
+      tags:
+        - Users
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  example: Password123$
+      responses:
+        '200':
+          description: Password changed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Password changed
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Password is required.
+        '401':
+          $ref: '#/components/responses/noToken'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+
 
   /users/password-reset:
     post:
@@ -266,6 +378,8 @@ paths:
                   message:
                     type: string
                     example: Email is required.
+        '429':
+          $ref: '#/components/responses/tooManyRequests'
         '500':
           $ref: '#/components/responses/internalError'
     patch:
@@ -310,8 +424,6 @@ paths:
                     example: Password is required.
         '401':
           $ref: '#/components/responses/noToken'
-        '404':
-          $ref: '#/components/responses/userNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
@@ -341,8 +453,8 @@ paths:
                     example: A verification link has been sent to your email address.
         '401':
           $ref: '#/components/responses/noToken'
-        '404':
-          $ref: '#/components/responses/userNotFound'
+        '429':
+          $ref: '#/components/responses/tooManyRequests'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
@@ -370,142 +482,18 @@ paths:
                     example: Email address verified
         '401':
           $ref: '#/components/responses/noToken'
-        '404':
-          $ref: '#/components/responses/userNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
 
-  /travels/my:
-    get:
-      summary: My travels
-      description: Get all the trips of the current user (as a driver or a passenger).
-      tags:
-        - Travels
-      parameters:
-        - $ref: '#/components/parameters/Accept-Language'
-      security:
-        - bearerAuth: [ ]
-      responses:
-        '200':
-          description: The travel he has made or will make, depending on the status of the travel.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ListRoute'
-        '401':
-          $ref: '#/components/responses/noToken'
-        '404':
-          $ref: '#/components/responses/userNotFound'
-        '498':
-          $ref: '#/components/responses/invalidToken'
-        '500':
-          $ref: '#/components/responses/internalError'
-
-  /settings/notifications:
-    get:
-      summary: Setting for mail notification
-      description: True to have notification sent by mail or false to not be sent mail.
-      tags:
-        - Settings
-      parameters:
-        - $ref: '#/components/parameters/Accept-Language'
-      security:
-        - bearerAuth: [ ]
-      responses:
-        '200':
-          description: The present value of this setting.
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  value:
-                    type: boolean
-                    example: True 
-        '401':
-          $ref: '#/components/responses/noToken'
-        '404':
-          $ref: '#/components/responses/userNotFound'
-        '498':
-          $ref: '#/components/responses/invalidToken'
-        '500':
-          $ref: '#/components/responses/internalError'
-    patch:
-      summary: Update setting
-      description: Update the setting to have mail sent or not by mail when receiving a notification
-      operationId: updateNotificationSetting
-      tags:
-        - Settings
-      parameters:
-        - $ref: '#/components/parameters/Accept-Language'
-      security:
-        - bearerAuth: [ ]
-      responses:
-        '200':
-          description: Update the mailNotif setting
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Settings saved
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Field "value" is required.
-        '401':
-          $ref: '#/components/responses/noToken'
-        '404':
-          $ref: '#/components/responses/userNotFound'
-        '498':
-          $ref: '#/components/responses/invalidToken'
-        '500':
-          $ref: '#/components/responses/internalError'
-          
-  /notifications/my:
-    get:
-      summary: Get the list of notifications
-      description: Get all the notifications of the current user.
-      operationId: getAllUsers
-      tags:
-        - Notifications
-      parameters:
-        - $ref: '#/components/parameters/Accept-Language'
-      security:
-        - bearerAuth: [ ]
-      responses:
-        '200':
-          description: A list of the notifications
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ArrayOfNotifications'
-        '401':
-          $ref: '#/components/responses/noToken'
-        '404':
-          $ref: '#/components/responses/userNotFound'
-        '498':
-          $ref: '#/components/responses/invalidToken'
-        '500':
-          $ref: '#/components/responses/internalError'
-
-  /admin/users:
+  /users:
     get:
       summary: Get all users
       description: Get all users. Only available to admins.
       operationId: getAllUsers
       tags:
-        - Admin
+        - Users
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
       security:
@@ -516,25 +504,23 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ArrayOfUsers'
+                $ref: '#/components/schemas/ArrayOfPrivateUsers'
         '401':
           $ref: '#/components/responses/noToken'
         '403':
           $ref: '#/components/responses/insufficientPrivileges'
-        '404':
-          $ref: '#/components/responses/userNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
 
-  /admin/user/:id:
+  /users/:id:
     delete:
       summary: Delete an user
       description: Delete an user. Only available to admins.
       operationId: deleteUser
       tags:
-        - Admin
+        - Users
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
         - name: id
@@ -578,10 +564,10 @@ paths:
           $ref: '#/components/responses/internalError'
     patch:
       summary: Update an user
-      description: Update an user. Only available to admins. Only the fields to update are required.
+      description: Update an user. Only available to admins.
       operationId: updateUser
       tags:
-        - Admin
+        - Users
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
         - name: id
@@ -604,10 +590,6 @@ paths:
                   type: string
                   required: false
                   example: john@example.com
-                password:
-                  type: string
-                  required: false
-                  example: Password123$
                 firstName:
                   type: string
                   required: false
@@ -645,8 +627,13 @@ paths:
                 type: object
                 properties:
                   message:
-                    type: string
-                    example: User updated
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: User updated
+                      user:
+                        $ref: '#/components/schemas/PrivateUser'
         '400':
           description: Bad request
           content:
@@ -663,6 +650,226 @@ paths:
           $ref: '#/components/responses/insufficientPrivileges'
         '404':
           $ref: '#/components/responses/userNotFound'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+
+  /travels/my:
+    get:
+      summary: My travels
+      description: Get all the trips of the current user (as a driver or a passenger).
+      tags:
+        - Travels
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: The travel he has made or will make, depending on the status of the travel.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListRoute'
+        '401':
+          $ref: '#/components/responses/noToken'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+
+  /settings/notifications:
+    get:
+      summary: Setting for mail notification
+      description: True to have notification sent by mail or false to not be sent mail.
+      tags:
+        - Settings
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: The present value of this setting.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  value:
+                    type: boolean
+                    example: True
+        '401':
+          $ref: '#/components/responses/noToken'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+    patch:
+      summary: Update setting
+      description: Update the setting to have mail sent or not by mail when receiving a notification
+      operationId: updateNotificationSetting
+      tags:
+        - Settings
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Update the mailNotif setting
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Settings saved
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Field "value" is required.
+        '401':
+          $ref: '#/components/responses/noToken'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+
+  /notifications/my:
+    get:
+      summary: Get the list of notifications
+      description: Get all the notifications of the current user.
+      operationId: getAllUsers
+      tags:
+        - Notifications
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: A list of the notifications
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfNotifications'
+        '401':
+          $ref: '#/components/responses/noToken'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+  /notifications/all:
+    delete:
+      summary: Delete all the notification
+      description: Delete all the notification of the current user
+      operationId: deleteAllNotification
+      tags:
+        - Notifications
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: All notifications deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: All notifications have been removed
+        '401':
+          $ref: '#/components/responses/noToken'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+
+  /groups/my:
+    post:
+      summary: Create a group
+      description: Create a group.
+      operationId: createGroup
+      tags:
+        - Groups
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        description: The group to create
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  required: true
+                  example: My friends
+      responses:
+        '200':
+          description: Group created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Group created
+                  group:
+                    $ref: '#/components/schemas/Group'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Group name is required.
+        '401':
+          $ref: '#/components/responses/noToken'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+    get:
+      summary: Get my groups
+      description: Get my groups.
+      operationId: getMyGroups
+      tags:
+        - Groups
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Groups retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Group'
+        '401':
+          $ref: '#/components/responses/noToken'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
@@ -747,6 +954,16 @@ components:
               message:
                 type: string
                 example: Invalid type of value provided.
+    tooManyRequests:
+      description: Too many requests
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: An email has already been sent to this address less than 10 minutes ago. Please wait before trying again.
     internalError:
       description: Internal server error
       content:
@@ -768,7 +985,63 @@ components:
                 type: string
                 example: This feature is not yet implemented.
   schemas:
-    User:
+    Group:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: My friends
+        creatorId:
+          type: integer
+          example: 1
+        createdAt:
+          type: string
+          format: date-time
+          example: 2020-01-01T00:00:00.000Z
+        users:
+          type: array
+          items:
+            $ref: '#/components/schemas/PublicUser'
+    PublicUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        email:
+          type: string
+          example: john@example.com
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Doe
+        phone:
+          type: string
+          example: "+330612345678"
+        avatar:
+          type: string
+          nullable: true
+          default: null
+        gender:
+          type: integer
+          default: -1
+        hasCar:
+          type: boolean
+          default: false
+        level:
+          type: integer
+          default: 0
+        emailVerifiedOn:
+          type: string
+          format: date-time
+          nullable: true
+          default: null
+    PrivateUser:
       type: object
       properties:
         id:
@@ -810,10 +1083,10 @@ components:
           format: date-time
           nullable: true
           default: null
-    ArrayOfUsers:
+    ArrayOfPrivateUsers:
       type: array
       items:
-        $ref: '#/components/schemas/User'
+        $ref: '#/components/schemas/PrivateUser'
       example:
         - id: 1
           email: bob@example.com

@@ -11,26 +11,28 @@ datasource db {
 }
 
 model User {
-  id                   Int            @id @default(autoincrement())
-  email                String         @unique @db.VarChar(64)
-  emailVerifiedOn      DateTime?
-  password             String         @db.Text
-  firstName            String?        @db.VarChar(50)
-  lastName             String?        @db.VarChar(50)
-  phone                String?        @db.VarChar(16)
-  avatar               String?        @db.VarChar(255)
-  gender               Int            @default(-1)
-  hasCar               Boolean        @default(false)
-  mailNotif            Boolean        @default(false)
-  level                Int            @default(0)
-  evaluationsPublished Evaluation[]   @relation("evaluator")
-  evaluationsReceived  Evaluation[]   @relation("evaluated")
-  travelsAsDriver      Travel[]       @relation("driver")
-  travelsAsPassenger   Passenger[]
-  notifications        Notification[]
-  createdGroups        Group[]        @relation("creator")
-  groups               Group[]        @relation("users")
-  createdAt            DateTime       @default(now())
+  id                             Int            @id @default(autoincrement())
+  email                          String         @unique @db.VarChar(64)
+  emailVerifiedOn                DateTime?
+  password                       String         @db.Text
+  firstName                      String?        @db.VarChar(50)
+  lastName                       String?        @db.VarChar(50)
+  phone                          String?        @db.VarChar(16)
+  avatar                         String?        @db.VarChar(255)
+  gender                         Int            @default(-1)
+  hasCar                         Boolean        @default(false)
+  mailNotif                      Boolean        @default(false)
+  level                          Int            @default(0)
+  evaluationsPublished           Evaluation[]   @relation("evaluator")
+  evaluationsReceived            Evaluation[]   @relation("evaluated")
+  travelsAsDriver                Travel[]       @relation("driver")
+  travelsAsPassenger             Passenger[]
+  notifications                  Notification[]
+  createdGroups                  Group[]        @relation("creator")
+  groups                         Group[]        @relation("users")
+  createdAt                      DateTime       @default(now())
+  lastPasswordResetEmailedOn     DateTime?
+  lastEmailVerificationEmailedOn DateTime?
 }
 
 model Travel {

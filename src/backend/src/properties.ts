@@ -2,20 +2,7 @@ import type express from 'express';
 import { error, sendMsg, type Variants } from './tools/translator';
 import IsEmail from 'isemail';
 
-const txtExpirationTokenAccess: Variants = {
-    fr: '24 heures',
-    en: '24 hours'
-}
-const txtExpirationTokenPasswordReset: Variants = {
-    fr: '1 heure',
-    en: '1 hour'
-}
-const txtExpirationTokenEmailVerification: Variants = {
-    fr: '4 heures',
-    en: '4 hours'
-}
-
-const p: Record<string, Record<string, any>> = {
+const p = {
     email: {
         max: 64 // from schema.prisma
     },
@@ -45,22 +32,47 @@ const p: Record<string, Record<string, any>> = {
     token: {
         access: {
             expiration: '24h',
-            expirationTxt: txtExpirationTokenAccess
+            expirationTxt: {
+                fr: '24 heures',
+                en: '24 hours'
+            } satisfies Variants
         },
         passwordReset: {
             expiration: '1h',
-            expirationTxt: txtExpirationTokenPasswordReset
+            expirationTxt: {
+                fr: '1 heure',
+                en: '1 hour'
+            } satisfies Variants
         },
         verify: {
             expiration: '4h',
-            expirationTxt: txtExpirationTokenEmailVerification
+            expirationTxt: {
+                fr: '4 heures',
+                en: '4 hours'
+            } satisfies Variants
         }
     },
     url: {
         passwordReset: `${String(process.env.FRONTEND_URL)}/reinit?token=`,
         emailVerification: `${String(process.env.FRONTEND_URL)}/validate?token=`
+    },
+    mailer: {
+        passwordReset: {
+            cooldown: 10 * 60 * 1000, // 10 minutes
+            cooldownTxt: {
+                fr: '10 minutes',
+                en: '10 minutes'
+            } satisfies Variants
+        },
+        emailVerification: {
+            cooldown: 10 * 60 * 1000, // 10 minutes
+            cooldownTxt: {
+                fr: '10 minutes',
+                en: '10 minutes'
+            } satisfies Variants
+        }
     }
-}
+} satisfies Record<string, Record<string, any>>;
 
 /**
  * Check if the email is in a valid format
@@ -241,6 +253,18 @@ function checkBooleanField (value: any, req: express.Request, res: express.Respo
     return true;
 }
 
+function checkGroupNameField (name: any, req: express.Request, res: express.Response): boolean {
+    if (name === undefined || name === '') {
+        sendMsg(req, res, error.groupName.required);
+        return false;
+    }
+    if (typeof name !== 'string') {
+        sendMsg(req, res, error.groupName.type);
+        return false;
+    }
+    return true;
+}
+
 /**
  * Check if a date is in a valid format
  * If the date is not valid, send an error message to the client
@@ -295,7 +319,7 @@ function sanitizeGender (gender: any): number | undefined {
     if (typeof gender !== 'number') {
         return undefined;
     }
-    if (p.gender.values.includes(gender) === false) {
+    if (!p.gender.values.includes(gender)) {
         return undefined;
     }
     return gender;
@@ -324,6 +348,7 @@ export {
     checkLastNameField,
     checkFirstNameField,
     checkLevelField,
+    checkGroupNameField,
     checkBooleanField,
     checkDateField,
     sanitizePhone,
