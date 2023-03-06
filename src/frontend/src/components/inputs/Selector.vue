@@ -1,5 +1,5 @@
 <template>
-    <div class="h-0 w-0 pointer-events-none">
+    <div class="h-0 w-0 pointer-events-none" style="z-index: 500;">
         <div
             v-show="_data.length > 0 && showing"
             class="absolute pointer-events-auto flex flex-col rounded-md border-2 border-slate-200 bg-white shadow-md"
@@ -22,12 +22,17 @@ export default {
         setData(data) {
             if (this._data.length != data.length) this.setSelection(-1);
             this._data = data;
+            this.showing = true;
+        },
+        setShowing(showing) {
+            this.showing = showing;
         },
         getData() {
             return this._data;
         },
         setSelection(selection) {
             this._selection = typeof(selection) === "string" ? parseInt(selection) : selection;
+            this.showing = true;
             const children = this.$el.firstElementChild.children;
             let index = 0;
             for (const child of children) {
@@ -49,7 +54,8 @@ export default {
                 }
             });
             input.addEventListener('keyup', ev => {
-                if (ev.key === "ArrowDown" || ev.key === "ArrowUp" || ev.key === "Enter") return;
+                const avoided = ["ArrowDown", "ArrowUp", "Enter", "Escape", "Shift", "Control", "Alt", "Meta", "CapsLock", "Tab"];
+                if (avoided.includes(ev.key)) return;
                 
                 if (timeout) clearTimeout(timeout);
                 timeout = setTimeout(() => {
@@ -76,6 +82,11 @@ export default {
                         break;
                     case "ArrowUp":
                         this.prev();
+                        ev.preventDefault();
+                        break;
+                    case "Escape":
+                        this.setSelection(-1);
+                        this.setShowing(false);
                         ev.preventDefault();
                         break;
                 }
@@ -135,6 +146,8 @@ export default {
             this.mouse.x = ev.clientX;
             this.mouse.y = ev.clientY;
         });
+        setInterval(() => {
+        }, 100);
     }
 }
 </script>

@@ -229,8 +229,8 @@ export default {
             this.isMobile = window.innerWidth < 768;
         });
 
-        this.startInput = this.$el.querySelector('input[name="startpoint"]');
-        this.endInput = this.$el.querySelector('input[name="endpoint"]');
+        this.startInput = this.$el.querySelector('input[name="startingpoint"]');
+        this.endInput = this.$el.querySelector('input[name="endingpoint"]');
         this.dateInput = this.$el.querySelector('input[name="datepoint"]');
         this.timeInput = this.$el.querySelector('input[name="timepoint"]');
         this.startSelector = this.$refs["startSelector"];
