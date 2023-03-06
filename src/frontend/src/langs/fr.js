@@ -1,6 +1,6 @@
 export default {
     // common
-    CARSHARE: "Car Share",
+    CARSHARE: "Car share",
     CARSHARE_DESC: "Covoiturez entre amis ou inconnus !",
     WELCOME: "Bienvenue sur Car Share !",
     WELCOME_DESC: "Pour commencer à utiliser l'application, veuillez vous connecter ou vous inscrire.",
@@ -104,7 +104,10 @@ export default {
         // groups
         NO_GROUPS: "Vous n'avez encore aucun groupe",
         NO_GROUPS_DESC: "Créez un groupe pour pouvoir partager vos trajets avec vos amis",
-
+        CREATE_GROUP: "Créer un nouveau groupe",
+        MEMBERS: "Membres",
+        DELETE_GROUP: "Supprimer le groupe",
+        GROUP_DELETE_CONFIRMATION: "Êtes-vous sûr de vouloir supprimer ce groupe ?\nCette action est irréversible.",
 
     // informations
     ADDRESS_NOT_VERIFIED: "Adresse non vérifiée",

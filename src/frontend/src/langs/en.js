@@ -1,6 +1,6 @@
 export default {
     // common
-    CARSHARE: "Car Share",
+    CARSHARE: "Car share",
     CARSHARE_DESC: "Carpool with friends or strangers !",
     WELCOME: "Welcome to Car Share !",
     WELCOME_DESC: "To start using the application, please login or register.",
@@ -100,6 +100,14 @@ export default {
     MY_TRIPS: "My trips",
     MY_GROUPS: "My groups",
     PARAMS: "Settings",
+
+        // groups
+        NO_GROUPS: "You don't have any group yet",
+        NO_GROUPS_DESC: "Create a group to start sharing your trips with your friends !",
+        CREATE_GROUP: "Create a new group",
+        MEMBERS: "Members",
+        DELETE_GROUP: "Delete group",
+        GROUP_DELETE_CONFIRMATION: "Are you sure you want to delete this group ?\nThis action is irreversible.",
 
     // informations
     ADDRESS_NOT_VERIFIED: "Address not verified",
