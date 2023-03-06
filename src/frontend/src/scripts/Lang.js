@@ -14,9 +14,15 @@ class Lang {
     static #defaultCode = null;
     static #defaultLanguage = null;
 
+    static #sanitizeCode = (code) => {
+        if (code.length > 2) code = code.split("-")[0];
+        if (code.length > 2) code = code.substring(0, 2);
+        return code.toLowerCase();
+    }
+
     static get DefaultCode() {
         if (this.#defaultCode == null)
-            this.#defaultCode = navigator.language || navigator.userLanguage;
+            this.#defaultCode = this.#sanitizeCode( navigator.language || navigator.userLanguage );
         return this.#defaultCode;
     }
 
@@ -39,6 +45,7 @@ class Lang {
 
 
     static LoadLang(code) {
+        code = this.#sanitizeCode(code);
         if (this.Langs.map(l => l.value).indexOf(code) === -1)
             return false;
         
