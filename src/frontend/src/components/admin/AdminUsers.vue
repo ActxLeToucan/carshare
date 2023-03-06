@@ -199,7 +199,7 @@ export default {
         return { User, usersList: [], selectedUser: null, isMobile: window.innerWidth < 768, genres, lang: Lang.CurrentLang }
     },
     mounted() {
-        Lang.addCallback(lang => {
+        Lang.AddCallback(lang => {
             this.lang = lang;
             this.deletePopup.setTitle(this.lang.DELETE + ' ' + this.selectedUser?.firstName + ' ' + this.selectedUser?.lastName);
         });

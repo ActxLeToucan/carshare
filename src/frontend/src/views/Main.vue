@@ -223,7 +223,7 @@ export default {
         }
     },
     mounted() {
-        Lang.addCallback(lang => this.lang = lang);
+        Lang.AddCallback(lang => this.lang = lang);
 
         window.addEventListener("resize", ev => {
             this.isMobile = window.innerWidth < 768;

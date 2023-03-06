@@ -88,7 +88,7 @@ export default {
         }
     },
     mounted() {
-        Lang.addCallback(lang => this.lang = lang);
+        Lang.AddCallback(lang => this.lang = lang);
 
         this.selected = this.value;
         this.elements.forEach(item => {

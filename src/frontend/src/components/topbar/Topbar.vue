@@ -85,7 +85,7 @@ export default {
         return { buttons, lang: Lang.CurrentLang }
     },
     mounted() {
-        Lang.addCallback(lang => {
+        Lang.AddCallback(lang => {
             this.lang = lang;
             this.buttons = buttons;
         });

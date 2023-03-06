@@ -147,7 +147,7 @@ export default {
         }
     },
     mounted() {
-        Lang.addCallback(lang => this.lang = lang);
+        Lang.AddCallback(lang => this.lang = lang);
 
         this.createPopup = this.$refs["create-popup"];
     }

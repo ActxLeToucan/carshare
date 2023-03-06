@@ -124,7 +124,7 @@ export default {
         }
     },
     mounted() {
-        Lang.addCallback(lang => this.lang = lang);
+        Lang.AddCallback(lang => this.lang = lang);
 
         const setInputValue = (name, value) => {
             const input = this.$el.querySelector(`input[name="${name}"]`);

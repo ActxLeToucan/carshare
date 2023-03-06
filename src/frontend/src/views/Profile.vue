@@ -122,7 +122,7 @@ export default {
         }
     },
     mounted() {
-        Lang.addCallback(lang => this.lang = lang);
+        Lang.AddCallback(lang => this.lang = lang);
 
         this.setupView();
         window.addEventListener("resize", () => {

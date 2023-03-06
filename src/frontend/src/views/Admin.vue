@@ -100,7 +100,7 @@ export default {
         return { User, isMobile: window.innerWidth < 768, lang: Lang.CurrentLang }
     },
     mounted() {
-        Lang.addCallback(lang => this.lang = lang);
+        Lang.AddCallback(lang => this.lang = lang);
 
         this.setupView();
         window.addEventListener("resize", () => {
