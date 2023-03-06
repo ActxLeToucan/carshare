@@ -375,11 +375,10 @@ function checkDateDepartArrivalField (date: any, req: express.Request, res: expr
  * @param value Value to sanitize
  * @param req Express request
  * @param res Express response
- * @param fieldName Name of the field
  * @returns true if the value is valid and it's a positive number, false otherwise
  */
 function checkPriceField (value: any, req: express.Request, res: express.Response): boolean {
-    if (typeof value !== 'number') {
+    if (typeof value !== 'number' && value !== undefined && value !== null) {
         sendMsg(req, res, error.number.type, 'Price');
         return false;
     }
@@ -397,11 +396,10 @@ function checkPriceField (value: any, req: express.Request, res: express.Respons
  * @param value Value to sanitize
  * @param req Express request
  * @param res Express response
- * @param fieldName Name of the field
  * @returns true if the value is valid and it's a positive number, false otherwise
  */
 function checkMaxPassengersField (value: any, req: express.Request, res: express.Response): boolean {
-    if (typeof value !== 'number') {
+    if (typeof value !== 'number' && value !== undefined && value !== null) {
         sendMsg(req, res, error.number.type, 'MaxPassengers');
         return false;
     }

@@ -35,8 +35,8 @@ exports.createTravel = async (req: express.Request, res: express.Response, next:
 
     if (!properties.checkDateDepartArrivalField(departureDate, req, res)) return;
     if (!properties.checkDateDepartArrivalField(arrivalDate, req, res)) return;
-    if (!properties.checkMaxPassengersField(arrivalDate, req, res)) return;
-    if (!properties.checkPriceField(arrivalDate, req, res)) return;
+    if (!properties.checkMaxPassengersField(maxPassengers, req, res)) return;
+    if (!properties.checkPriceField(price, req, res)) return;
     if (!properties.checkDescriptionField(description, req, res, 'description')) return;
 
     if (typeof groupId === 'number') {
