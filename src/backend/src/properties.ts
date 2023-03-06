@@ -370,21 +370,113 @@ function checkDateDepartArrivalField (date: any, req: express.Request, res: expr
 }
 
 /**
- * Check if a number field is valid
- * If the number is not valid, send an error message to the client
+ * Check if a price field is valid
+ * If the price is not valid, send an error message to the client
+ * @param value Value to sanitize
+ * @param req Express request
+ * @param res Express response
+ * @param fieldName Name of the field
+ * @returns true if the value is valid and it's a positive number, false otherwise
+ */
+function checkPriceField (value: any, req: express.Request, res: express.Response): boolean {
+    if (typeof value !== 'number') {
+        sendMsg(req, res, error.number.type, 'Price');
+        return false;
+    }
+
+    if (value < 0) {
+        sendMsg(req, res, error.number.positive, 'Price');
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Check if a price field is valid
+ * If the price is not valid, send an error message to the client
+ * @param value Value to sanitize
+ * @param req Express request
+ * @param res Express response
+ * @param fieldName Name of the field
+ * @returns true if the value is valid and it's a positive number, false otherwise
+ */
+function checkMaxPassengersField (value: any, req: express.Request, res: express.Response): boolean {
+    if (typeof value !== 'number') {
+        sendMsg(req, res, error.number.type, 'MaxPassengers');
+        return false;
+    }
+
+    if (value < 1) {
+        sendMsg(req, res, error.number.positive, 'MaxPassengers');
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Check if a lng field is valid
+ * If the lng is not valid, send an error message to the client
+ * @param value Value to sanitize
+ * @param req Express request
+ * @param res Express response
+ * @param fieldName Name of the field
+ * @returns true if the value is valid and if the value is between -180 and 180, false otherwise
+ */
+function checkLngField (value: any, req: express.Request, res: express.Response): boolean {
+    if (value === undefined || value === '') {
+        sendMsg(req, res, error.number.required, 'lng');
+        return false;
+    }
+    if (typeof value !== 'number') {
+        sendMsg(req, res, error.number.type, 'lng');
+        return false;
+    }
+
+    if (value < -180 || value > 180) {
+        sendMsg(req, res, error.longitude.minMax, 'lng');
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Check if a lat field is valid
+ * If the lat is not valid, send an error message to the client
+ * @param value Value to sanitize
+ * @param req Express request
+ * @param res Express response
+ * @param fieldName Name of the field
+ * @returns true if the value is valid and if the value is between -90 and 90, false otherwise
+ */
+function checkLatField (value: any, req: express.Request, res: express.Response): boolean {
+    if (value === undefined || value === '') {
+        sendMsg(req, res, error.number.required, 'lng');
+        return false;
+    }
+    if (typeof value !== 'number') {
+        sendMsg(req, res, error.number.type, 'lng');
+        return false;
+    }
+
+    if (value < -90 || value > 90) {
+        sendMsg(req, res, error.latitude.minMax, 'lng');
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Check if a description field is valid
+ * If the descirption is not valid, send an error message to the client
  * @param value Value to sanitize
  * @param req Express request
  * @param res Express response
  * @param fieldName Name of the field
  * @returns true if the value is valid, false otherwise
  */
-function checkNumberField (value: any, req: express.Request, res: express.Response, fieldName: string): boolean {
-    if (value === undefined || value === '') {
-        sendMsg(req, res, error.number.required, fieldName);
-        return false;
-    }
-    if (typeof value !== 'number') {
-        sendMsg(req, res, error.number.type, fieldName);
+function checkDescriptionField (value: any, req: express.Request, res: express.Response, fieldName: string): boolean {
+    if (typeof value !== 'string' && value !== undefined && value !== null) {
+        sendMsg(req, res, error.string.type, fieldName);
         return false;
     }
     return true;
@@ -417,28 +509,27 @@ function checkStringField (value: any, req: express.Request, res: express.Respon
  * @param value Value to sanitize
  * @param req Express request
  * @param res Express response
- * @param fieldName Name of the field
  * @returns true if the value is valid, false otherwise
  */
 function checkListOfEtapeField (value: any, req: express.Request, res: express.Response): boolean {
     if (value === undefined || value === '') {
-        sendMsg(req, res, error.etape.required);
+        sendMsg(req, res, error.etape.required, 'listOfEtape');
         return false;
     }
     if (typeof value !== 'object') {
-        sendMsg(req, res, error.etape.type);
+        sendMsg(req, res, error.etape.type, 'listOfEtape');
         return false;
     }
     if (value.length < 2) {
-        sendMsg(req, res, error.etape.etapeMin);
+        sendMsg(req, res, error.etape.etapeMin, 'listOfEtape');
         return false;
     }
     for (const i in value) {
         if (!checkStringField(value[i].label, req, res, 'label')) return false;
         if (!checkStringField(value[i].city, req, res, 'city')) return false;
         if (!checkStringField(value[i].context, req, res, 'context')) return false;
-        if (!checkNumberField(value[i].lat, req, res, 'lat')) return false;
-        if (!checkNumberField(value[i].lng, req, res, 'lng')) return false;
+        if (!checkLatField(value[i].lat, req, res)) return false;
+        if (!checkLngField(value[i].lng, req, res)) return false;
     }
     return true;
 }
@@ -457,7 +548,9 @@ export {
     sanitizeGender,
     sanitizeUserId,
     checkDateDepartArrivalField,
-    checkNumberField,
+    checkMaxPassengersField,
+    checkPriceField,
     checkStringField,
-    checkListOfEtapeField
+    checkListOfEtapeField,
+    checkDescriptionField
 };

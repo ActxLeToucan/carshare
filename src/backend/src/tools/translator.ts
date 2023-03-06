@@ -1,5 +1,5 @@
 import { type Request, type Response } from 'express';
-import { type User, type Travel, type Etape,  type Group } from '@prisma/client';
+import { type User, type Travel, type Group } from '@prisma/client';
 
 import { p } from '../properties';
 import { sendMail as mailerSend } from './mailer';
@@ -466,6 +466,13 @@ const error = {
                 en: `Field "${fieldName}" must be a number.`
             },
             code: 400
+        }),
+        positive: (req: Request, fieldName: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Le champ "${fieldName}" doit être un nombre positif.`,
+                en: `Field "${fieldName}" must be a positive number.`
+            },
+            code: 400
         })
     },
     string: {
@@ -485,24 +492,51 @@ const error = {
         })
     },
     etape: {
-        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        required: (req: Request, fieldName: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Le champ listOfEtape est requis.',
-                en: 'Field listOfEtape is required.'
+                fr: `Le champ "${fieldName}" est requis.`,
+                en: `Field "${fieldName}" is required.`
             },
             code: 400
         }),
-        etapeMin: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        etapeMin: (req: Request, fieldName: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Le champ listOfEtape doit avoir une taille supérieur à 2.',
-                en: 'Field listOfEtape field must have a size greater than 2.'
+                fr: `Le champ "${fieldName}" doit avoir une taille supérieur à 2.`,
+                en: `Field "${fieldName}" field must have a size greater than 2.`
             },
             code: 400
         }),
-        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        type: (req: Request, fieldName: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Le champ listOfEtape doit être un objet.',
-                en: 'Field listOfEtape must be a object.'
+                fr: `Le champ "${fieldName}" doit être un objet.`,
+                en: `Field "${fieldName}" must be a object.`
+            },
+            code: 400
+        })
+    },
+    maxPassengers: {
+        minPassenger: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Le nombre de passagers doit être au minimum d\'une personne.',
+                en: 'The number of passengers must be at least one person.'
+            },
+            code: 400
+        })
+    },
+    latitude: {
+        minMax: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'La latitude doit être entre -90 et 90.',
+                en: 'The latitude must be between -90 and 90.'
+            },
+            code: 400
+        })
+    },
+    longitude: {
+        minMax: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'La longitude doit être entre -180 et 180.',
+                en: 'The longitude must be between -180 and 180.'
             },
             code: 400
         })
@@ -591,7 +625,7 @@ const info = {
         })
     },
     travel: {
-        created: (req: Request, travel: Travel, etape: Etape) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        created: (req: Request, travel: Travel, nbEtape: object) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Trajet créé',
                 en: 'Travel created'
@@ -599,7 +633,7 @@ const info = {
             code: 201,
             data: {
                 travel,
-                numberOfEtape: etape
+                numberOfEtape: nbEtape
             }
         })
     },

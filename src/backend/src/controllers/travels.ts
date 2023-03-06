@@ -25,7 +25,7 @@ exports.myTravels = (req: express.Request, res: express.Response, next: express.
     });
 }
 
-exports.createTravels = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+exports.createTravel = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     if (res.locals.user === undefined) {
         sendMsg(req, res, error.auth.noToken);
         return;
@@ -35,21 +35,9 @@ exports.createTravels = async (req: express.Request, res: express.Response, next
 
     if (!properties.checkDateDepartArrivalField(departureDate, req, res)) return;
     if (!properties.checkDateDepartArrivalField(arrivalDate, req, res)) return;
-
-    if (maxPassengers !== undefined && maxPassengers !== null && typeof maxPassengers !== 'number') {
-        sendMsg(req, res, error.number.type, 'maxPassengers');
-        return false;
-    }
-
-    if (price !== undefined && price !== null && typeof price !== 'number') {
-        sendMsg(req, res, error.number.type, 'price');
-        return false;
-    }
-
-    if (typeof description !== 'string' && description !== undefined && description !== null) {
-        sendMsg(req, res, error.string.type, 'description');
-        return false;
-    }
+    if (!properties.checkMaxPassengersField(arrivalDate, req, res)) return;
+    if (!properties.checkPriceField(arrivalDate, req, res)) return;
+    if (!properties.checkDescriptionField(description, req, res, 'description')) return;
 
     if (typeof groupId === 'number') {
         const count = await prisma.group.count({ where: { id: groupId } });
