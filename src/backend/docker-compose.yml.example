@@ -30,9 +30,9 @@ services:
       DATABASE_URL: "mysql://root:<change_password>@db:3306/carshare"
       JWT_SECRET: '<change_secret>'
       NODE_ENV: 'production'
-      FRONTEND_URL: 'https://car-share.projects.antoinectx.fr'
+      FRONTEND_URL: 'https://carshare.projects.antoinectx.fr'
       FRONTEND_NAME: 'Car Share'
-      FRONTEND_LOGO: 'https://car-share.projects.antoinectx.fr/assets/car.a9cd8032.svg'
+      FRONTEND_LOGO: 'https://carshare.projects.antoinectx.fr/img/car.svg'
 
   # Added adminer (light phpmyadmin), to be able to view the database
   adminer:
