@@ -26,7 +26,7 @@ exports.myTravels = (req: express.Request, res: express.Response, next: express.
     });
 }
 
-exports.searchTravels = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+exports.searchTravels = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     if (res.locals.user === undefined) {
         sendMsg(req, res, error.auth.noToken);
         return;
@@ -47,11 +47,11 @@ exports.searchTravels = (req: express.Request, res: express.Response, next: expr
         where: {
             city: req.body.start_city,
         },
-    }).then((starting_stages) => {
+    }).then(async (starting_stages) => {
         // Loop through all starting stages
         for (let starting_stage of starting_stages) {
             // Query Etape table to get all stages ending at the end_city and having a higher order than the starting stage
-            prisma.etape.findFirst({
+            await prisma.etape.findFirst({
                 where: {
                     city: req.body.end_city,
                     order: {
@@ -86,4 +86,5 @@ exports.searchTravels = (req: express.Request, res: express.Response, next: expr
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
     });
+    
 }
