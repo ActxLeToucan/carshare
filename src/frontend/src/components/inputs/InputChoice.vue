@@ -9,7 +9,7 @@
                 class="flex w-fit h-fit bg-white rounded-md text-slate-600 font-bold text-lg whitespace-nowrap text-ellipsis
                        outline-transparent px-4 py-2 border-b-4 border-sslate-500 transition-all focus:outline hover:border-slate-300"
             >
-                <option v-for="el in this.elements" :value="el.value" :key="el.value"> {{ el.label }} </option>
+                <option v-for="el in this.elements" :value="el.value" :key="el.value"> {{ el.label ?? lang[el.id] }} </option>
             </select>
         </div>
         <input ref="input" :name="name" type="number" class="hidden">
@@ -17,6 +17,7 @@
 </template>
 
 <script>
+import Lang from '../../scripts/Lang';
 
 function setup(obj) {
     obj.selected = obj.value;
@@ -45,6 +46,7 @@ function setup(obj) {
         const el = obj.list[i];
         obj.elements.push({
             label: el.label,
+            id: el.id,
             value: el.value,
             selected: el.value === obj.value || el.selected
         });
@@ -55,7 +57,7 @@ export default {
     name: 'Choice',
     data() {
         setup(this);
-        return {};
+        return { lang: Lang.CurrentLang };
     },
     components: {},
     methods: {},
@@ -86,6 +88,8 @@ export default {
         }
     },
     mounted() {
+        Lang.addCallback(lang => this.lang = lang);
+
         this.selected = this.value;
         this.elements.forEach(item => {
             if (item.selected) {

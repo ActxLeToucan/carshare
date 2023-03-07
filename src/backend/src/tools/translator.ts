@@ -341,6 +341,13 @@ const error = {
             },
             code: 401
         }),
+        wrongPassword: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Mot de passe incorrect',
+                en: 'Wrong password'
+            },
+            code: 401
+        }),
         emailNotVerified: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Votre adresse email doit être vérifiée avant de pouvoir effectuer cette action.',
@@ -384,10 +391,12 @@ const error = {
     documentation: {
         notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: '<h1>Documentation introuvable</h1>' +
+                fr: '<head><title>Documentation introuvable</title></head>' +
+                    '<h1>Documentation introuvable</h1>' +
                     '<p>Si vous êtes le propriétaire du serveur, exécutez "npm run docs" pour la générer.</p>' +
                     '<p>Vous pouvez également trouver le fichier de documentation (YAML) <a href="/docs/yaml">ici</a>.</p>',
-                en: '<h1>Documentation not found</h1>' +
+                en: '<head><title>Documentation not found</title></head>' +
+                    '<h1>Documentation not found</h1>' +
                     '<p>If you are the owner of the server, run "npm run docs" to generate it.</p>' +
                     '<p>You can also find the documentation file (YAML) <a href="/docs/yaml">here</a>.</p>'
             },
