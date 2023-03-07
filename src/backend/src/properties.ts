@@ -71,6 +71,10 @@ const p = {
                 en: '10 minutes'
             } satisfies Variants
         }
+    },
+    query: {
+        minLimit: 1, // in database queries, the minimum value allowed for LIMIT statements
+        maxLimit: 50 // the max value allowed for LIMIT statements
     }
 } satisfies Record<string, Record<string, any>>;
 
