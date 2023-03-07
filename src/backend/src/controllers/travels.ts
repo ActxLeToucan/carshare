@@ -30,7 +30,7 @@ exports.searchTravels = async (req: express.Request, res: express.Response, next
         sendMsg(req, res, error.auth.noToken);
         return;
     }
-    if (typeof req.body.start_city !== 'string' || typeof req.body.end_city !== 'string') {
+    if (typeof req.body.startCity !== 'string' || typeof req.body.endCity !== 'string') {
         sendMsg(req, res, error.ville.type);
         return false;
     }
