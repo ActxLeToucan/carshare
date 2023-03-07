@@ -345,6 +345,22 @@ function sanitizeUserId (id: any, req: express.Request, res: express.Response): 
     return Number(id);
 }
 
+/**
+ * Sanitize the id of notification
+ * @param id id to sanitize
+ * @param req Express request
+ * @param res Express response
+ * @returns The id number if it is valid, null otherwise
+ */
+function sanitizeNotificationId (id: any, req: express.Request, res: express.Response): number | null {
+    if (id === ' ' || Number.isNaN(Number(id))) {
+        sendMsg(req, res, error.notification.invalidId);
+        return null;
+    }
+
+    return Number(id);
+}
+
 export {
     p,
     checkEmailField,
@@ -357,5 +373,6 @@ export {
     checkDateField,
     sanitizePhone,
     sanitizeGender,
-    sanitizeUserId
+    sanitizeUserId,
+    sanitizeNotificationId
 };
