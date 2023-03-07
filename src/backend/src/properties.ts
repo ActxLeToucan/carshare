@@ -531,6 +531,21 @@ function checkListOfEtapeField (value: any, req: express.Request, res: express.R
     }
     return true;
 }
+/**
+* Sanitize the id of notification
+* @param id id to sanitize
+* @param req Express request
+* @param res Express response
+* @returns The id number if it is valid, null otherwise
+*/
+function sanitizeNotificationId (id: any, req: express.Request, res: express.Response): number | null {
+    if (id === ' ' || Number.isNaN(Number(id))) {
+        sendMsg(req, res, error.notification.invalidId);
+        return null;
+    }
+
+    return Number(id);
+}
 
 export {
     p,
@@ -550,5 +565,7 @@ export {
     checkPriceField,
     checkStringField,
     checkListOfEtapeField,
-    checkDescriptionField
+    checkDescriptionField,
+    sanitizeNotificationId
+
 };

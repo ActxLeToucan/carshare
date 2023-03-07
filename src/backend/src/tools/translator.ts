@@ -18,17 +18,20 @@ interface TemplateMail {
     text: Variants
     html: Variants
 }
+
 export interface Mail {
     to: string
     subject: string
     text: string
     html: string
 }
+
 interface TemplateMessageHTTP {
     msg: Variants
     code: number
     data?: any
 }
+
 export interface MessageHTTP {
     msg: string
     code: number
@@ -540,6 +543,22 @@ const error = {
             },
             code: 400
         })
+    },
+    notification: {
+        notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Notification introuvable.',
+                en: 'Notification not found.'
+            },
+            code: 404
+        }),
+        invalidId: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'L\'identifiant de la notification est invalide.',
+                en: 'Notification id is invalid.'
+            },
+            code: 400
+        })
     }
 } satisfies TranslationsMessageHTTP;
 
@@ -654,6 +673,13 @@ const info = {
             msg: {
                 fr: 'Toutes les notifications ont été supprimées',
                 en: 'All notifications have been removed'
+            },
+            code: 200
+        }),
+        deletedOne: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'La notification a été supprimée',
+                en: 'The notification has been removed'
             },
             code: 200
         })
