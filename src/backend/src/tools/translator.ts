@@ -502,10 +502,10 @@ const error = {
             },
             code: 400
         }),
-        etapeMin: (req: Request, fieldName: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        etapeMin: (req: Request, length: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Le champ "${fieldName}" doit avoir une taille supérieur à 2.`,
-                en: `Field "${fieldName}" field must have a size greater than 2.`
+                fr: `Le nombre de villes dans un trajet est au minimum de ${length}.`,
+                en: `The minimum number of cities in a trip is ${length}.`
             },
             code: 400
         }),
@@ -527,19 +527,19 @@ const error = {
         })
     },
     latitude: {
-        minMax: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        minMax: (req: Request, min: number, max: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'La latitude doit être entre -90 et 90.',
-                en: 'The latitude must be between -90 and 90.'
+                fr: `La latitude doit être entre ${min} et ${max}.`,
+                en: `The latitude must be between ${min} and ${max}.`
             },
             code: 400
         })
     },
     longitude: {
-        minMax: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        minMax: (req: Request, min: number, max: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'La longitude doit être entre -180 et 180.',
-                en: 'The longitude must be between -180 and 180.'
+                fr: `La longitude doit être entre ${min} et ${max}.`,
+                en: `The longitude must be between ${min} and ${max}.`
             },
             code: 400
         })

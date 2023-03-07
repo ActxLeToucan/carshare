@@ -40,11 +40,16 @@ exports.createTravel = async (req: express.Request, res: express.Response, next:
     if (!properties.checkDescriptionField(description, req, res, 'description')) return;
 
     if (typeof groupId === 'number') {
-        const count = await prisma.group.count({ where: { id: groupId } });
+        try {
+            const count = await prisma.group.count({ where: { id: groupId } });
 
-        if (count === 0) {
-            sendMsg(req, res, error.group.notFound);
-            return;
+            if (count === 0) {
+                sendMsg(req, res, error.group.notFound);
+                return;
+            }
+        } catch (err) {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
         }
     }
 

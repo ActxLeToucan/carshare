@@ -71,6 +71,17 @@ const p = {
                 en: '10 minutes'
             } satisfies Variants
         }
+    },
+    latitude: {
+        min: -90,
+        max: 90
+    },
+    longitude: {
+        min: -180,
+        max: 180
+    },
+    listOfEtape: {
+        minLength: 2
     }
 } satisfies Record<string, Record<string, any>>;
 
@@ -431,7 +442,7 @@ function checkLngField (value: any, req: express.Request, res: express.Response)
     }
 
     if (value < -180 || value > 180) {
-        sendMsg(req, res, error.longitude.minMax, 'lng');
+        sendMsg(req, res, error.longitude.minMax, p.longitude.min, p.longitude.max);
         return false;
     }
     return true;
@@ -457,7 +468,7 @@ function checkLatField (value: any, req: express.Request, res: express.Response)
     }
 
     if (value < -90 || value > 90) {
-        sendMsg(req, res, error.latitude.minMax, 'lng');
+        sendMsg(req, res, error.latitude.minMax, p.latitude.min, p.latitude.max);
         return false;
     }
     return true;
@@ -519,7 +530,7 @@ function checkListOfEtapeField (value: any, req: express.Request, res: express.R
         return false;
     }
     if (value.length < 2) {
-        sendMsg(req, res, error.etape.etapeMin, 'listOfEtape');
+        sendMsg(req, res, error.etape.etapeMin, p.listOfEtape.minLength);
         return false;
     }
     for (const i in value) {
