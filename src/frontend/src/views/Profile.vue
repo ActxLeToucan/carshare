@@ -1,5 +1,5 @@
 <template>
-    <div class="flex grow flex-col min-h-0 max-h-full">
+    <div class="flex grow flex-col min-h-0 max-h-full 'dark': isDarkMode }"  :class="{ 'dark': isDarkMode } ">
         <topbar></topbar>
         <div class="flex md:flex-row flex-col grow max-h-full min-h-0">
             <div ref="tabs-zone" class="show-right flex flex-col items-center h-full md:w-min w-full min-h-0 px-8 py-4 space-y-4 md:border-r-8 border-teal-500 mx-auto overflow-hidden">

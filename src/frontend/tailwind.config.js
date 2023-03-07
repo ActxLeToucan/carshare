@@ -4,10 +4,20 @@ module.exports = {
     "./src/**/*.{vue,js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {}
+    extend: {
+      colors: {
+        'primary': '#1E90FF',
+      },
+    }
   },
   plugins: [
     
   ],
-  darkMode: "class",
+  variants: {
+    extend: {
+      backgroundColor: ['dark'],
+     
+    },
+  },
+  isDarkMode: "class",
 }
