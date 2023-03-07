@@ -13,5 +13,5 @@ The front-end is a website made with VueJS, TailwindCSS and JavaScript.
 For more information, see the [Front-end README](./src/frontend/README.md).
 
 ## Statistiques
-Voici des statistiques rapides sur les contributeurs actuels à ce projet :
+Voici des statistiques rapides sur les contributeurs actuels à ce projet sur la branche principale (`main`) :
 ![Statistics](https://carshare.projects.furwaz.fr/stats.gif)
