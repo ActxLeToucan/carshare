@@ -80,6 +80,11 @@ export default {
     GROUPS: "Groups",
     TRIPS: "Trips",
 
-        // users
-        SEARCH_USER: "Search user",
+    // users
+    SEARCH_USER: "Search user",
+
+    //parametres
+    GET_NOTIFIED: "Get notified by e-mail :",
+    DARKMODE: "Dark mode : " , 
+    ENGLISH : "English :" , 
 }

@@ -80,6 +80,12 @@ export default {
     GROUPS: "Groupes",
     TRIPS: "Trajets",
 
-        // users
-        SEARCH_USER: "Rechercher un utilisateur",
+    // users
+    SEARCH_USER: "Rechercher un utilisateur",
+
+
+    //parametres
+    GET_NOTIFIED: "Notification par Email :",
+    DARKMODE: "Mode sombre : " , 
+    ENGLISH : "Anglais :"
 }
