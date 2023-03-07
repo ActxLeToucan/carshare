@@ -69,6 +69,12 @@ export default {
             this.updateButton();
         });
         this.updateButton();
+    },
+    watch: {
+        value: function (val) {
+            this.state = val;
+            this.updateButton();
+        }
     }
 }
 </script>

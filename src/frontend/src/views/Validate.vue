@@ -3,8 +3,8 @@
         <topbar v-if="User.CurrentUser != null"></topbar>
         <div class="flex grow w-fit flex-col justify-center mx-auto">
             <card class="flex-col space-y-6">
-                <p class="text-4xl font-bold text-slate-500 text-center"> Validation du compte </p>
-                <p ref="msg" class="text-lg font-semibold text-slate-500 text-center"> Validation de votre compte ... </p>
+                <p class="text-4xl font-bold text-slate-500 text-center"> {{ lang.VALIDATION_TITLE }} </p>
+                <p ref="msg" class="text-lg font-semibold text-slate-500 text-center"> {{ lang.VALIDATION_LOADING }} ... </p>
             </card>
         </div>
     </div>
@@ -16,6 +16,7 @@ import Modal from '../components/cards/Modal.vue';
 import Card from '../components/cards/Card.vue';
 import API from '../scripts/API';
 import User from '../scripts/User';
+import Lang from '../scripts/Lang';
 
 export default {
     components: {
@@ -28,7 +29,7 @@ export default {
         
     },
     data() {
-        return { User }
+        return { User, lang: Lang.CurrentLang }
     },
     mounted() {
         const msg = this.$refs["msg"];
@@ -37,7 +38,7 @@ export default {
         if (!token) {
             msg.classList.remove("text-slate-500");
             msg.classList.add("text-red-500");
-            msg.innerText = "Erreur : Aucun token de validation n'a été fourni.";
+            msg.innerText = this.lang.VALIDATION_NO_TOKEN;
             return;
         }
         const creds = new API.Credentials({ token: "bearer " + token, type: API.Credentials.TYPE.TOKEN });
@@ -45,11 +46,11 @@ export default {
         API.execute_logged(API.ROUTE.VERIFY, API.METHOD.PATCH, creds).then(res => {
             msg.classList.remove("text-slate-500");
             msg.classList.add("text-teal-500");
-            msg.innerText = "Compte validé avec succès ! Vous pouvez fermer cette page.";
+            msg.innerText = this.lang.VALIDATION_SUCCESS;
         }).catch(err => {
             msg.classList.remove("text-slate-500");
             msg.classList.add("text-red-500");
-            msg.innerText = "Erreur : " + err.message;
+            msg.innerText = this.lang.ERROR + " : " + err.message;
         });
     }
 }

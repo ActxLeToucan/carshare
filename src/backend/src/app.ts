@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import { error, sendMsg } from './tools/translator';
 
 const dbNeeded = require('./middlewares/dbNeeded');
+
 const prisma = new PrismaClient({ errorFormat: 'pretty' });
 
 const app = express();
@@ -19,7 +20,9 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content, Accept, Content-Type, Authorization');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-    next();
+
+    if (req.method === 'OPTIONS') res.sendStatus(200);
+    else next();
 });
 
 app.get('/', (req, res) => {
@@ -28,10 +31,10 @@ app.get('/', (req, res) => {
 
 app.use('/docs', require('./routes/docs'));
 app.use('/users', dbNeeded, require('./routes/users'));
-app.use('/admin', dbNeeded, require('./routes/admin'));
 app.use('/travels', dbNeeded, require('./routes/travels'));
 app.use('/notifications', dbNeeded, require('./routes/notifications'));
 app.use('/settings', dbNeeded, require('./routes/settings'));
+app.use('/groups', dbNeeded, require('./routes/groups'));
 
 app.use((req, res) => {
     sendMsg(req, res, error.generic.routeNotFound);

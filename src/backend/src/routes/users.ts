@@ -1,18 +1,22 @@
 import express from 'express';
-
 import auth from '../middlewares/auth';
 
 const router = express.Router();
-
 const controller = require('../controllers/users');
+const admin = require('../middlewares/admin');
+const emailVerified = require('../middlewares/emailVerified');
+
+router.use('/me', auth.access, require('./users/me'));
 router.post('/signup', controller.signup);
 router.post('/login', controller.login);
-router.get('/me', auth.access, controller.getMe);
-router.delete('/me', auth.access, controller.deleteMe);
-router.patch('/me', auth.access, controller.updateMe);
 router.post('/password-reset', controller.passwordResetSendEmail);
-router.patch('/password-reset', auth.resetPassword, controller.passwordReset);
+router.patch('/password-reset', auth.resetPassword, controller.updatePassword);
 router.post('/email-verification', auth.access, controller.emailVerificationSendEmail);
 router.patch('/email-verification', auth.verify, controller.emailVerification);
+
+// admin routes
+router.get('/', auth.access, emailVerified, admin, controller.getAllUsers);
+router.delete('/:id', auth.access, emailVerified, admin, controller.deleteUser);
+router.patch('/:id', auth.access, emailVerified, admin, controller.updateUser);
 
 module.exports = router;

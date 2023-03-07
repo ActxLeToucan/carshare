@@ -45,12 +45,11 @@ class User {
             }
         }
         if (this.token != null && checkToken) { // verify token
-            API.execute_logged(API.ROUTE.USER, API.METHOD.GET, this.getCredentials()).then(res => {
+            API.execute_logged(API.ROUTE.ME, API.METHOD.GET, this.getCredentials()).then(res => {
                 this.setInformations(res, false);
             }).catch(err => {
-                if (err.status === 498) { // token expired, disconnect
-                    User.forget();
-                }
+                // token expired or user deleted
+                User.forget();
             })
         }
     }
@@ -61,7 +60,7 @@ class User {
     }
 
     getCredentials() {
-        return new API.Credentials({token: "bearer " + this.token, type: API.Credentials.TYPE.TOKEN});
+        return new API.Credentials({token: "Bearer " + this.token, type: API.Credentials.TYPE.TOKEN});
     }
 }
 
