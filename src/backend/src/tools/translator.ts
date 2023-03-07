@@ -316,10 +316,17 @@ const error = {
         })
     },
     ville: {
-        type: (req: Request, fieldName: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Le champ "${fieldName}" doit être une chaîne de charactères.`,
-                en: `Field "${fieldName}" must be a string.`
+                fr: 'Le nom de la ville est requise.',
+                en: 'The City name is required.'
+            },
+            code: 400
+        }),
+        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Le champ cityName doit être une chaîne de charactères.',
+                en: 'Field cityName must be a string.'
             },
             code: 400
         })

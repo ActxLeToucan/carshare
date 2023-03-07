@@ -326,6 +326,23 @@ function sanitizeGender (gender: any): number | undefined {
 }
 
 /**
+ * Sanitize the string
+ * @param str string to sanitize
+ * @returns string if it is valid, undefined otherwise
+ */
+function sanitizeCityName (str: any, req: express.Request, res: express.Response): string | null {
+    if (str === undefined || str === '') {
+        sendMsg(req, res, error.ville.required);
+        return null;
+    }
+    if (typeof str !== 'string') {
+        sendMsg(req, res, error.ville.type);
+        return null;
+    }
+    return str.replace(/'/g, "''");
+}
+
+/**
  * Sanitize the id of user
  * @param id id to sanitize
  * @param req Express request
@@ -370,5 +387,6 @@ export {
     sanitizePhone,
     sanitizeGender,
     sanitizeUserId,
-    sanitizeNotificationId
+    sanitizeNotificationId,
+    sanitizeCityName
 };
