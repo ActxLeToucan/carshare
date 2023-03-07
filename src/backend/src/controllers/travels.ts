@@ -1,8 +1,7 @@
 import type express from 'express';
 import { prisma } from '../app';
 import { error, sendMsg } from '../tools/translator';
-import { checkDateField } from '../properties'; 
-import { Etape } from '@prisma/client';
+import { checkDateField } from '../properties';
 
 exports.myTravels = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     if (res.locals.user === undefined) {
@@ -38,30 +37,28 @@ exports.searchTravels = async (req: express.Request, res: express.Response, next
     if (!checkDateField(req.body.date, req, res)) return;
 
     // Initialize a list to store the resulting Travel records
-    let travels: number[] = [];
-    let ending_stages: Etape[] = [];
-    let starting_stages: Etape[] = [];
+    const travels: number[] = [];
 
     // Query Etape table to get all stages starting at the start_city
     prisma.etape.findMany({
         where: {
-            city: req.body.start_city,
-        },
-    }).then(async (starting_stages) => {
+            city: req.body.startCity
+        }
+    }).then(async (startingStages) => {
         // Loop through all starting stages
-        for (let starting_stage of starting_stages) {
+        for (const startingStage of startingStages) {
             // Query Etape table to get all stages ending at the end_city and having a higher order than the starting stage
             await prisma.etape.findFirst({
                 where: {
-                    city: req.body.end_city,
+                    city: req.body.endCity,
                     order: {
-                        gt: starting_stage.order,
+                        gt: startingStage.order
                     },
-                    travelId: starting_stage.travelId
+                    travelId: startingStage.travelId
                 }
-            }).then((ending_stage) => {
+            }).then((endingStage) => {
                 // Append the Travel record to the list of resulting travels
-                if (ending_stage) travels.push(ending_stage.travelId);
+                if (endingStage != null) travels.push(endingStage.travelId);
             }).catch((err) => {
                 console.error(err);
                 sendMsg(req, res, error.generic.internalError);
@@ -77,7 +74,6 @@ exports.searchTravels = async (req: express.Request, res: express.Response, next
         }).then((data) => {
             console.log(data);
             res.status(200).json(data);
-            return
         }).catch((err) => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);
@@ -86,5 +82,4 @@ exports.searchTravels = async (req: express.Request, res: express.Response, next
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
     });
-    
 }
