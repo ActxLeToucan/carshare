@@ -37,57 +37,51 @@ exports.searchTravels = (req: express.Request, res: express.Response, next: expr
     }
     if (!checkDateField(req.body.date, req, res)) return;
 
-    // Query Etape table to get all stages starting at the start_city
+    // Initialize a list to store the resulting Travel records
+    let travels: number[] = [];
+    let ending_stages: Etape[] = [];
     let starting_stages: Etape[] = [];
+
+    // Query Etape table to get all stages starting at the start_city
     prisma.etape.findMany({
         where: {
             city: req.body.start_city,
         },
-    }).then((data) => {
-        starting_stages = data;
-    }).catch((err) => {
-        console.error(err);
-        sendMsg(req, res, error.generic.internalError);
-    });
-
-    // Initialize a list to store the resulting Travel records
-    let travels = [];
-    let ending_stages: Etape[] = [];
-
-    // Loop through all starting stages
-    for (let starting_stage of starting_stages) {
-        // Query Etape table to get all stages ending at the end_city and having a higher order than the starting stage
-        prisma.etape.findMany({
+    }).then((starting_stages) => {
+        // Loop through all starting stages
+        for (let starting_stage of starting_stages) {
+            // Query Etape table to get all stages ending at the end_city and having a higher order than the starting stage
+            prisma.etape.findFirst({
+                where: {
+                    city: req.body.end_city,
+                    order: {
+                        gt: starting_stage.order,
+                    },
+                    travelId: starting_stage.travelId
+                }
+            }).then((ending_stage) => {
+                // Append the Travel record to the list of resulting travels
+                if (ending_stage) travels.push(ending_stage.travelId);
+            }).catch((err) => {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
+            });
+        }
+        // Get all tavels and return them in JSON
+        prisma.travel.findMany({
             where: {
-                city: req.body.end_city,
-                order: {
-                    gt: starting_stage.order,
-                },
-                travelId: starting_stage.travelId
+                id: {
+                    in: travels
+                }
             }
         }).then((data) => {
-            ending_stages = data;
+            console.log(data);
+            res.status(200).json(data);
+            return
         }).catch((err) => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);
         });
-    }
-
-    // Loop through all ending stages
-    for (let ending_stage of ending_stages) {
-        // Append the Travel record to the list of resulting travels
-        travels.push(ending_stage.travelId);
-    }
-
-    // Get all tavels and return them in JSON
-    prisma.travel.findMany({
-        where: {
-            id: {
-                in: travels
-            }
-        }
-    }).then((data) => {
-        res.status(200).json(data);
     }).catch((err) => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
