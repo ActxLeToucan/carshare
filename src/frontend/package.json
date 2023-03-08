@@ -3,8 +3,8 @@
     "version": "1.0.0",
     "scripts": {
         "dev": "vite --host --port=80",
-        "build": "vite build",
-        "preview": "vite preview"
+        "build": "vite build && cp -r public/* dist/",
+        "preview": "vite preview --host"
     },
     "dependencies": {
         "@heroicons/vue": "^2.0.14",

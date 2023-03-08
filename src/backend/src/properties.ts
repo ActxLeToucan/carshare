@@ -71,6 +71,10 @@ const p = {
                 en: '10 minutes'
             } satisfies Variants
         }
+    },
+    query: {
+        minLimit: 1, // in database queries, the minimum value allowed for LIMIT statements
+        maxLimit: 50 // the max value allowed for LIMIT statements
     }
 } satisfies Record<string, Record<string, any>>;
 
@@ -253,6 +257,18 @@ function checkBooleanField (value: any, req: express.Request, res: express.Respo
     return true;
 }
 
+function checkGroupNameField (name: any, req: express.Request, res: express.Response): boolean {
+    if (name === undefined || name === '') {
+        sendMsg(req, res, error.groupName.required);
+        return false;
+    }
+    if (typeof name !== 'string') {
+        sendMsg(req, res, error.groupName.type);
+        return false;
+    }
+    return true;
+}
+
 /**
  * Check if a date is in a valid format
  * If the date is not valid, send an error message to the client
@@ -270,8 +286,25 @@ function checkDateField (date: any, req: express.Request, res: express.Response)
         sendMsg(req, res, error.date.invalid);
         return false;
     }
-    if (new Date(date) > new Date()) {
-        sendMsg(req, res, error.date.tooLate, new Date());
+    return true;
+}
+
+/**
+ * Check if a city is in a valid format
+ * If the city is not valid, send an error message to the client
+ * @param name City to check
+ * @param req Express request
+ * @param res Express response
+ * @param fieldName Name of the field
+ * @returns true if the city is valid, false otherwise
+ */
+function checkCityField (name: any, req: express.Request, res: express.Response, fieldName: string): boolean {
+    if (name === undefined || name === '') {
+        sendMsg(req, res, error.city.required, fieldName);
+        return false;
+    }
+    if (typeof name !== 'string') {
+        sendMsg(req, res, error.city.type, fieldName);
         return false;
     }
     return true;
@@ -333,6 +366,22 @@ function sanitizeUserId (id: any, req: express.Request, res: express.Response): 
     return Number(id);
 }
 
+/**
+ * Sanitize the id of notification
+ * @param id id to sanitize
+ * @param req Express request
+ * @param res Express response
+ * @returns The id number if it is valid, null otherwise
+ */
+function sanitizeNotificationId (id: any, req: express.Request, res: express.Response): number | null {
+    if (id === ' ' || Number.isNaN(Number(id))) {
+        sendMsg(req, res, error.notification.invalidId);
+        return null;
+    }
+
+    return Number(id);
+}
+
 export {
     p,
     checkEmailField,
@@ -340,9 +389,12 @@ export {
     checkLastNameField,
     checkFirstNameField,
     checkLevelField,
+    checkGroupNameField,
     checkBooleanField,
     checkDateField,
+    checkCityField,
     sanitizePhone,
     sanitizeGender,
-    sanitizeUserId
+    sanitizeUserId,
+    sanitizeNotificationId
 };

@@ -1,5 +1,5 @@
 import { type Request, type Response } from 'express';
-import { type User } from '@prisma/client';
+import { type Group, type User } from '@prisma/client';
 
 import { p } from '../properties';
 import { sendMail as mailerSend } from './mailer';
@@ -18,17 +18,20 @@ interface TemplateMail {
     text: Variants
     html: Variants
 }
+
 export interface Mail {
     to: string
     subject: string
     text: string
     html: string
 }
+
 interface TemplateMessageHTTP {
     msg: Variants
     code: number
     data?: any
 }
+
 export interface MessageHTTP {
     msg: string
     code: number
@@ -80,6 +83,22 @@ const error = {
             msg: {
                 fr: "L'adresse email a déjà été vérifiée.",
                 en: 'Email address is already verified.'
+            },
+            code: 400
+        })
+    },
+    users: {
+        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Les utilisateurs doivent être un tableau de chaînes de caractères.',
+                en: 'Users must be an array of strings.'
+            },
+            code: 400
+        }),
+        maxPerRequest: (req: Request, length: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Vous ne pouvez pas ajouter plus de ${length} utilisateur${length > 1 ? 's' : ''} à la fois.`,
+                en: `You can't add more than ${length} user${length > 1 ? 's' : ''} at once.`
             },
             code: 400
         })
@@ -241,6 +260,22 @@ const error = {
             code: 403
         })
     },
+    groupName: {
+        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Le nom du groupe est requis.',
+                en: 'Group name is required.'
+            },
+            code: 400
+        }),
+        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Le nom du groupe doit être une chaîne de caractères.',
+                en: 'Group name must be a string.'
+            },
+            code: 400
+        })
+    },
     boolean: {
         required: (req: Request, fieldName: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
@@ -276,6 +311,22 @@ const error = {
             msg: {
                 fr: `La date doit être antérieure à ${date.toLocaleDateString('fr-FR')}.`,
                 en: `Date must be before ${date.toLocaleDateString('en-US')}.`
+            },
+            code: 400
+        })
+    },
+    ville: {
+        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Le nom de la ville est requise.',
+                en: 'The City name is required.'
+            },
+            code: 400
+        }),
+        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Le champ cityName doit être une chaîne de charactères.',
+                en: 'Field cityName must be a string.'
             },
             code: 400
         })
@@ -402,6 +453,38 @@ const error = {
             },
             code: 404
         })
+    },
+    notification: {
+        notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Notification introuvable.',
+                en: 'Notification not found.'
+            },
+            code: 404
+        }),
+        invalidId: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'L\'identifiant de la notification est invalide.',
+                en: 'Notification id is invalid.'
+            },
+            code: 400
+        })
+    },
+    city: {
+        required: (req: Request, field: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Le champ "${field}" est requis.`,
+                en: `Field "${field}" is required.`
+            },
+            code: 400
+        }),
+        type: (req: Request, field: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Le champ "${field}" doit être une chaîne de caractères.`,
+                en: `Field "${field}" must be a string.`
+            },
+            code: 400
+        })
     }
 } satisfies TranslationsMessageHTTP;
 
@@ -414,7 +497,7 @@ const info = {
             },
             code: 201,
             data: {
-                user: displayableUser(user),
+                user: displayableUserPrivate(user),
                 token
             }
         }),
@@ -457,7 +540,7 @@ const info = {
             },
             code: 200,
             data: {
-                user: displayableUser(user)
+                user: displayableUserPrivate(user)
             }
         })
     },
@@ -482,6 +565,34 @@ const info = {
             msg: {
                 fr: 'Paramètres enregistrés',
                 en: 'Settings saved'
+            },
+            code: 200
+        })
+    },
+    group: {
+        created: (req: Request, group: Group & { users: User[] }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Groupe créé',
+                en: 'Group created'
+            },
+            code: 201,
+            data: {
+                group: displayableGroup(group)
+            }
+        })
+    },
+    notification: {
+        deletedAll: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Toutes les notifications ont été supprimées',
+                en: 'All notifications have been removed'
+            },
+            code: 200
+        }),
+        deletedOne: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'La notification a été supprimée',
+                en: 'The notification has been removed'
             },
             code: 200
         })
@@ -651,14 +762,36 @@ async function sendMail (req: Request, message: (req: Request, ...args: any) => 
 }
 
 /**
- * Returns a user without the password
+ * Returns a user without some properties for display to the user itself or to admins
  * @param user User to display
- * @returns User without the password
+ * @returns User without some properties
+ * @see displayableUserPublic
  */
-function displayableUser (user: User) {
+function displayableUserPrivate (user: User) {
     const u = user as any;
     delete u.password;
+    delete u.lastPasswordResetEmailedOn;
+    delete u.lastEmailVerificationEmailedOn;
     return u;
 }
 
-export { error, info, mail, sendMsg, sendMail, sendRaw, displayableUser };
+/**
+ * Returns a user without some properties for display to other users
+ * @param user User to display
+ * @returns User without some properties
+ * @see displayableUserPrivate
+ */
+function displayableUserPublic (user: User) {
+    const u = displayableUserPrivate(user);
+    delete u.mailNotif;
+    delete u.createdAt;
+    return u;
+}
+
+function displayableGroup (group: Group & { users: User[] }) {
+    const g = group as any;
+    g.users = g.users.map(displayableUserPublic);
+    return g;
+}
+
+export { error, info, mail, sendMsg, sendMail, sendRaw, displayableUserPrivate, displayableGroup };

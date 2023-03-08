@@ -1,9 +1,9 @@
 import type express from 'express';
-import { displayableUser, error, info, sendMsg } from '../../tools/translator';
+import { displayableUserPrivate, error, info, sendMsg } from '../../tools/translator';
 import * as properties from '../../properties';
 import bcrypt from 'bcrypt';
 import { prisma } from '../../app';
-import * as _user from '../_common/user';
+import * as _user from './_common';
 
 exports.getMe = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     if (res.locals.user === undefined) {
@@ -11,7 +11,7 @@ exports.getMe = (req: express.Request, res: express.Response, next: express.Next
         return;
     }
 
-    res.status(200).json(displayableUser(res.locals.user));
+    res.status(200).json(displayableUserPrivate(res.locals.user));
 }
 
 exports.deleteMe = (req: express.Request, res: express.Response, next: express.NextFunction) => {

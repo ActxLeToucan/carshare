@@ -10,10 +10,13 @@
                 <input-switch name="sombre"    :label="lang.DARKMODE" @click="toggleDarkMode" :checked="isDarkMode"></input-switch><br><br>
                 
                 <p class="font-bold   text-slate-500 text-xl"> --Langue--</p>
-                <input-choice  name="en"  id="angalis"  :label="lang.LANGUES "  :options="langues"    :value="-1" @click = "ChangeToEnglish"></input-choice><br><br><br><br>         
+                <input-choice  name="en"  id="angalis"  :label="lang.LANGUES "     :value="-1" @click = "ChangeToEnglish"></input-choice><br><br><br><br>         
 
             </div>
          </div>
+         </div>
+    <div class="md:show-up flex flex-col grow">
+        <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> Paramètres </p>
     </div>
 </template>
 
@@ -21,7 +24,7 @@
 import InputSwitch from '../inputs/InputSwitch.vue';
 import InputChoice from '../inputs/InputChoice.vue'
 import Lang from '../../scripts/Lang';
-import { langues } from '../../scripts/data';
+
 
 export default {
     
@@ -34,7 +37,7 @@ export default {
             isDarkMode: false,
             isEnglish:false, 
             lang: Lang.CurrentLang,
-            langues,
+          
             
             
         }

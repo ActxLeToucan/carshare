@@ -2,8 +2,10 @@ import type express from 'express';
 import { prisma } from '../app';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { error, info, mail, sendMail, sendMsg } from '../tools/translator';
+import { displayableUserPrivate, error, info, mail, sendMail, sendMsg } from '../tools/translator';
 import * as properties from '../properties';
+import * as _user from './users/_common';
+import { type Prisma } from '@prisma/client';
 
 exports.signup = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const { email, password, lastName, firstName, phone, hasCar, gender } = req.body;
@@ -226,4 +228,84 @@ exports.emailVerification = (req: express.Request, res: express.Response, next: 
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
     });
+}
+
+exports.getAllUsers = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const offset = Number.isNaN(req.query.offset) ? 0 : Math.max(0, Number(req.query.offset)); // default 0, min 0
+    const limit = Number.isNaN(req.query.limit)
+        ? properties.p.query.maxLimit // default
+        : Math.min(properties.p.query.maxLimit,
+            Math.max(properties.p.query.minLimit, Number(req.query.limit))
+        ); // default max, min p.query.minLimit, max p.query.maxLimit
+
+    prisma.user.findMany<Prisma.UserFindManyArgs>({
+        skip: offset,
+        take: limit,
+        orderBy: [
+            {
+                id: 'asc'
+            }
+        ]
+    })
+        .then(users => {
+            res.status(200).json(users.map(displayableUserPrivate));
+        })
+        .catch(err => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
+}
+
+exports.deleteUser = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const userId = properties.sanitizeUserId(req.params.id, req, res);
+    if (userId === null) return;
+
+    prisma.user.findUnique({ where: { id: userId } })
+        .then(user => {
+            if (user == null) {
+                sendMsg(req, res, error.user.notFound);
+                return;
+            }
+
+            if (res.locals.user.level <= user.level) {
+                sendMsg(req, res, error.auth.insufficientPrivileges);
+                return;
+            }
+
+            prisma.user.delete({ where: { id: userId } })
+                .then(() => { sendMsg(req, res, info.user.deleted); })
+                .catch((err) => {
+                    console.error(err);
+                    sendMsg(req, res, error.generic.internalError);
+                });
+        }).catch((err) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
+}
+
+exports.updateUser = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const userId = properties.sanitizeUserId(req.params.id, req, res);
+    if (userId === null) return;
+
+    prisma.user.findUnique({ where: { id: userId } })
+        .then(user => {
+            if (user == null) {
+                sendMsg(req, res, error.user.notFound);
+                return;
+            }
+
+            if (res.locals.user.level <= user.level) {
+                sendMsg(req, res, error.auth.insufficientPrivileges);
+                return;
+            }
+
+            _user.update(req, res, userId, true).catch((err) => {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
+            });
+        }).catch((err) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
 }
