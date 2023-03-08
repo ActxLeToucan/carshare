@@ -1,7 +1,7 @@
 import type express from 'express';
 import { prisma } from '../app';
 import { error, sendMsg } from '../tools/translator';
-import { checkDateField, sanitizeCityName } from '../properties';
+import { checkCityField, checkDateField } from '../properties';
 
 exports.myTravels = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     if (res.locals.user === undefined) {
@@ -14,9 +14,7 @@ exports.myTravels = (req: express.Request, res: express.Response, next: express.
         select: {
             travelsAsDriver: true,
             travelsAsPassenger: { select: { travel: true } }
-
         }
-
     }).then(travel => {
         res.status(200).json(travel);
     }).catch((err) => {
@@ -25,26 +23,29 @@ exports.myTravels = (req: express.Request, res: express.Response, next: express.
     });
 }
 
-exports.searchTravels = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+exports.searchTravels = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     if (res.locals.user === undefined) {
         sendMsg(req, res, error.auth.noToken);
         return;
     }
-    const startCity = sanitizeCityName(req.body.startCity, req, res);
-    const endCity = sanitizeCityName(req.body.endCity, req, res);
-    if (startCity === null) return;
-    if (endCity === null) return;
-    if (!checkDateField(req.body.date, req, res)) return;
 
-    const travels = await prisma.$executeRaw`
-        SELECT DISTINCT travel.*
-        FROM travel
-        JOIN etape AS start_stage ON start_stage.travelId = travel.id
-        JOIN etape AS end_stage ON end_stage.travelId = travel.id
-        WHERE start_stage.city = ${startCity}
-        AND end_stage.city = ${endCity}
-        AND start_stage.order < end_stage.order
-    `;
+    const { date, startCity, endCity } = req.body;
+    if (!checkCityField(startCity, req, res, 'startCity')) return;
+    if (!checkCityField(endCity, req, res, 'endCity')) return;
+    if (!checkDateField(date, req, res)) return;
 
-    res.status(200).json(travels);
+    const date1 = new Date(new Date(date).getTime() - 1000 * 60 * 60);
+    const date2 = new Date(new Date(date).getTime() + 1000 * 60 * 60);
+
+    // TODO: verifier les dates sur les etapes
+    prisma.$queryRaw`select t.* from travel t
+    inner join etape e1 on e1.travelId = t.id and e1.city = ${startCity}
+    inner join etape e2 on e2.travelId = t.id and e2.city = ${endCity}
+    where e1.\`order\` < e2.\`order\` and t.arrivalDate BETWEEN ${date1} and ${date2}`
+        .then((data) => {
+            res.status(200).json(data);
+        }).catch((err) => {
+            console.log(err);
+            res.status(500).json(err);
+        });
 }

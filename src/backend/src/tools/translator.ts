@@ -469,6 +469,22 @@ const error = {
             },
             code: 400
         })
+    },
+    city: {
+        required: (req: Request, field: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Le champ "${field}" est requis.`,
+                en: `Field "${field}" is required.`
+            },
+            code: 400
+        }),
+        type: (req: Request, field: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Le champ "${field}" doit être une chaîne de caractères.`,
+                en: `Field "${field}" must be a string.`
+            },
+            code: 400
+        })
     }
 } satisfies TranslationsMessageHTTP;
 

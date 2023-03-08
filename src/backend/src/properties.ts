@@ -286,6 +286,27 @@ function checkDateField (date: any, req: express.Request, res: express.Response)
 }
 
 /**
+ * Check if a city is in a valid format
+ * If the city is not valid, send an error message to the client
+ * @param name City to check
+ * @param req Express request
+ * @param res Express response
+ * @param fieldName Name of the field
+ * @returns true if the city is valid, false otherwise
+ */
+function checkCityField (name: any, req: express.Request, res: express.Response, fieldName: string): boolean {
+    if (name === undefined || name === '') {
+        sendMsg(req, res, error.city.required, fieldName);
+        return false;
+    }
+    if (typeof name !== 'string') {
+        sendMsg(req, res, error.city.type, fieldName);
+        return false;
+    }
+    return true;
+}
+
+/**
  * Sanitize the phone number
  * If the phone is not valid, send an error message to the client
  * @param phone Phone to sanitize
@@ -323,23 +344,6 @@ function sanitizeGender (gender: any): number | undefined {
         return undefined;
     }
     return gender;
-}
-
-/**
- * Sanitize the string
- * @param str string to sanitize
- * @returns string if it is valid, undefined otherwise
- */
-function sanitizeCityName (str: any, req: express.Request, res: express.Response): string | null {
-    if (str === undefined || str === '') {
-        sendMsg(req, res, error.ville.required);
-        return null;
-    }
-    if (typeof str !== 'string') {
-        sendMsg(req, res, error.ville.type);
-        return null;
-    }
-    return str.replace(/'/g, "''");
 }
 
 /**
@@ -384,9 +388,9 @@ export {
     checkGroupNameField,
     checkBooleanField,
     checkDateField,
+    checkCityField,
     sanitizePhone,
     sanitizeGender,
     sanitizeUserId,
-    sanitizeNotificationId,
-    sanitizeCityName
+    sanitizeNotificationId
 };
