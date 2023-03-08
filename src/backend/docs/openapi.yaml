@@ -493,7 +493,7 @@ paths:
   /users:
     get:
       summary: Get all users
-      description: Get all users ordered by their internal id. Only available to admins.
+      description: Get all users ordered by their internal id. Only available to admins. Filters (`lastName`, `firstName`, `email`) can be combined together.
       operationId: getAllUsers
       tags:
         - Users
@@ -514,6 +514,21 @@ paths:
             minimum: 0
             default: 0
           description: The number of users to skip before starting to collect the result set
+        - in: query
+          name: lastName
+          schema:
+            type: string
+          description: Filters results based on last names starting with this value (case-insensitive)
+        - in: query
+          name: firstName
+          schema:
+            type: string
+          description: Filters results based on first names starting with this value (case-insensitive)
+        - in: query
+          name: email
+          schema:
+            type: string
+          description: Filters results based on emails starting with this value (case-insensitive)
       security:
         - bearerAuth: [ ]
       responses:
