@@ -5,6 +5,7 @@ import jwt from 'jsonwebtoken';
 import { displayableUserPrivate, error, info, mail, sendMail, sendMsg } from '../tools/translator';
 import * as properties from '../properties';
 import * as _user from './users/_common';
+import { type Prisma } from '@prisma/client';
 
 exports.signup = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const { email, password, lastName, firstName, phone, hasCar, gender } = req.body;
@@ -230,7 +231,22 @@ exports.emailVerification = (req: express.Request, res: express.Response, next: 
 }
 
 exports.getAllUsers = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    prisma.user.findMany()
+    const offset = Number.isNaN(req.query.offset) ? 0 : Math.max(0, Number(req.query.offset)); // default 0, min 0
+    const limit = Number.isNaN(req.query.limit)
+        ? properties.p.query.maxLimit // default
+        : Math.min(properties.p.query.maxLimit,
+            Math.max(properties.p.query.minLimit, Number(req.query.limit))
+        ); // default max, min p.query.minLimit, max p.query.maxLimit
+
+    prisma.user.findMany<Prisma.UserFindManyArgs>({
+        skip: offset,
+        take: limit,
+        orderBy: [
+            {
+                id: 'asc'
+            }
+        ]
+    })
         .then(users => {
             res.status(200).json(users.map(displayableUserPrivate));
         })
