@@ -286,8 +286,25 @@ function checkDateField (date: any, req: express.Request, res: express.Response)
         sendMsg(req, res, error.date.invalid);
         return false;
     }
-    if (new Date(date) > new Date()) {
-        sendMsg(req, res, error.date.tooLate, new Date());
+    return true;
+}
+
+/**
+ * Check if a city is in a valid format
+ * If the city is not valid, send an error message to the client
+ * @param name City to check
+ * @param req Express request
+ * @param res Express response
+ * @param fieldName Name of the field
+ * @returns true if the city is valid, false otherwise
+ */
+function checkCityField (name: any, req: express.Request, res: express.Response, fieldName: string): boolean {
+    if (name === undefined || name === '') {
+        sendMsg(req, res, error.city.required, fieldName);
+        return false;
+    }
+    if (typeof name !== 'string') {
+        sendMsg(req, res, error.city.type, fieldName);
         return false;
     }
     return true;
@@ -375,6 +392,7 @@ export {
     checkGroupNameField,
     checkBooleanField,
     checkDateField,
+    checkCityField,
     sanitizePhone,
     sanitizeGender,
     sanitizeUserId,
