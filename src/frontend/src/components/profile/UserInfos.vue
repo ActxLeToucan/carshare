@@ -13,7 +13,7 @@
                         <p v-if="emailVerified == 'pending'" class="ml-auto text-md text-slate-500"> {{ lang.ADDRESS_VERIFICATION }}. </p>
                         <p v-if="emailVerified == '429'" class="ml-auto text-md text-red-500"> {{ lang.ADDRESS_ERROR_SPAM }}. </p>
                         <p v-if="emailVerified == 'error'" class="ml-auto text-md text-red-500"> {{ lang.ADDRESS_ERROR }}. </p>
-                        <p v-if="emailVerified == 'loading'" class="ml-auto text-md text-slate-500"> Sending ... </p>
+                        <p v-if="emailVerified == 'loading'" class="ml-auto text-md text-slate-500"> {{ lang.DATA_SENDING }} </p>
                         <button
                             v-on:click="verifyEmail"
                             v-if="emailVerified !== 'true'"
@@ -32,12 +32,12 @@
             </card>
             <card class="flex flex-col m-4">
                 <div class="flex flex-col">
-                    <input-text :label="lang.OLD_PASSWORD" :placeholder="lang.OLD_PASSWORD" :value="''"></input-text>
-                    <input-text :label="lang.NEW_PASSWORD" :placeholder="lang.NEW_PASSWORD" :value="''"></input-text>
-                    <input-text :label="lang.PWD_CONFIRM" :placeholder="lang.PASSWORD_CONFIRM" :value="''"></input-text>
+                    <input-text name="password-old"     :label="lang.OLD_PASSWORD"  :placeholder="lang.OLD_PASSWORD"     :value="formPassword.old"      @input="formPassword.old = $event.target.value"></input-text>
+                    <input-text name="password-new"     :label="lang.NEW_PASSWORD"  :placeholder="lang.NEW_PASSWORD"     :value="formPassword.new"      @input="formPassword.new = $event.target.value"></input-text>
+                    <input-text name="password-confirm" :label="lang.PWD_CONFIRM"   :placeholder="lang.PASSWORD_CONFIRM" :value="formPassword.confirm"  @input="formPassword.confirm = $event.target.value"></input-text>
                 </div>
                 <div class="flex grow justify-end">
-                    <button-block :action="() => {}" disabled="true"> {{ lang.CHANGE }} </button-block>
+                    <button-block :action="updatePassword" :disabled="!passwordChangeable"> {{ lang.EDIT }} </button-block>
                 </div>
             </card>
         </div>
@@ -63,8 +63,10 @@ import InputSwitch from '../inputs/InputSwitch.vue';
 import Card from '../cards/Card.vue';
 import Popup from '../cards/Popup.vue';
 import { Log } from '../../scripts/Logs';
-import { genres } from '../../scripts/data';
+import {genres, getTypedValue} from '../../scripts/data';
 import Lang from '../../scripts/Lang';
+import API from "../../scripts/API";
+import User from "../../scripts/User";
 
 export default {
     name: "UserInfos",
@@ -77,7 +79,27 @@ export default {
         InputSwitch
     },
     data() {
-        return { User, genres, isMobile: window.innerWidth < 768, emailVerified: (User.CurrentUser?.emailVerifiedOn != null).toString(), lang: Lang.CurrentLang }
+        return {
+            User,
+            genres,
+            isMobile: window.innerWidth < 768,
+            emailVerified: (User.CurrentUser?.emailVerifiedOn != null).toString(),
+            lang: Lang.CurrentLang,
+            formPassword: {
+                old: "",
+                new: "",
+                confirm: "",
+                buttonEnabled: true
+            },
+        }
+    },
+    computed: {
+        passwordChangeable() {
+            return this.formPassword.old.length > 0
+                && this.formPassword.new.length > 0
+                && this.formPassword.confirm.length > 0
+                && this.formPassword.buttonEnabled;
+        }
     },
     methods: {
         setDeletePopup(popup) {
@@ -121,6 +143,23 @@ export default {
         disconnect() {
             User.forget();
             this.$router.push('/');
+        },
+        updatePassword() {
+            this.formPassword.buttonEnabled = false;
+            const data = {
+                oldPassword: this.formPassword.old,
+                password: this.formPassword.new
+            };
+            API.execute_logged(API.ROUTE.MY_PWD, API.METHOD.PATCH, User.CurrentUser?.getCredentials(), data).then((res) => {
+                console.log(res.message);
+                this.formPassword.old = "";
+                this.formPassword.new = "";
+                this.formPassword.confirm = "";
+            }).catch(err => {
+                console.error(err);
+            }).finally(() => {
+                this.formPassword.buttonEnabled = true;
+            });
         }
     },
     mounted() {
@@ -138,7 +177,7 @@ export default {
         API.execute_logged(API.ROUTE.ME, API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
             User.CurrentUser?.setInformations(res);
             User.CurrentUser?.save();
-            
+
             const fields = ["lastName", "firstName", "email", "phone", "gender", "hasCar"];
             fields.forEach(field => setInputValue(field, User.CurrentUser[field]));
 

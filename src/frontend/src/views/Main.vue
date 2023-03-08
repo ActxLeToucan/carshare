@@ -202,6 +202,7 @@ export default {
             setTimeout(() => {
                 parent.classList.remove("tutshake");
             }, 500);
+
             setTimeout(() => addtut(this.$el), 50);
             setTimeout(() => addtut(this.$el), 300);
         },

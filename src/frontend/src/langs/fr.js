@@ -105,12 +105,18 @@ export default {
         // groups
         NO_GROUPS: "Vous n'avez encore aucun groupe",
         NO_GROUPS_DESC: "Créez un groupe pour pouvoir partager vos trajets avec vos amis",
+        NO_USERS: "Il n'y encore aucun utilisateur",
+        NO_USERS_DESC: "Ajoutez des utilisateurs à votre groupe pour pouvoir partager vos trajets avec eux",
         CREATE_GROUP: "Créer un nouveau groupe",
         GROUP_CREATE_CONFIRMATION: "Veuillez renseigner les informations du groupe pour le créer",
         MEMBERS: "Membres",
         DELETE_GROUP: "Supprimer le groupe",
         GROUP_DELETE_CONFIRMATION: "Êtes-vous sûr de vouloir supprimer ce groupe ?\nCette action est irréversible.",
         GROUP_NAME: "Nom du groupe",
+        CREATING_GROUP: "Création du groupe",
+        GROUP_CREATED: "Groupe créé avec succès",
+        LOADING_GROUPS: "Chargement des groupes",
+        LOADING_GROUPS_DESC: "Veuillez patienter pendant que nous chargeons vos groupes",
 
     // informations
     ADDRESS_NOT_VERIFIED: "Adresse non vérifiée",

@@ -104,13 +104,19 @@ export default {
 
         // groups
         NO_GROUPS: "You don't have any group yet",
-        NO_GROUPS_DESC: "Create a group to start sharing your trips with your friends !",
+        NO_GROUPS_DESC: "Create a group to start sharing your trips with your friends",
+        NO_USERS: "No users in this group yet",
+        NO_USERS_DESC: "Add users to this group to start sharing your trips with them",
         CREATE_GROUP: "Create a new group",
         GROUP_CREATE_CONFIRMATION: "Please specify the group informations to create it",
         MEMBERS: "Members",
         DELETE_GROUP: "Delete group",
         GROUP_DELETE_CONFIRMATION: "Are you sure you want to delete this group ?\nThis action is irreversible.",
         GROUP_NAME: "Group name",
+        CREATING_GROUP: "Creating group",
+        GROUP_CREATED: "Group created successfully",
+        LOADING_GROUPS: "Loading groups",
+        LOADING_GROUPS_DESC: "Please wait while we load your groups",
 
     // informations
     ADDRESS_NOT_VERIFIED: "Address not verified",

@@ -168,6 +168,26 @@ function checkPasswordField (password: any, req: express.Request, res: express.R
 }
 
 /**
+ * Check if the old password is in a valid format
+ * If the old password is not valid, send an error message to the client
+ * @param oldPassword Old password to check
+ * @param req Express request
+ * @param res Express response
+ * @returns true if the old password is valid, false otherwise
+ */
+function checkOldPasswordField (oldPassword: any, req: express.Request, res: express.Response): boolean {
+    if (oldPassword === undefined || oldPassword === '') {
+        sendMsg(req, res, error.oldPassword.required);
+        return false;
+    }
+    if (typeof oldPassword !== 'string') {
+        sendMsg(req, res, error.oldPassword.type);
+        return false;
+    }
+    return true;
+}
+
+/**
  * Check if the lastname is in a valid format
  * If the lastname is not valid, send an error message to the client
  * @param lastname Lastname to check
@@ -297,8 +317,25 @@ function checkDateField (date: any, req: express.Request, res: express.Response)
         sendMsg(req, res, error.date.invalid);
         return false;
     }
-    if (new Date(date) > new Date()) {
-        sendMsg(req, res, error.date.tooLate, new Date());
+    return true;
+}
+
+/**
+ * Check if a city is in a valid format
+ * If the city is not valid, send an error message to the client
+ * @param name City to check
+ * @param req Express request
+ * @param res Express response
+ * @param fieldName Name of the field
+ * @returns true if the city is valid, false otherwise
+ */
+function checkCityField (name: any, req: express.Request, res: express.Response, fieldName: string): boolean {
+    if (name === undefined || name === '') {
+        sendMsg(req, res, error.city.required, fieldName);
+        return false;
+    }
+    if (typeof name !== 'string') {
+        sendMsg(req, res, error.city.type, fieldName);
         return false;
     }
     return true;
@@ -566,12 +603,14 @@ export {
     p,
     checkEmailField,
     checkPasswordField,
+    checkOldPasswordField,
     checkLastNameField,
     checkFirstNameField,
     checkLevelField,
     checkGroupNameField,
     checkBooleanField,
     checkDateField,
+    checkCityField,
     sanitizePhone,
     sanitizeGender,
     sanitizeUserId,

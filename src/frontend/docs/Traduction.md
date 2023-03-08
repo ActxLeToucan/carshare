@@ -14,7 +14,7 @@ export default {
 import [nouvelleLangue] from "../langs/[nouvelleLangue].js";
 
 class Langs {
-    static langs = [
+    static Langs = [
         {label: "English", value: "en", data: en},
         {label: "Français", value: "fr", data: fr},
         {label: "[LabelLangue]", value: "[CodeLangue]", data: [nouvelleLangue]},

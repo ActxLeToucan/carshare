@@ -154,6 +154,22 @@ const error = {
             code: 400
         })
     },
+    oldPassword: {
+        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'L\'ancien mot de passe est requis.',
+                en: 'Old password is required.'
+            },
+            code: 400
+        }),
+        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'L\'ancien mot de passe doit être une chaîne de caractères.',
+                en: 'Old password must be a string.'
+            },
+            code: 400
+        })
+    },
     lastname: {
         required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
@@ -318,6 +334,22 @@ const error = {
             msg: {
                 fr: `La date doit être supérieur à ${date.toLocaleDateString('fr-FR')}.`,
                 en: `Date must be greater than ${date.toLocaleDateString('en-US')}.`
+            },
+            code: 400
+        })
+    },
+    ville: {
+        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Le nom de la ville est requise.',
+                en: 'The City name is required.'
+            },
+            code: 400
+        }),
+        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Le champ cityName doit être une chaîne de charactères.',
+                en: 'Field cityName must be a string.'
             },
             code: 400
         })
@@ -556,6 +588,22 @@ const error = {
             msg: {
                 fr: 'L\'identifiant de la notification est invalide.',
                 en: 'Notification id is invalid.'
+            },
+            code: 400
+        })
+    },
+    city: {
+        required: (req: Request, field: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Le champ "${field}" est requis.`,
+                en: `Field "${field}" is required.`
+            },
+            code: 400
+        }),
+        type: (req: Request, field: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Le champ "${field}" doit être une chaîne de caractères.`,
+                en: `Field "${field}" must be a string.`
             },
             code: 400
         })

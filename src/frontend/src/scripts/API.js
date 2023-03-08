@@ -83,9 +83,11 @@ class API {
         SIGNUP: "/users/signup",
         LOGIN: "/users/login",
         ME: "/users/me",
+        MY_PWD: "/users/me/password",
         VERIFY: "/users/email-verification",
         RESETPWD: "/users/password-reset",
-        USERS: "/users"
+        USERS: "/users",
+        GROUPS: "/groups/my"
     };
 
     /**
