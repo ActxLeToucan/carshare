@@ -85,7 +85,8 @@ class API {
         ME: "/users/me",
         VERIFY: "/users/email-verification",
         RESETPWD: "/users/password-reset",
-        USERS: "/users"
+        USERS: "/users",
+        GROUPS: "/groups/my"
     };
 
     /**
