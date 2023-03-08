@@ -15,7 +15,10 @@ exports.getUserEvaluation = (req: express.Request, res: express.Response, next: 
 
     prisma.evaluation.aggregate({
         where: {
-            evaluatedId: userId
+            evaluatedId: userId,
+            travel: {
+                driverId: userId
+            }
 
         },
         _avg: {
@@ -25,11 +28,17 @@ exports.getUserEvaluation = (req: express.Request, res: express.Response, next: 
             note: true,
         }
 
-    }).then((evaluated) => {
+    }).then((driver) => {
         prisma.evaluation.aggregate({
             where: {
-                evaluatorId: userId
-
+                evaluatedId: userId,
+                travel: {
+                    passengers: {
+                        some: {
+                            passengerId: userId
+                        }
+                    }
+                }
             },
             _avg: {
                 note: true,
@@ -38,9 +47,9 @@ exports.getUserEvaluation = (req: express.Request, res: express.Response, next: 
                 note: true,
             }
 
-        }).then((evaluator) => {
+        }).then((passenger) => {
 
-            res.status(200).json({ evaluated : evaluated, evaluator: evaluator});
+            res.status(200).json({ driver : driver, passenger: passenger});
 
         }).catch((err) => {
             console.error(err);
