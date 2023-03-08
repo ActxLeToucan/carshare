@@ -37,7 +37,7 @@
                     <input-text :label="lang.PWD_CONFIRM" :placeholder="lang.PASSWORD_CONFIRM" :value="''"></input-text>
                 </div>
                 <div class="flex grow justify-end">
-                    <button-block :action="() => {}" disabled="true"> {{ lang.CHANGE }} </button-block>
+                    <button-block :action="() => {}" disabled="true"> {{ lang.EDIT }} </button-block>
                 </div>
             </card>
         </div>
