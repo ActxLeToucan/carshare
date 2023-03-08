@@ -1251,6 +1251,11 @@ components:
         email:
           type: string
           example: john@example.com
+        emailVerifiedOn:
+          type: string
+          format: date-time
+          nullable: true
+          default: null
         firstName:
           type: string
           example: John
@@ -1273,11 +1278,6 @@ components:
         level:
           type: integer
           default: 0
-        emailVerifiedOn:
-          type: string
-          format: date-time
-          nullable: true
-          default: null
     PrivateUser:
       type: object
       properties:
@@ -1287,6 +1287,11 @@ components:
         email:
           type: string
           example: john@example.com
+        emailVerifiedOn:
+          type: string
+          format: date-time
+          nullable: true
+          default: null
         firstName:
           type: string
           example: John
@@ -1315,11 +1320,6 @@ components:
         createdAt:
           type: string
           format: date-time
-        emailVerifiedOn:
-          type: string
-          format: date-time
-          nullable: true
-          default: null
     ArrayOfPrivateUsers:
       type: array
       items:
@@ -1327,6 +1327,7 @@ components:
       example:
         - id: 1
           email: bob@example.com
+          emailVerifiedOn: 2023-01-26T15:26:31.144Z
           firstName: Bob
           lastName: LeBricoleur
           phone: "0321456789"
@@ -1336,9 +1337,9 @@ components:
           mailNotif: true
           level: 3
           createdAt: 2023-01-26T15:26:31.144Z
-          emailVerifiedOn: 2023-01-26T15:26:31.144Z
         - id: 2
           email: laia@cat.world
+          emailVerifiedOn: 2023-02-18T13:19:23.636Z
           firstName: Laia
           lastName: Kitten
           phone: "+330612345678"
@@ -1348,7 +1349,6 @@ components:
           mailNotif: true
           level: 1
           createdAt: 2023-02-18T13:19:23.636Z
-          emailVerifiedOn: 2023-02-18T13:19:23.636Z
     ArrayOfTravels:
       type: array
       items:
