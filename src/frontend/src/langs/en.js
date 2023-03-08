@@ -86,5 +86,6 @@ export default {
     //parametres
     GET_NOTIFIED: "Get notified by e-mail :",
     DARKMODE: "Dark mode : " , 
-    ENGLISH : "English :" , 
+    ENGLISH: "English :", 
+    LANGUES : "Langues : ",
 }

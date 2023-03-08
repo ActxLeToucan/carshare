@@ -44,3 +44,9 @@ export const genres = [
     {value: -1, id: 'UNSPECIFIED'},
     {value: 0,  id: 'FEMALE'},
 ];
+
+export const langues = [
+    {value: 'en',  id: 'ANGLAIS'},
+    {value: 'fr', id: 'FRANCAIS'},
+   
+];

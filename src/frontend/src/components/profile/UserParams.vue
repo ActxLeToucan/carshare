@@ -1,6 +1,6 @@
 <template>
     <div class="show-up flex flex-col grow"  :class="{ 'dark': isDarkMode }">
-        <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> Paramètres  </p> <p>{{ lang.PARAMS }} </p>
+        <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> {{ lang.PARAMS }}  </p> 
          <div class="flex flex-col grow justify-evenly items-center">
             <div class="flex flex-col">
                 <p class="font-bold   text-slate-500 text-xl"> --Email--</p>
@@ -10,7 +10,7 @@
                 <input-switch name="sombre"    :label="lang.DARKMODE" @click="toggleDarkMode" :checked="isDarkMode"></input-switch><br><br>
                 
                 <p class="font-bold   text-slate-500 text-xl"> --Langue--</p>
-                <input-switch name="en"    :label="lang.ENGLISH "  @click = "ChangeToEnglish"></input-switch><br><br><br><br>
+                <input-choice  name="en"  id="angalis"  :label="lang.LANGUES "  :options="langues"    :value="-1" @click = "ChangeToEnglish"></input-choice><br><br><br><br>         
 
             </div>
          </div>
@@ -19,17 +19,23 @@
 
 <script>
 import InputSwitch from '../inputs/InputSwitch.vue';
+import InputChoice from '../inputs/InputChoice.vue'
 import Lang from '../../scripts/Lang';
+import { langues } from '../../scripts/data';
+
 export default {
+    
     name: "UserParams",
     components: {
-        InputSwitch
+        InputSwitch, InputChoice
     },
     data() {
         return { 
             isDarkMode: false,
             isEnglish:false, 
-           lang: Lang.CurrentLang
+            lang: Lang.CurrentLang,
+            langues,
+            
             
         }
     },
