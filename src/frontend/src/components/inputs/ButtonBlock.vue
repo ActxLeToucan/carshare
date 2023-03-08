@@ -53,11 +53,11 @@ export default {
         applyDisabled() {
             const el = this.href ? this.$refs["btn"].$el : this.$refs["btn-2"];
             if (this.disabled) {
-                el.classList.remove("text-slate-500", "hover:bg-teal-500", "hover:text-slate-50", "hover:shadow-md", "hover:border-teal-600");
+                el.classList.remove("text-slate-500", "hover:bg-"+this.color+"-500", "hover:text-slate-50", "hover:shadow-md", "hover:border-"+this.color+"-600");
                 el.classList.add("text-slate-400", "cursor-default");
             } else {
                 el.classList.remove("text-slate-400", "cursor-default");
-                el.classList.add("text-slate-500", "hover:bg-teal-500", "hover:text-slate-50", "hover:shadow-md", "hover:border-teal-600");
+                el.classList.add("text-slate-500", "hover:bg-"+this.color+"-500", "hover:text-slate-50", "hover:shadow-md", "hover:border-"+this.color+"-600");
             }
         }
     },
