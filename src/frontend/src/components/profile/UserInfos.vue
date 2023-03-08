@@ -4,9 +4,9 @@
         <div class="flex flex-col grow justify-evenly items-center">
             <card class="flex flex-col m-4">
                 <div class="flex flex-col">
-                    <input-text   name="lastName"  :label="lang.LASTNAME"  :placeholder="lang.LASTNAME"  :value="User.CurrentUser?.lastName"></input-text>
-                    <input-text   name="firstName" :label="lang.FIRSTNAME" :placeholder="lang.FIRSTNAME" :value="User.CurrentUser?.firstName"></input-text>
-                    <input-text   name="email"     :label="lang.EMAIL"     :placeholder="lang.EMAIL"     :value="User.CurrentUser?.email" class="mb-0"></input-text>
+                    <input-text   name="lastName"  :label="lang.LASTNAME"  :placeholder="lang.LASTNAME"  :value="formProperties.properties.lastName" @input="formProperties.properties.lastName = $event.target.value"></input-text>
+                    <input-text   name="firstName" :label="lang.FIRSTNAME" :placeholder="lang.FIRSTNAME" :value="formProperties.properties.firstName" @input="formProperties.properties.firstName = $event.target.value"></input-text>
+                    <input-text   name="email"     :label="lang.EMAIL"     :placeholder="lang.EMAIL"     :value="formProperties.properties.email" class="mb-0" @input="formProperties.properties.email = $event.target.value"></input-text>
                     <div class="flex space-x-4">
                         <p v-if="emailVerified == 'false'" class="ml-auto text-md text-slate-500"> {{ lang.ADDRESS_NOT_VERIFIED }}. </p>
                         <p v-if="emailVerified == 'true'" class="ml-auto text-md text-slate-500"> {{ lang.ADDRESS_VERIFIED }}. </p>
@@ -19,22 +19,22 @@
                             v-if="emailVerified !== 'true'"
                             class="ml-auto font-semibold text-md text-slate-500 hover:text-teal-500 cursor-pointer"> {{ lang.VERIFY }} </button>
                     </div>
-                    <input-text   name="phone"    :label="lang.PHONE"          :placeholder="lang.PHONE" :value="User.CurrentUser?.phone"></input-text>
-                    <input-choice name="gender"   :label="lang.GENDER"         :value="User.CurrentUser?.gender" :list="genres"></input-choice>
-                    <input-switch name="hasCar"   :label="lang.I_HAVE_A_CAR"   :value="User.CurrentUser?.hasCar"></input-switch>
+                    <input-text   name="phone"    :label="lang.PHONE"          :placeholder="lang.PHONE" :value="formProperties.properties.phone" @input="formProperties.properties.phone = $event.target.value"></input-text>
+                    <input-choice name="gender"   :label="lang.GENDER"         :value="formProperties.properties.gender" :list="genres" @input="formProperties.properties.gender = Number($event.target.value)"></input-choice>
+                    <input-switch name="hasCar"   :label="lang.I_HAVE_A_CAR"   :value="formProperties.properties.hasCar" :onchange="(state) => this.formProperties.properties.hasCar = state"></input-switch>
                 </div>
                 <div class="flex md:flex-row flex-col md:space-x-4 md:space-y-0 space-y-2 mt-4">
                     <button-block :action="deleteAccount" color="red"> {{ lang.DELETE_ACCOUNT }} </button-block>
                     <div class="flex grow justify-end pl-20">
-                        <button-block :action="() => {}" disabled="true"> {{ lang.EDIT }} </button-block>
+                        <button-block :action="updateAccount" :disabled="!propertiesChangeable"> {{ lang.EDIT }} </button-block>
                     </div>
                 </div>
             </card>
             <card class="flex flex-col m-4">
                 <div class="flex flex-col">
-                    <input-text name="password-old"     :label="lang.OLD_PASSWORD"  :placeholder="lang.OLD_PASSWORD"     :value="formPassword.old"      @input="formPassword.old = $event.target.value"></input-text>
-                    <input-text name="password-new"     :label="lang.NEW_PASSWORD"  :placeholder="lang.NEW_PASSWORD"     :value="formPassword.new"      @input="formPassword.new = $event.target.value"></input-text>
-                    <input-text name="password-confirm" :label="lang.PWD_CONFIRM"   :placeholder="lang.PASSWORD_CONFIRM" :value="formPassword.confirm"  @input="formPassword.confirm = $event.target.value"></input-text>
+                    <input-text name="password-old"     :label="lang.OLD_PASSWORD"  :placeholder="lang.OLD_PASSWORD"     :value="formPassword.old"     type="password" @input="formPassword.old = $event.target.value"></input-text>
+                    <input-text name="password-new"     :label="lang.NEW_PASSWORD"  :placeholder="lang.NEW_PASSWORD"     :value="formPassword.new"     type="password" @input="formPassword.new = $event.target.value"></input-text>
+                    <input-text name="password-confirm" :label="lang.PWD_CONFIRM"   :placeholder="lang.PASSWORD_CONFIRM" :value="formPassword.confirm" type="password" @input="formPassword.confirm = $event.target.value"></input-text>
                 </div>
                 <div class="flex grow justify-end">
                     <button-block :action="updatePassword" :disabled="!passwordChangeable"> {{ lang.EDIT }} </button-block>
@@ -91,14 +91,33 @@ export default {
                 confirm: "",
                 buttonEnabled: true
             },
+            formProperties: {
+                properties: {
+                    lastName: User.CurrentUser?.lastName,
+                    firstName: User.CurrentUser?.firstName,
+                    email: User.CurrentUser?.email,
+                    phone: User.CurrentUser?.phone,
+                    gender: User.CurrentUser?.gender,
+                    hasCar: User.CurrentUser?.hasCar
+                },
+                buttonEnabled: true
+            },
+            mounted: false,
         }
     },
     computed: {
         passwordChangeable() {
-            return this.formPassword.old.length > 0
+            return this.formPassword.buttonEnabled
+                && this.formPassword.old.length > 0
                 && this.formPassword.new.length > 0
-                && this.formPassword.confirm.length > 0
-                && this.formPassword.buttonEnabled;
+                && this.formPassword.confirm.length > 0;
+        },
+        propertiesChangeable() {
+            if (!this.mounted || !this.formProperties.buttonEnabled) return false;
+            for (const prop of Object.keys(this.formProperties.properties)) {
+                if (this.formProperties.properties[prop] !== User.CurrentUser[prop]) return true;
+            }
+            return false;
         }
     },
     methods: {
@@ -160,6 +179,22 @@ export default {
             }).finally(() => {
                 this.formPassword.buttonEnabled = true;
             });
+        },
+        updateAccount() {
+            this.formProperties.buttonEnabled = false;
+            const data = Object.assign({}, this.formProperties.properties);
+            API.execute_logged(API.ROUTE.ME, API.METHOD.PATCH, User.CurrentUser?.getCredentials(), data).then((data) => {
+                console.log(data.message);
+                for (const prop of Object.keys(this.formProperties.properties)) {
+                    this.formProperties.properties[prop] = data.user[prop];
+                    User.CurrentUser[prop] = data.user[prop];
+                }
+                User.CurrentUser.save();
+            }).catch(err => {
+                console.error(err);
+            }).finally(() => {
+                this.formProperties.buttonEnabled = true;
+            });
         }
     },
     mounted() {
@@ -184,6 +219,8 @@ export default {
         }).catch(err => {
             console.error(err);
         });
+
+        this.mounted = true;
     }
 }
 </script>
