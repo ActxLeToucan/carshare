@@ -250,7 +250,17 @@ exports.getAllUsers = (req: express.Request, res: express.Response, next: expres
             Math.max(properties.p.query.minLimit, Number(req.query.limit))
         ); // default max, min p.query.minLimit, max p.query.maxLimit
 
+    const lastName = String(req.query.lastName ?? '');
+    const firstName = String(req.query.firstName ?? '');
+    const email = String(req.query.email ?? '');
+
+    const where: {lastName?: any, firstName?: any, email?: any} = {};
+    if (lastName !== '') { where.lastName = { startsWith: lastName }; }
+    if (firstName !== '') { where.firstName = { startsWith: firstName }; }
+    if (email !== '') { where.email = { startsWith: email }; }
+
     prisma.user.findMany<Prisma.UserFindManyArgs>({
+        where,
         skip: offset,
         take: limit,
         orderBy: [
