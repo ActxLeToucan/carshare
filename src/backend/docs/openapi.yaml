@@ -682,11 +682,50 @@ paths:
         - bearerAuth: [ ]
       responses:
         '200':
-          description: The travel he has made or will make, depending on the status of the travel.
+          description: The travels he has made or will make, depending on the status of the travel.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ListRoute'
+                type: object
+                properties:
+                  travelsAsDriver:
+                    $ref: '#/components/schemas/ArrayOfTravels'
+                  travelsAsPassenger:
+                      $ref: '#/components/schemas/ArrayOfTravels'
+        '401':
+          $ref: '#/components/responses/noToken'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+
+  /travels/search:
+    get:
+      summary: Search travels
+      description: Get all the trips fitting with the given criteria
+      tags:
+        - Travels
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: The travels fitting the given criteria
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArrayOfTravels'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Date is invalid.
         '401':
           $ref: '#/components/responses/noToken'
         '498':
@@ -1048,6 +1087,43 @@ components:
                 type: string
                 example: This feature is not yet implemented.
   schemas:
+    Travel:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        departureDate:
+          type: string
+          format: date-time
+          example: 2020-01-01T00:00:00.000Z
+        arrivalDate:
+          type: string
+          format: date-time
+          example: 2020-01-01T00:00:00.000Z
+        maxPassengers:
+          type: integer
+          example: 4
+        price:
+          type: number
+          example: 100
+        description:
+          type: string
+          example: No pets allowed
+        status:
+          type: integer
+          example: 1
+        driverId:
+          type: integer
+          example: 1
+        groupId:
+          type: integer
+          nullable: true
+          example: 1
+        createdAt:
+          type: string
+          format: date-time
+          example: 2020-01-01T00:00:00.000Z
     Group:
       type: object
       properties:
@@ -1175,39 +1251,31 @@ components:
           level: 1
           createdAt: 2023-02-18T13:19:23.636Z
           emailVerifiedOn: 2023-02-18T13:19:23.636Z
-    ListRoute:
-      type: object
-      properties:
-        travelAsDriver:
-          type: object
-          example: [ {
-            id: 2,
-            departureDate: "2023-02-26T10:00:58.000Z",
-            arrivalDate: "2023-02-28T02:32:22.000Z",
-            maxPassengers: 3,
-            price: 86,
-            description: null,
-            status: 0,
-            driverId: 1,
-            groupeId: null,
-            createdAt: "2023-02-23T00:00:00.000Z"
-
-          } ]
-        travelAsPassenger:
-          type: object
-          example: [ {
-            id: 1,
-            departureDate: "2023-02-25T10:00:58.000Z",
-            arrivalDate: "2023-02-25T21:00:58.000Z",
-            maxPassengers: 7,
-            price: 89,
-            description: null,
-            status: 1,
-            driverId: 2,
-            groupeId: null,
-            createdAt: "2023-02-21T10:03:07.000Z"
-
-          } ]
+    ArrayOfTravels:
+      type: array
+      items:
+        $ref: '#/components/schemas/Travel'
+      example:
+        - id: 1
+          departureDate: 2023-02-27T17:52:29.000Z
+          arrivalDate: 2023-02-27T18:00:09.000Z
+          maxPassengers: 2
+          price: 100
+          description: No pets allowed
+          status: 1
+          driverId: 1
+          groupId: null
+          createdAt: 2023-02-27T17:52:29.000Z
+        - id: 2
+          departureDate: 2023-02-27T17:52:29.000Z
+          arrivalDate: 2023-02-27T18:00:09.000Z
+          maxPassengers: 4
+          price: 100
+          description: No pets allowed
+          status: 1
+          driverId: 1
+          groupId: null
+          createdAt: 2023-02-27T17:52:29.000Z
     ArrayOfNotifications:
       type: array
       items:
