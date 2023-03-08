@@ -30,9 +30,9 @@ exports.searchTravels = (req: express.Request, res: express.Response, next: expr
     }
 
     const { date, startCity, endCity } = req.body;
-    if (!checkCityField(startCity, req, res, 'startCity')) return;
-    if (!checkCityField(endCity, req, res, 'endCity')) return;
-    if (!checkDateField(date, req, res)) return;
+    if (!properties.checkCityField(startCity, req, res, 'startCity')) return;
+    if (!properties.checkCityField(endCity, req, res, 'endCity')) return;
+    if (!properties.checkDateField(date, req, res)) return;
 
     const date1 = new Date(new Date(date).getTime() - 1000 * 60 * 60);
     const date2 = new Date(new Date(date).getTime() + 1000 * 60 * 60);
