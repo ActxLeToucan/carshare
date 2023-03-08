@@ -1,16 +1,16 @@
 <template>
     <div class="flex grow flex-col">
         <topbar v-if="User.CurrentUser != null"></topbar>
-        <button-block class="show-right flex flex-col items-center md:w-min w-full  mx-auto overflow-hidden text-xl" style="margin-top: 1em ; margin-bottom: -3em"> Nouveau trajet </button-block>
+        <button-block class="show-right flex flex-col items-center md:w-min w-full  mx-auto overflow-hidden text-xl" style="margin-top: 1em ; margin-bottom: -3em"  href="/createTrip"> Nouveau trajet </button-block>
         <div class="flex items-center">
-        <p class="show-down text-xl text-xl text-slate-400 text-left font-bold position: left  ml-4" style="margin-top: 5em"> Type de trajet </p>
+        <p class="show-down text-xl text-xl text-slate-400 text-left font-bold position: left  ml-20" style="margin-top: 5em"> Type de trajet </p>
         <button-block class="text-xl text-slate-400 font-bold ml-10" style="margin-top: 4.6em"> Public </button-block>
         <button-block class="text-xl text-slate-400 font-bold" style="margin-top: 4.6em"> Privé </button-block>
         </div>
 
 
         <div class="flex items-center">
-            <p class="text-xl text-slate-400 font-bold  ml-4 " style="margin-top: 5em"> Nombre de places </p>
+            <p class="text-xl text-slate-400 font-bold  ml-20 " style="margin-top: 5em"> Nombre de places </p>
             <button class="bg-gray-300  text-white font-bold py-2 px-4 rounded ml-4" style="margin-top: 6em" @click="incrementCounter">{{ compteur }}</button>
         </div>
        
@@ -43,12 +43,14 @@
             </div>
         </div>
 
-
-
-        <p class="show-down text-xl text-xl text-slate-400 text-left font-bold position: left  ml-4" style="margin-top: -7em"> Groupe de trajet </p>
+        <p class="show-down text-xl text-xl text-slate-400 text-left font-bold position: left  ml-20" style="margin-top: -7em"> Groupe de trajet </p>
+        
         <div class="flex items-center">
         <button-block class="show-right flex flex-col items-center md:w-min w-full  mx-auto overflow-hidden text-xl" style="margin-top: 8em"> Annuler </button-block>
-        <button-block class="show-right flex flex-col items-center md:w-min w-full  mx-auto overflow-hidden text-xl" style="margin-top: 8em" > Créer le trajet </button-block>
+        <button-block @click="showModal = true" class="show-right flex flex-col items-center md:w-min w-full  mx-auto overflow-hidden text-xl" style="margin-top: 8em" > Créer le trajet </button-block>
+        <modal v-if="showModal" @close="showModal = false">
+        <p>Contenu de la povxcpup</p>
+        </modal>
         </div>
     </div>
     
@@ -60,19 +62,24 @@ import ButtonBlock from '../components/inputs/ButtonBlock.vue';
 import ButtonText from '../components/inputs/ButtonText.vue';
 import InputText from '../components/inputs/InputText.vue';
 import Topbar from "../components/topbar/Topbar.vue";
+import Popup from "../components/trip/Popup.vue";
 import { goBack } from '../scripts/redirects';
 import User from "../scripts/User.js";
 
+
 export default {
-    name: 'Home',
+    name: 'App',
     components: {
     Topbar,
     ButtonBlock,
     InputText,
-    ButtonText
+    ButtonText,
+    Popup
 },
     data() {
-        return { User, goBack ,
+        return { 
+            User,
+            goBack ,
             compteur: 0 }
     },
     searchCities(selector, search) {
@@ -94,8 +101,10 @@ export default {
     methods: {
     incrementCounter() {
       this.compteur++
+    },
+    actionOnClick() {
+      console.log("Bouton cliqué !");
     }
   }
 }
-
 </script>
