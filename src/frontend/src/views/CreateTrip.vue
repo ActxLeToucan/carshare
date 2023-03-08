@@ -47,10 +47,8 @@
         
         <div class="flex items-center">
         <button-block class="show-right flex flex-col items-center md:w-min w-full  mx-auto overflow-hidden text-xl" style="margin-top: 8em"> Annuler </button-block>
-        <button-block @click="showModal = true" class="show-right flex flex-col items-center md:w-min w-full  mx-auto overflow-hidden text-xl" style="margin-top: 8em" > Créer le trajet </button-block>
-        <modal v-if="showModal" @close="showModal = false">
-        <p>Contenu de la povxcpup</p>
-        </modal>
+        <button-block class="show-right flex flex-col items-center md:w-min w-full  mx-auto overflow-hidden text-xl" style="margin-top: 8em" > Créer le trajet </button-block>
+       
         </div>
     </div>
     
@@ -62,7 +60,7 @@ import ButtonBlock from '../components/inputs/ButtonBlock.vue';
 import ButtonText from '../components/inputs/ButtonText.vue';
 import InputText from '../components/inputs/InputText.vue';
 import Topbar from "../components/topbar/Topbar.vue";
-import Popup from "../components/trip/Popup.vue";
+import UserTrips from '../components/profile/UserTrips.vue';
 import { goBack } from '../scripts/redirects';
 import User from "../scripts/User.js";
 
@@ -74,7 +72,7 @@ export default {
     ButtonBlock,
     InputText,
     ButtonText,
-    Popup
+    UserTrips
 },
     data() {
         return { 

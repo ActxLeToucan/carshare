@@ -11,6 +11,7 @@ class BAN {
                             return {
                                 name: feature.properties.name,
                                 city: feature.properties.city,
+                                context: feature.properties.context,
                                 postcode: feature.properties.postcode,
                                 lat: feature.geometry.coordinates[1],
                                 lng: feature.geometry.coordinates[0]

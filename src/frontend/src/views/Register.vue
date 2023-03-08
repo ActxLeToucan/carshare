@@ -39,25 +39,25 @@ function isPhoneNumber(val) {
 }
 
 const field_checks = [
-    {field: "firstName",        check: (value) => value.length > 0, error: "Veuillez renseignez votre nom."},
-    {field: "lastName",         check: (value) => value.length > 0, error: "Veuillez renseignez votre prénom."},
-    {field: "email",            check: (value) => value.length > 0, error: "Veuillez renseignez votre adresse mail."},
-    {field: "phone",            check: (value) => value.length > 0, error: "Veuillez renseignez votre numéro de téléphone."},
-    {field: "password",         check: (value) => value.length > 0, error: "Veuillez renseignez votre mot de passe."},
-    {field: "password-confirm", check: (value) => value.length > 0, error: "Veuillez confirmer votre mot de passe."},
+    {field: "firstName",        check: (value) => value.length > 0, error: Lang.CurrentLang.FIRSTNAME_SPECIFY},
+    {field: "lastName",         check: (value) => value.length > 0, error: Lang.CurrentLang.LASTNAME_SPECIFY},
+    {field: "email",            check: (value) => value.length > 0, error: Lang.CurrentLang.EMAIL_SPECIFY},
+    {field: "phone",            check: (value) => value.length > 0, error: Lang.CurrentLang.PHONE_SPECIFY},
+    {field: "password",         check: (value) => value.length > 0, error: Lang.CurrentLang.PASSWORD_SPECIFY},
+    {field: "password-confirm", check: (value) => value.length > 0, error: Lang.CurrentLang.PASSWORD_CONFIRM_SPECIFY},
 
-    {field: "firstName",        check: (value) => value.length <= 50,               error: "Le nom est trop long."},
-    {field: "lastName",         check: (value) => value.length <= 50,               error: "Le prénom est trop long."},
-    {field: "email",            check: (value) => value.length <= 64,               error: "L'adresse mail est trop longue."},
-    {field: "email",            check: (value) => value.match(re.REGEX_EMAIL) != null, error: "L'adresse mail n'est pas valide."},
-    {field: "phone",            check: (value) => isPhoneNumber(value),             error: "Le numéro de téléphone est invalide."},
+    {field: "firstName",        check: (value) => value.length <= 50,                  error: Lang.CurrentLang.FIRSTNAME_TOOLONG},
+    {field: "lastName",         check: (value) => value.length <= 50,                  error: Lang.CurrentLang.LASTNAME_TOOLONG},
+    {field: "email",            check: (value) => value.length <= 64,                  error: Lang.CurrentLang.EMAIL_TOOLONG},
+    {field: "email",            check: (value) => value.match(re.REGEX_EMAIL) != null, error: Lang.CurrentLang.EMAIL_INVALID},
+    {field: "phone",            check: (value) => isPhoneNumber(value),                error: Lang.CurrentLang.PHONE_INVALID},
 
-    {field: "password-confirm", check: (value, modal) => value === modal.get("password"), error: "Les mots de passe ne correspondent pas."},
-    {field: "password",         check: (value) => value.length >= 10,                     error: "Le mot de passe doit faire au moins 10 caractères."},
-    {field: "password",         check: (value) => value.match(/[A-Z]/g) != null,          error: "Le mot de passe doit contenir au moins une majuscule."},
-    {field: "password",         check: (value) => value.match(/[a-z]/g) != null,          error: "Le mot de passe doit contenir au moins une minuscule."},
-    {field: "password",         check: (value) => value.match(/[0-9]/g) != null,          error: "Le mot de passe doit contenir au moins un chiffre."},
-    {field: "password",         check: (value) => value.match(/[^A-Za-z0-9]/g) != null,   error: "Le mot de passe doit contenir au moins un caractère spécial."}
+    {field: "password-confirm", check: (value, modal) => value === modal.get("password"), error: Lang.CurrentLang.PASSWORD_UNMATCH},
+    {field: "password",         check: (value) => value.length >= 10,                     error: Lang.CurrentLang.PASSWORD_ERRLEN},
+    {field: "password",         check: (value) => value.match(/[A-Z]/g) != null,          error: Lang.CurrentLang.PASSWORD_ERRMAJ},
+    {field: "password",         check: (value) => value.match(/[a-z]/g) != null,          error: Lang.CurrentLang.PASSWORD_ERRMIN},
+    {field: "password",         check: (value) => value.match(/[0-9]/g) != null,          error: Lang.CurrentLang.PASSWORD_ERRNBR},
+    {field: "password",         check: (value) => value.match(/[^A-Za-z0-9]/g) != null,   error: Lang.CurrentLang.PASSWORD_ERRSPE}
 ];
 
 function onCancel(modal) {
@@ -66,7 +66,7 @@ function onCancel(modal) {
 
 function onValidate(modal) {
     return new Promise((resolve, reject) => {
-        const log = modal.log("Vérification des entrées ...", Log.INFO);
+        const log = modal.log(Lang.CurrentLang.INPUT_VERIFICATION + " ...", Log.INFO);
         for (let i = 0; i < field_checks.length; i++) {
             const check = field_checks[i];
             const result = check.check(modal.get(check.field), modal);
@@ -78,7 +78,7 @@ function onValidate(modal) {
                 return;
             }
         }
-        log.update("Envoi des données ...", Log.INFO);
+        log.update(Lang.CurrentLang.DATA_SENDING + " ...", Log.INFO);
 
         const payload = modal.getPayload();
         const userInfos = {
@@ -92,15 +92,15 @@ function onValidate(modal) {
         };
 
         API.execute(API.ROUTE.SIGNUP, API.METHOD.POST, userInfos, API.TYPE.JSON).then(res => {
-            log.update("Compte créé avec succès !", Log.SUCCESS);
+            log.update(Lang.CurrentLang.REGISTER_SUCCESS + " !", Log.SUCCESS);
 
             const user = new User(res.user);
             user.setInformations({token: res.token});
             user.save();
 
-            const email_log = modal.log("Envoi de l'email de vérification ...", Log.INFO);
+            const email_log = modal.log(Lang.CurrentLang.SENDING_EMAILVERIF + " ...", Log.INFO);
             API.execute_logged(API.ROUTE.VERIFY, API.METHOD.POST, user.getCredentials(), {email: userInfos.email}, API.TYPE.JSON).then(res => {
-                email_log.update("Email envoyé avec succès !", Log.SUCCESS);
+                email_log.update(Lang.CurrentLang.SENDING_EMAIL_SUCCESS + " !", Log.SUCCESS);
 
                 setTimeout(() => {
                     log.delete();
@@ -109,7 +109,7 @@ function onValidate(modal) {
                 }, 2000);
 
             }).catch(err => {
-                email_log.update("Erreur : " + err.message, Log.ERROR);
+                email_log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
             
                 setTimeout(() => {
                     log.delete();
@@ -119,7 +119,7 @@ function onValidate(modal) {
             });
 
         }).catch(err => {
-            log.update("Erreur : " + err.message, Log.ERROR);
+            log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
             
             setTimeout(() => {
                 log.delete();
@@ -146,7 +146,7 @@ export default {
         return { User, genres, lang: Lang.CurrentLang }
     },
     mounted() {
-        Lang.addCallback(lang => this.lang = lang);
+        Lang.AddCallback(lang => this.lang = lang);
     }
 }
 </script>

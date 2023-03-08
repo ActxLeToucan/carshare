@@ -42,7 +42,7 @@ data() {
 - Pour profiter d'une mise à jour automatique de la page en cas de changement de langue, écouter les changements de langue et mettre à jour la page en conséquence:
 ```js
 mounted() {
-    Lang.addCallback(lang => this.lang = lang);
+    Lang.AddCallback(lang => this.lang = lang);
 }
 ```
 - Enfin, rechercher le mot clé correspondant à la traduction du texte voulu dans le fichier `src/langs/fr.js` (fichier contenant toutes les traductions du site web, par defaut en Français). Si la traduction n'existe pas, il faut la créer.
@@ -69,7 +69,7 @@ const langues = Lang.Langs;
 - Pour modifier la langue courante, il suffit d'utiliser la fonction `Lang.loadLang(code)`:
 ```js
 button.addEventListener("click", () => {
-    const success = Lang.loadLang("fr");
+    const success = Lang.LoadLang("fr");
 });
 /*
 Au clic du bouton, la langue courante sera changée pour le français et toutes les traductions des pages écoutant les évenements de la classe Lang seront mises à jour.
