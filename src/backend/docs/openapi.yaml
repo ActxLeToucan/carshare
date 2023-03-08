@@ -309,6 +309,9 @@ paths:
               properties:
                 password:
                   type: string
+                  example: New_Password123
+                oldPassword:
+                  type: string
                   example: Password123$
       responses:
         '200':

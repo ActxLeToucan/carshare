@@ -157,6 +157,26 @@ function checkPasswordField (password: any, req: express.Request, res: express.R
 }
 
 /**
+ * Check if the old password is in a valid format
+ * If the old password is not valid, send an error message to the client
+ * @param oldPassword Old password to check
+ * @param req Express request
+ * @param res Express response
+ * @returns true if the old password is valid, false otherwise
+ */
+function checkOldPasswordField (oldPassword: any, req: express.Request, res: express.Response): boolean {
+    if (oldPassword === undefined || oldPassword === '') {
+        sendMsg(req, res, error.oldPassword.required);
+        return false;
+    }
+    if (typeof oldPassword !== 'string') {
+        sendMsg(req, res, error.oldPassword.type);
+        return false;
+    }
+    return true;
+}
+
+/**
  * Check if the lastname is in a valid format
  * If the lastname is not valid, send an error message to the client
  * @param lastname Lastname to check
@@ -386,6 +406,7 @@ export {
     p,
     checkEmailField,
     checkPasswordField,
+    checkOldPasswordField,
     checkLastNameField,
     checkFirstNameField,
     checkLevelField,

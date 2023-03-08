@@ -153,18 +153,30 @@ exports.updatePassword = (req: express.Request, res: express.Response, next: exp
         return;
     }
     if (!properties.checkPasswordField(req.body.password, req, res)) return;
+    if (!properties.checkOldPasswordField(req.body.oldPassword, req, res)) return;
 
-    bcrypt.hash(req.body.password, properties.p.password.salt)
-        .then((hash) => {
-            prisma.user.update({
-                where: { id: res.locals.user.id },
-                data: { password: hash }
-            }).then(() => {
-                sendMsg(req, res, info.user.passwordChanged);
-            }).catch((err) => {
-                console.error(err);
-                sendMsg(req, res, error.generic.internalError);
-            });
+    bcrypt.compare(req.body.oldPassword, res.locals.user.password)
+        .then((valid) => {
+            if (!valid) {
+                sendMsg(req, res, error.auth.wrongPassword);
+                return;
+            }
+
+            bcrypt.hash(req.body.password, properties.p.password.salt)
+                .then((hash) => {
+                    prisma.user.update({
+                        where: { id: res.locals.user.id },
+                        data: { password: hash }
+                    }).then(() => {
+                        sendMsg(req, res, info.user.passwordChanged);
+                    }).catch((err) => {
+                        console.error(err);
+                        sendMsg(req, res, error.generic.internalError);
+                    });
+                }).catch((err) => {
+                    console.error(err);
+                    sendMsg(req, res, error.generic.internalError);
+                });
         }).catch((err) => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);

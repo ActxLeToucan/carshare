@@ -154,6 +154,22 @@ const error = {
             code: 400
         })
     },
+    oldPassword: {
+        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'L\'ancien mot de passe est requis.',
+                en: 'Old password is required.'
+            },
+            code: 400
+        }),
+        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'L\'ancien mot de passe doit être une chaîne de caractères.',
+                en: 'Old password must be a string.'
+            },
+            code: 400
+        })
+    },
     lastname: {
         required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
