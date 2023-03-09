@@ -66,6 +66,7 @@ export default {
         PHONE_SPECIFY: "Veuillez renseignez votre numéro de téléphone",
         PASSWORD_SPECIFY: "Veuillez renseignez votre mot de passe",
         PASSWORD_CONFIRM_SPECIFY: "Veuillez confirmer votre mot de passe",
+        NAME_SPECIFY: "Veuillez renseignez le nom",
 
         FIRSTNAME_TOOLONG: "Le nom est trop long",
         LASTNAME_TOOLONG: "Le prénom est trop long",
