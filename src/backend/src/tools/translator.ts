@@ -87,22 +87,6 @@ const error = {
             code: 400
         })
     },
-    users: {
-        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Les utilisateurs doivent être un tableau de chaînes de caractères.',
-                en: 'Users must be an array of strings.'
-            },
-            code: 400
-        }),
-        maxPerRequest: (req: Request, length: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: `Vous ne pouvez pas ajouter plus de ${length} utilisateur${length > 1 ? 's' : ''} à la fois.`,
-                en: `You can't add more than ${length} user${length > 1 ? 's' : ''} at once.`
-            },
-            code: 400
-        })
-    },
     password: {
         required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
@@ -341,15 +325,15 @@ const error = {
     ville: {
         required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Le nom de la ville est requise.',
-                en: 'The City name is required.'
+                fr: 'Le nom de la ville est requis.',
+                en: 'City name is required.'
             },
             code: 400
         }),
         type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Le champ cityName doit être une chaîne de charactères.',
-                en: 'Field cityName must be a string.'
+                fr: 'Le nom de la ville doit être une chaîne de caractères.',
+                en: 'City name must be a string.'
             },
             code: 400
         })
@@ -527,40 +511,40 @@ const error = {
         }),
         type: (req: Request, fieldName: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Le champ "${fieldName}" doit être un string.`,
+                fr: `Le champ "${fieldName}" doit être une chaîne de caractères.`,
                 en: `Field "${fieldName}" must be a string.`
             },
             code: 400
         })
     },
-    etape: {
-        required: (req: Request, fieldName: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+    etapes: {
+        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Le champ "${fieldName}" est requis.`,
-                en: `Field "${fieldName}" is required.`
+                fr: 'Les étapes sont requises.',
+                en: 'Etapes are required.'
             },
             code: 400
         }),
         etapeMin: (req: Request, length: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Le nombre de villes dans un trajet est au minimum de ${length}.`,
-                en: `The minimum number of cities in a trip is ${length}.`
+                fr: `Un trajet doit comporter au minimum ${length} étape${length > 1 ? 's' : ''}.`,
+                en: `A trip must have at least ${length} step${length > 1 ? 's' : ''}.`
             },
             code: 400
         }),
-        type: (req: Request, fieldName: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Le champ "${fieldName}" doit être un objet.`,
-                en: `Field "${fieldName}" must be a object.`
+                fr: 'Les étapes doivent être un tableau.',
+                en: 'Etapes must be an array.'
             },
             code: 400
         })
     },
     maxPassengers: {
-        minPassenger: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        minPassenger: (req: Request, nb: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Le nombre de passagers doit être au minimum d\'une personne.',
-                en: 'The number of passengers must be at least one person.'
+                fr: `Le nombre de passagers doit être au minimum de ${nb} personne${nb > 1 ? 's' : ''}.`,
+                en: `The number of passengers must be at least ${nb} person${nb > 1 ? 's' : ''}.`
             },
             code: 400
         })
@@ -602,15 +586,15 @@ const error = {
     city: {
         required: (req: Request, field: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Le champ "${field}" est requis.`,
-                en: `Field "${field}" is required.`
+                fr: 'La ville est requise.',
+                en: 'City is required.'
             },
             code: 400
         }),
         type: (req: Request, field: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Le champ "${field}" doit être une chaîne de caractères.`,
-                en: `Field "${field}" must be a string.`
+                fr: 'La ville doit être une chaîne de caractères.',
+                en: 'City must be a string.'
             },
             code: 400
         })
@@ -726,15 +710,15 @@ const info = {
     notification: {
         deletedAll: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Toutes les notifications ont été supprimées',
-                en: 'All notifications have been removed'
+                fr: 'Notifications supprimées',
+                en: 'Notifications removed'
             },
             code: 200
         }),
         deletedOne: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'La notification a été supprimée',
-                en: 'The notification has been removed'
+                fr: 'Notification supprimée',
+                en: 'Notification removed'
             },
             code: 200
         })
