@@ -337,10 +337,10 @@ const error = {
             },
             code: 400
         }),
-        arrivalSoonDepart: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        isSame: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'La date de départ doit être antérieure à la date d\'arrivée.',
-                en: 'The departure date must be before to the arrival date.'
+                fr: 'Les dates mises sont les mêmes.',
+                en: 'The dates are the same.'
             },
             code: 400
         })

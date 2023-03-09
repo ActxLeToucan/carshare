@@ -308,7 +308,7 @@ function checkGroupNameField (name: any, req: express.Request, res: express.Resp
  * @param res Express response
  * @returns true if the date is valid, false otherwise
  */
-function checkDateField (date: any, req: express.Request, res: express.Response): boolean {
+function checkDateField (date: any, dateDays: boolean, req: express.Request, res: express.Response): boolean {
     if (date === undefined || date === '') {
         sendMsg(req, res, error.date.required);
         return false;
@@ -318,8 +318,18 @@ function checkDateField (date: any, req: express.Request, res: express.Response)
         return false;
     }
     if (new Date(date).getTime() < new Date().getTime()) {
-        sendMsg(req, res, error.date.tooSoon);
+        sendMsg(req, res, error.date.tooSoon, new Date());
         return false;
+    }
+
+    if (dateDays) {
+        const dateC = new Date();
+        dateC.setDate(dateC.getDate() + 1);
+
+        if (new Date(date) < dateC) {
+            sendMsg(req, res, error.date.tooSoon, dateC);
+            return false;
+        }
     }
     return true;
 }
@@ -399,43 +409,6 @@ function sanitizeUserId (id: any, req: express.Request, res: express.Response): 
     }
 
     return Number(id);
-}
-
-/**
- * Check if depart and arrival date is in a valid format
- * If the date is not valid, send an error message to the client
- * @param dateDepart Date to check
- * @param dateArrvial Date to check
- * @param req Express request
- * @param res Express response
- * @returns true if the date is valid, false otherwise
- */
-function checkDateDepartArrivalField (dateDepart: any, dateArrival: any, req: express.Request, res: express.Response): boolean {
-    if (dateDepart === undefined || dateDepart === '' || dateArrival === undefined || dateArrival === '') {
-        sendMsg(req, res, error.date.required);
-        return false;
-    }
-
-    const date = new Date();
-    date.setDate(date.getDate() + 1);
-
-    if (new Date(dateDepart) < date) {
-        sendMsg(req, res, error.date.tooSoon, date);
-        return false;
-    }
-    if (isNaN(new Date(dateDepart).getTime()) || isNaN(new Date(dateArrival).getTime())) {
-        sendMsg(req, res, error.date.invalid);
-        return false;
-    }
-    if (new Date(dateDepart) < new Date() || new Date(dateArrival) < new Date()) {
-        sendMsg(req, res, error.date.tooSoon, new Date());
-        return false;
-    }
-    if (new Date(dateArrival) < new Date(dateDepart)) {
-        sendMsg(req, res, error.date.arrivalSoonDepart);
-        return false;
-    }
-    return true;
 }
 
 /**
@@ -592,7 +565,8 @@ function checkListOfEtapeField (value: any, req: express.Request, res: express.R
         return false;
     }
     for (const i in value) {
-        // if (!checkDateDepartArrivalField(value[i].date, req, res)) return false;
+        if (!checkDateField(value[i].date, true, req, res)) return false;
+
         if (!checkStringField(value[i].label, req, res, 'label')) return false;
         if (!checkStringField(value[i].city, req, res, 'city')) return false;
         if (!checkStringField(value[i].context, req, res, 'context')) return false;
@@ -632,7 +606,6 @@ export {
     sanitizePhone,
     sanitizeGender,
     sanitizeUserId,
-    checkDateDepartArrivalField,
     checkMaxPassengersField,
     checkPriceField,
     checkStringField,
