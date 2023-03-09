@@ -1191,14 +1191,6 @@ components:
         id:
           type: integer
           example: 1
-        departureDate:
-          type: string
-          format: date-time
-          example: 2020-01-01T00:00:00.000Z
-        arrivalDate:
-          type: string
-          format: date-time
-          example: 2020-01-01T00:00:00.000Z
         maxPassengers:
           type: integer
           example: 4
@@ -1429,8 +1421,10 @@ components:
           type: integer
         travelId:
           type: integer
-        order:
-          type: integer
+        date:
+          type: string
+          format: date-time
+          example: 2020-01-01T00:00:00.000Z
     TravelCreate:
       type: object
       properties:
