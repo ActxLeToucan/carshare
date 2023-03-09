@@ -124,15 +124,15 @@ exports.cancelTravel = (req: express.Request, res: express.Response, next: expre
 
     const travel = req.body.travel;
 
-    if ( !(res.locals.user.id === travel.driver.id) ) {
-        sendMsg(req, res, error.);
+    if ( !(res.locals.user.id === travel.driver.id) && !(res.locals.user.level >= 1) ) {
+        sendMsg(req, res, error.auth.insufficientPrivileges);
         return;
     }
 
     const dateCheck = new Date(new Date(travel.date).getTime() - 1000 * 60 * 60 * 24);
 
     if ( !(travel.passagers === undefined || travel.passagers.length == 0) && dateCheck <= new Date() ) {
-        sendMsg(req, res, error.);
+        sendMsg(req, res, error.travel.unableToCancel);
         return;
     }
 
@@ -140,7 +140,7 @@ exports.cancelTravel = (req: express.Request, res: express.Response, next: expre
         where: { id: travel.id },
         data: { status: -1 }
     }).then(() => {
-        sendMsg(req, res, info.);
+        sendMsg(req, res, info.travel.successfulCancel);
         if ( travel.passagers === undefined || travel.passagers.length > 0 ){
             //Todo Send Notif
 

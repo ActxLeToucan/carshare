@@ -607,6 +607,15 @@ const error = {
             },
             code: 400
         })
+    },
+    travel: {
+        unableToCancel: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Annulement impossible 24h avant le départ d'un trajet qui possède des passagers.`,
+                en: `Impossible to cancel travel 24h before departure if it has at least one passenger.`
+            },
+            code: 400
+        })
     }
 } satisfies TranslationsMessageHTTP;
 
@@ -702,7 +711,14 @@ const info = {
                 travel,
                 numberOfEtape: nbEtape
             }
-        })
+        }),
+        successfulCancel: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `L'annulement du trajet a été effectué.`,
+                en: `Travel canceled successfully !`
+            },
+            code: 200
+        }),
     },
     group: {
         created: (req: Request, group: Group & { users: User[] }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
