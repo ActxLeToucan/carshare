@@ -83,9 +83,11 @@ class API {
         SIGNUP: "/users/signup",
         LOGIN: "/users/login",
         ME: "/users/me",
+        MY_PWD: "/users/me/password",
         VERIFY: "/users/email-verification",
         RESETPWD: "/users/password-reset",
-        USERS: "/users"
+        USERS: "/users",
+        GROUPS: "/groups/my"
     };
 
     /**
@@ -241,8 +243,8 @@ class API {
      * @param {number} per_page number of elements in one page
      * @returns a string corresponding to the pagination's parameters part of the url
      */
-    static createPagination(page, per_page) {
-        return this.createParameters({ page: page, per_page: per_page });
+    static createPagination(limit = 10, offset = 0) {
+        return this.createParameters({ offset: offset, limit: limit });
     }
 }
 

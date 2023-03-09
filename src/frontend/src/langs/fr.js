@@ -66,6 +66,7 @@ export default {
         PHONE_SPECIFY: "Veuillez renseignez votre numéro de téléphone",
         PASSWORD_SPECIFY: "Veuillez renseignez votre mot de passe",
         PASSWORD_CONFIRM_SPECIFY: "Veuillez confirmer votre mot de passe",
+        NAME_SPECIFY: "Veuillez renseignez le nom",
 
         FIRSTNAME_TOOLONG: "Le nom est trop long",
         LASTNAME_TOOLONG: "Le prénom est trop long",
@@ -102,15 +103,27 @@ export default {
     MY_GROUPS: "Mes groupes",
     PARAMS: "Paramètres",
 
+        // informations
+        CHANGING_PASSWORD: "Changement du mot de passe",
+        PASSWORD_CHANGED: "Mot de passe changé avec succès",
+        CHANGING_INFORMATIONS: "Changement des informations",
+        INFORMATIONS_CHANGED: "Informations changées avec succès",
+
         // groups
         NO_GROUPS: "Vous n'avez encore aucun groupe",
         NO_GROUPS_DESC: "Créez un groupe pour pouvoir partager vos trajets avec vos amis",
+        NO_USERS: "Il n'y encore aucun utilisateur",
+        NO_USERS_DESC: "Ajoutez des utilisateurs à votre groupe pour pouvoir partager vos trajets avec eux",
         CREATE_GROUP: "Créer un nouveau groupe",
         GROUP_CREATE_CONFIRMATION: "Veuillez renseigner les informations du groupe pour le créer",
         MEMBERS: "Membres",
         DELETE_GROUP: "Supprimer le groupe",
         GROUP_DELETE_CONFIRMATION: "Êtes-vous sûr de vouloir supprimer ce groupe ?\nCette action est irréversible.",
         GROUP_NAME: "Nom du groupe",
+        CREATING_GROUP: "Création du groupe",
+        GROUP_CREATED: "Groupe créé avec succès",
+        LOADING_GROUPS: "Chargement des groupes",
+        LOADING_GROUPS_DESC: "Veuillez patienter pendant que nous chargeons vos groupes",
 
     // informations
     ADDRESS_NOT_VERIFIED: "Adresse non vérifiée",
@@ -125,7 +138,6 @@ export default {
     // administration
     ADMINISTRATION: "Administration",
     USERS: "Utilisateurs",
-    GROUPS: "Groupes",
     TRIPS: "Trajets",
 
         // users
