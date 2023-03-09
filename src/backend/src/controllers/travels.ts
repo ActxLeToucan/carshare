@@ -2,6 +2,7 @@ import type express from 'express';
 import { prisma } from '../app';
 import * as properties from '../properties';
 import { error, info, sendMsg } from '../tools/translator';
+import { getPagination } from './_common';
 
 exports.myTravels = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     if (res.locals.user === undefined) {
@@ -9,12 +10,16 @@ exports.myTravels = (req: express.Request, res: express.Response, next: express.
         return;
     }
 
+    const pagination = getPagination(req);
+
     prisma.user.findMany({
         where: { id: res.locals.user.id },
         select: {
             travelsAsDriver: true,
             travelsAsPassenger: { select: { travel: true } }
-        }
+        },
+        skip: pagination.offset,
+        take: pagination.limit
     }).then(travel => {
         res.status(200).json(travel);
     }).catch((err) => {
