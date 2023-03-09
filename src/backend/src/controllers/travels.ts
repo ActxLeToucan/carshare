@@ -115,3 +115,32 @@ exports.createTravel = async (req: express.Request, res: express.Response, next:
       sendMsg(req, res, error.generic.internalError);
   });
 }
+
+exports.cancelTravel = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    if (res.locals.user === undefined) {
+        sendMsg(req, res, error.auth.noToken);
+        return;
+    }
+
+    const travel = req.body.travel;
+    const dateCheck = new Date(new Date(travel.date).getTime() - 1000 * 60 * 60 * 24);
+
+    if ( !(travel.passagers === undefined || travel.passagers.length == 0) && dateCheck <= new Date() ) {
+        sendMsg(req, res, error.);
+        return;
+    }
+
+    prisma.travel.update({
+        where: { id: travel.id },
+        data: { status: -1 }
+    }).then(() => {
+        sendMsg(req, res, info.);
+        if ( travel.passagers === undefined || travel.passagers.length > 0 ){
+            //Todo Send Notif
+
+        }
+    }).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
+}
