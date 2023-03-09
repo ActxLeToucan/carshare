@@ -103,6 +103,12 @@ export default {
     MY_GROUPS: "Mes groupes",
     PARAMS: "Paramètres",
 
+        // informations
+        CHANGING_PASSWORD: "Changement du mot de passe",
+        PASSWORD_CHANGED: "Mot de passe changé avec succès",
+        CHANGING_INFORMATIONS: "Changement des informations",
+        INFORMATIONS_CHANGED: "Informations changées avec succès",
+
         // groups
         NO_GROUPS: "Vous n'avez encore aucun groupe",
         NO_GROUPS_DESC: "Créez un groupe pour pouvoir partager vos trajets avec vos amis",
@@ -132,7 +138,6 @@ export default {
     // administration
     ADMINISTRATION: "Administration",
     USERS: "Utilisateurs",
-    GROUPS: "Groupes",
     TRIPS: "Trajets",
 
         // users
