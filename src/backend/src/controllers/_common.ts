@@ -2,7 +2,7 @@ import type express from 'express';
 import * as properties from '../properties';
 
 /**
- * Gets pagination query params in the request and returns an object with those values.
+ * Gets pagination query params in the request and returns an object with those values after sanitization.
  * Offset is a positive number, default to 0.
  * Limit is a number between [{@link properties.p.query.minLimit}...{@link properties.p.query.maxLimit}], default {@link properties.p.query.maxLimit}.
  * @param req The express request.
