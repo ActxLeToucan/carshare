@@ -317,6 +317,10 @@ function checkDateField (date: any, req: express.Request, res: express.Response)
         sendMsg(req, res, error.date.invalid);
         return false;
     }
+    if (new Date(date).getTime() < new Date().getTime()) {
+        sendMsg(req, res, error.date.tooSoon);
+        return false;
+    }
     return true;
 }
 

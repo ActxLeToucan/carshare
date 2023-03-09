@@ -37,12 +37,11 @@ exports.searchTravels = (req: express.Request, res: express.Response, next: expr
     const date1 = new Date(new Date(date as string).getTime() - 1000 * 60 * 60);
     const date2 = new Date(new Date(date as string).getTime() + 1000 * 60 * 60);
 
-    // TODO: verifier les dates sur les etapes
     prisma.$queryRaw`select t.*
                      from travel t
                               inner join etape e1 on e1.travelId = t.id and e1.city = ${startCity}
                               inner join etape e2 on e2.travelId = t.id and e2.city = ${endCity}
-                     where e1.\`order\` < e2.\`order\`
+                     where e1.date < e2.date
                        and t.arrivalDate BETWEEN ${date1} and ${date2}`
         .then((data) => {
             res.status(200).json(data);
@@ -61,6 +60,7 @@ exports.createTravel = async (req: express.Request, res: express.Response, next:
     const { maxPassengers, price, description, groupId, listOfEtape } = req.body;
 
     // if (!properties.checkDateDepartArrivalField(departureDate,arrivalDate, req, res)) return;
+
     if (!properties.checkMaxPassengersField(maxPassengers, req, res)) return;
     if (!properties.checkPriceField(price, req, res)) return;
     if (!properties.checkDescriptionField(description, req, res, 'description')) return;
@@ -104,6 +104,7 @@ exports.createTravel = async (req: express.Request, res: express.Response, next:
             lng: listOfEtape[index].lng,
             travelId: travel.id,
             date: listOfEtape[index].date
+
         }))
 
         prisma.etape.createMany({
