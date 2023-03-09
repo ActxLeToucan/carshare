@@ -317,6 +317,10 @@ function checkDateField (date: any, req: express.Request, res: express.Response)
         sendMsg(req, res, error.date.invalid);
         return false;
     }
+    if (new Date(date).getTime() < new Date().getTime()) {
+        sendMsg(req, res, error.date.tooSoon);
+        return false;
+    }
     return true;
 }
 
@@ -415,11 +419,11 @@ function checkDateDepartArrivalField (dateDepart: any, dateArrival: any, req: ex
     const date = new Date();
     date.setDate(date.getDate() + 1);
 
-    if(new Date(dateDepart) < date){
+    if (new Date(dateDepart) < date) {
         sendMsg(req, res, error.date.tooSoon, date);
         return false;
     }
-    if (isNaN(new Date(dateDepart).getTime()) || isNaN(new Date(dateArrival).getTime()) ) {
+    if (isNaN(new Date(dateDepart).getTime()) || isNaN(new Date(dateArrival).getTime())) {
         sendMsg(req, res, error.date.invalid);
         return false;
     }
@@ -427,7 +431,7 @@ function checkDateDepartArrivalField (dateDepart: any, dateArrival: any, req: ex
         sendMsg(req, res, error.date.tooSoon, new Date());
         return false;
     }
-    if(new Date(dateArrival) < new Date(dateDepart)){
+    if (new Date(dateArrival) < new Date(dateDepart)) {
         sendMsg(req, res, error.date.arrivalSoonDepart);
         return false;
     }

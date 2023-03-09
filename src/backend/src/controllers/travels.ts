@@ -37,12 +37,11 @@ exports.searchTravels = (req: express.Request, res: express.Response, next: expr
     const date1 = new Date(new Date(date as string).getTime() - 1000 * 60 * 60);
     const date2 = new Date(new Date(date as string).getTime() + 1000 * 60 * 60);
 
-    // TODO: verifier les dates sur les etapes
     prisma.$queryRaw`select t.*
                      from travel t
                               inner join etape e1 on e1.travelId = t.id and e1.city = ${startCity}
                               inner join etape e2 on e2.travelId = t.id and e2.city = ${endCity}
-                     where e1.\`order\` < e2.\`order\`
+                     where e1.date < e2.date
                        and t.arrivalDate BETWEEN ${date1} and ${date2}`
         .then((data) => {
             res.status(200).json(data);
@@ -60,19 +59,19 @@ exports.createTravel = async (req: express.Request, res: express.Response, next:
 
     const { departureDate, arrivalDate, maxPassengers, price, description, groupId, listOfEtape } = req.body;
 
-  if (!properties.checkDateDepartArrivalField(departureDate,arrivalDate,  req, res)) return;
-  if (!properties.checkMaxPassengersField(maxPassengers, req, res)) return;
-  if (!properties.checkPriceField(price, req, res)) return;
-  if (!properties.checkDescriptionField(description, req, res, 'description')) return;
+    if (!properties.checkDateDepartArrivalField(departureDate, arrivalDate, req, res)) return;
+    if (!properties.checkMaxPassengersField(maxPassengers, req, res)) return;
+    if (!properties.checkPriceField(price, req, res)) return;
+    if (!properties.checkDescriptionField(description, req, res, 'description')) return;
 
-  if (typeof groupId === 'number') {
-      try {
-          const count = await prisma.group.count({
-              where: {
-                  id: groupId,
-                  creatorId: res.locals.user.id
-              }
-          });
+    if (typeof groupId === 'number') {
+        try {
+            const count = await prisma.group.count({
+                where: {
+                    id: groupId,
+                    creatorId: res.locals.user.id
+                }
+            });
 
             if (count === 0) {
                 sendMsg(req, res, error.group.notFound);
@@ -99,13 +98,13 @@ exports.createTravel = async (req: express.Request, res: express.Response, next:
     }).then((travel) => {
         const data = Array.from({ length: listOfEtape.length }).map((value, index, array) => ({
 
-          label: listOfEtape[index].label,
-          city: listOfEtape[index].city,
-          context: listOfEtape[index].context,
-          lat: listOfEtape[index].lat,
-          lng: listOfEtape[index].lng,
-          travelId: travel.id,
-      }))
+            label: listOfEtape[index].label,
+            city: listOfEtape[index].city,
+            context: listOfEtape[index].context,
+            lat: listOfEtape[index].lat,
+            lng: listOfEtape[index].lng,
+            travelId: travel.id
+        }))
 
         prisma.etape.createMany({
             data
