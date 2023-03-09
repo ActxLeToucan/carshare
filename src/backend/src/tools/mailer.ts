@@ -2,6 +2,13 @@ import nodemailer from 'nodemailer';
 import mailConfig from '../../mail.config.json';
 import { type Mail } from './translator';
 
+export class MailerError extends Error {
+    constructor (message: string) {
+        super(message);
+        this.name = 'MailerError';
+    }
+}
+
 let transporter: nodemailer.Transporter | undefined;
 
 async function initMailer () {
@@ -27,8 +34,7 @@ async function initMailer () {
 
 async function sendMail ({ to, subject, text, html }: Mail) {
     if (transporter === undefined) {
-        console.warn('Mailer disabled, cannot send email: ', { to, subject })
-        return;
+        throw new MailerError(`Mailer disabled. Cannot send email '${subject}' to '${to}'.`);
     }
 
     if (process.env.NODE_ENV !== 'production') {

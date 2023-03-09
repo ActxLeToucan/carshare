@@ -7,6 +7,7 @@ import * as properties from '../properties';
 import * as _user from './users/_common';
 import { type Prisma } from '@prisma/client';
 import { getPagination } from './_common';
+import { MailerError } from '../tools/mailer';
 
 exports.signup = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const { email, password, lastName, firstName, phone, hasCar, gender } = req.body;
@@ -144,6 +145,10 @@ exports.passwordResetSendEmail = (req: express.Request, res: express.Response, n
                 });
         }).catch((err) => {
             console.error(err);
+            if (err instanceof MailerError) {
+                sendMsg(req, res, error.mailer.disabled);
+                return;
+            }
             sendMsg(req, res, error.generic.internalError);
         });
 }
@@ -222,6 +227,10 @@ exports.emailVerificationSendEmail = (req: express.Request, res: express.Respons
             });
         }).catch((err) => {
             console.error(err);
+            if (err instanceof MailerError) {
+                sendMsg(req, res, error.mailer.disabled);
+                return;
+            }
             sendMsg(req, res, error.generic.internalError);
         });
 }
@@ -250,7 +259,7 @@ exports.getAllUsers = (req: express.Request, res: express.Response, next: expres
     const firstName = String(req.query.firstName ?? '');
     const email = String(req.query.email ?? '');
 
-    const where: {lastName?: any, firstName?: any, email?: any} = {};
+    const where: { lastName?: any, firstName?: any, email?: any } = {};
     if (lastName !== '') { where.lastName = { startsWith: lastName }; }
     if (firstName !== '') { where.firstName = { startsWith: firstName }; }
     if (email !== '') { where.email = { startsWith: email }; }

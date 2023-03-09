@@ -460,6 +460,13 @@ const error = {
                 en: `An email has already been sent to this address less than ${translate(req, cooldown)} ago. Please wait before trying again.`
             },
             code: 429
+        }),
+        disabled: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'L\'envoi d\'email est désactivé sur ce serveur.',
+                en: 'Email sending is disabled on this server.'
+            },
+            code: 500
         })
     },
     documentation: {
