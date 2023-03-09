@@ -900,7 +900,7 @@ paths:
     get:
       summary: Get the list of notifications
       description: Get all the notifications of the current user.
-      operationId: getAllUsers
+      operationId: myNotifications
       tags:
         - Notifications
       parameters:
