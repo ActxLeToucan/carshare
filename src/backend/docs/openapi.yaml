@@ -309,6 +309,9 @@ paths:
               properties:
                 password:
                   type: string
+                  example: New_Password123
+                oldPassword:
+                  type: string
                   example: Password123$
       responses:
         '200':
@@ -490,7 +493,7 @@ paths:
   /users:
     get:
       summary: Get all users
-      description: Get all users ordered by their internal id. Only available to admins.
+      description: Get all users ordered by their internal id. Only available to admins. Filters (`lastName`, `firstName`, `email`) can be combined together.
       operationId: getAllUsers
       tags:
         - Users
@@ -511,6 +514,21 @@ paths:
             minimum: 0
             default: 0
           description: The number of users to skip before starting to collect the result set
+        - in: query
+          name: lastName
+          schema:
+            type: string
+          description: Filters results based on last names starting with this value (case-insensitive)
+        - in: query
+          name: firstName
+          schema:
+            type: string
+          description: Filters results based on first names starting with this value (case-insensitive)
+        - in: query
+          name: email
+          schema:
+            type: string
+          description: Filters results based on emails starting with this value (case-insensitive)
       security:
         - bearerAuth: [ ]
       responses:
@@ -663,6 +681,86 @@ paths:
           $ref: '#/components/responses/noToken'
         '403':
           $ref: '#/components/responses/insufficientPrivileges'
+        '404':
+          $ref: '#/components/responses/userNotFound'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+  /travel/create:
+    post:
+      summary: create a new travel
+      description: create a new travel with etape
+      tags:
+        - Travels
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                departureDate:
+                  type: string
+                  example: 2023-03-16T09:15:36.000Z
+                arrivalDate:
+                  type: string
+                  example: 2023-03-17T09:15:36.000Z
+                maxPassengers:
+                  type: integer
+                  example: 10
+                price:
+                  type: integer
+                  example: 78
+                description:
+                  type: string
+                  example: Voyage non fumeur
+                groupId:
+                  type: integer
+                  example: null
+                listOfEtape:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Etape'
+                  example:
+                    - label: 2ter Boulevard Charlemagne 54000 Nancy
+                      city: Nancy
+                      context: 54, Meurthe-et-Moselle, Grand Est
+                      lat: 48.683188
+                      lng: 6.1877
+                    - label: 2ter Boulevard Charlemagne 54000 Laxou
+                      city: Laxou
+                      context: 54, Meurthe-et-Moselle, Grand Est
+                      lat: 49.683188
+                      lng: 6.5877
+                    - label: 1801 chemin Napoléon 55000 Metz
+                      city: Metz
+                      context: 55, Moselle, Grand Est
+                      lat: 78.683188
+                      lng: 6.1877
+
+      responses:
+        '201':
+          description: travel create
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TravelCreate'
+        '401':
+          $ref: '#/components/responses/noToken'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Date is required.
         '404':
           $ref: '#/components/responses/userNotFound'
         '498':
@@ -1153,6 +1251,11 @@ components:
         email:
           type: string
           example: john@example.com
+        emailVerifiedOn:
+          type: string
+          format: date-time
+          nullable: true
+          default: null
         firstName:
           type: string
           example: John
@@ -1175,11 +1278,6 @@ components:
         level:
           type: integer
           default: 0
-        emailVerifiedOn:
-          type: string
-          format: date-time
-          nullable: true
-          default: null
     PrivateUser:
       type: object
       properties:
@@ -1189,6 +1287,11 @@ components:
         email:
           type: string
           example: john@example.com
+        emailVerifiedOn:
+          type: string
+          format: date-time
+          nullable: true
+          default: null
         firstName:
           type: string
           example: John
@@ -1217,11 +1320,6 @@ components:
         createdAt:
           type: string
           format: date-time
-        emailVerifiedOn:
-          type: string
-          format: date-time
-          nullable: true
-          default: null
     ArrayOfPrivateUsers:
       type: array
       items:
@@ -1229,6 +1327,7 @@ components:
       example:
         - id: 1
           email: bob@example.com
+          emailVerifiedOn: 2023-01-26T15:26:31.144Z
           firstName: Bob
           lastName: LeBricoleur
           phone: "0321456789"
@@ -1238,9 +1337,9 @@ components:
           mailNotif: true
           level: 3
           createdAt: 2023-01-26T15:26:31.144Z
-          emailVerifiedOn: 2023-01-26T15:26:31.144Z
         - id: 2
           email: laia@cat.world
+          emailVerifiedOn: 2023-02-18T13:19:23.636Z
           firstName: Laia
           lastName: Kitten
           phone: "+330612345678"
@@ -1250,7 +1349,6 @@ components:
           mailNotif: true
           level: 1
           createdAt: 2023-02-18T13:19:23.636Z
-          emailVerifiedOn: 2023-02-18T13:19:23.636Z
     ArrayOfTravels:
       type: array
       items:
@@ -1295,7 +1393,7 @@ components:
           userId: 1
           travelId: null
           createdAt: 2023-02-27T18:00:09.000Z
-    
+
     Notification:
       type: object
       properties:
@@ -1314,3 +1412,61 @@ components:
         createdAt:
           type: string
           format: date-time
+    Etape:
+      type: object
+      properties:
+        id:
+          type: integer
+        label:
+          type: string
+        city:
+          type: string
+        context:
+          type: string
+        lat:
+          type: integer
+        lng:
+          type: integer
+        travelId:
+          type: integer
+        order:
+          type: integer
+    TravelCreate:
+      type: object
+      properties:
+        message:
+          type: string
+          example: "Travel created"
+        travel:
+          type: object
+          properties:
+            id:
+              type: integer
+              example: 2
+            departureDate:
+              type: string
+              example: 2023-03-16T09:15:36.000Z
+            arrivalDate:
+              type: string
+              example: 2023-03-17T09:15:36.000Z
+            maxPassengers:
+              type: integer
+              example: 10
+            price:
+              type: integer
+              example: 78
+            description:
+              type: string
+              example: Voyage non fumeur
+            groupId:
+              type: integer
+              example: null
+            createdAt:
+              type: string
+              example: 2023-03-05T13:30:41.483Z
+        numberOfEtape:
+          type: object
+          properties:
+            count:
+              type: integer
+              example: 3

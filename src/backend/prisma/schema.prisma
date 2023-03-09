@@ -43,21 +43,21 @@ model Travel {
   price         Float          @default(0)
   description   String?        @db.Text
   status        Int            @default(0)
-  driver        User           @relation(fields: [driverId], references: [id], name: "driver")
+  driver        User           @relation(fields: [driverId], references: [id], name: "driver", onDelete: Cascade)
   driverId      Int
   passengers    Passenger[]
   etapes        Etape[]
   evaluations   Evaluation[]
   notifications Notification[]
-  group         Group?         @relation(fields: [groupId], references: [id])
+  group         Group?         @relation(fields: [groupId], references: [id], onDelete: SetNull)
   groupId       Int?
   createdAt     DateTime       @default(now())
 }
 
 model Passenger {
-  travel      Travel  @relation(fields: [travelId], references: [id])
+  travel      Travel  @relation(fields: [travelId], references: [id], onDelete: Cascade)
   travelId    Int
-  passenger   User    @relation(fields: [passengerId], references: [id])
+  passenger   User    @relation(fields: [passengerId], references: [id], onDelete: Cascade)
   passengerId Int
   status      Int     @default(0)
   comment     String? @db.Text
@@ -72,7 +72,7 @@ model Etape {
   context  String @db.Text // ex: "54, Meurthe-et-Moselle, Grand Est"
   lat      Float // ex: 48.683188
   lng      Float // ex: 6.161877
-  travel   Travel @relation(fields: [travelId], references: [id])
+  travel   Travel @relation(fields: [travelId], references: [id], onDelete: Cascade)
   travelId Int
   order    Int
 }
@@ -80,11 +80,11 @@ model Etape {
 model Evaluation {
   id          Int      @id @default(autoincrement())
   note        Int
-  travel      Travel   @relation(fields: [travelId], references: [id])
+  travel      Travel   @relation(fields: [travelId], references: [id], onDelete: Cascade)
   travelId    Int
-  evaluator   User     @relation(fields: [evaluatorId], references: [id], name: "evaluator")
+  evaluator   User     @relation(fields: [evaluatorId], references: [id], name: "evaluator", onDelete: Cascade)
   evaluatorId Int
-  evaluated   User     @relation(fields: [evaluatedId], references: [id], name: "evaluated")
+  evaluated   User     @relation(fields: [evaluatedId], references: [id], name: "evaluated", onDelete: Cascade)
   evaluatedId Int
   createdAt   DateTime @default(now())
 }
@@ -94,9 +94,9 @@ model Notification {
   action    String?  @db.Text
   title     String   @db.Text
   message   String   @db.Text
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    Int
-  travel    Travel?  @relation(fields: [travelId], references: [id])
+  travel    Travel?  @relation(fields: [travelId], references: [id], onDelete: SetNull)
   travelId  Int?
   createdAt DateTime @default(now())
 }
@@ -104,7 +104,7 @@ model Notification {
 model Group {
   id        Int      @id @default(autoincrement())
   name      String   @db.Text
-  creator   User     @relation(fields: [creatorId], references: [id], name: "creator")
+  creator   User     @relation(fields: [creatorId], references: [id], name: "creator", onDelete: Cascade)
   creatorId Int
   users     User[]   @relation("users")
   travels   Travel[]
