@@ -1,3 +1,4 @@
+import { User } from '@prisma/client';
 import type express from 'express';
 import { prisma } from '../app';
 import * as properties from '../properties';
@@ -142,8 +143,27 @@ exports.cancelTravel = (req: express.Request, res: express.Response, next: expre
     }).then(() => {
         sendMsg(req, res, info.travel.successfulCancel);
         if ( travel.passagers === undefined || travel.passagers.length > 0 ){
-            //Todo Send Notif
+            let template = {
+                title: ,
+                message: ,
+                userId: 0,
+                travelId: travel.id,
+                createdAt: new Date()
+            };
+            let data: any[] = [];
+            travel.passagers.array.forEach((element: User) => {
+                template.userId = element.id
+                data.push(template)
+            });
 
+            prisma.notification.createMany({
+                data
+            }).then(() => {
+                sendMsg(req, res, info.notification.sent);
+            }).catch((err) => {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
+            });
         }
     }).catch((err) => {
         console.error(err);

@@ -746,10 +746,34 @@ const info = {
                 en: 'The notification has been removed'
             },
             code: 200
+        }),
+        sent: (req: Request, user: User) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Les notications ont étés envoyés.',
+                en: 'The notications have been sent.'
+            },
+            code: 200,
         })
     }
 
 } satisfies TranslationsMessageHTTP;
+
+const notification = {
+    cancelTravel: {
+        titel: (req: Request, user: User, token: string) => msgForLang<>(req, {
+            msg: {
+                fr: "Annulation d'un trajet",
+                eng: "A travel has been canceled"
+            }
+        }),
+        core: (req: Request, user: User, token: string) => msgForLang<>(req, {
+            msg: {
+                fr: `Le trajet à destination de "" à "" départ le "" a été annulé.`,
+                eng: `The travel to "" from "" at "" has been canceled.` 
+            }
+        })
+    }
+} 
 
 const mail = {
     password: {
