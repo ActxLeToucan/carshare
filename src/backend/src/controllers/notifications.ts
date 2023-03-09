@@ -5,11 +5,6 @@ import * as properties from '../properties';
 import { getPagination } from './_common';
 
 exports.myNotifications = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
-
     const pagination = getPagination(req);
 
     prisma.notification.findMany({
@@ -25,11 +20,6 @@ exports.myNotifications = (req: express.Request, res: express.Response, next: ex
 }
 
 exports.deleteAllNotification = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
-
     prisma.notification.deleteMany({
         where: { userId: res.locals.user.id }
 
@@ -42,10 +32,6 @@ exports.deleteAllNotification = (req: express.Request, res: express.Response, ne
 }
 
 exports.deleteOneNotification = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
     const notifId = properties.sanitizeNotificationId(req.params.id, req, res);
     if (notifId === null) return;
 

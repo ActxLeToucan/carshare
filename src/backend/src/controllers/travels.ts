@@ -5,11 +5,6 @@ import { error, info, sendMsg } from '../tools/translator';
 import { getPagination } from './_common';
 
 exports.myTravels = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
-
     const pagination = getPagination(req);
 
     prisma.user.findMany({
@@ -29,11 +24,6 @@ exports.myTravels = (req: express.Request, res: express.Response, next: express.
 }
 
 exports.searchTravels = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
-
     const { date, startCity, endCity } = req.query;
     if (!properties.checkCityField(startCity, req, res, 'startCity')) return;
     if (!properties.checkCityField(endCity, req, res, 'endCity')) return;
@@ -58,11 +48,6 @@ exports.searchTravels = (req: express.Request, res: express.Response, next: expr
 }
 
 exports.createTravel = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
-
     const { departureDate, arrivalDate, maxPassengers, price, description, groupId, listOfEtape } = req.body;
 
     if (!properties.checkDateDepartArrivalField(departureDate, req, res)) return;

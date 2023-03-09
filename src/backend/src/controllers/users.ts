@@ -154,10 +154,6 @@ exports.passwordResetSendEmail = (req: express.Request, res: express.Response, n
 }
 
 exports.updatePassword = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
     if (!properties.checkPasswordField(req.body.password, req, res)) return;
     if (!properties.checkOldPasswordField(req.body.oldPassword, req, res)) return;
 
@@ -190,11 +186,6 @@ exports.updatePassword = (req: express.Request, res: express.Response, next: exp
 }
 
 exports.emailVerificationSendEmail = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
-
     if (res.locals.user.emailVerifiedOn !== null) {
         sendMsg(req, res, error.email.alreadyVerified);
         return;
@@ -236,11 +227,6 @@ exports.emailVerificationSendEmail = (req: express.Request, res: express.Respons
 }
 
 exports.emailVerification = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
-
     prisma.user.update({
         where: { id: res.locals.user.id },
         data: { emailVerifiedOn: new Date() }
