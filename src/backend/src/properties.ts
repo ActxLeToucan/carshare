@@ -415,11 +415,11 @@ function checkDateDepartArrivalField (dateDepart: any, dateArrival: any, req: ex
     const date = new Date();
     date.setDate(date.getDate() + 1);
 
-    if(new Date(dateDepart) < date){
+    if (new Date(dateDepart) < date) {
         sendMsg(req, res, error.date.tooSoon, date);
         return false;
     }
-    if (isNaN(new Date(dateDepart).getTime()) || isNaN(new Date(dateArrival).getTime()) ) {
+    if (isNaN(new Date(dateDepart).getTime()) || isNaN(new Date(dateArrival).getTime())) {
         sendMsg(req, res, error.date.invalid);
         return false;
     }
@@ -427,7 +427,7 @@ function checkDateDepartArrivalField (dateDepart: any, dateArrival: any, req: ex
         sendMsg(req, res, error.date.tooSoon, new Date());
         return false;
     }
-    if(new Date(dateArrival) < new Date(dateDepart)){
+    if (new Date(dateArrival) < new Date(dateDepart)) {
         sendMsg(req, res, error.date.arrivalSoonDepart);
         return false;
     }
@@ -588,6 +588,7 @@ function checkListOfEtapeField (value: any, req: express.Request, res: express.R
         return false;
     }
     for (const i in value) {
+        // if (!checkDateDepartArrivalField(value[i].date, req, res)) return false;
         if (!checkStringField(value[i].label, req, res, 'label')) return false;
         if (!checkStringField(value[i].city, req, res, 'city')) return false;
         if (!checkStringField(value[i].context, req, res, 'context')) return false;

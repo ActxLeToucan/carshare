@@ -339,8 +339,8 @@ const error = {
         }),
         arrivalSoonDepart: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `La date de départ doit être antérieure à la date d'arrivée.`,
-                en: `The departure date must be before to the arrival date.`
+                fr: 'La date de départ doit être antérieure à la date d\'arrivée.',
+                en: 'The departure date must be before to the arrival date.'
             },
             code: 400
         })

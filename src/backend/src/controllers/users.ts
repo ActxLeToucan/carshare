@@ -254,7 +254,7 @@ exports.getAllUsers = (req: express.Request, res: express.Response, next: expres
     const firstName = String(req.query.firstName ?? '');
     const email = String(req.query.email ?? '');
 
-    const where: {lastName?: any, firstName?: any, email?: any} = {};
+    const where: { lastName?: any, firstName?: any, email?: any } = {};
     if (lastName !== '') { where.lastName = { startsWith: lastName }; }
     if (firstName !== '') { where.firstName = { startsWith: firstName }; }
     if (email !== '') { where.email = { startsWith: email }; }
