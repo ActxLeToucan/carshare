@@ -26,7 +26,7 @@
                 <div
                     ref="user-log-zone"
                     class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
-                    style="max-height: 0px;"
+                    style="max-height: 0;"
                 ></div>
                 <div class="flex md:flex-row flex-col md:space-x-4 md:space-y-0 space-y-2 mt-4">
                     <button-block :action="deleteAccount" color="red"> {{ lang.DELETE_ACCOUNT }} </button-block>
@@ -44,7 +44,7 @@
                 <div
                     ref="password-log-zone"
                     class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
-                    style="max-height: 0px;"
+                    style="max-height: 0;"
                 ></div>
                 <div class="flex grow justify-end">
                     <button-block :action="updatePassword" :disabled="!formPassword.buttonEnabled"> {{ lang.EDIT }} </button-block>
@@ -139,7 +139,7 @@ export default {
         removeAccount(popup) {
             return new Promise((resolve, reject) => {
                 const log = popup.log("Suppression du compte...", Log.INFO);
-                API.execute_logged(API.ROUTE.ME, API.METHOD.DELETE, User.CurrentUser?.getCredentials(), {password: popup.get("password")}).then(res => {
+                API.execute_logged(API.ROUTE.ME, API.METHOD.DELETE, User.CurrentUser?.getCredentials(), {password: popup.get("password")}).then(_ => {
                     log.update("Compte supprimé avec succès !", Log.SUCCESS);
                     setTimeout(() => {
                         log.delete();
@@ -172,6 +172,7 @@ export default {
             this.$router.push('/');
         },
         updatePassword() {
+            this.formPassword.buttonEnabled = false;
             const log = this.passwordLog(Lang.CurrentLang.INPUT_VERIFICATION + " ...", Log.INFO);
             
             const field_checks = [
@@ -197,12 +198,11 @@ export default {
             }
 
             log.update(Lang.CurrentLang.CHANGING_PASSWORD, Log.WARNING);
-            this.formPassword.buttonEnabled = false;
             const data = {
                 oldPassword: this.formPassword.old,
                 password: this.formPassword.new
             };
-            API.execute_logged(API.ROUTE.MY_PWD, API.METHOD.PATCH, User.CurrentUser?.getCredentials(), data).then((res) => {
+            API.execute_logged(API.ROUTE.MY_PWD, API.METHOD.PATCH, User.CurrentUser?.getCredentials(), data).then((_) => {
                 this.formPassword.old = "";
                 this.formPassword.new = "";
                 this.formPassword.confirm = "";
@@ -216,6 +216,7 @@ export default {
             });
         },
         updateAccount() {
+            this.formProperties.buttonEnabled = false;
             const log = this.userLog(Lang.CurrentLang.INPUT_VERIFICATION + " ...", Log.INFO);
             
             const field_checks = [
@@ -242,7 +243,6 @@ export default {
             }
 
             log.update(Lang.CurrentLang.CHANGING_INFORMATIONS, Log.WARNING);
-            this.formProperties.buttonEnabled = false;
             
             const data = {};
             for (const prop of Object.keys(this.formProperties.properties)) {
