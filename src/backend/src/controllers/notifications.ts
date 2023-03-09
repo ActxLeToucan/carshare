@@ -2,6 +2,7 @@ import type express from 'express';
 import { prisma } from '../app';
 import { error, info, sendMsg } from '../tools/translator';
 import * as properties from '../properties';
+import { getPagination } from './_common';
 
 exports.myNotifications = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     if (res.locals.user === undefined) {
@@ -9,9 +10,12 @@ exports.myNotifications = (req: express.Request, res: express.Response, next: ex
         return;
     }
 
-    prisma.notification.findMany({
-        where: { userId: res.locals.user.id }
+    const pagination = getPagination(req);
 
+    prisma.notification.findMany({
+        where: { userId: res.locals.user.id },
+        skip: pagination.offset,
+        take: pagination.limit
     }).then(notifications => {
         res.status(200).json(notifications);
     }).catch((err) => {

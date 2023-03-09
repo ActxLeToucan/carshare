@@ -905,6 +905,21 @@ paths:
         - Notifications
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 50
+            minimum: 1
+            maximum: 50
+          description: The number of notifications to return
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: The number of notifications to skip before starting to collect the result set
       security:
         - bearerAuth: [ ]
       responses:
