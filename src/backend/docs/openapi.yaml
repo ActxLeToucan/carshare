@@ -776,6 +776,21 @@ paths:
         - Travels
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 50
+            minimum: 1
+            maximum: 50
+          description: The number of travels to return
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: The number of travels to skip before starting to collect the result set
       security:
         - bearerAuth: [ ]
       responses:
@@ -900,11 +915,26 @@ paths:
     get:
       summary: Get the list of notifications
       description: Get all the notifications of the current user.
-      operationId: getAllUsers
+      operationId: myNotifications
       tags:
         - Notifications
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 50
+            minimum: 1
+            maximum: 50
+          description: The number of notifications to return
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: The number of notifications to skip before starting to collect the result set
       security:
         - bearerAuth: [ ]
       responses:
@@ -1057,6 +1087,21 @@ paths:
         - Groups
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
+        - in: query
+          name: limit
+          schema:
+            type: integer
+            default: 50
+            minimum: 1
+            maximum: 50
+          description: The number of groups to return
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+          description: The number of groups to skip before starting to collect the result set
       security:
         - bearerAuth: [ ]
       responses:

@@ -6,6 +6,7 @@ import { displayableUserPrivate, error, info, mail, sendMail, sendMsg } from '..
 import * as properties from '../properties';
 import * as _user from './users/_common';
 import { type Prisma } from '@prisma/client';
+import { getPagination } from './_common';
 
 exports.signup = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const { email, password, lastName, firstName, phone, hasCar, gender } = req.body;
@@ -243,12 +244,7 @@ exports.emailVerification = (req: express.Request, res: express.Response, next: 
 }
 
 exports.getAllUsers = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const offset = Number.isNaN(Number(req.query.offset)) ? 0 : Math.max(0, Number(req.query.offset)); // default 0, min 0
-    const limit = Number.isNaN(Number(req.query.limit))
-        ? properties.p.query.maxLimit // default
-        : Math.min(properties.p.query.maxLimit,
-            Math.max(properties.p.query.minLimit, Number(req.query.limit))
-        ); // default max, min p.query.minLimit, max p.query.maxLimit
+    const pagination = getPagination(req);
 
     const lastName = String(req.query.lastName ?? '');
     const firstName = String(req.query.firstName ?? '');
@@ -261,8 +257,8 @@ exports.getAllUsers = (req: express.Request, res: express.Response, next: expres
 
     prisma.user.findMany<Prisma.UserFindManyArgs>({
         where,
-        skip: offset,
-        take: limit,
+        skip: pagination.offset,
+        take: pagination.limit,
         orderBy: [
             {
                 id: 'asc'
