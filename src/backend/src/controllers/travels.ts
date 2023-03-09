@@ -58,15 +58,19 @@ exports.createTravel = async (req: express.Request, res: express.Response, next:
 
   const { departureDate, arrivalDate, maxPassengers, price, description, groupId, listOfEtape } = req.body;
 
-  if (!properties.checkDateDepartArrivalField(departureDate, req, res)) return;
-  if (!properties.checkDateDepartArrivalField(arrivalDate, req, res)) return;
+  if (!properties.checkDateDepartArrivalField(departureDate,arrivalDate,  req, res)) return;
   if (!properties.checkMaxPassengersField(maxPassengers, req, res)) return;
   if (!properties.checkPriceField(price, req, res)) return;
   if (!properties.checkDescriptionField(description, req, res, 'description')) return;
 
   if (typeof groupId === 'number') {
       try {
-          const count = await prisma.group.count({ where: { id: groupId } });
+          const count = await prisma.group.count({
+              where: {
+                  id: groupId,
+                  creatorId: res.locals.user.id
+              }
+          });
 
           if (count === 0) {
               sendMsg(req, res, error.group.notFound);
@@ -99,7 +103,6 @@ exports.createTravel = async (req: express.Request, res: express.Response, next:
           lat: listOfEtape[index].lat,
           lng: listOfEtape[index].lng,
           travelId: travel.id,
-          order: index
       }))
 
       prisma.etape.createMany({

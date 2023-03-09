@@ -400,22 +400,35 @@ function sanitizeUserId (id: any, req: express.Request, res: express.Response): 
 /**
  * Check if depart and arrival date is in a valid format
  * If the date is not valid, send an error message to the client
- * @param date Date to check
+ * @param dateDepart Date to check
+ * @param dateArrvial Date to check
  * @param req Express request
  * @param res Express response
  * @returns true if the date is valid, false otherwise
  */
-function checkDateDepartArrivalField (date: any, req: express.Request, res: express.Response): boolean {
-    if (date === undefined || date === '') {
+function checkDateDepartArrivalField (dateDepart: any, dateArrival: any, req: express.Request, res: express.Response): boolean {
+    if (dateDepart === undefined || dateDepart === '' || dateArrival === undefined || dateArrival === '') {
         sendMsg(req, res, error.date.required);
         return false;
     }
-    if (isNaN(new Date(date).getTime())) {
+
+    const date = new Date();
+    date.setDate(date.getDate() + 1);
+
+    if(new Date(dateDepart) < date){
+        sendMsg(req, res, error.date.tooSoon, date);
+        return false;
+    }
+    if (isNaN(new Date(dateDepart).getTime()) || isNaN(new Date(dateArrival).getTime()) ) {
         sendMsg(req, res, error.date.invalid);
         return false;
     }
-    if (new Date(date) < new Date()) {
+    if (new Date(dateDepart) < new Date() || new Date(dateArrival) < new Date()) {
         sendMsg(req, res, error.date.tooSoon, new Date());
+        return false;
+    }
+    if(new Date(dateArrival) < new Date(dateDepart)){
+        sendMsg(req, res, error.date.arrivalSoonDepart);
         return false;
     }
     return true;
