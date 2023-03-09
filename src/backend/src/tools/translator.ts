@@ -325,15 +325,15 @@ const error = {
         }),
         tooLate: (req: Request, date: Date) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `La date doit être antérieure à ${date.toLocaleDateString('fr-FR')}.`,
-                en: `Date must be before ${date.toLocaleDateString('en-US')}.`
+                fr: `La date doit être antérieure à ${date.toLocaleString('fr-FR')}.`,
+                en: `Date must be before ${date.toLocaleString('en-US')}.`
             },
             code: 400
         }),
         tooSoon: (req: Request, date: Date) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `La date doit être supérieur à ${date.toLocaleDateString('fr-FR')}.`,
-                en: `Date must be greater than ${date.toLocaleDateString('en-US')}.`
+                fr: `La date doit être supérieur à ${date.toLocaleString('fr-FR')}.`,
+                en: `Date must be greater than ${date.toLocaleString('en-US')}.`
             },
             code: 400
         })
