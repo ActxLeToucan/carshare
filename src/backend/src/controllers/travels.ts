@@ -123,6 +123,12 @@ exports.cancelTravel = (req: express.Request, res: express.Response, next: expre
     }
 
     const travel = req.body.travel;
+
+    if ( !(res.locals.user.id === travel.driver.id) ) {
+        sendMsg(req, res, error.);
+        return;
+    }
+
     const dateCheck = new Date(new Date(travel.date).getTime() - 1000 * 60 * 60 * 24);
 
     if ( !(travel.passagers === undefined || travel.passagers.length == 0) && dateCheck <= new Date() ) {
