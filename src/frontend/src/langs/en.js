@@ -66,6 +66,7 @@ export default {
         PHONE_SPECIFY: "Please specify the phone number",
         PASSWORD_SPECIFY: "Please specify the password",
         PASSWORD_CONFIRM_SPECIFY: "Please confirm the password",
+        NAME_SPECIFY: "Please specify the name",
 
         FIRSTNAME_TOOLONG: "The first name is too long",
         LASTNAME_TOOLONG: "The last name is too long",

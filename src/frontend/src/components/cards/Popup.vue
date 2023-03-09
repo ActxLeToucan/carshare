@@ -136,6 +136,10 @@ export default {
         this._title = this.title;
         document.body.appendChild(this.$el);
 
+        this.$refs["inputs"].addEventListener("keydown", ev => {
+            if (ev.key == "Enter") this.$refs["btn-validate"].$el.click();
+        });
+
         this.$refs["btn-cancel"].$el.addEventListener("click", () => {
             executeAfter(
                 this.cancel?.(this),

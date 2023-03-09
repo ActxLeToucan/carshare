@@ -86,7 +86,7 @@ const PAGE = { QUERY: 1, RESULTS: 2 };
 function search(obj) {
     const value = obj.$refs['query-zone'].querySelector('input').value;
 
-    API.execute_logged(API.ROUTE.USERS, API.METHOD.GET, User.CurrentUser?.getCredentials(), { search: value }).then((data) => {
+    API.execute_logged(API.ROUTE.USERS + obj.pagination, API.METHOD.GET, User.CurrentUser?.getCredentials(), { search: value }).then((data) => {
         obj.usersList = data;
     });
 }
@@ -156,7 +156,7 @@ export default {
             // Setting popup title to static string to avoid seing (Delete undefined undefined)
             popup.setTitle(this.lang.DELETE + ' ' + this.selectedUser?.firstName + ' ' + this.selectedUser?.lastName);
 
-            API.execute_logged(API.ROUTE.USERS + "/" + this.selectedUser.id, API.METHOD.DELETE, User.CurrentUser?.getCredentials()).then((data) => {
+            API.execute_logged(API.ROUTE.USERS + "/" + this.selectedUser.id + this.pagination, API.METHOD.DELETE, User.CurrentUser?.getCredentials()).then((data) => {
                 this.displayPage(PAGE.QUERY);
                 this.usersList.splice(this.usersList.indexOf(this.selectedUser), 1);
                 this.selectedUser = null;
@@ -180,7 +180,7 @@ export default {
                 newData[prop] = getTypedValue(input);
             }
 
-            API.execute_logged(API.ROUTE.USERS + "/" + this.selectedUser.id, API.METHOD.PATCH, User.CurrentUser?.getCredentials(), newData).then((data) => {
+            API.execute_logged(API.ROUTE.USERS + "/" + this.selectedUser.id + this.pagination, API.METHOD.PATCH, User.CurrentUser?.getCredentials(), newData).then((data) => {
                 for (const prop of props) {
                     this.selectedUser[prop] = newData[prop];
                 }
@@ -196,7 +196,7 @@ export default {
         }
     },
     data() {
-        return { User, usersList: [], selectedUser: null, isMobile: window.innerWidth < 768, genres, lang: Lang.CurrentLang }
+        return { User, usersList: [], selectedUser: null, isMobile: window.innerWidth < 768, genres, lang: Lang.CurrentLang, pagination: API.createPagination() }
     },
     mounted() {
         Lang.AddCallback(lang => {
