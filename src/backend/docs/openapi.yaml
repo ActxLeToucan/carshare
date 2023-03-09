@@ -499,21 +499,8 @@ paths:
         - Users
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
-        - in: query
-          name: limit
-          schema:
-            type: integer
-            default: 50
-            minimum: 1
-            maximum: 50
-          description: The number of users to return
-        - in: query
-          name: offset
-          schema:
-            type: integer
-            minimum: 0
-            default: 0
-          description: The number of users to skip before starting to collect the result set
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
         - in: query
           name: lastName
           schema:
@@ -776,21 +763,8 @@ paths:
         - Travels
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
-        - in: query
-          name: limit
-          schema:
-            type: integer
-            default: 50
-            minimum: 1
-            maximum: 50
-          description: The number of travels to return
-        - in: query
-          name: offset
-          schema:
-            type: integer
-            minimum: 0
-            default: 0
-          description: The number of travels to skip before starting to collect the result set
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
       security:
         - bearerAuth: [ ]
       responses:
@@ -920,21 +894,8 @@ paths:
         - Notifications
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
-        - in: query
-          name: limit
-          schema:
-            type: integer
-            default: 50
-            minimum: 1
-            maximum: 50
-          description: The number of notifications to return
-        - in: query
-          name: offset
-          schema:
-            type: integer
-            minimum: 0
-            default: 0
-          description: The number of notifications to skip before starting to collect the result set
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
       security:
         - bearerAuth: [ ]
       responses:
@@ -1087,21 +1048,8 @@ paths:
         - Groups
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
-        - in: query
-          name: limit
-          schema:
-            type: integer
-            default: 50
-            minimum: 1
-            maximum: 50
-          description: The number of groups to return
-        - in: query
-          name: offset
-          schema:
-            type: integer
-            minimum: 0
-            default: 0
-          description: The number of groups to skip before starting to collect the result set
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
       security:
         - bearerAuth: [ ]
       responses:
@@ -1138,6 +1086,25 @@ components:
         enum:
           - en
           - fr
+    limit:
+      name: limit
+      in: query
+      description: The number of items to return
+      required: false
+      schema:
+        type: integer
+        default: 50
+        minimum: 1
+        maximum: 50
+    offset:
+      name: offset
+      in: query
+      description: The number of items to skip before starting to collect the result set
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
   responses:
     noToken:
       description: Unauthorized
