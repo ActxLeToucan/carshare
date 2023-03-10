@@ -4,20 +4,10 @@ import { error, sendMsg, info } from '../tools/translator';
 import * as properties from '../properties';
 
 exports.getSettingsNotifications = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
-
     res.status(200).json({ value: res.locals.user.mailNotif });
 }
 
 exports.updateSettingsNotifications = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
-
     const value = req.body.value;
 
     if (!properties.checkBooleanField(value, req, res, 'value')) return;

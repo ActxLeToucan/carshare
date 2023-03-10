@@ -2,19 +2,19 @@ import type express from 'express';
 import { prisma } from '../app';
 import * as properties from '../properties';
 import { error, info, sendMsg } from '../tools/translator';
+import { getPagination } from './_common';
 
 exports.myTravels = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
+    const pagination = getPagination(req);
 
     prisma.user.findMany({
         where: { id: res.locals.user.id },
         select: {
             travelsAsDriver: true,
             travelsAsPassenger: { select: { travel: true } }
-        }
+        },
+        skip: pagination.offset,
+        take: pagination.limit
     }).then(travel => {
         res.status(200).json(travel);
     }).catch((err) => {
@@ -24,11 +24,6 @@ exports.myTravels = (req: express.Request, res: express.Response, next: express.
 }
 
 exports.searchTravels = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
-
     const { date, startCity, endCity } = req.query;
     if (!properties.checkCityField(startCity, req, res, 'startCity')) return;
     if (!properties.checkCityField(endCity, req, res, 'endCity')) return;
@@ -53,11 +48,6 @@ exports.searchTravels = (req: express.Request, res: express.Response, next: expr
 }
 
 exports.createTravel = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
-
     const { departureDate, arrivalDate, maxPassengers, price, description, groupId, listOfEtape } = req.body;
 
     if (!properties.checkDateDepartArrivalField(departureDate, req, res)) return;

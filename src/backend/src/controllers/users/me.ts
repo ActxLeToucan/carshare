@@ -62,20 +62,10 @@ import { prisma } from '../../app';
 import * as _user from './_common';
 
 exports.getMe = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
-
     res.status(200).json(displayableUserPrivate(res.locals.user));
 }
 
 exports.deleteMe = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
-
     if (!properties.checkPasswordField(req.body.password, req, res, false)) return;
 
     bcrypt.compare(req.body.password, res.locals.user.password)
@@ -98,11 +88,6 @@ exports.deleteMe = (req: express.Request, res: express.Response, next: express.N
 }
 
 exports.updateMe = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
-
     _user.update(req, res, res.locals.user.id, false).catch((err) => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
