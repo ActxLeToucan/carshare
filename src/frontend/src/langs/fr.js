@@ -12,6 +12,7 @@ export default {
     UNSPECIFIED: "Non spécifié",
     FEMALE: "Femme",
     ERROR: "Erreur",
+    SEARCHING: "Recherche",
 
     // 404 page
     WOOPS: "Woops !",
