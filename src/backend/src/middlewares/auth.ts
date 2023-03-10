@@ -36,7 +36,7 @@ function auth (req: express.Request, res: express.Response, next: express.NextFu
         prisma.user.findUnique({ where: { id: userId } })
             .then(user => {
                 if (user === null) {
-                    sendMsg(req, res, error.user.notFound);
+                    sendMsg(req, res, error.auth.invalidToken);
                     return;
                 }
                 res.locals.user = user;

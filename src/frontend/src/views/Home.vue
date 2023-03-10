@@ -31,7 +31,7 @@ export default {
         return { lang: Lang.CurrentLang }
     },
     mounted() {
-        Lang.addCallback(lang => this.lang = lang);
+        Lang.AddCallback(lang => this.lang = lang);
     }
 }
 </script>

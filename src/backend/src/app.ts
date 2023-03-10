@@ -31,10 +31,10 @@ app.get('/', (req, res) => {
 
 app.use('/docs', require('./routes/docs'));
 app.use('/users', dbNeeded, require('./routes/users'));
-app.use('/admin', dbNeeded, require('./routes/admin'));
 app.use('/travels', dbNeeded, require('./routes/travels'));
 app.use('/notifications', dbNeeded, require('./routes/notifications'));
 app.use('/settings', dbNeeded, require('./routes/settings'));
+app.use('/groups', dbNeeded, require('./routes/groups'));
 
 app.use((req, res) => {
     sendMsg(req, res, error.generic.routeNotFound);

@@ -40,7 +40,7 @@ export default {
                 default: this.state = false; break;
             }
         }
-        return {}
+        return {};
     },
     methods: {
         updateButton() {

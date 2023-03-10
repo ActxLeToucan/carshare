@@ -1,4 +1,6 @@
 import config from '../config.js';
+import Lang from './Lang.js';
+import User from './User.js';
 
 class Credentials {
     static get TYPE() {
@@ -80,13 +82,12 @@ class API {
     static ROUTE = {
         SIGNUP: "/users/signup",
         LOGIN: "/users/login",
-        USER: "/users/me",
+        ME: "/users/me",
+        MY_PWD: "/users/me/password",
         VERIFY: "/users/email-verification",
         RESETPWD: "/users/password-reset",
-        ADMIN: {
-            USER: "/admin/user",
-            USERS: "/admin/users",
-        }
+        USERS: "/users",
+        GROUPS: "/groups/my"
     };
 
     /**
@@ -111,7 +112,7 @@ class API {
 
             let reqHeaders = {
                 "Accept": "application/json",
-                "Accept-Language": "fr"
+                "Accept-Language": Lang.CurrentCode
             };
             if (type != this.TYPE_NONE && type != this.TYPE_FILE) reqHeaders["Content-Type"] = type;
 
@@ -161,9 +162,13 @@ class API {
                 referrer: window.location.origin,
                 mode: "cors"
             }).then(response => {
-                if (!response.status.toString().startsWith("2"))
+                if (!response.status.toString().startsWith("2")) {
+                    if (response.status === 498) { // token expired
+                        User.forget();
+                        window.location.reload();
+                    }
                     sendError(response);
-                else {
+                } else {
                     response.json().then(data => {
                         resolve(data);
                     }).catch(err => sendError(err));
@@ -238,8 +243,8 @@ class API {
      * @param {number} per_page number of elements in one page
      * @returns a string corresponding to the pagination's parameters part of the url
      */
-    static createPagination(page, per_page) {
-        return this.createParameters({ page: page, per_page: per_page });
+    static createPagination(limit = 10, offset = 0) {
+        return this.createParameters({ offset: offset, limit: limit });
     }
 }
 

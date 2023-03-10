@@ -27,7 +27,7 @@ npm i -g nodemon
 6. Compléter le fichier `mail.config.json` avec les informations de votre serveur SMTP, ou désactiver l'envoi d'emails en mettant `enabled` à `false`
 7. Initialiser la base de données
 ```bash
-npx prisma migrate dev
+npx prisma migrate deploy
 ```
 8. Lancer le serveur
 ```bash
