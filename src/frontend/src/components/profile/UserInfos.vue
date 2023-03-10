@@ -26,12 +26,12 @@
                 <div
                     ref="user-log-zone"
                     class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
-                    style="max-height: 0px;"
+                    style="max-height: 0;"
                 ></div>
                 <div class="flex md:flex-row flex-col md:space-x-4 md:space-y-0 space-y-2 mt-4">
                     <button-block :action="deleteAccount" color="red"> {{ lang.DELETE_ACCOUNT }} </button-block>
                     <div class="flex grow justify-end pl-20">
-                        <button-block :action="updateAccount" :disabled="!propertiesChangeable"> {{ lang.EDIT }} </button-block>
+                        <button-block :action="updateAccount" :disabled="!formProperties.buttonEnabled"> {{ lang.EDIT }} </button-block>
                     </div>
                 </div>
             </card>
@@ -44,10 +44,10 @@
                 <div
                     ref="password-log-zone"
                     class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
-                    style="max-height: 0px;"
+                    style="max-height: 0;"
                 ></div>
                 <div class="flex grow justify-end">
-                    <button-block :action="updatePassword" :disabled="!passwordChangeable"> {{ lang.EDIT }} </button-block>
+                    <button-block :action="updatePassword" :disabled="!formPassword.buttonEnabled"> {{ lang.EDIT }} </button-block>
                 </div>
             </card>
         </div>
@@ -116,21 +116,6 @@ export default {
             mounted: false,
         }
     },
-    computed: {
-        passwordChangeable() {
-            return this.formPassword.buttonEnabled
-                && this.formPassword.old.length > 0
-                && this.formPassword.new.length > 0
-                && this.formPassword.confirm.length > 0;
-        },
-        propertiesChangeable() {
-            if (!this.mounted || !this.formProperties.buttonEnabled) return false;
-            for (const prop of Object.keys(this.formProperties.properties)) {
-                if (this.formProperties.properties[prop] !== User.CurrentUser[prop]) return true;
-            }
-            return false;
-        }
-    },
     methods: {
         userLog(msg, type = Log.INFO) {
             if (!this.userLogZone) return null;
@@ -154,7 +139,7 @@ export default {
         removeAccount(popup) {
             return new Promise((resolve, reject) => {
                 const log = popup.log("Suppression du compte...", Log.INFO);
-                API.execute_logged(API.ROUTE.ME, API.METHOD.DELETE, User.CurrentUser?.getCredentials(), {password: popup.get("password")}).then(res => {
+                API.execute_logged(API.ROUTE.ME, API.METHOD.DELETE, User.CurrentUser?.getCredentials(), {password: popup.get("password")}).then(_ => {
                     log.update("Compte supprimé avec succès !", Log.SUCCESS);
                     setTimeout(() => {
                         log.delete();
@@ -187,6 +172,7 @@ export default {
             this.$router.push('/');
         },
         updatePassword() {
+            this.formPassword.buttonEnabled = false;
             const log = this.passwordLog(Lang.CurrentLang.INPUT_VERIFICATION + " ...", Log.INFO);
             
             const field_checks = [
@@ -212,20 +198,17 @@ export default {
             }
 
             log.update(Lang.CurrentLang.CHANGING_PASSWORD, Log.WARNING);
-            this.formPassword.buttonEnabled = false;
             const data = {
                 oldPassword: this.formPassword.old,
                 password: this.formPassword.new
             };
-            API.execute_logged(API.ROUTE.MY_PWD, API.METHOD.PATCH, User.CurrentUser?.getCredentials(), data).then((res) => {
-                console.log(res.message);
+            API.execute_logged(API.ROUTE.MY_PWD, API.METHOD.PATCH, User.CurrentUser?.getCredentials(), data).then((_) => {
                 this.formPassword.old = "";
                 this.formPassword.new = "";
                 this.formPassword.confirm = "";
                 log.update(Lang.CurrentLang.PASSWORD_CHANGED, Log.SUCCESS);
                 setTimeout(() => { log.delete(); }, 2000);
             }).catch(err => {
-                console.error(err);
                 log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
                 setTimeout(() => { log.delete(); }, 4000);
             }).finally(() => {
@@ -233,6 +216,7 @@ export default {
             });
         },
         updateAccount() {
+            this.formProperties.buttonEnabled = false;
             const log = this.userLog(Lang.CurrentLang.INPUT_VERIFICATION + " ...", Log.INFO);
             
             const field_checks = [
@@ -259,7 +243,6 @@ export default {
             }
 
             log.update(Lang.CurrentLang.CHANGING_INFORMATIONS, Log.WARNING);
-            this.formProperties.buttonEnabled = false;
             
             const data = {};
             for (const prop of Object.keys(this.formProperties.properties)) {
@@ -268,7 +251,6 @@ export default {
             }
 
             API.execute_logged(API.ROUTE.ME, API.METHOD.PATCH, User.CurrentUser?.getCredentials(), data).then((data) => {
-                console.log(data.message);
                 for (const prop of Object.keys(this.formProperties.properties)) {
                     this.formProperties.properties[prop] = data.user[prop];
                     User.CurrentUser[prop] = data.user[prop];
@@ -277,7 +259,6 @@ export default {
                 log.update(Lang.CurrentLang.INFORMATIONS_CHANGED, Log.SUCCESS);
                 setTimeout(() => { log.delete(); }, 2000);
             }).catch(err => {
-                console.error(err);
                 log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
                 setTimeout(() => { log.delete(); }, 4000);
             }).finally(() => {
@@ -292,13 +273,13 @@ export default {
         });
 
         this.$refs["user-inputs"].addEventListener("keydown", ev => {
-            if (ev.key == "Enter" && this.propertiesChangeable) {
+            if (ev.key == "Enter") {
                 this.updateAccount();
                 ev.preventDefault();
             }
         });
         this.$refs["password-inputs"].addEventListener("keydown", ev => {
-            if (ev.key == "Enter" && this.passwordChangeable) {
+            if (ev.key == "Enter") {
                 this.updatePassword();
                 ev.preventDefault();
             }

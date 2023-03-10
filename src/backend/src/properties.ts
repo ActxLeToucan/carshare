@@ -27,6 +27,7 @@ const p = {
         values: [-1, 0, 1]
     },
     userLevel: {
+        user: 0,
         admin: 1
     },
     token: {
@@ -563,15 +564,15 @@ function checkStringField (value: any, req: express.Request, res: express.Respon
  */
 function checkListOfEtapeField (value: any, req: express.Request, res: express.Response): boolean {
     if (value === undefined || value === '') {
-        sendMsg(req, res, error.etape.required, 'listOfEtape');
+        sendMsg(req, res, error.etapes.required);
         return false;
     }
     if (typeof value !== 'object') {
-        sendMsg(req, res, error.etape.type, 'listOfEtape');
+        sendMsg(req, res, error.etapes.type);
         return false;
     }
     if (value.length < 2) {
-        sendMsg(req, res, error.etape.etapeMin, p.listOfEtape.minLength);
+        sendMsg(req, res, error.etapes.etapeMin, p.listOfEtape.minLength);
         return false;
     }
     for (const i in value) {
@@ -621,5 +622,4 @@ export {
     checkListOfEtapeField,
     checkDescriptionField,
     sanitizeNotificationId
-
 };
