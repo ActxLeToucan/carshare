@@ -1,29 +1,35 @@
 <template>
-    <div class="show-up flex flex-col grow"  :class="{ 'dark': isDarkMode }">
+  
+    <div class="show-up flex flex-col grow  bg-white dark:bg-black" >
         <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> {{ lang.PARAMS }}  </p> 
-         <div class="flex flex-col grow justify-evenly items-center">
+        <div class="flex flex-col grow justify-evenly items-center">
             <div class="flex flex-col">
                 <p class="font-bold   text-slate-500 text-xl"> --Email--</p>
-                <input-switch name="NotifEmail"    :label="lang.GET_NOTIFIED " v-model="emailNotifications" ></input-switch><br><br>
+                <input-switch name="mailNotif"    :label="lang.GET_NOTIFIED" :onchange="$stat => beNotified($stat)"></input-switch><br><br>
                 
                 <p class="font-bold   text-slate-500 text-xl"> --Affichage--</p>
-                <input-switch name="sombre"    :label="lang.DARKMODE" @click="toggleDarkMode" :checked="isDarkMode"></input-switch><br><br>
+                <input-choice  name="sombre"   :label="lang.THEME"     :value="0"  :list="theme"  @change="onchangeTheme($event)" ></input-choice><br><br>        
                 
                 <p class="font-bold   text-slate-500 text-xl"> --Langue--</p>
-                <input-choice  name="en"  id="angalis"  :label="lang.LANGUES "     :value="-1" @click = "ChangeToEnglish"></input-choice><br><br><br><br>         
-
+                <input-choice  name="langue"   :label="lang.LANGUES "     :value="fr"  :list="langues" @change = "onchangeLang($event)"></input-choice><br><br><br><br>         
+               
             </div>
-         </div>
-         </div>
-    <div class="md:show-up flex flex-col grow">
-        <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> Paramètres </p>
+        </div>
     </div>
+   
+    
 </template>
 
 <script>
+
 import InputSwitch from '../inputs/InputSwitch.vue';
 import InputChoice from '../inputs/InputChoice.vue'
 import Lang from '../../scripts/Lang';
+import { langues } from '../../scripts/data';
+import { theme } from '../../scripts/data';
+import User from '../../scripts/User';
+import API from '../../scripts/API.js';
+
 
 
 export default {
@@ -33,53 +39,79 @@ export default {
         InputSwitch, InputChoice
     },
     data() {
-        return { 
-            isDarkMode: false,
-            isEnglish:false, 
+        return {
+            User,
             lang: Lang.CurrentLang,
-          
+            langues,
+            theme,
+            SelectedLang: '',
+            SelectedTheme: '',
+
+            formProperties: {
+                properties: {
+                    mailNotif: User.CurrentUser?.mailNotif,
+                    id : User.CurrentUser?.id 
+                },
             
-            
+            },
         }
     },
     mounted() {
-        Lang.addCallback(lang => this.lang = lang);
-
-        // Check if the user has a dark mode preference
-        this.isDarkMode = window.matchMedia('(prefers-color-scheme : dark)').matches
-        // Update the class of the body tag
-        document.body.classList.toggle('dark', this.isDarkMode)
-
-        API.execute_logged(API.ROUTE.USER, API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
-            User.CurrentUser?.setInformations(res);
-            User.CurrentUser?.save();
-
-            const fields = ["NotifEmail", "sombre", "en"];
-            fields.forEach(field => setInputValue(field, User.CurrentUser[field]));
-
-        }).catch(err => {
-            console.error(err);
-        });
+        Lang.AddCallback(lang => this.lang = lang);
+        if (User.CurrentUser == null) return;
+        console.log("mail" , User.CurrentUser.mailNotif)
     },
     methods: {
-        toggleDarkMode() {
-            this.isDarkMode = !this.isDarkMode
-            // Update the class of the body tag
-            document.body.classList.toggle('dark', this.isDarkMode)
+     onchangeTheme(e) {
+            console.log(e.target.value);
+            this.SelectedTheme = e.target.value;
+           
+            if (this.SelectedTheme === 'dark') {
+                document.documentElement.classList.add("dark");
+            }
+            else if (this.SelectedTheme === 'defaut') {
+                const themeSombreActif = window.matchMedia("(prefers-color-scheme: dark)").matches;
+                if (themeSombreActif) {
+                    document.documentElement.classList.add("dark");
+                } else {
+                    document.documentElement.classList.remove("dark");
+                }
+            }
+            else {
+                document.documentElement.classList.remove("dark");
+            }
         },
-        ChangeToEnglish() {
-            button.addEventListener("click", () => {
+        onchangeLang(e) {
+            console.log(e.target.value);
+            this.SelectedLang = e.target.value;
+            if (this.SelectedLang === 'fr') {
+                // Charger la langue française
+                const success = Lang.LoadLang("fr");
+            } else if (this.SelectedLang === 'en') {
+                // Charger la langue anglaise
                 const success = Lang.LoadLang("en");
+            }
+        },
+        beNotified(state) {
+            this.User.CurrentUser.mailNotif = state;
+            console.log("stat", state)
+            const { id } = this;
+             console.log("id", this.User.CurrentUser?.id)
+            const data = {
+                "value": state ,
+            }
+            API.execute_logged(API.ROUTE.SETTINGS , API.METHOD.PATCH, User.CurrentUser?.getCredentials() ).then((data) => {
+               console.log("succes")
+            }).catch(err => {
+                console.error(err);
+               // state = !state; 
+                console.log("stat", state)
             });
-
-        }
+        }, 
+        
+        
+    
+      
     }
 }
 </script>
-<style>
-.dark {
-    /* Add your dark mode styles here */
-    background-color: #1a202c;
-    color: #fff;
-}
-</style>

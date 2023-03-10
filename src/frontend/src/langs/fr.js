@@ -134,18 +134,19 @@ export default {
     GROUPS: "Groupes",
     TRIPS: "Trajets",
 
-<<<<<<< HEAD
-    // users
-    SEARCH_USER: "Rechercher un utilisateur",
 
 
     //parametres
     GET_NOTIFIED: "Notification par Email :",
-    DARKMODE: "Mode sombre : " , 
-    ENGLISH: "Anglais :", 
-    LANGUES : "Langues : "
+    DARKMODE: "Sombre  ", 
+    LIGHTMODE: "Claire", 
+    THEME: " Theme :  ", 
+    DEFAULTMODE: "default",
+    ENGLISH: "Anglais ", 
+    FRENSH : "Français" , 
+    LANGUES: "Langues : ",
     
-=======
+    
         // users
         SEARCH_USER: "Rechercher un utilisateur",
         ACCOUNT_DELETE_VERIFY: "Êtes-vous sûr de vouloir supprimer ce compte ?\nCette action est irréversible.",
@@ -154,5 +155,4 @@ export default {
         EMAIL_UNMATCHING: "L'Email ne correspond pas",
         ACCOUNT_DELETION: "Suppression du compte",
         ACCOUNT_DELETED: "Compte supprimé",
->>>>>>> 37c3192e61934afd578c2706b8c493e672e33950
 }
