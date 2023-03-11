@@ -4,9 +4,12 @@ import auth from '../middlewares/auth';
 const router = express.Router();
 const controller = require('../controllers/groups');
 const emailVerified = require('../middlewares/emailVerified');
+const admin = require('../middlewares/admin');
 
-router.use(auth.access, emailVerified);
-router.post('/my', controller.createGroup);
-router.get('/my', controller.getMyGroups);
+router.post('/my', auth.access, emailVerified, controller.createGroup);
+router.get('/my', auth.access, emailVerified, controller.getMyGroups);
+
+// admin routes
+router.get('/', auth.access, emailVerified, admin, controller.getAllGroups);
 
 module.exports = router;

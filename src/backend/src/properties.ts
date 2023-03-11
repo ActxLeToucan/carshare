@@ -85,6 +85,7 @@ const p = {
         minLength: 2
     },
     query: {
+        defaultLimit: 10,
         minLimit: 1, // in database queries, the minimum value allowed for LIMIT statements
         maxLimit: 50 // the max value allowed for LIMIT statements
     }
