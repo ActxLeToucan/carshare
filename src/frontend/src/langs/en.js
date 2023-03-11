@@ -12,6 +12,7 @@ export default {
     UNSPECIFIED: "Not specified",
     FEMALE: "Female",
     ERROR: "Error",
+    SEARCHING: "Searching",
 
     // 404 page
     WOOPS: "Oops",
@@ -103,6 +104,10 @@ export default {
     MY_GROUPS: "My groups",
     PARAMS: "Settings",
 
+        // informations
+        CHANGING_PASSWORD: "Changing password",
+        PASSWORD_CHANGED: "Password changed successfully",
+
         // groups
         NO_GROUPS: "You don't have any group yet",
         NO_GROUPS_DESC: "Create a group to start sharing your trips with your friends",
@@ -132,7 +137,6 @@ export default {
     // administration
     ADMINISTRATION: "Administration",
     USERS: "Users",
-    GROUPS: "Groups",
     TRIPS: "Trips",
 
         // users
