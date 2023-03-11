@@ -1,15 +1,14 @@
 import type express from 'express';
-import fs from 'fs';
-import { error, sendRaw } from '../tools/translator';
 
 exports.getDocs = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (fs.existsSync('docs/out/index.html')) {
-        res.sendFile('docs/out/index.html', { root: '.' });
-    } else {
-        sendRaw(req, res, error.documentation.notFound);
-    }
+    res.sendFile('docs/index.html', { root: '.' });
 }
 
 exports.getDocsYaml = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     res.download('docs/openapi.yaml', 'openapi.yaml');
+}
+
+exports.getFavicon = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    if (process.env.FRONTEND_LOGO === undefined) res.sendStatus(404);
+    else res.redirect(process.env.FRONTEND_LOGO);
 }
