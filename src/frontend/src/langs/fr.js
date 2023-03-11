@@ -126,6 +126,12 @@ export default {
         LOADING_GROUPS: "Chargement des groupes",
         LOADING_GROUPS_DESC: "Veuillez patienter pendant que nous chargeons vos groupes",
 
+         //trip
+         Future_trips: "Trajets à venir",
+         Past_trips: "Trajets passés",
+         Trip_off: "Trajet du",
+         Passenger: "passagers",
+
     // informations
     ADDRESS_NOT_VERIFIED: "Adresse non vérifiée",
     ADDRESS_VERIFIED: "Adresse vérifiée",
