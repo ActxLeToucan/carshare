@@ -5,9 +5,9 @@ import jwt from 'jsonwebtoken';
 import { displayableUserPrivate, error, info, mail, sendMail, sendMsg } from '../tools/translator';
 import * as properties from '../properties';
 import * as _user from './users/_common';
-import { type Prisma } from '@prisma/client';
-import { getPagination } from './_common';
+import { prepareSearch } from './_common';
 import { MailerError } from '../tools/mailer';
+import { type User } from '@prisma/client';
 
 exports.signup = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const { email, password, lastName, firstName, phone, hasCar, gender } = req.body;
@@ -239,31 +239,19 @@ exports.emailVerification = (req: express.Request, res: express.Response, next: 
 }
 
 exports.getAllUsers = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const pagination = getPagination(req);
+    const search = prepareSearch(req);
 
-    const lastName = String(req.query.lastName ?? '');
-    const firstName = String(req.query.firstName ?? '');
-    const email = String(req.query.email ?? '');
+    const q = `%${search.query ?? ''}%`;
 
-    const where: { lastName?: any, firstName?: any, email?: any } = {};
-    if (lastName !== '') { where.lastName = { startsWith: lastName }; }
-    if (firstName !== '') { where.firstName = { startsWith: firstName }; }
-    if (email !== '') { where.email = { startsWith: email }; }
-
-    prisma.user.findMany<Prisma.UserFindManyArgs>({
-        where,
-        skip: pagination.offset,
-        take: pagination.limit,
-        orderBy: [
-            {
-                id: 'asc'
-            }
-        ]
-    })
+    prisma.$queryRaw`SELECT *
+                     FROM user
+                     WHERE IF(${search.query !== undefined}, email LIKE ${q}
+                         OR phone LIKE ${q}
+                         OR CONCAT(firstName, ' ', lastName) LIKE ${q}, TRUE)
+                     LIMIT ${search.pagination.take} OFFSET ${search.pagination.skip}`
         .then(users => {
-            res.status(200).json(users.map(displayableUserPrivate));
-        })
-        .catch(err => {
+            res.status(200).json(search.results('users', (users as User[]).map(displayableUserPrivate)));
+        }).catch(err => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);
         });
@@ -286,7 +274,9 @@ exports.deleteUser = (req: express.Request, res: express.Response, next: express
             }
 
             prisma.user.delete({ where: { id: userId } })
-                .then(() => { sendMsg(req, res, info.user.deleted); })
+                .then(() => {
+                    sendMsg(req, res, info.user.deleted);
+                })
                 .catch((err) => {
                     console.error(err);
                     sendMsg(req, res, error.generic.internalError);
