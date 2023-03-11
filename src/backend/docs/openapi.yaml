@@ -501,7 +501,7 @@ paths:
         - $ref: '#/components/parameters/Accept-Language'
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/offset'
-        - $ref: '#/components/parameters/search'
+        - $ref: '#/components/parameters/query'
       security:
         - bearerAuth: [ ]
       responses:
@@ -787,7 +787,7 @@ paths:
                   travelsAsDriver:
                     $ref: '#/components/schemas/ArrayOfTravels'
                   travelsAsPassenger:
-                      $ref: '#/components/schemas/ArrayOfTravels'
+                    $ref: '#/components/schemas/ArrayOfTravels'
         '401':
           $ref: '#/components/responses/noToken'
         '498':
@@ -1126,6 +1126,60 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
+
+  /docs:
+    get:
+      summary: Get the documentation
+      description: Get the documentation in html
+      operationId: getDocs
+      tags:
+        - Docs
+      responses:
+        '200':
+          description: Documentation
+          content:
+            text/html:
+              schema:
+                type: string
+  /docs/yaml:
+    get:
+      summary: Get the documentation in yaml
+      description: Get the documentation in yaml
+      operationId: getDocsYaml
+      tags:
+        - Docs
+      responses:
+        '200':
+          description: Documentation in yaml
+          content:
+            text/yaml:
+              schema:
+                type: string
+  /docs/favicon:
+    get:
+      summary: Get the favicon
+      description: Redirect to the favicon of the frontend (specified in the .env file)
+      operationId: getFavicon
+      tags:
+        - Docs
+      responses:
+        '302':
+          description: Redirect to the favicon
+          headers:
+            Location:
+              schema:
+                type: string
+              description: The URL to redirect to
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Environment variable "FRONTEND_LOGO" is not defined.
 
 components:
   securitySchemes:

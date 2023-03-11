@@ -454,18 +454,12 @@ const error = {
         })
     },
     documentation: {
-        notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        favicon: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: '<head><title>Documentation introuvable</title></head>' +
-                    '<h1>Documentation introuvable</h1>' +
-                    '<p>Si vous êtes le propriétaire du serveur, exécutez "npm run docs" pour la générer.</p>' +
-                    '<p>Vous pouvez également trouver le fichier de documentation (YAML) <a href="/docs/yaml">ici</a>.</p>',
-                en: '<head><title>Documentation not found</title></head>' +
-                    '<h1>Documentation not found</h1>' +
-                    '<p>If you are the owner of the server, run "npm run docs" to generate it.</p>' +
-                    '<p>You can also find the documentation file (YAML) <a href="/docs/yaml">here</a>.</p>'
+                fr: 'La variable d\'environnement "FRONTEND_LOGO" n\'est pas définie.',
+                en: 'Environment variable "FRONTEND_LOGO" is not defined.'
             },
-            code: 404
+            code: 500
         })
     },
     group: {
