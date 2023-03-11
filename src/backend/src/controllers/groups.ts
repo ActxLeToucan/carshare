@@ -59,7 +59,7 @@ exports.getAllGroups = (req: express.Request, res: express.Response, next: expre
         include: {
             users: true
         },
-        ...search.paginationPrisma
+        ...search.pagination
     }).then((groups) => {
         res.status(200).json(search.results('groups', groups.map(displayableGroup)));
     }).catch((err) => {

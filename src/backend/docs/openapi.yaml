@@ -492,30 +492,16 @@ paths:
 
   /users:
     get:
-      summary: Get all users
-      description: Get all users ordered by their internal id. Only available to admins. Filters (`lastName`, `firstName`, `email`) can be combined together.
-      operationId: getAllUsers
+      summary: Search users
+      description: Search in all users. Only available to admins.
+      operationId: searchAllUsers
       tags:
         - Users
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/offset'
-        - in: query
-          name: lastName
-          schema:
-            type: string
-          description: Filters results based on last names starting with this value (case-insensitive)
-        - in: query
-          name: firstName
-          schema:
-            type: string
-          description: Filters results based on first names starting with this value (case-insensitive)
-        - in: query
-          name: email
-          schema:
-            type: string
-          description: Filters results based on emails starting with this value (case-insensitive)
+        - $ref: '#/components/parameters/query'
       security:
         - bearerAuth: [ ]
       responses:
@@ -524,7 +510,30 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ArrayOfPrivateUsers'
+                type: object
+                properties:
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PrivateUser'
+                  query:
+                    type: string
+                    required: false
+                    example: friends
+                  limit:
+                    type: integer
+                    example: 10
+                  offset:
+                    type: integer
+                    example: 0
+                  next:
+                    type: integer
+                    nullable: true
+                    example: 10
+                  prev:
+                    type: integer
+                    nullable: true
+                    example: 0
         '401':
           $ref: '#/components/responses/noToken'
         '403':
@@ -778,7 +787,7 @@ paths:
                   travelsAsDriver:
                     $ref: '#/components/schemas/ArrayOfTravels'
                   travelsAsPassenger:
-                      $ref: '#/components/schemas/ArrayOfTravels'
+                    $ref: '#/components/schemas/ArrayOfTravels'
         '401':
           $ref: '#/components/responses/noToken'
         '498':
@@ -990,8 +999,8 @@ paths:
 
   /groups:
     get:
-      summary: Search in all groups
-      description: Search in all groups. Only available for admin.
+      summary: Search groups
+      description: Search in all groups. Only available to admins.
       operationId: searchAllGroups
       tags:
         - Groups
@@ -1016,6 +1025,7 @@ paths:
                       $ref: '#/components/schemas/Group'
                   query:
                     type: string
+                    required: false
                     example: friends
                   limit:
                     type: integer
@@ -1027,7 +1037,7 @@ paths:
                     type: integer
                     nullable: true
                     example: 10
-                  previous:
+                  prev:
                     type: integer
                     nullable: true
                     example: 0
@@ -1116,6 +1126,60 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
+
+  /docs:
+    get:
+      summary: Get the documentation
+      description: Get the documentation in html
+      operationId: getDocs
+      tags:
+        - Docs
+      responses:
+        '200':
+          description: Documentation
+          content:
+            text/html:
+              schema:
+                type: string
+  /docs/yaml:
+    get:
+      summary: Get the documentation in yaml
+      description: Get the documentation in yaml
+      operationId: getDocsYaml
+      tags:
+        - Docs
+      responses:
+        '200':
+          description: Documentation in yaml
+          content:
+            text/yaml:
+              schema:
+                type: string
+  /docs/favicon:
+    get:
+      summary: Get the favicon
+      description: Redirect to the favicon of the frontend (specified in the .env file)
+      operationId: getFavicon
+      tags:
+        - Docs
+      responses:
+        '302':
+          description: Redirect to the favicon
+          headers:
+            Location:
+              schema:
+                type: string
+              description: The URL to redirect to
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Environment variable "FRONTEND_LOGO" is not defined.
 
 components:
   securitySchemes:

@@ -31,7 +31,7 @@ function prepareSearch (req: express.Request) {
 
     return {
         query,
-        paginationPrisma: {
+        pagination: {
             skip: pagination.offset,
             take: pagination.limit + 1
         },
