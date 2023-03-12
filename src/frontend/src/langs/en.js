@@ -142,6 +142,8 @@ export default {
     DEFAULTMODE: "default",
     ENGLISH: "English ", 
     FRENSH: "Frensh", 
+    LANG : "Please choose a language" , 
+    MODE : "Please choose a theme" , 
     
     LANGUES : "Langues : ",
         // users

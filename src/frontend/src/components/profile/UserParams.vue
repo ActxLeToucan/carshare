@@ -8,10 +8,10 @@
                 <input-switch name="mailNotif"    :label="lang.GET_NOTIFIED" :onchange="$stat => beNotified($stat)"></input-switch><br><br>
                 
                 <p class="font-bold   text-slate-500 text-xl"> --Affichage--</p>
-                <input-choice  name="sombre"   :label="lang.THEME"     :value="0"  :list="theme"  @change="onchangeTheme($event)" ></input-choice><br><br>        
+                <input-choice  name="sombre"   :label="lang.THEME"     :value="defaut"  :list="theme"  @change="onchangeTheme($event)" ></input-choice><br><br>        
                 
                 <p class="font-bold   text-slate-500 text-xl"> --Langue--</p>
-                <input-choice  name="langue"   :label="lang.LANGUES "     :value="fr"  :list="langues" @change = "onchangeLang($event)"></input-choice><br><br><br><br>         
+                <input-choice  name="langue"   :label="lang.LANGUES "   v-model="selected"  :value="fr"  :list="langues" @change = "onchangeLang($event)"></input-choice><br><br><br><br>         
                
             </div>
         </div>
@@ -46,6 +46,7 @@ export default {
             theme,
             SelectedLang: '',
             SelectedTheme: '',
+            selected: '' , 
 
             formProperties: {
                 properties: {

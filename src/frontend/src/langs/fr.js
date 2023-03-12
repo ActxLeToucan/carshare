@@ -138,14 +138,15 @@ export default {
 
     //parametres
     GET_NOTIFIED: "Notification par Email :",
-    DARKMODE: "Sombre  ", 
-    LIGHTMODE: "Claire", 
-    THEME: " Theme :  ", 
-    DEFAULTMODE: "default",
+    DARKMODE: "Sombre", 
+    LIGHTMODE: "Clair", 
+    THEME: " Théme   ", 
+    DEFAULTMODE: "Par défaut",
     ENGLISH: "Anglais ", 
     FRENSH : "Français" , 
-    LANGUES: "Langues : ",
-    
+    LANGUES: "Langues  ",
+    LANG : "Veuillez choisir une langue" , 
+    MODE : "Veuillez choisir une theme" , 
     
         // users
         SEARCH_USER: "Rechercher un utilisateur",
