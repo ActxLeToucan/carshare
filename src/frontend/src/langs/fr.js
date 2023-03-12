@@ -125,6 +125,7 @@ export default {
         GROUP_CREATED: "Groupe créé avec succès",
         LOADING_GROUPS: "Chargement des groupes",
         LOADING_GROUPS_DESC: "Veuillez patienter pendant que nous chargeons vos groupes",
+        SEARCH_GROUPE : " Rechercher un groupe"  ,
 
     // informations
     ADDRESS_NOT_VERIFIED: "Adresse non vérifiée",

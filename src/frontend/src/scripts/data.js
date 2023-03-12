@@ -61,6 +61,6 @@ export const theme = [
     {value: 'dark', id: 'DARKMODE' },
     {value: 'clair',  id: 'LIGHTMODE'},
     { value: 'defaut', id: 'DEFAULTMODE' },
-    {value:'theme', id: 'MODE' ,  "selected": true ,disabled },
+    {value:'theme', id: 'MODE' ,  "selected": true  },
    
 ];
