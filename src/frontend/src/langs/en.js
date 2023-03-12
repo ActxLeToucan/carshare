@@ -12,6 +12,7 @@ export default {
     UNSPECIFIED: "Not specified",
     FEMALE: "Female",
     ERROR: "Error",
+    SEARCHING: "Searching",
 
     // 404 page
     WOOPS: "Oops",
@@ -66,6 +67,7 @@ export default {
         PHONE_SPECIFY: "Please specify the phone number",
         PASSWORD_SPECIFY: "Please specify the password",
         PASSWORD_CONFIRM_SPECIFY: "Please confirm the password",
+        NAME_SPECIFY: "Please specify the name",
 
         FIRSTNAME_TOOLONG: "The first name is too long",
         LASTNAME_TOOLONG: "The last name is too long",
@@ -102,6 +104,10 @@ export default {
     MY_GROUPS: "My groups",
     PARAMS: "Settings",
 
+        // informations
+        CHANGING_PASSWORD: "Changing password",
+        PASSWORD_CHANGED: "Password changed successfully",
+
         // groups
         NO_GROUPS: "You don't have any group yet",
         NO_GROUPS_DESC: "Create a group to start sharing your trips with your friends",
@@ -131,7 +137,6 @@ export default {
     // administration
     ADMINISTRATION: "Administration",
     USERS: "Users",
-    GROUPS: "Groups",
     TRIPS: "Trips",
 
     //parametres

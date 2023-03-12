@@ -12,6 +12,7 @@ export default {
     UNSPECIFIED: "Non spécifié",
     FEMALE: "Femme",
     ERROR: "Erreur",
+    SEARCHING: "Recherche",
 
     // 404 page
     WOOPS: "Woops !",
@@ -66,6 +67,7 @@ export default {
         PHONE_SPECIFY: "Veuillez renseignez votre numéro de téléphone",
         PASSWORD_SPECIFY: "Veuillez renseignez votre mot de passe",
         PASSWORD_CONFIRM_SPECIFY: "Veuillez confirmer votre mot de passe",
+        NAME_SPECIFY: "Veuillez renseignez le nom",
 
         FIRSTNAME_TOOLONG: "Le nom est trop long",
         LASTNAME_TOOLONG: "Le prénom est trop long",
@@ -102,6 +104,12 @@ export default {
     MY_GROUPS: "Mes groupes",
     PARAMS: "Paramètres",
 
+        // informations
+        CHANGING_PASSWORD: "Changement du mot de passe",
+        PASSWORD_CHANGED: "Mot de passe changé avec succès",
+        CHANGING_INFORMATIONS: "Changement des informations",
+        INFORMATIONS_CHANGED: "Informations changées avec succès",
+
         // groups
         NO_GROUPS: "Vous n'avez encore aucun groupe",
         NO_GROUPS_DESC: "Créez un groupe pour pouvoir partager vos trajets avec vos amis",
@@ -131,7 +139,6 @@ export default {
     // administration
     ADMINISTRATION: "Administration",
     USERS: "Utilisateurs",
-    GROUPS: "Groupes",
     TRIPS: "Trajets",
 
 
