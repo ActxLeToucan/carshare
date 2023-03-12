@@ -127,10 +127,11 @@ export default {
         LOADING_GROUPS_DESC: "Veuillez patienter pendant que nous chargeons vos groupes",
 
          //trip
-         Future_trips: "Trajets à venir",
-         Past_trips: "Trajets passés",
-         Trip_off: "Trajet du",
-         Passenger: "passagers",
+         FUTURE_TRIPS: "Trajets à venir",
+         PAST_TRIPS: "Trajets passés",
+         TRIP_OFF: "Trajet du",
+         PASSENGER: "passagers",
+
 
     // informations
     ADDRESS_NOT_VERIFIED: "Adresse non vérifiée",
