@@ -580,15 +580,15 @@ const error = {
     city: {
         required: (req: Request, field: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'La ville est requise.',
-                en: 'City is required.'
+                fr: `Le champ "${field}" est requis.`,
+                en: `Field "${field}" is required.`
             },
             code: 400
         }),
         type: (req: Request, field: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'La ville doit être une chaîne de caractères.',
-                en: 'City must be a string.'
+                fr: `Le champ "${field}" doit être une chaîne de caractères.`,
+                en: `Field "${field}" must be a string.`
             },
             code: 400
         })

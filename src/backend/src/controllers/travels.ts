@@ -23,10 +23,15 @@ exports.getMyTravels = (req: express.Request, res: express.Response, _: express.
 }
 
 exports.searchTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const { date, startCity, endCity } = req.query;
+    const { date, startCity, startContext, endCity, endContext } = req.query;
     if (!properties.checkCityField(startCity, req, res, 'startCity')) return;
     if (!properties.checkCityField(endCity, req, res, 'endCity')) return;
     if (!properties.checkDateField(date, req, res)) return;
+    if (startContext !== undefined && !properties.checkStringField(startContext, req, res, 'startContext')) return;
+    if (endContext !== undefined && !properties.checkStringField(endContext, req, res, 'endContext')) return;
+
+    const startCtx = startContext === undefined ? '' : startContext;
+    const endCtx = endContext === undefined ? '' : endContext;
 
     const date1 = new Date(new Date(date as string).getTime() - 1000 * 60 * 60);
     const date2 = new Date(new Date(date as string).getTime() + 1000 * 60 * 60);
@@ -37,6 +42,8 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
                               inner join etape e1 on e1.travelId = t.id and e1.city = ${startCity}
                               inner join etape e2 on e2.travelId = t.id and e2.city = ${endCity}
                      where e1.\`order\` < e2.\`order\`
+                       and IF(${startCtx} = '', true, e1.context = ${startCtx})
+                       and IF(${endCtx} = '', true, e2.context = ${endCtx})
                        and t.arrivalDate BETWEEN ${date1} and ${date2}`
         .then((data) => {
             res.status(200).json(data);
@@ -83,7 +90,6 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
         }
     }).then((travel) => {
         const data = Array.from({ length: listOfEtape.length }).map((value, index, array) => ({
-
             label: listOfEtape[index].label,
             city: listOfEtape[index].city,
             context: listOfEtape[index].context,

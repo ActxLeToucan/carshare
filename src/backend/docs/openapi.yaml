@@ -836,12 +836,24 @@ paths:
           schema:
             type: string
             example: Nancy
+        - name: startContext
+          in: query
+          description: Start context
+          schema:
+            type: string
+            example: 54, Meurthe-et-Moselle, Grand Est
         - name: endCity
           in: query
           description: End city
           schema:
               type: string
               example: Metz
+        - name: endContext
+          in: query
+          description: End context
+          schema:
+            type: string
+            example: 55, Moselle, Grand Est
       security:
         - bearerAuth: [ ]
       responses:
