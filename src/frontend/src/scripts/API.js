@@ -87,7 +87,12 @@ class API {
         VERIFY: "/users/email-verification",
         RESETPWD: "/users/password-reset",
         USERS: "/users",
-        GROUPS: "/groups/my"
+        GROUPS: "/groups/my",
+        TRAVELS: {
+            CREATE: "/travels/create",
+            MY: "/travels/my",
+            SEARCH: "/travels/search",
+        }
     };
 
     /**

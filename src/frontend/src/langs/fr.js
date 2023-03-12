@@ -13,6 +13,7 @@ export default {
     FEMALE: "Femme",
     ERROR: "Erreur",
     SEARCHING: "Recherche",
+    PRICE: "Prix",
 
     // 404 page
     WOOPS: "Woops !",
@@ -118,6 +119,7 @@ export default {
         CREATE_GROUP: "Créer un nouveau groupe",
         GROUP_CREATE_CONFIRMATION: "Veuillez renseigner les informations du groupe pour le créer",
         MEMBERS: "Membres",
+        MEMBER: "Membre",
         DELETE_GROUP: "Supprimer le groupe",
         GROUP_DELETE_CONFIRMATION: "Êtes-vous sûr de vouloir supprimer ce groupe ?\nCette action est irréversible.",
         GROUP_NAME: "Nom du groupe",
@@ -125,6 +127,9 @@ export default {
         GROUP_CREATED: "Groupe créé avec succès",
         LOADING_GROUPS: "Chargement des groupes",
         LOADING_GROUPS_DESC: "Veuillez patienter pendant que nous chargeons vos groupes",
+        SELECT_GROUP: "Sélectionnez un groupe",
+        SELECT_GROUP_DESC: "Veuillez sélectionner un groupe d'utilisateurs pour pouvoir partager vos trajets avec eux",
+        GROUP_SELECTED: "Groupe sélectionné",
 
     // informations
     ADDRESS_NOT_VERIFIED: "Adresse non vérifiée",
@@ -149,4 +154,32 @@ export default {
         EMAIL_UNMATCHING: "L'Email ne correspond pas",
         ACCOUNT_DELETION: "Suppression du compte",
         ACCOUNT_DELETED: "Compte supprimé",
+
+    // trip creation
+    TRIP_TYPE: "Type de trajet",
+    TRIP_PUBLIC: "Public",
+    TRIP_PRIVATE: "Privé",
+    TRIP_SLOTS: "Nombre de places",
+    TRIP_START: "Départ",
+    TRIP_END: "Arrivée",
+    TRIP_STEP: "Étape",
+    TRIP_INFO: "Informations supplémentaires",
+    SAME_DAY: "Même jour",
+    CONFIRM_TRIP: "Confirmer le trajet",
+    CONFIRM_TRIP_DESC: "Veuillez vérifier les informations du trajet avant de le créer",
+    CONFIRM_TRIP_CONTENT: "Vous allez faire un trajet de {0} à {1}.\nEn partant le {2} à {3} et arrivant le {4} à {5}.\nLe trajet sera au prix de {6}€ par personne et il y aura {7} places disponibles.",
+    CONFIRM_TRIP_PUBLIC: "Ce trajet sera public et tout le monde pourra le voir",
+    CONFIRM_TRIP_PRIVATE: "Ce trajet sera privé et seuls les membres du groupe {0} pourront le voir",
+    CONFIRM_TRIP_INFOS: "Informations supplémentaires : {0}",
+    CONFIRM_TRIP_NO_INFOS: "Aucune information supplémentaire n'a été renseignée",
+    CONFIRM_TRIP_NO_STEPS: "Ce trajet n'aura aucune étape",
+    CONFIRM_TRIP_N_STEPS: "Ce trajet contiendra {0} étapes :",
+    CONFIRM_TRIP_1_STEP: "Ce trajet contiendra {0} étape :",
+    CONFIRM_TRIP_STEP: "Étape {0} : Vous arriverez à {1} le {2} à {3}",
+    CREATING_TRIP: "Création du trajet",
+    TRIP_CREATED: "Trajet créé avec succès",
+    DESTINATION_SPECIFY: "Veuillez spécifier toutes les destinations du trajet",
+    DATETIME_SPECIFY: "Veuillez spécifier toutes les dates et heures du trajet",
+    SLOTS_SPECIFY: "Veuillez spécifier le nombre de places disponibles pour le trajet",
+    GROUP_SPECIFY: "Veuillez spécifier un groupe pour le trajet",
 }

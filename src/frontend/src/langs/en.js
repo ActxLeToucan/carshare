@@ -13,6 +13,7 @@ export default {
     FEMALE: "Female",
     ERROR: "Error",
     SEARCHING: "Searching",
+    PRICE: "Price",
 
     // 404 page
     WOOPS: "Oops",
@@ -116,6 +117,7 @@ export default {
         CREATE_GROUP: "Create a new group",
         GROUP_CREATE_CONFIRMATION: "Please specify the group informations to create it",
         MEMBERS: "Members",
+        MEMBER: "Member",
         DELETE_GROUP: "Delete group",
         GROUP_DELETE_CONFIRMATION: "Are you sure you want to delete this group ?\nThis action is irreversible.",
         GROUP_NAME: "Group name",
@@ -123,6 +125,9 @@ export default {
         GROUP_CREATED: "Group created successfully",
         LOADING_GROUPS: "Loading groups",
         LOADING_GROUPS_DESC: "Please wait while we load your groups",
+        SELECT_GROUP: "Select a group",
+        SELECT_GROUP_DESC: "Please select a group of users to share your trip with",
+        GROUP_SELECTED: "Group selected",
 
     // informations
     ADDRESS_NOT_VERIFIED: "Address not verified",
@@ -147,4 +152,31 @@ export default {
         EMAIL_UNMATCHING: "Emails do not match",
         ACCOUNT_DELETION: "Account deletion",
         ACCOUNT_DELETED: "Account deleted",
+
+    // trip creation
+    TRIP_TYPE: "Trip type",
+    TRIP_PUBLIC: "Public",
+    TRIP_PRIVATE: "Private",
+    TRIP_SLOTS: "Nomber of slots",
+    TRIP_START: "Start",
+    TRIP_END: "End",
+    TRIP_INFO: "Additional informations",
+    SAME_DAY: "Same day",
+    CONFIRM_TRIP: "Confirm trip",
+    CONFIRM_TRIP_DESC: "Please verify the informations below before confirming the trip",
+    CONFIRM_TRIP_CONTENT: "You are about to create a trip from {0} to {1} starting the {2} at {3} and arriving the {4} at {5}.\nThe trip will be {6} and will have {7} slots available.",
+    CONFIRM_TRIP_PUBLIC: "This trip will be public and everyone will be able to see it",
+    CONFIRM_TRIP_PRIVATE: "This trip will be private and only the users of the group {0} will be able to see it",
+    CONFIRM_TRIP_INFOS: "Additionnal informations : {0}",
+    CONFIRM_TRIP_NO_INFOS: "No additionnal informations have been specified",
+    CONFIRM_TRIP_NO_STEPS: "This trip will have no steps",
+    CONFIRM_TRIP_N_STEPS: "This trip will have {0} steps",
+    CONFIRM_TRIP_1_STEP: "This trip will have {0} step",
+    CONFIRM_TRIP_STEP: "Step {0} : You will arrive at {1} on {2} at {3}",
+    CREATING_TRIP: "Creating trip",
+    TRIP_CREATED: "Trip created successfully",
+    DESTINATION_SPECIFY: "Please specify all the trip destinations",
+    DATETIME_SPECIFY: "Please specify all the trip dates and times",
+    SLOTS_SPECIFY: "Please specify the number of slots for the trip",
+    GROUP_SPECIFY: "Please specify the group of users to share the trip with",
 }

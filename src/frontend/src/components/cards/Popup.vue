@@ -16,7 +16,7 @@
             <span class="flex grow h-1 w-full bg-slate-200 rounded-lg mb-4 mt-2"></span>
             <div class="flex justify-between">
                 <button-text ref="btn-cancel"> {{ cancelLabel }} </button-text>
-                <button-block :color="color" ref="btn-validate"> {{ validateLabel }} </button-block>
+                <button-block v-show="showValidate" :color="color" ref="btn-validate"> {{ validateLabel }} </button-block>
             </div>
         </div>
     </div>
@@ -59,6 +59,11 @@ export default {
         validateLabel: {
             type: String,
             default: 'Valider',
+            required: false
+        },
+        showValidate: {
+            type: [Boolean, String],
+            default: true,
             required: false
         },
         oncancel: {

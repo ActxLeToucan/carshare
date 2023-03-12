@@ -1,108 +1,475 @@
 <template>
     <div class="flex grow flex-col">
-        <topbar v-if="User.CurrentUser != null"></topbar>
-        <button-block class="show-right flex flex-col items-center md:w-min w-full  mx-auto overflow-hidden text-xl" style="margin-top: 1em ; margin-bottom: -3em"  href="/createTrip"> Nouveau trajet </button-block>
-        <div class="flex items-center">
-        <p class="show-down text-xl text-xl text-slate-400 text-left font-bold position: left  ml-20" style="margin-top: 5em"> Type de trajet </p>
-        <button-block class="text-xl text-slate-400 font-bold ml-10" style="margin-top: 4.6em"> Public </button-block>
-        <button-block class="text-xl text-slate-400 font-bold" style="margin-top: 4.6em"> Privé </button-block>
-        </div>
+        <topbar v-show="User.CurrentUser != null"></topbar>
+        <div class="flex grow flex-col">
+            <p class="text-2xl text-teal-500 font-bold mx-auto my-4"> {{ lang.CREATE_TRIP }} </p>
+            <div class="flex grow h-full">
 
+                <div class="flex flex-col w-[50%] grow">
+                    <card class="flex flex-col w-fit mx-auto space-y-4">
+                        <input-choice name="trip-type" :label="lang.TRIP_TYPE" :list="tripTypes"
+                            :onchange="val => selectedTripType = Number(val)" :value="selectedTripType"
+                        ></input-choice>
+                        <input-text name="trip-slots" :label="lang.TRIP_SLOTS" type="number" value="0" min="0"></input-text>
+                        <input-text name="trip-price" :label="lang.PRICE" type="number" value="0" min="0"></input-text>
+                        <input-block name="trip-infos" :label="lang.TRIP_INFO" type="text" value=""></input-block>
+                    </card>
+                    <div class="flex flex-col grow justify-evenly items-center my-4 space-y-4">
 
-        <div class="flex items-center">
-            <p class="text-xl text-slate-400 font-bold  ml-20 " style="margin-top: 5em"> Nombre de places </p>
-            <button class="bg-gray-300  text-white font-bold py-2 px-4 rounded ml-4" style="margin-top: 6em" @click="incrementCounter">{{ compteur }}</button>
-        </div>
-       
+                        <!-- GROUP SELECTION -->
+                        <card v-show="selectedTripType == 1">
+                            
+                            <div v-show="selectedGroup == null" class="flex flex-col justify-center">
+                                <p class="text-slate-500 text-lg text-center font-base"> {{ lang.SELECT_GROUP }} </p>
+                                <button
+                                    class="p-2 mt-2 mx-auto text-slate-400 rounded-lg border-2 border-transparent hover:bg-slate-100 hover:border-slate-200 transition-all"
+                                    v-on:click="() => { this.$refs['group-popup'].show(); }"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+                                    </svg>
+                                </button>
+                            </div>
+                            <div v-show="selectedGroup != null" class="flex flex-col justify-center">
+                                <p class="text-slate-500 text-lg text-center font-base"> {{ lang.GROUP_SELECTED }} </p>
+                                <button
+                                    class="p-2 mt-2 mx-auto text-slate-400 rounded-lg border-2 border-transparent hover:bg-slate-100 hover:border-slate-200 transition-all"
+                                    v-on:click="() => { this.$refs['group-popup'].show(); }"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 mx-auto">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+                                    </svg>
+                                    <p class="text-slate-500 text-lg text-center font-semibold"> {{ selectedGroup?.name }} </p>
+                                    <p class="text-slate-500 text-md text-center font-base"> {{ selectedGroup?.users?.length }} {{ (selectedGroup?.users?.length == 1? lang.MEMBER: lang.MEMBERS) }} </p>
+                                </button>
+                            </div>
 
-        <div  class="show-down text-xl text-xl text-slate-400 text-left font-bold position: left  ml-auto">
-            <div class="flex items-center" style="margin-top: -8em">
-                <p class="show-down text-xl text-xl  text-slate-400 text-left font-bold position: left  ml-4"> Départ </p>
-                <selector ref="startSelector" :oncompletion="searchCities" :onclick="onstartselected" x="1" y="4"></selector>
-                <input-text name="startpoint" class="w-50 mx-10 max-w-fit" placeholder="Nancy" dark="true" style="margin-right: 8em"></input-text>
+                        </card>
+
+                    </div>
+                    <div
+                        ref="log-zone"
+                        class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
+                        style="max-height: 0px;"
+                    ></div>
+                    <div class="flex w-full justify-evenly items-end my-4">
+
+                        <button-text :action="goBack"> {{ lang.CANCEL }} </button-text>
+                        <button-block :action="showValidatePopup"> {{ lang.CREATE }} </button-block>
+
+                    </div>
+                </div>
+
+                <div class="flex grow w-fit items-center justify-center py-[20vh]">
+                    <span class="w-1 h-full bg-slate-200 rounded-lg"></span>
+                </div>
+
+                <div class="flex flex-col w-[50%]">
+
+                    <div class="flex flex-col w-fit mx-auto">
+
+                        <!-- START SECTION -->
+                        <card class="flex flex-col my-2 p-1 w-full">
+                            <input-text
+                                class="my-1"
+                                ref="startstep-input" :label="lang.TRIP_START"
+                                :onchange="e => { if (startStep.destination?.value != e.target.value) startStep.destination = null; }"
+                                :value="startStep.destination?.value">
+                            </input-text>
+                            <selector
+                                ref="start-selector" :oncompletion="searchCities"
+                                :onclick="city => { this.startStep.destination = city; }"
+                                :onload="sel => sel.attachInput(this.$refs['startstep-input'].$el.querySelector('input'))">
+                            </selector>
+                            <input-text
+                                class="my-1" 
+                                ref="startstep-date"
+                                :label="lang.DATE"
+                                :value="startStep.datetime" :onchange="e => setStartDate(e.target.value)"
+                                type="datetime-local">
+                            </input-text>
+                        </card>
+
+                        <div class="flex flex-col">
+                            <div class="flex flex-col space-y-2">
+                                <span class="h-4 w-1 bg-slate-300 rounded-md mx-auto"></span>
+                                <div class="flex rounded-md border-2 border-slate-400 w-fit mx-auto text-slate-500 shadow-none
+                                            hover:border-teal-500 hover:text-teal-500 hover:shadow-md cursor-pointer transition-all"
+                                     v-on:click="addStep(0)">
+                                    <plus-icon class="w-6 h-6"></plus-icon>
+                                </div>
+                                <span class="h-4 w-1 bg-slate-300 rounded-md mx-auto"></span>
+                            </div>
+
+                            <!-- IN BETWEEN STEPS SECTION -->
+                            <div class="flex flex-col" v-for="(step, index) in tripSteps" :key="step.id">
+                                <div class="flex items-center">
+                                    <card class="flex flex-col w-full my-2 p-1">
+                                        <input-text
+                                            class="my-1" 
+                                            :name="'midpoint-input-' + index" :label="lang.TRIP_STEP + ' ' + (index+1)" type="text"
+                                            :onchange="e => { if (step.destination?.value != e.target.value) step.destination = null; }"
+                                            :value="step.destination?.value">
+                                        </input-text>
+                                        <selector
+                                            class="ml-auto"
+                                            :ref="'mid-selector-' + index" :oncompletion="searchCities"
+                                            :onclick="city => { step.destination = city; }"
+                                            :onload="sel => sel.attachInput(this.$el.querySelector('input[name=midpoint-input-' + index + ']'))">
+                                        </selector>
+                                        <input-text
+                                            class="my-1" 
+                                            :ref="'midpoint-date-' + index" :label="lang.DATE"
+                                            :value="step.datetime" :onchange="e => setStepDate(index, e.target.value)"
+                                            type="datetime-local">
+                                        </input-text>
+                                    </card>
+                                    <div class="flex grow w-0">
+                                        <div class="flex rounded-md h-fit w-fit mx-auto text-slate-500 pl-2 hover:text-red-500 cursor-pointer transition-all"
+                                            v-on:click="() => delStep(index)">
+                                            <x-mark-icon class="w-6 h-6"></x-mark-icon>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex flex-col space-y-2">
+                                    <span class="h-4 w-1 bg-slate-300 rounded-md mx-auto"></span>
+                                    <div class="flex rounded-md border-2 border-slate-400 w-fit mx-auto text-slate-500 shadow-none
+                                                hover:border-teal-500 hover:text-teal-500 hover:shadow-md cursor-pointer transition-all"
+                                         v-on:click="() => addStep(index + 1)">
+                                        <plus-icon class="w-6 h-6"></plus-icon>
+                                    </div>
+                                    <span class="h-4 w-1 bg-slate-300 rounded-md mx-auto"></span>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- END STEP -->
+                        <card class="flex flex-col my-2 p-1 w-full">
+                            <input-text
+                                class="my-1"
+                                ref="endstep-input" :label="lang.TRIP_END"
+                                :onchange="e => { if (endStep.destination?.value != e.target.value) endStep.destination = null; }"
+                                :value="endStep.destination?.value">
+                            </input-text>
+                            <selector
+                                ref="start-selector" :oncompletion="searchCities"
+                                :onclick="city => { this.endStep.destination = city; }"
+                                :onload="sel => sel.attachInput(this.$refs['endstep-input'].$el.querySelector('input'))">
+                            </selector>
+                            <input-text
+                                class="my-1" 
+                                ref="endstep-date"
+                                :label="lang.DATE"
+                                :value="endStep.datetime" :onchange="e => setEndDate(e.target.value)"
+                                type="datetime-local">
+                            </input-text>
+                        </card>
+                    </div>
+
+                </div>
+
             </div>
-       <!-- <button-block class="w-fit" color="slate" :action="reverseInputs"> 
-            <arrows-right-left-icon class="md:block hidden h-7 w-7"></arrows-right-left-icon>
-            <arrows-up-down-icon class="md:hidden block h-7 w-7"></arrows-up-down-icon>
-        </button-block> -->
-            <div class="flex items-center">
-                <p class="show-down text-xl text-xl text-slate-400 text-left font-bold position: left  ml-4"> Arrivée </p>
-                <selector ref="endSelector" :oncompletion="searchCities" :onclick="onendselected" x="1" y="4"></selector>
-                <input-text name="endpoint" class="w-45 mx-10 max-w-fit" placeholder="Paris" dark="true"></input-text>
-            </div>   
         </div>
-        <div class="flex items-center  bg-gray-200 " style="margin-left: 45em ; margin-right: 1em ; margin-top: 8em ">
-            <div class="show-down text-xl text-xl text-slate-400 text-left font-bold position: left  ml-auto">
-                <p class="text-xl text-slate-400 font-bold  ml-1 " style="margin-top: 2em"> Nombre de kilomètres </p>
-                <input-text  name="startpoint" class="w-50 mx-1 max-w-fit" placeholder="100" dark="true" style="margin-right: 5em" ></input-text>
+        <popup
+            ref="group-popup"
+            :title="lang.SELECT_GROUP"
+            :content="lang.SELECT_GROUP_DESC"
+            :showValidate="false"
+            :oncancel="() => { selectedGroup = null; this.$refs['group-popup'].hide();}"
+        >
+            <div class="flex flex-wrap justify-evenly md:max-w-[50vw] overflow-auto max-h-[50vh]">
+                <button v-for="group in groups" :key="group.name" v-on:click="() => { selectedGroup = group; $refs['group-popup'].hide(); }"
+                    class="flex flex-col justify-center py-1 md:m-2 m-1 rounded-md bg-slate-100 px-2 w-fit max-w-[14em] border-2 border-transparent
+                            hover:border-slate-200 cursor-pointer transition-all"
+                >
+                    <p class="md:text-xl text-lg text-slate-500 font-bold mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full"> {{ group.name }} </p>
+                    <p class="md:text-lg text-md text-slate-500 mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full"> {{ group.users.length }} {{ group.users.length == 1? lang.MEMBER: lang.MEMBERS }} </p>
+                </button>
             </div>
-            <div class="show-down text-xl text-xl text-slate-400 text-left font-bold position: left  ml-1">
-                <p class="text-xl text-slate-400 font-bold  ml-1 " style="margin-top: 2em"> Prix conseillé </p>
-                <p class="text-sm text-slate-400 font-bold  ml-1  "> Par personne </p>
-                <input-text name="startpoint" class="w-50 mx-1 max-w-fit" placeholder="8 €" dark="true" style="margin-right: 5em"></input-text>
-            </div>
-        </div>
+        </popup>
+        <popup
+            ref="confirm-popup"
+            :title="lang.CONFIRM_TRIP"
+            :content="lang.CONFIRM_TRIP_DESC"
+            :showValidate="true"
+            :onvalidate="uploadTrip"
+            :oncancel="() => { this.$refs['confirm-popup'].hide(); }"
+        >
+            <div ref="trip-desc" class="flex flex-col">
 
-        <p class="show-down text-xl text-xl text-slate-400 text-left font-bold position: left  ml-20" style="margin-top: -7em"> Groupe de trajet </p>
-        
-        <div class="flex items-center">
-        <button-block class="show-right flex flex-col items-center md:w-min w-full  mx-auto overflow-hidden text-xl" style="margin-top: 8em"> Annuler </button-block>
-        <button-block class="show-right flex flex-col items-center md:w-min w-full  mx-auto overflow-hidden text-xl" style="margin-top: 8em" > Créer le trajet </button-block>
-       
-        </div>
+            </div>
+        </popup>
     </div>
-    
 </template>
-
 
 <script>
 import ButtonBlock from '../components/inputs/ButtonBlock.vue';
 import ButtonText from '../components/inputs/ButtonText.vue';
+import InputChoice from '../components/inputs/InputChoice.vue';
 import InputText from '../components/inputs/InputText.vue';
+import InputBlock from '../components/inputs/InputBlock.vue';
 import Topbar from "../components/topbar/Topbar.vue";
-import UserTrips from '../components/profile/UserTrips.vue';
-import { goBack } from '../scripts/redirects';
+import Popup from "../components/cards/Popup.vue";
+import Card from '../components/cards/Card.vue';
+import { goBack } from "../scripts/redirects.js";
 import User from "../scripts/User.js";
+import Lang from "../scripts/Lang.js";
+import Selector from '../components/inputs/Selector.vue';
+import BAN from '../scripts/BAN';
+import { Log, LogZone } from '../scripts/Logs';
 
+import {
+    PlusIcon,
+    XMarkIcon
+} from '@heroicons/vue/24/outline';
+import API from '../scripts/API';
+
+const tripTypes = [
+    { value: 0, id: 'TRIP_PUBLIC' },
+    { value: 1, id: 'TRIP_PRIVATE' }
+];
 
 export default {
     name: 'App',
     components: {
-    Topbar,
-    ButtonBlock,
-    InputText,
-    ButtonText,
-    UserTrips
-},
+        Topbar,
+        ButtonBlock,
+        InputText,
+        InputBlock,
+        ButtonText,
+        InputChoice,
+        PlusIcon,
+        XMarkIcon,
+        Selector,
+        Card,
+        Popup
+    },
     data() {
-        return { 
+        return {
             User,
-            goBack ,
-            compteur: 0 }
+            lang: Lang.CurrentLang,
+            tripTypes,
+            selectedTripType: 0,
+            selectedGroup: null,
+            tripSteps: [],
+            startStep: {destination: "", datetime: null},
+            endStep: {destination: "", datetime: null},
+            goBack,
+            groups: []
+        }
     },
-    searchCities(selector, search) {
-        BAN.searchCities(search).then(cities => {
-            let index = 0;
-            startCities = cities.map(city => ({ id: index++, value: city.city }));
-            selector.setData(startCities);
-        }).catch(err => {
-            startCities = [];
-            selector.setData(startCities);
-        });
-    },
-    reverseInputs() {
-            const start = this.startInput.value;
-            const end = this.endInput.value;
-            this.startInput.value = end;
-            this.endInput.value = start;
-        },
     methods: {
-    incrementCounter() {
-      this.compteur++
+        searchCities(selector, search) {
+            BAN.searchCities(search).then(cities => {
+                let index = 0;
+                let res = cities.map(city => ({
+                    id: index++,
+                    value: city.name,
+                    desc: city.context,
+                    label: city.label,
+                    city: city.city,
+                    context: city.context,
+                    lat: city.lat,
+                    lng: city.lng,
+                }));
+                selector.setData(res);
+            }).catch(err => {
+                selector.setData([]);
+            });
+        },
+        addStep(index) {
+            this.tripSteps.splice(index, 0, {destination: "", datetime: null})
+        },
+        setStepDate(index, v) { this.tripSteps[index].datetime = v; },
+        setStartDate(v)       { this.startStep.datetime = v;        },
+        setEndDate(v)         { this.endStep.datetime = v;          },
+        delStep(index) {
+            this.tripSteps.splice(index, 1)
+        },
+        showValidatePopup() {
+            const res = this.updateTripDesc();
+            if (!res) return;
+            const popup = this.$refs['confirm-popup'];
+            popup.show();
+        },
+        log(msg, type = Log.INFO) {
+            if (!this.logZone) return null;
+            const log = new Log(msg, type);
+            log.attachTo(this.logZone);
+            return log;
+        },
+        createTrip() {
+            const toDestination = (obj) => !obj? null: ({label: obj.label, city: obj.city, context: obj.context, lat: obj.lat, lng: obj.lng});
+            const toStep = (obj) => !obj? null: ({destination: toDestination(obj.destination), datetime: obj.datetime});
+
+            const groupID = this.selectedTripType == 1? this.selectedGroup?.id: null;
+            const infos = this.$el.querySelector("textarea[name=trip-infos]").value;
+            const price = this.$el.querySelector("input[name=trip-price]").value;
+            const slots = this.$el.querySelector("input[name=trip-slots]").value;
+            const steps = [this.startStep]
+                .concat(this.tripSteps)
+                .concat([this.endStep])
+                .map(toStep);
+
+            const data = {
+                maxPassengers: slots,
+                price: price,
+                description: infos,
+                groupId: groupID,
+                steps: steps
+            }
+
+            const msg_log = this.log(Lang.CurrentLang.INPUT_VERIFICATION + " ...", Log.INFO);
+            let valid = true;
+
+            const field_checks = [
+                {check: () => slots > 0, error: Lang.CurrentLang.SLOTS_SPECIFY},
+                {check: () => this.selectedTripType == 0 || this.selectedGroup, error: Lang.CurrentLang.GROUP_SPECIFY},
+                {
+                    check: () =>
+                        steps.reduce((acc, step) => {
+                            if (!acc) return false;
+                            if (!step) return false;
+                            if (!step.destination) return false;
+                            return true;
+                        }, true)
+                    ,
+                    error: Lang.CurrentLang.DESTINATION_SPECIFY
+                },
+                {
+                    check: () =>
+                        steps.reduce((acc, step) => {
+                            if (!acc) return false;
+                            if (!step) return false;
+                            if (!step.datetime) return false;
+                            return true;
+                        }, true)
+                    ,
+                    error: Lang.CurrentLang.DATETIME_SPECIFY
+                }
+            ];
+
+            field_checks.forEach(check => {
+                if (!check.check() && valid) {
+                    msg_log.update(check.error, Log.WARNING);
+                    valid = false;
+                }
+            });
+
+            if (!valid) {
+                setTimeout(() => { msg_log.delete(); }, 6000);
+                return null;
+            }
+
+            msg_log.update(Lang.CurrentLang.INPUT_VERIFICATION_SUCCESS, Log.SUCCESS);
+            setTimeout(() => { msg_log.delete(); }, 2000);
+
+            return data;
+        },
+        updateTripDesc() {
+            const data = this.createTrip();
+            if (!data) return false;
+            let startDate = "";
+
+            const stylize = str => `<span class="text-slate-600 font-bold">${str}</span>`;
+            const getDate = date => {
+                if (!date) return undefined;
+                const strDate = new Date(date).toLocaleDateString();
+                if (strDate === startDate) return Lang.CurrentLang.SAME_DAY.toLowerCase();
+                return strDate;
+            };
+            const getTime = date => !date ? undefined: new Date(date).toLocaleTimeString().substring(0, 5);
+            const formatString = (str, ...args) => {
+                return str.replace(/\{(\d+)\}/g, (match, number) => {
+                    return stylize(typeof args[number] != 'undefined' ? args[number] : match);
+                });
+            }
+
+            const tripDesc = this.$refs['trip-desc'];
+            startDate = getDate(data.steps[0].datetime);
+
+            let desc = "";
+            desc += formatString(
+                Lang.CurrentLang.CONFIRM_TRIP_CONTENT,
+                data.steps[0].destination?.label,
+                data.steps[data.steps.length - 1].destination?.label,
+                startDate,
+                getTime(data.steps[0].datetime),
+                getDate(data.steps[data.steps.length - 1].datetime),
+                getTime(data.steps[data.steps.length - 1].datetime),
+                data.price,
+                data.maxPassengers,
+            ) + "\n";
+
+            desc += formatString(
+                data.groupId? Lang.CurrentLang.CONFIRM_TRIP_PRIVATE: Lang.CurrentLang.CONFIRM_TRIP_PUBLIC,
+                this.selectedGroup?.name
+            ) + "\n";
+
+            desc += formatString(
+                data.steps.length > 2? (
+                    data.steps.length == 3? Lang.CurrentLang.CONFIRM_TRIP_1_STEP: Lang.CurrentLang.CONFIRM_TRIP_N_STEPS
+                ): Lang.CurrentLang.CONFIRM_TRIP_NO_STEPS,
+                data.steps.length - 2
+            ) + "\n";
+
+            const steps = data.steps.slice(1, data.steps.length - 1);
+            steps.forEach((step, index) => {
+                desc += formatString(
+                    Lang.CurrentLang.CONFIRM_TRIP_STEP,
+                    index + 1,
+                    step.destination?.label,
+                    getDate(step.datetime),
+                    getTime(step.datetime)
+                ) + "\n";
+            });
+
+            desc += formatString(
+                data.description == ""? Lang.CurrentLang.CONFIRM_TRIP_NO_INFOS: Lang.CurrentLang.CONFIRM_TRIP_INFOS,
+                "\n" + data.description
+            );
+
+            const lines = desc.split("\n");
+            tripDesc.innerHTML = "";
+            lines.forEach(line => {
+                const p = document.createElement("p");
+                p.classList.add("text-md", "text-gray-500", "font-semibold");
+                p.innerHTML = line;
+                tripDesc.appendChild(p);
+            });
+
+            return true;
+        },
+        uploadTrip(popup) {
+            const data = this.createTrip();
+            if (!data) return;
+
+            const msg_log = popup.log(Lang.CurrentLang.CREATING_TRIP, Log.INFO);
+            API.execute_logged(API.ROUTE.TRAVELS.CREATE, API.METHOD.POST, User.CurrentUser?.getCredentials(), data).then(res => {
+                msg_log.update(Lang.CurrentLang.TRIP_CREATED, Log.SUCCESS);
+                setTimeout(() => {
+                    msg_log.delete();
+                    popup.hide();
+                }, 2000);
+            }).catch(err => {
+                msg_log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
+                setTimeout(() => {
+                    msg_log.delete();
+                    popup.hide();
+                }, 6000);
+            });
+        }
     },
-    actionOnClick() {
-      console.log("Bouton cliqué !");
+    mounted() {
+        this.logZone = new LogZone(this.$refs['log-zone']);
+
+        this.groups.splice(0, this.groups.length);
+        API.execute_logged(API.ROUTE.GROUPS, API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
+            res.forEach(group => this.groups.push(group));
+        }).catch(err => {
+            console.error(err);
+        });
     }
-  }
 }
 </script>
