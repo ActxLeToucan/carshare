@@ -38,10 +38,16 @@
                                     <span class="text-slate-400 mr-4">{{ new Date(notif.createdAt).toLocaleString() }}</span>
                                     <span class="">{{ notif.title }}</span>
                                 </p>
-                                <p class=""> {{ notif.message }} </p>
+                                <p class="whitespace-pre-wrap"> {{ notif.message }} </p>
+                                <div class="mt-4" v-if="notif.type === 'request'">
+                                    <button-block class="inline-block mr-4"         :action="() => acceptRequest(notif)">Accepter</button-block>
+                                    <button-block class="inline-block" color="red"  :action="() => refuseRequest(notif)">Refuser</button-block>
+                                </div>
                             </div>
                             <div class="">
-                                <button-block class="" color="red" @click="deleteOne(notif.id)">Supprimer</button-block>
+                                <button-block color="red" :action="() => deleteOne(notif)">
+                                    <trash-icon class="w-7 h-7"></trash-icon>
+                                </button-block>
                             </div>
 
                         </card>
@@ -61,10 +67,11 @@ import Card from "../cards/Card.vue";
 import ButtonBlock from "../inputs/ButtonBlock.vue";
 import ButtonText from "../inputs/ButtonText.vue";
 import ButtonTab from "../inputs/ButtonTab.vue";
+import {TrashIcon} from "@heroicons/vue/20/solid";
 
 export default {
     name: "UserNotifs",
-    components: {ButtonTab, ButtonText, ButtonBlock, Card},
+    components: {ButtonTab, ButtonText, ButtonBlock, Card, TrashIcon},
     data() {
         return {
             lang: Lang.CurrentLang,
@@ -79,6 +86,7 @@ export default {
     },
     methods: {
         getNotifs() {
+            // TODO: gérer pagination
             this.loading = true;
             API.execute_logged(API.ROUTE.MY_NOTIFS, API.METHOD.GET, User.CurrentUser?.getCredentials()).then((data) => {
                 console.log(data);
@@ -92,10 +100,22 @@ export default {
                 this.loading = false;
             });
         },
-        deleteOne(id) {
-            this.notifs = this.notifs.filter(notif => notif.id !== id);
+        deleteOne(notif) {
+            this.notifs = this.notifs.filter(n => n.id !== notif.id);
             // TODO: delete notif
         },
+        deleteAll() {
+            this.notifs = [];
+            // TODO: delete all notifs
+        },
+        acceptRequest(notif) {
+            console.log(`TODO: send accept request with SENDER: ${notif.userId} and TRAVEL: ${notif.travelId} TO: ${notif.senderId}`);
+            notif.type = 'request.old';
+        },
+        refuseRequest(notif) {
+            console.log(`TODO: send refuse request with SENDER: ${notif.userId} and TRAVEL: ${notif.travelId} TO: ${notif.senderId}`);
+            notif.type = 'request.old';
+        }
     }
 }
 </script>
