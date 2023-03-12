@@ -471,7 +471,6 @@ function checkMaxPassengersField (value: any, req: express.Request, res: express
  * @param value Value to sanitize
  * @param req Express request
  * @param res Express response
- * @param fieldName Name of the field
  * @returns true if the value is valid and if the value is between -180 and 180, false otherwise
  */
 function checkLngField (value: any, req: express.Request, res: express.Response): boolean {
@@ -497,7 +496,6 @@ function checkLngField (value: any, req: express.Request, res: express.Response)
  * @param value Value to sanitize
  * @param req Express request
  * @param res Express response
- * @param fieldName Name of the field
  * @returns true if the value is valid and if the value is between -90 and 90, false otherwise
  */
 function checkLatField (value: any, req: express.Request, res: express.Response): boolean {

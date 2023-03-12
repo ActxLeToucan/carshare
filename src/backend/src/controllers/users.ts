@@ -5,11 +5,11 @@ import jwt from 'jsonwebtoken';
 import { displayableUserPrivate, error, info, mail, sendMail, sendMsg } from '../tools/translator';
 import * as properties from '../properties';
 import * as _user from './users/_common';
-import { prepareSearch } from './_common';
+import { preparePagination } from './_common';
 import { MailerError } from '../tools/mailer';
 import { type User } from '@prisma/client';
 
-exports.signup = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+exports.signup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { email, password, lastName, firstName, phone, hasCar, gender } = req.body;
 
     if (!properties.checkEmailField(email, req, res)) return;
@@ -65,7 +65,7 @@ exports.signup = (req: express.Request, res: express.Response, next: express.Nex
         });
 }
 
-exports.login = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+exports.login = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     if (!properties.checkEmailField(req.body.email, req, res, false)) return;
     if (!properties.checkPasswordField(req.body.password, req, res, false)) return;
 
@@ -102,7 +102,7 @@ exports.login = (req: express.Request, res: express.Response, next: express.Next
         });
 }
 
-exports.passwordResetSendEmail = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+exports.askForPasswordReset = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     if (!properties.checkEmailField(req.body.email, req, res, false)) return;
 
     prisma.user.findUnique({ where: { email: req.body.email } })
@@ -153,7 +153,11 @@ exports.passwordResetSendEmail = (req: express.Request, res: express.Response, n
         });
 }
 
-exports.updatePassword = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+exports.resetPassword = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    exports.updatePassword(req, res, next);
+}
+
+exports.updatePassword = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     if (!properties.checkPasswordField(req.body.password, req, res)) return;
     if (!properties.checkOldPasswordField(req.body.oldPassword, req, res)) return;
 
@@ -185,7 +189,7 @@ exports.updatePassword = (req: express.Request, res: express.Response, next: exp
         });
 }
 
-exports.emailVerificationSendEmail = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+exports.askForEmailVerification = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     if (res.locals.user.emailVerifiedOn !== null) {
         sendMsg(req, res, error.email.alreadyVerified);
         return;
@@ -226,7 +230,7 @@ exports.emailVerificationSendEmail = (req: express.Request, res: express.Respons
         });
 }
 
-exports.emailVerification = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+exports.emailVerification = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     prisma.user.update({
         where: { id: res.locals.user.id },
         data: { emailVerifiedOn: new Date() }
@@ -238,26 +242,26 @@ exports.emailVerification = (req: express.Request, res: express.Response, next: 
     });
 }
 
-exports.getAllUsers = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const search = prepareSearch(req);
+exports.searchUsers = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    const pagination = preparePagination(req, true);
 
-    const q = `%${search.query ?? ''}%`;
+    const q = `%${pagination.query ?? ''}%`;
 
     prisma.$queryRaw`SELECT *
                      FROM user
-                     WHERE IF(${search.query !== undefined}, email LIKE ${q}
+                     WHERE IF(${pagination.query !== undefined}, email LIKE ${q}
                          OR phone LIKE ${q}
                          OR CONCAT(firstName, ' ', lastName) LIKE ${q}, TRUE)
-                     LIMIT ${search.pagination.take} OFFSET ${search.pagination.skip}`
+                     LIMIT ${pagination.pagination.take} OFFSET ${pagination.pagination.skip}`
         .then(users => {
-            res.status(200).json(search.results('users', (users as User[]).map(displayableUserPrivate)));
+            res.status(200).json(pagination.results('users', (users as User[]).map(displayableUserPrivate)));
         }).catch(err => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);
         });
 }
 
-exports.deleteUser = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+exports.deleteUser = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const userId = properties.sanitizeUserId(req.params.id, req, res);
     if (userId === null) return;
 
@@ -287,7 +291,7 @@ exports.deleteUser = (req: express.Request, res: express.Response, next: express
         });
 }
 
-exports.updateUser = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+exports.updateUser = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const userId = properties.sanitizeUserId(req.params.id, req, res);
     if (userId === null) return;
 
