@@ -30,11 +30,6 @@ export default {
             type: String,
             default: "",
             required: false
-        },
-        onchange: {
-            type: Function,
-            default: (state) => { },
-            required: false
         }
     },
     data() {
@@ -45,9 +40,7 @@ export default {
                 default: this.state = false; break;
             }
         }
-        return {
-            state: false
-        }
+        return {};
     },
     methods: {
         updateButton() {
@@ -73,7 +66,6 @@ export default {
     mounted() {
         this.$refs["switch"].addEventListener("click", ev => {
             this.state = !this.state;
-            this.onchange(this.state);
             this.updateButton();
         });
         this.updateButton();

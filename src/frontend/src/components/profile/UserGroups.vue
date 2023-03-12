@@ -147,8 +147,25 @@ export default {
             this.selectedGroup
         },
         createGroup(popup) {
-            const log = popup.log(Lang.CurrentLang.CREATING_GROUP + " ...", Log.INFO);
+            const log = popup.log(Lang.CurrentLang.INPUT_VERIFICATION + " ...", Log.INFO);
+
+            const field_checks = [
+                {field: "name",        check: (value) => value.length > 0, error: Lang.CurrentLang.NAME_SPECIFY},
+            ];
+            
+            for (let i = 0; i < field_checks.length; i++) {
+                const check = field_checks[i];
+                const result = check.check(popup.get(check.field), popup);
+                if (!result) {
+                    popup.focus(check.field);
+                    log.update(check.error, Log.WARNING);
+                    setTimeout(() => { log.delete(); }, 4000);
+                    return;
+                }
+            }
+            log.update(Lang.CurrentLang.CREATING_GROUP + " ...", Log.INFO);
             const name = popup.get("name");
+
             API.execute_logged(API.ROUTE.GROUPS, API.METHOD.POST, User.CurrentUser?.getCredentials(), {name}).then(res => {
                 log.update(Lang.CurrentLang.GROUP_CREATED, Log.SUCCESS);
                 setTimeout(() => {
@@ -157,7 +174,7 @@ export default {
                 }, 2000);
                 this.updateGroups();
             }).catch(err => {
-                log.update(Lang.CurrentLang.ERROR + " : " + err, Log.ERROR);
+                log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
                 setTimeout(() => {
                     log.delete();
                 }, 6000);

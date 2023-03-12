@@ -5,7 +5,9 @@ import jwt from 'jsonwebtoken';
 import { displayableUserPrivate, error, info, mail, sendMail, sendMsg } from '../tools/translator';
 import * as properties from '../properties';
 import * as _user from './users/_common';
-import { type Prisma } from '@prisma/client';
+import { prepareSearch } from './_common';
+import { MailerError } from '../tools/mailer';
+import { type User } from '@prisma/client';
 
 exports.signup = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const { email, password, lastName, firstName, phone, hasCar, gender } = req.body;
@@ -143,15 +145,15 @@ exports.passwordResetSendEmail = (req: express.Request, res: express.Response, n
                 });
         }).catch((err) => {
             console.error(err);
+            if (err instanceof MailerError) {
+                sendMsg(req, res, error.mailer.disabled);
+                return;
+            }
             sendMsg(req, res, error.generic.internalError);
         });
 }
 
 exports.updatePassword = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
     if (!properties.checkPasswordField(req.body.password, req, res)) return;
     if (!properties.checkOldPasswordField(req.body.oldPassword, req, res)) return;
 
@@ -184,11 +186,6 @@ exports.updatePassword = (req: express.Request, res: express.Response, next: exp
 }
 
 exports.emailVerificationSendEmail = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
-
     if (res.locals.user.emailVerifiedOn !== null) {
         sendMsg(req, res, error.email.alreadyVerified);
         return;
@@ -221,16 +218,15 @@ exports.emailVerificationSendEmail = (req: express.Request, res: express.Respons
             });
         }).catch((err) => {
             console.error(err);
+            if (err instanceof MailerError) {
+                sendMsg(req, res, error.mailer.disabled);
+                return;
+            }
             sendMsg(req, res, error.generic.internalError);
         });
 }
 
 exports.emailVerification = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
-
     prisma.user.update({
         where: { id: res.locals.user.id },
         data: { emailVerifiedOn: new Date() }
@@ -243,36 +239,19 @@ exports.emailVerification = (req: express.Request, res: express.Response, next: 
 }
 
 exports.getAllUsers = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const offset = Number.isNaN(req.query.offset) ? 0 : Math.max(0, Number(req.query.offset)); // default 0, min 0
-    const limit = Number.isNaN(req.query.limit)
-        ? properties.p.query.maxLimit // default
-        : Math.min(properties.p.query.maxLimit,
-            Math.max(properties.p.query.minLimit, Number(req.query.limit))
-        ); // default max, min p.query.minLimit, max p.query.maxLimit
+    const search = prepareSearch(req);
 
-    const lastName = String(req.query.lastName ?? '');
-    const firstName = String(req.query.firstName ?? '');
-    const email = String(req.query.email ?? '');
+    const q = `%${search.query ?? ''}%`;
 
-    const where: {lastName?: any, firstName?: any, email?: any} = {};
-    if (lastName !== '') { where.lastName = { startsWith: lastName }; }
-    if (firstName !== '') { where.firstName = { startsWith: firstName }; }
-    if (email !== '') { where.email = { startsWith: email }; }
-
-    prisma.user.findMany<Prisma.UserFindManyArgs>({
-        where,
-        skip: offset,
-        take: limit,
-        orderBy: [
-            {
-                id: 'asc'
-            }
-        ]
-    })
+    prisma.$queryRaw`SELECT *
+                     FROM user
+                     WHERE IF(${search.query !== undefined}, email LIKE ${q}
+                         OR phone LIKE ${q}
+                         OR CONCAT(firstName, ' ', lastName) LIKE ${q}, TRUE)
+                     LIMIT ${search.pagination.take} OFFSET ${search.pagination.skip}`
         .then(users => {
-            res.status(200).json(users.map(displayableUserPrivate));
-        })
-        .catch(err => {
+            res.status(200).json(search.results('users', (users as User[]).map(displayableUserPrivate)));
+        }).catch(err => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);
         });
@@ -295,7 +274,9 @@ exports.deleteUser = (req: express.Request, res: express.Response, next: express
             }
 
             prisma.user.delete({ where: { id: userId } })
-                .then(() => { sendMsg(req, res, info.user.deleted); })
+                .then(() => {
+                    sendMsg(req, res, info.user.deleted);
+                })
                 .catch((err) => {
                     console.error(err);
                     sendMsg(req, res, error.generic.internalError);

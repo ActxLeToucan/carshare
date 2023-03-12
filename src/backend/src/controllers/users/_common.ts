@@ -28,6 +28,12 @@ async function update (req: express.Request, res: express.Response, userId: numb
     const phoneSanitized = _phoneSanitized;
     const genderSanitized = properties.sanitizeGender(gender);
 
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (user === null) {
+        sendMsg(req, res, error.user.notFound);
+        return;
+    }
+
     const data = {
         email,
         lastName,
@@ -36,7 +42,7 @@ async function update (req: express.Request, res: express.Response, userId: numb
         hasCar,
         mailNotif,
         gender: genderSanitized,
-        emailVerifiedOn: email !== undefined ? null : undefined,
+        emailVerifiedOn: email !== undefined && email !== user.email ? null : undefined,
         level: asAdmin ? level : undefined
     };
 

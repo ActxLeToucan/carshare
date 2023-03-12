@@ -2,16 +2,15 @@ import type express from 'express';
 import { prisma } from '../app';
 import { error, info, sendMsg } from '../tools/translator';
 import * as properties from '../properties';
+import { getPagination } from './_common';
 
 exports.myNotifications = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
+    const pagination = getPagination(req);
 
     prisma.notification.findMany({
-        where: { userId: res.locals.user.id }
-
+        where: { userId: res.locals.user.id },
+        skip: pagination.offset,
+        take: pagination.limit
     }).then(notifications => {
         res.status(200).json(notifications);
     }).catch((err) => {
@@ -21,11 +20,6 @@ exports.myNotifications = (req: express.Request, res: express.Response, next: ex
 }
 
 exports.deleteAllNotification = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
-
     prisma.notification.deleteMany({
         where: { userId: res.locals.user.id }
 
@@ -38,10 +32,6 @@ exports.deleteAllNotification = (req: express.Request, res: express.Response, ne
 }
 
 exports.deleteOneNotification = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
     const notifId = properties.sanitizeNotificationId(req.params.id, req, res);
     if (notifId === null) return;
 

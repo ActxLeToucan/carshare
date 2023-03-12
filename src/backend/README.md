@@ -27,7 +27,7 @@ npm i -g nodemon
 6. Compléter le fichier `mail.config.json` avec les informations de votre serveur SMTP, ou désactiver l'envoi d'emails en mettant `enabled` à `false`
 7. Initialiser la base de données
 ```bash
-npx prisma migrate dev
+npx prisma migrate deploy
 ```
 8. Lancer le serveur
 ```bash
@@ -108,15 +108,11 @@ npm i -g pm2
 ```bash
 npx prisma migrate dev
 ```
-9. Générer les fichiers pour le mode production
-```bash
-npm run build
-```
-10. Lancer le serveur
+9. Lancer le serveur
 ```bash
 pm2 start dist/src/server.js --name "backend"
 ```
-11. Configurer le serveur web pour qu'il redirige les requêtes vers le serveur Node.js (reverse proxy)
+10. Configurer le serveur web pour qu'il redirige les requêtes vers le serveur Node.js (reverse proxy)
 
 #### Quelques commandes utiles
 Pour lancer le serveur en mode production sans pm2, exécuter la commande suivante :
