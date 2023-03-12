@@ -99,6 +99,7 @@ export default {
     // profile
     MY_PROFILE: "My profile",
     MY_INFOS: "My informations",
+    MY_NOTIFS: "My notifications",
     MY_EVALS: "My evaluations",
     MY_TRIPS: "My trips",
     MY_GROUPS: "My groups",
@@ -107,6 +108,12 @@ export default {
         // informations
         CHANGING_PASSWORD: "Changing password",
         PASSWORD_CHANGED: "Password changed successfully",
+
+        // notifications
+        NO_NOTIFS: "You don't have any notification",
+        NO_NOTIFS_DESC: "You have processed everything! There is nothing more to do here at the moment.",
+        LOADING_NOTIFS: "Loading notifications",
+        LOADING_NOTIFS_DESC: "Please wait while we load your notifications",
 
         // groups
         NO_GROUPS: "You don't have any group yet",

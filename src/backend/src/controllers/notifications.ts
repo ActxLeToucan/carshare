@@ -9,6 +9,9 @@ exports.myNotifications = (req: express.Request, res: express.Response, next: ex
 
     prisma.notification.findMany({
         where: { userId: res.locals.user.id },
+        include: {
+            travel: true
+        },
         skip: pagination.offset,
         take: pagination.limit
     }).then(notifications => {

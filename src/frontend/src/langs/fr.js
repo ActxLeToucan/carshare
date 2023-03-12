@@ -99,6 +99,7 @@ export default {
     // profile
     MY_PROFILE: "Mon profil",
     MY_INFOS: "Mes informations",
+    MY_NOTIFS: "Mes notifications",
     MY_EVALS: "Mes notes",
     MY_TRIPS: "Mes trajets",
     MY_GROUPS: "Mes groupes",
@@ -109,6 +110,12 @@ export default {
         PASSWORD_CHANGED: "Mot de passe changé avec succès",
         CHANGING_INFORMATIONS: "Changement des informations",
         INFORMATIONS_CHANGED: "Informations changées avec succès",
+
+        // notifications
+        NO_NOTIFS: "Vous n'avez aucune notification",
+        NO_NOTIFS_DESC: "Vous avez tout traité ! Il n'y a plus rien à faire ici pour le moment.",
+        LOADING_NOTIFS: "Chargement des notifications",
+        LOADING_NOTIFS_DESC: "Veuillez patienter pendant que nous récupérons vos notifications",
 
         // groups
         NO_GROUPS: "Vous n'avez encore aucun groupe",
