@@ -765,7 +765,7 @@ const mail = {
         })
     },
     email: {
-        verification: (req: Request, user: User, token: string, frontendPath: string) => msgForLang<TemplateMail, Mail>(req, {
+        verification: (req: Request, user: User, token: string) => msgForLang<TemplateMail, Mail>(req, {
             to: user.email,
             subject: {
                 fr: 'Vérification de votre adresse email',
@@ -860,18 +860,6 @@ function sendMsg (req: Request, res: Response, message: (req: Request, ...args: 
 }
 
 /**
- * Sends a raw text with the given message
- * @param req Express request
- * @param res Express response
- * @param page Message to send
- * @param args Arguments to pass to the message function (if any)
- */
-function sendRaw (req: Request, res: Response, page: (req: Request, ...args: any) => MessageHTTP, ...args: any) {
-    const p = page(req, ...args);
-    res.status(p.code).send(p.msg);
-}
-
-/**
  * Sends an email
  * @param req Express request
  * @param message Message to send
@@ -915,4 +903,4 @@ function displayableGroup (group: Group & { users: User[] }) {
     return g;
 }
 
-export { error, info, mail, sendMsg, sendMail, sendRaw, displayableUserPrivate, displayableGroup };
+export { error, info, mail, sendMsg, sendMail, displayableUserPrivate, displayableGroup };

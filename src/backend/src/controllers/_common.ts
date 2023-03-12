@@ -19,18 +19,19 @@ function getPagination (req: express.Request): { limit: number, offset: number }
 }
 
 /**
- * Prepares a search query.
+ * Prepares pagination for a query.
  * @param req Express request
+ * @param searchMode If true, the query is returned.
  * @returns An object with the query, pagination params and a function to create the response.
  */
-function prepareSearch (req: express.Request) {
+function preparePagination (req: express.Request, searchMode: boolean) {
     const pagination = getPagination(req);
 
     const q = req.query.query;
     const query = q === undefined ? undefined : String(q).trim();
 
     return {
-        query,
+        query: searchMode ? query : undefined,
         pagination: {
             skip: pagination.offset,
             take: pagination.limit + 1
@@ -38,7 +39,7 @@ function prepareSearch (req: express.Request) {
         results: (name: string, elements: any[]) => {
             return {
                 [name]: elements.slice(0, pagination.limit),
-                query,
+                query: searchMode ? query : undefined,
                 ...pagination,
                 next: elements.length > pagination.limit ? pagination.offset + pagination.limit : null,
                 prev: pagination.offset - pagination.limit < 0 ? null : pagination.offset - pagination.limit
@@ -47,4 +48,6 @@ function prepareSearch (req: express.Request) {
     }
 }
 
-export { getPagination, prepareSearch };
+export type Pagination = ReturnType<typeof preparePagination>;
+
+export { preparePagination };

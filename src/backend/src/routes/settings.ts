@@ -4,7 +4,7 @@ import auth from '../middlewares/auth';
 const router = express.Router();
 const controller = require('../controllers/settings');
 
-router.get('/notifications', auth.access, controller.getSettingsNotifications);
-router.patch('/notifications', auth.access, controller.updateSettingsNotifications);
+router.get('/notifications', auth.access, controller.getNotificationSetting);
+router.patch('/notifications', auth.access, controller.updateNotificationSetting);
 
 module.exports = router;

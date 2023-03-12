@@ -2,10 +2,10 @@ import type express from 'express';
 import { prisma } from '../app';
 import * as properties from '../properties';
 import { error, info, sendMsg } from '../tools/translator';
-import { getPagination } from './_common';
+import { preparePagination } from './_common';
 
-exports.myTravels = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const pagination = getPagination(req);
+exports.getMyTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    const pagination = preparePagination(req, false);
 
     prisma.user.findMany({
         where: { id: res.locals.user.id },
@@ -13,17 +13,16 @@ exports.myTravels = (req: express.Request, res: express.Response, next: express.
             travelsAsDriver: true,
             travelsAsPassenger: { select: { travel: true } }
         },
-        skip: pagination.offset,
-        take: pagination.limit
-    }).then(travel => {
-        res.status(200).json(travel);
+        ...pagination.pagination
+    }).then(travels => {
+        res.status(200).json(pagination.results('travels', travels));
     }).catch((err) => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
     });
 }
 
-exports.searchTravels = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+exports.searchTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { date, startCity, endCity } = req.query;
     if (!properties.checkCityField(startCity, req, res, 'startCity')) return;
     if (!properties.checkCityField(endCity, req, res, 'endCity')) return;
@@ -47,7 +46,7 @@ exports.searchTravels = (req: express.Request, res: express.Response, next: expr
         });
 }
 
-exports.createTravel = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+exports.createTravel = async (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { departureDate, arrivalDate, maxPassengers, price, description, groupId, listOfEtape } = req.body;
 
     if (!properties.checkDateDepartArrivalField(departureDate, req, res)) return;
