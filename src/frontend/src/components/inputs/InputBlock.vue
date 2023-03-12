@@ -11,7 +11,7 @@
             :type="type"
             :name="name"
             :value="value"
-            rows="3"
+            :rows="isMobile? '2': '3'"
         ></textarea>
     </div>
 </template>
@@ -52,7 +52,7 @@ export default {
         },
     },
     data() {
-        return {}
+        return {isMobile: window.innerWidth < 768}
     }
 }
 </script>

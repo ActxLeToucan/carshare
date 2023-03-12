@@ -2,10 +2,32 @@
     <div class="flex grow flex-col">
         <topbar v-show="User.CurrentUser != null"></topbar>
         <div class="flex grow flex-col">
-            <p class="text-2xl text-teal-500 font-bold mx-auto my-4"> {{ lang.CREATE_TRIP }} </p>
-            <div class="flex grow h-full">
+            <p class="text-2xl text-teal-500 font-bold mx-auto md:my-4 my-2"> {{ lang.CREATE_TRIP }} </p>
+            <div class="flex md:hidden justify-evenly px-1 space-x-1">
 
-                <div class="flex flex-col w-[50%] grow">
+                <button
+                    class="p-2 my-2 border-2 bg-slate-100 w-[50%] h-fit text-md font-semibold transition-all"
+                    :class="selectedTab == 0 ? 'bg-teal-500 border-teal-600 text-teal-900' : 'bg-slate-100 border-transparent text-slate-500'"
+                    v-on:click="() => { selectedTab = 0; }"
+                >
+                    {{ lang.INFORMATIONS }}
+                </button>
+
+                <button
+                    class="p-2 my-2 border-2 bg-slate-100 w-[50%] h-fit text-md font-semibold transition-all"
+                    :class="selectedTab == 1 ? 'bg-teal-500 border-teal-600 text-teal-900' : 'bg-slate-100 border-transparent text-slate-500'"
+                    v-on:click="() => { selectedTab = 1; }"
+                >
+                    {{ lang.STEPS }}
+                </button>
+
+            </div>
+            <div class="flex md:flex-row flex-col grow h-full">
+
+                <div
+                    class="flex flex-col md:w-[50%] w-full grow"
+                    :class="isMobile && selectedTab == 1 ? 'hidden' : ''"
+                >
                     <card class="flex flex-col w-fit mx-auto space-y-4">
                         <input-choice name="trip-type" :label="lang.TRIP_TYPE" :list="tripTypes"
                             :onchange="val => selectedTripType = Number(val)" :value="selectedTripType"
@@ -52,7 +74,7 @@
                         class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
                         style="max-height: 0px;"
                     ></div>
-                    <div class="flex w-full justify-evenly items-end my-4">
+                    <div class="flex w-full md:justify-evenly justify-between items-end my-4 md:px-0 px-4">
 
                         <button-text :action="goBack"> {{ lang.CANCEL }} </button-text>
                         <button-block :action="showValidatePopup"> {{ lang.CREATE }} </button-block>
@@ -60,11 +82,14 @@
                     </div>
                 </div>
 
-                <div class="flex grow w-fit items-center justify-center py-[20vh]">
+                <div class="md:flex hidden grow w-fit items-center justify-center py-[20vh]">
                     <span class="w-1 h-full bg-slate-200 rounded-lg"></span>
                 </div>
 
-                <div class="flex flex-col w-[50%]">
+                <div
+                    class="flex flex-col w-[50%]"
+                    :class="isMobile && selectedTab == 0 ? 'hidden' : ''"
+                >
 
                     <div class="flex flex-col w-fit mx-auto">
 
@@ -105,6 +130,12 @@
                             <div class="flex flex-col" v-for="(step, index) in tripSteps" :key="step.id">
                                 <div class="flex items-center">
                                     <card class="flex flex-col w-full my-2 p-1">
+                                        <div class="flex grow w-full h-0 justify-end">
+                                            <button class="flex rounded-md h-fit w-fit text-slate-500 pl-2 hover:text-red-500 cursor-pointer -translate-y-4 translate-x-4 transition-all"
+                                                v-on:click="() => delStep(index)">
+                                                <x-mark-icon class="w-6 h-6"></x-mark-icon>
+                                            </button>
+                                        </div>
                                         <input-text
                                             class="my-1" 
                                             :name="'midpoint-input-' + index" :label="lang.TRIP_STEP + ' ' + (index+1)" type="text"
@@ -124,12 +155,6 @@
                                             type="datetime-local">
                                         </input-text>
                                     </card>
-                                    <div class="flex grow w-0">
-                                        <div class="flex rounded-md h-fit w-fit mx-auto text-slate-500 pl-2 hover:text-red-500 cursor-pointer transition-all"
-                                            v-on:click="() => delStep(index)">
-                                            <x-mark-icon class="w-6 h-6"></x-mark-icon>
-                                        </div>
-                                    </div>
                                 </div>
                                 <div class="flex flex-col space-y-2">
                                     <span class="h-4 w-1 bg-slate-300 rounded-md mx-auto"></span>
@@ -231,7 +256,7 @@ const tripTypes = [
 ];
 
 export default {
-    name: 'App',
+    name: 'TripsNew',
     components: {
         Topbar,
         ButtonBlock,
@@ -256,7 +281,9 @@ export default {
             startStep: {destination: "", datetime: null},
             endStep: {destination: "", datetime: null},
             goBack,
-            groups: []
+            groups: [],
+            selectedTab: 0,
+            isMobile: window.innerWidth < 768,
         }
     },
     methods: {
@@ -470,6 +497,8 @@ export default {
         }).catch(err => {
             console.error(err);
         });
+
+        window.addEventListener('resize', () => { this.isMobile = window.innerWidth < 768; });
     }
 }
 </script>

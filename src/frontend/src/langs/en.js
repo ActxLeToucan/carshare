@@ -14,6 +14,8 @@ export default {
     ERROR: "Error",
     SEARCHING: "Searching",
     PRICE: "Price",
+    INFORMATIONS: "Informations",
+    STEPS: "Steps",
 
     // 404 page
     WOOPS: "Oops",
