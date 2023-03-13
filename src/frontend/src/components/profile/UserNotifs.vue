@@ -34,8 +34,11 @@
                                 class="py-4 my-4 rounded-lg px-4 hover:bg-slate-100 transition-all w-full text-left
                                         text-slate-600">
                             <div class="w-full">
+                                <button-block class="float-right ml-2" color="red" :action="() => deleteOne(notif)">
+                                    <trash-icon class="w-7 h-7"></trash-icon>
+                                </button-block>
                                 <p class="font-bold">
-                                    <span class="text-slate-400 mr-4">{{ new Date(notif.createdAt).toLocaleString() }}</span>
+                                    <span class="text-slate-400 block md:mr-4 md:inline-block">{{ new Date(notif.createdAt).toLocaleString() }}</span>
                                     <span class="">{{ notif.title }}</span>
                                 </p>
                                 <p class="whitespace-pre-wrap"> {{ notif.message }} </p>
@@ -44,13 +47,10 @@
                                     <button-block class="inline-block" color="red"  :action="() => refuseRequest(notif)">Refuser</button-block>
                                 </div>
                             </div>
-                            <div class="">
-                                <button-block color="red" :action="() => deleteOne(notif)">
-                                    <trash-icon class="w-7 h-7"></trash-icon>
-                                </button-block>
-                            </div>
-
                         </card>
+                        <button-block class="mx-auto my-10 table" color="red" :action="deleteAll">
+                            <trash-icon class="w-7 h-7 mr-1.5 inline"></trash-icon><p class="inline">{{ lang.DELETE_ALL }}</p>
+                        </button-block>
 
                     </div>
                 </div>
@@ -89,7 +89,7 @@ export default {
             // TODO: gérer pagination
             this.loading = true;
             API.execute_logged(API.ROUTE.MY_NOTIFS, API.METHOD.GET, User.CurrentUser?.getCredentials()).then((data) => {
-                console.log(data);
+                data = data.data;
                 data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
                 this.notifs = data;
             }).catch(err => {
@@ -107,6 +107,7 @@ export default {
         deleteAll() {
             this.notifs = [];
             // TODO: delete all notifs
+            // peut etre une confirmation ?
         },
         acceptRequest(notif) {
             console.log(`TODO: send accept request with SENDER: ${notif.userId} and TRAVEL: ${notif.travelId} TO: ${notif.senderId}`);

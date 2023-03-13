@@ -32,6 +32,7 @@ export default {
     CANCEL: "Annuler",
     EDIT: "Modifier",
     DELETE: "Supprimer",
+    DELETE_ALL: "Tout supprimer",
     DELETE_ACCOUNT: "Supprimer le compte",
     ADD: "Ajouter",
     SEARCH: "Rechercher",
