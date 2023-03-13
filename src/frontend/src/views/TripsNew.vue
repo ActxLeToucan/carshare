@@ -326,7 +326,7 @@ export default {
             log.attachTo(this.logZone);
             return log;
         },
-        createTrip() {
+        createTrip(showlogs = true) {
             const toDestination = (obj) => !obj? null: ({label: obj.label, city: obj.city, context: obj.context, lat: obj.lat, lng: obj.lng});
             const toStep = (obj) => !obj? null: ({destination: toDestination(obj.destination), datetime: obj.datetime});
 
@@ -347,7 +347,9 @@ export default {
                 steps: steps
             }
 
-            const msg_log = this.log(Lang.CurrentLang.INPUT_VERIFICATION + " ...", Log.INFO);
+            let msg_log = null;
+            if (showlogs)
+                msg_log = this.log(Lang.CurrentLang.INPUT_VERIFICATION + " ...", Log.INFO);
             let valid = true;
 
             const field_checks = [
@@ -379,7 +381,7 @@ export default {
 
             field_checks.forEach(check => {
                 if (!check.check() && valid) {
-                    msg_log.update(check.error, Log.WARNING);
+                    if (showlogs) msg_log.update(check.error, Log.WARNING);
                     valid = false;
                 }
             });
@@ -389,8 +391,10 @@ export default {
                 return null;
             }
 
-            msg_log.update(Lang.CurrentLang.INPUT_VERIFICATION_SUCCESS, Log.SUCCESS);
-            setTimeout(() => { msg_log.delete(); }, 2000);
+            if (showlogs) {
+                msg_log.update(Lang.CurrentLang.INPUT_VERIFICATION_SUCCESS, Log.SUCCESS);
+                setTimeout(() => { msg_log.delete(); }, 2000);
+            }
 
             return data;
         },
@@ -469,7 +473,7 @@ export default {
             return true;
         },
         uploadTrip(popup) {
-            const data = this.createTrip();
+            const data = this.createTrip(false);
             if (!data) return;
 
             const msg_log = popup.log(Lang.CurrentLang.CREATING_TRIP, Log.INFO);
@@ -493,7 +497,8 @@ export default {
 
         this.groups.splice(0, this.groups.length);
         API.execute_logged(API.ROUTE.GROUPS, API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
-            res.forEach(group => this.groups.push(group));
+            const data = res.data ?? res.groups;
+            data.forEach(group => this.groups.push(group));
         }).catch(err => {
             console.error(err);
         });
