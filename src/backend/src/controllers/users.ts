@@ -254,7 +254,7 @@ exports.searchUsers = (req: express.Request, res: express.Response, _: express.N
                          OR CONCAT(firstName, ' ', lastName) LIKE ${q}, TRUE)
                      LIMIT ${pagination.pagination.take} OFFSET ${pagination.pagination.skip}`
         .then(users => {
-            res.status(200).json(pagination.results('users', (users as User[]).map(displayableUserPrivate)));
+            res.status(200).json(pagination.results((users as User[]).map(displayableUserPrivate)));
         }).catch(err => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);
