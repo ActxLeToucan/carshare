@@ -61,11 +61,13 @@ import bcrypt from 'bcrypt';
 import { prisma } from '../../app';
 import * as _user from './_common';
 
-exports.getMe = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+const usersController = require('../../controllers/users');
+
+exports.getMe = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     res.status(200).json(displayableUserPrivate(res.locals.user));
 }
 
-exports.deleteMe = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+exports.deleteMe = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     if (!properties.checkPasswordField(req.body.password, req, res, false)) return;
 
     bcrypt.compare(req.body.password, res.locals.user.password)
@@ -87,10 +89,12 @@ exports.deleteMe = (req: express.Request, res: express.Response, next: express.N
         });
 }
 
-exports.updateMe = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+exports.updateMe = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     _user.update(req, res, res.locals.user.id, false).catch((err) => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
     });
 }
 >>>>>>> 90164db2887ff038926435f49aaf10c671d2018e
+
+exports.updateMyPassword = usersController.updatePassword;
