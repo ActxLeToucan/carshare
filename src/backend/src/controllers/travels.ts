@@ -15,7 +15,7 @@ exports.getMyTravels = (req: express.Request, res: express.Response, _: express.
         },
         ...pagination.pagination
     }).then(travels => {
-        res.status(200).json(pagination.results('travels', travels));
+        res.status(200).json(pagination.results(travels));
     }).catch((err) => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
