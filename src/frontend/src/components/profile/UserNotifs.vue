@@ -2,9 +2,14 @@
     <div class="md:show-up flex flex-col grow">
         <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> {{ lang.MY_NOTIFS }} </p>
         <div class="flex flex-col md:w-fit w-full md:mx-auto px-4">
-            <button-block v-show="notifs.length > 0 && !loading" class="w-fit mt-8 ml-auto" color="red" :action="deleteAll">
+            <button-block v-show="notifs.length > 0 && !loading" class="w-fit mt-8 ml-auto" color="red" :action="deleteAllShow">
                 <trash-icon class="w-7 h-7 mr-1.5 inline"></trash-icon><p class="inline">{{ lang.DELETE_ALL }}</p>
             </button-block>
+            <div
+                ref="log-zone"
+                class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
+                style="max-height: 0;"
+            />
             <div class="flex grow h-fit min-w-[60vw] md:max-w-[70vw]">
                 <div v-show="loading" class="flex flex-col justify-center mx-auto">
 
@@ -54,6 +59,15 @@
                 </div>
             </div>
         </div>
+        <popup
+            color="red"
+            :title="lang.DELETE_ALL_NOTIFS"
+            :content="lang.DELETE_ALL_NOTIFS_CONFIRMATION"
+            :cancelLabel="lang.CANCEL"
+            :validateLabel="lang.DELETE"
+            :onload="setDeleteAllPopup"
+            :onvalidate="deleteAll"
+        />
     </div>
 </template>
 
@@ -66,10 +80,12 @@ import ButtonBlock from "../inputs/ButtonBlock.vue";
 import ButtonText from "../inputs/ButtonText.vue";
 import ButtonTab from "../inputs/ButtonTab.vue";
 import {TrashIcon} from "@heroicons/vue/20/solid";
+import Popup from "../cards/Popup.vue";
+import {Log, LogZone} from "../../scripts/Logs";
 
 export default {
     name: "UserNotifs",
-    components: {ButtonTab, ButtonText, ButtonBlock, Card, TrashIcon},
+    components: {Popup, ButtonTab, ButtonText, ButtonBlock, Card, TrashIcon},
     data() {
         return {
             lang: Lang.CurrentLang,
@@ -80,6 +96,9 @@ export default {
     },
     mounted() {
         Lang.AddCallback(lang => this.lang = lang);
+
+        this.logZone = new LogZone(this.$refs["log-zone"]);
+
         this.getNotifs();
     },
     methods: {
@@ -99,12 +118,37 @@ export default {
         },
         deleteOne(notif) {
             this.notifs = this.notifs.filter(n => n.id !== notif.id);
-            // TODO: delete notif
+            API.execute_logged(`${API.ROUTE.NOTIFS}/${notif.id}`, API.METHOD.DELETE, User.CurrentUser?.getCredentials()).catch(err => {
+                this.notifs.push(notif);
+                this.notifs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                const log = this.notifsLog(`${this.lang.ERROR} : ${err.message}`, Log.ERROR);
+                setTimeout(() => {
+                    log.delete();
+                }, 6000);
+            });
         },
-        deleteAll() {
-            this.notifs = [];
-            // TODO: delete all notifs
-            // peut etre une confirmation ?
+        setDeleteAllPopup(popup) {
+            this.deleteAllPopup = popup;
+        },
+        deleteAllShow() {
+            if (!this.deleteAllPopup) return;
+            this.deleteAllPopup.show();
+        },
+        deleteAll(popup) {
+            const log = popup.log(this.lang.DELETING_NOTIFS, Log.INFO);
+            API.execute_logged(API.ROUTE.ALL_NOITFS, API.METHOD.DELETE, User.CurrentUser?.getCredentials()).then(_ => {
+                this.notifs = [];
+                log.update(this.lang.NOTIFS_DELETED, Log.SUCCESS);
+                setTimeout(() => {
+                    log.delete();
+                    popup.hide();
+                }, 2000);
+            }).catch(err => {
+                log.update(this.lang.ERROR + " : " + err.message, Log.ERROR);
+                setTimeout(() => {
+                    log.delete();
+                }, 6000);
+            });
         },
         acceptRequest(notif) {
             // TODO: send accept request with SENDER: ${notif.userId} and TRAVEL: ${notif.travelId} TO: ${notif.senderId}
@@ -113,7 +157,13 @@ export default {
         refuseRequest(notif) {
             // TODO: send refuse request with SENDER: ${notif.userId} and TRAVEL: ${notif.travelId} TO: ${notif.senderId}
             notif.type = 'request.old';
-        }
+        },
+        notifsLog(msg, type = Log.INFO) {
+            if (!this.logZone) return null;
+            const log = new Log(msg, type);
+            log.attachTo(this.logZone);
+            return log;
+        },
     }
 }
 </script>

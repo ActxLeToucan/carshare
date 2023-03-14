@@ -111,12 +111,17 @@ export default {
         PASSWORD_CHANGED: "Mot de passe changé avec succès",
         CHANGING_INFORMATIONS: "Changement des informations",
         INFORMATIONS_CHANGED: "Informations changées avec succès",
+        DELETING_ACCOUNT: "Suppression du compte",
 
         // notifications
         NO_NOTIFS: "Vous n'avez aucune notification",
         NO_NOTIFS_DESC: "Vous avez tout vu ! Il n'y a plus rien à faire ici pour le moment.",
         LOADING_NOTIFS: "Chargement des notifications",
         LOADING_NOTIFS_DESC: "Veuillez patienter pendant que nous récupérons vos notifications",
+        DELETE_ALL_NOTIFS: "Supprimer toutes les notifications",
+        DELETE_ALL_NOTIFS_CONFIRMATION: "Êtes-vous sûr de vouloir supprimer toutes vos notifications ?\nElles seront supprimées, même si elles ne sont pas affichées sur cette page.\nCette action est irréversible.",
+        DELETING_NOTIFS: "Suppression des notifications",
+        NOTIFS_DELETED: "Notifications supprimées avec succès",
 
         // groups
         NO_GROUPS: "Vous n'avez encore aucun groupe",

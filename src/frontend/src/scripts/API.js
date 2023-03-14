@@ -88,7 +88,9 @@ class API {
         RESETPWD: "/users/password-reset",
         USERS: "/users",
         GROUPS: "/groups/my",
+        NOTIFS: "/notifications",
         MY_NOTIFS: "/notifications/my",
+        ALL_NOITFS: "/notifications/all",
     };
 
     /**
