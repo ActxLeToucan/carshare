@@ -1,5 +1,5 @@
 <template>
-    <div class="flex grow flex-col">
+    <div class="flex grow flex-col max-w-full">
         <topbar v-show="User.CurrentUser != null"></topbar>
         <div class="flex grow flex-col">
             <p class="text-2xl text-teal-500 font-bold mx-auto md:my-4 my-2"> {{ lang.CREATE_TRIP }} </p>
@@ -25,16 +25,16 @@
             <div class="flex md:flex-row flex-col grow h-full">
 
                 <div
-                    class="flex flex-col md:w-[50%] w-full grow"
+                    class="flex flex-col md:w-[50%] w-full grow md:px-2"
                     :class="isMobile && selectedTab == 1 ? 'hidden' : ''"
                 >
-                    <card class="flex flex-col w-fit mx-auto space-y-4">
+                    <card class="flex flex-col w-fit mx-auto space-y-4 max-w-full">
                         <input-choice name="trip-type" :label="lang.TRIP_TYPE" :list="tripTypes"
                             :onchange="val => selectedTripType = Number(val)" :value="selectedTripType"
                         ></input-choice>
-                        <input-text name="trip-slots" :label="lang.TRIP_SLOTS" type="number" value="0" min="0"></input-text>
-                        <input-text name="trip-price" :label="lang.PRICE" type="number" value="0" min="0"></input-text>
-                        <input-block name="trip-infos" :label="lang.TRIP_INFO" type="text" value=""></input-block>
+                        <input-text class="max-w-full" name="trip-slots" :label="lang.TRIP_SLOTS" type="number" value="0" min="0"></input-text>
+                        <input-text class="max-w-full" name="trip-price" :label="lang.PRICE" type="number" value="0" min="0"></input-text>
+                        <input-block class="max-w-full" name="trip-infos" :label="lang.TRIP_INFO" type="text" value=""></input-block>
                     </card>
                     <div class="flex flex-col grow justify-evenly items-center my-4 space-y-4">
 
@@ -87,7 +87,7 @@
                 </div>
 
                 <div
-                    class="flex flex-col w-[50%]"
+                    class="flex flex-col md:w-[50%] grow w-full md:px-2"
                     :class="isMobile && selectedTab == 0 ? 'hidden' : ''"
                 >
 
@@ -487,7 +487,6 @@ export default {
                 msg_log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
                 setTimeout(() => {
                     msg_log.delete();
-                    popup.hide();
                 }, 6000);
             });
         }
