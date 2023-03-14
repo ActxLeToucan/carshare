@@ -179,7 +179,7 @@ const error = {
         number: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Le nom ne peut pas contenir de chiffre.',
-                en: 'Lastname cannot contain number.'
+                en: 'Lastname can contain number.'
             },
             code: 400
         })
@@ -354,6 +354,24 @@ const error = {
             code: 400
         })
     },
+
+    travel: {
+        notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Trajet introuvable.',
+                en: 'Travel not found.'
+            },
+            code: 404
+        }),
+        invalidId: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'L\'identifiant du trajet est invalide.',
+                en: 'Travel id is invalid.'
+            },
+            code: 400
+        })
+    },
+    
     db: {
         notReachable: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
@@ -437,14 +455,6 @@ const error = {
             code: 404
         })
     },
-<<<<<<< HEAD
-
-    travel: {
-        notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Trajet introuvable.',
-                en: 'Travel not found.'
-=======
     mailer: {
         cooldown: (req: Request, cooldown: Variants) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
@@ -580,26 +590,17 @@ const error = {
             msg: {
                 fr: 'Notification introuvable.',
                 en: 'Notification not found.'
->>>>>>> 9290aba3b673b60d60204f794cd669148522b9a0
             },
             code: 404
         }),
         invalidId: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-<<<<<<< HEAD
-                fr: 'L\'identifiant du trajet est invalide.',
-                en: 'Travel id is invalid. '
-=======
                 fr: 'L\'identifiant de la notification est invalide.',
                 en: 'Notification id is invalid.'
->>>>>>> 9290aba3b673b60d60204f794cd669148522b9a0
             },
             code: 400
         })
     },
-<<<<<<< HEAD
-}
-=======
     city: {
         required: (req: Request, field: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
@@ -617,7 +618,6 @@ const error = {
         })
     }
 } satisfies TranslationsMessageHTTP;
->>>>>>> 9290aba3b673b60d60204f794cd669148522b9a0
 
 const info = {
     user: {
