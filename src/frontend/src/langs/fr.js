@@ -114,7 +114,7 @@ export default {
 
         // notifications
         NO_NOTIFS: "Vous n'avez aucune notification",
-        NO_NOTIFS_DESC: "Vous avez tout traité ! Il n'y a plus rien à faire ici pour le moment.",
+        NO_NOTIFS_DESC: "Vous avez tout vu ! Il n'y a plus rien à faire ici pour le moment.",
         LOADING_NOTIFS: "Chargement des notifications",
         LOADING_NOTIFS_DESC: "Veuillez patienter pendant que nous récupérons vos notifications",
 
