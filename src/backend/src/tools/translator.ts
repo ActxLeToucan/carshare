@@ -327,6 +327,13 @@ const error = {
                 en: 'The dates are the same.'
             },
             code: 400
+        }),
+        badOrder: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Les dates mises ne sont pas dans le bonne ordre.',
+                en: 'The dates are not in the right order.'
+            },
+            code: 400
         })
     },
     ville: {

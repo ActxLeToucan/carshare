@@ -545,6 +545,30 @@ function checkStringField (value: any, req: express.Request, res: express.Respon
 }
 
 /**
+ * Check if the dates is in a good order
+ * If the date is not valid, send an error message to the client
+ * @param date1 Date to check
+ * @param date2 Date to check
+ * @param req Express request
+ * @param res Express response
+ * @returns true if the date is in a good order, false otherwise
+ */
+function checkDatesOrder (date1: any, date2: any, req: express.Request, res: express.Response): boolean {
+    if (!checkDateField(date2, true, req, res)) return false;
+
+    if (new Date(date1).getTime() === new Date(date2).getTime()) {
+        sendMsg(req, res, error.date.isSame);
+        return false;
+    }
+
+    if(new Date(date1)> new Date(date2)){
+        sendMsg(req, res, error.date.badOrder);
+        return false;
+    }
+    return true;
+}
+
+/**
  * Check if a listOfEtape field is valid
  * If the string is not valid, send an error message to the client
  * @param value Value to sanitize
@@ -565,14 +589,28 @@ function checkListOfEtapeField (value: any, req: express.Request, res: express.R
         sendMsg(req, res, error.etapes.etapeMin, p.listOfEtape.minLength);
         return false;
     }
+
+    const tabUniqueDate = new Set(...value.map((e: any) => e.date));
+
+    if (tabUniqueDate.size === value.length){
+        sendMsg(req, res, error.etapes.required);
+        return false;
+    }
+    let i2: number = 1;
     for (const i in value) {
         if (!checkDateField(value[i].date, true, req, res)) return false;
+
+        if( i != String(value.length-1)){
+            if (!checkDatesOrder(value[i].date, value[i2].date, req, res)) return false;
+        }
 
         if (!checkStringField(value[i].label, req, res, 'label')) return false;
         if (!checkStringField(value[i].city, req, res, 'city')) return false;
         if (!checkStringField(value[i].context, req, res, 'context')) return false;
         if (!checkLatField(value[i].lat, req, res)) return false;
         if (!checkLngField(value[i].lng, req, res)) return false;
+
+        i2+=1;
     }
     return true;
 }
