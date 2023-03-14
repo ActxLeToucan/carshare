@@ -371,7 +371,7 @@ const error = {
             code: 400
         })
     },
-    
+
     db: {
         notReachable: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
@@ -700,6 +700,7 @@ const info = {
             code: 200
         })
     },
+
     travel: {
         created: (req: Request, travel: Travel, nbEtape: object) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
