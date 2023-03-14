@@ -51,7 +51,7 @@ function getGroups (req: express.Request, res: express.Response, next: express.N
         },
         ...pagination.pagination
     }).then((groups) => {
-        res.status(200).json(pagination.results('groups', groups.map(displayableGroup)));
+        res.status(200).json(pagination.results(groups.map(displayableGroup)));
     }).catch((err) => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);

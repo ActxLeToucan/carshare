@@ -18,7 +18,7 @@
             <div class="flex w-full flex-col px-8 space-y-4 pt-4 max-w-full min-w-0">
                 <admin-user-card
                     class="min-w-0 w-full show-up" v-for="user in usersList"
-                    :data="user" :key="user.id" :onclick="onCardClicked">
+                    :data="user" :key="user?.id" :onclick="onCardClicked">
                 </admin-user-card>
             </div>
         </div>
@@ -103,7 +103,7 @@ function search(obj) {
     const value = obj.$refs['query-zone'].querySelector('input').value;
 
     API.execute_logged(API.ROUTE.USERS + obj.pagination, API.METHOD.GET, User.CurrentUser?.getCredentials(), { search: value }).then((data) => {
-        obj.usersList = data;
+        obj.usersList = data.data ?? data.users;
         log.delete();
     }).catch((err) => {
         log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
