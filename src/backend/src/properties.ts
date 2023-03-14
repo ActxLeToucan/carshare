@@ -600,6 +600,21 @@ function sanitizeNotificationId (id: any, req: express.Request, res: express.Res
     return Number(id);
 }
 
+/**
+ * Sanitize the id of travel
+ * @param id id to sanitize
+ * @param req Express request
+ * @param res Express response
+ * @returns The id number if it is valid, null otherwise
+ */
+function sanitizeTravelId (id: any, req: express.Request, res: express.Response): number | null {
+    if (id === '' || Number.isNaN(Number(id))) {
+        sendMsg(req, res, error.travel.invalidId);
+        return null;
+    }
+    return Number(id);
+}
+
 export {
     p,
     checkEmailField,
@@ -621,5 +636,6 @@ export {
     checkStringField,
     checkListOfEtapeField,
     checkDescriptionField,
-    sanitizeNotificationId
+    sanitizeNotificationId,
+    sanitizeTravelId
 };
