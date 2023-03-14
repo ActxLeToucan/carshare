@@ -36,9 +36,9 @@ function preparePagination (req: express.Request, searchMode: boolean) {
             skip: pagination.offset,
             take: pagination.limit + 1
         },
-        results: (name: string, elements: any[]) => {
+        results: (elements: any[]) => {
             return {
-                [name]: elements.slice(0, pagination.limit),
+                data: elements.slice(0, pagination.limit),
                 query: searchMode ? query : undefined,
                 ...pagination,
                 next: elements.length > pagination.limit ? pagination.offset + pagination.limit : null,
