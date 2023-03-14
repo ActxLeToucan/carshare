@@ -584,6 +584,8 @@ function checkListOfEtapeField (value: any, req: express.Request, res: express.R
     }
     return true;
 }
+
+
 /**
 * Sanitize the id of notification
 * @param id id to sanitize
@@ -634,6 +636,8 @@ export {
     checkMaxPassengersField,
     checkPriceField,
     checkStringField,
+    checkLatField,
+    checkLngField,
     checkListOfEtapeField,
     checkDescriptionField,
     sanitizeNotificationId,
