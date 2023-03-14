@@ -40,7 +40,7 @@ export default {
                 default: this.state = false; break;
             }
         }
-        return {}
+        return {};
     },
     methods: {
         updateButton() {
@@ -69,6 +69,12 @@ export default {
             this.updateButton();
         });
         this.updateButton();
+    },
+    watch: {
+        value: function (val) {
+            this.state = val;
+            this.updateButton();
+        }
     }
 }
 </script>

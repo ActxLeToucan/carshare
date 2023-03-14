@@ -2,18 +2,19 @@
     <div class="flex grow flex-col">
         <topbar v-if="User.CurrentUser != null"></topbar>
         <div class="flex grow w-fit flex-col justify-center space-y-6 mx-auto min-w-0 max-w-full">
-            <modal :oncancel="onCancel" :onvalidate="onValidate" title="S'inscrire">
+            <modal :oncancel="onCancel" :onvalidate="onValidate" :title="lang.REGISTER_TITLE">
                 <div class="py-4">
-                    <p class="text-lg font-semibold text-slate-500"> Veuillez renseigner vos informations pour vous inscrire. </p>
+                    <p class="text-lg font-semibold text-slate-500"> {{ lang.REGISTER_DESC }}. </p>
                 </div>
-                <input-text   name="firstName"        label="Prénom"       placeholder="Prénom"                                       ></input-text>
-                <input-text   name="lastName"         label="Nom"          placeholder="Nom de famille"                               ></input-text>
-                <input-text   name="email"            label="Email"        placeholder="Adresse mail"                 type="email"    ></input-text>
-                <input-text   name="phone"            label="Téléphone"    placeholder="Numéro de téléphone"          type="tel"      ></input-text>
-                <input-text   name="password"         label="Mot de passe" placeholder="Mot de passe"                 type="password" ></input-text>
-                <input-text   name="password-confirm" label="Confirmation" placeholder="Confirmation du mot de passe" type="password" ></input-text>
-                <input-choice name="gender"           label="Genre"        :list="genres"                                             ></input-choice>
-                <input-switch name="hasCar"           label="J'ai une voiture"                                        value="false"   ></input-switch>
+                <input-text   name="firstName"        :label="lang.FIRSTNAME+'*'"   :placeholder="lang.FIRSTNAME"                        ></input-text>
+                <input-text   name="lastName"         :label="lang.LASTNAME+'*'"    :placeholder="lang.LASTNAME"                         ></input-text>
+                <input-text   name="email"            :label="lang.EMAIL+'*'"       :placeholder="lang.EMAIL"            type="email"    ></input-text>
+                <input-text   name="phone"            :label="lang.PHONE+'*'"       :placeholder="lang.PHONE"            type="tel"      ></input-text>
+                <input-text   name="password"         :label="lang.PASSWORD+'*'"    :placeholder="lang.PASSWORD"         type="password" ></input-text>
+                <input-text   name="password-confirm" :label="lang.PWD_CONFIRM+'*'" :placeholder="lang.PASSWORD_CONFIRM" type="password" ></input-text>
+                <input-choice name="gender"           :label="lang.GENDER"          :list="genres"                       :value="-1"     ></input-choice>
+                <input-switch name="hasCar"           :label="lang.I_HAVE_A_CAR"                                         value="false"   ></input-switch>
+                <p class="text-md font-semibold text-slate-500"> * {{ lang.REQUIRED_FIELDS }}. </p>
             </modal>
         </div>
     </div>
@@ -25,42 +26,33 @@ import Modal from '../components/cards/Modal.vue';
 import InputText from '../components/inputs/InputText.vue';
 import InputSwitch from '../components/inputs/InputSwitch.vue';
 import InputChoice from '../components/inputs/InputChoice.vue';
-import { Log } from '../scripts/Logs';
 import User from '../scripts/User';
 import re from '../scripts/Regex';
 import API from '../scripts/API';
-
-function isPhoneNumber(val) {
-    if (!val) return false;
-    return val.replace(/(\.|\s|-)/g, "").trim().match(/^((00[0-9]{2})?0[0-9][0-9]{8}|\+[0-9]{11,12})$/) != null;
-}
-
-const genres = [
-    {value: 1, label: "Homme"},
-    {value: -1, label: "Non spécifié", selected: true},
-    {value: 0, label: "Femme"},
-];
+import Lang from '../scripts/Lang';
+import { Log } from '../scripts/Logs';
+import { genres, isPhoneNumber } from '../scripts/data';
 
 const field_checks = [
-    {field: "firstName",        check: (value) => value.length > 0, error: "Veuillez renseignez votre nom."},
-    {field: "lastName",         check: (value) => value.length > 0, error: "Veuillez renseignez votre prénom."},
-    {field: "email",            check: (value) => value.length > 0, error: "Veuillez renseignez votre adresse mail."},
-    {field: "phone",            check: (value) => value.length > 0, error: "Veuillez renseignez votre numéro de téléphone."},
-    {field: "password",         check: (value) => value.length > 0, error: "Veuillez renseignez votre mot de passe."},
-    {field: "password-confirm", check: (value) => value.length > 0, error: "Veuillez confirmer votre mot de passe."},
+    {field: "firstName",        check: (value) => value.length > 0, error: Lang.CurrentLang.FIRSTNAME_SPECIFY},
+    {field: "lastName",         check: (value) => value.length > 0, error: Lang.CurrentLang.LASTNAME_SPECIFY},
+    {field: "email",            check: (value) => value.length > 0, error: Lang.CurrentLang.EMAIL_SPECIFY},
+    {field: "phone",            check: (value) => value.length > 0, error: Lang.CurrentLang.PHONE_SPECIFY},
+    {field: "password",         check: (value) => value.length > 0, error: Lang.CurrentLang.PASSWORD_SPECIFY},
+    {field: "password-confirm", check: (value) => value.length > 0, error: Lang.CurrentLang.PASSWORD_CONFIRM_SPECIFY},
 
-    {field: "firstName",        check: (value) => value.length <= 50,               error: "Le nom est trop long."},
-    {field: "lastName",         check: (value) => value.length <= 50,               error: "Le prénom est trop long."},
-    {field: "email",            check: (value) => value.length <= 64,               error: "L'adresse mail est trop longue."},
-    {field: "email",            check: (value) => value.match(re.REGEX_EMAIL) != null, error: "L'adresse mail n'est pas valide."},
-    {field: "phone",            check: (value) => isPhoneNumber(value),             error: "Le numéro de téléphone est invalide."},
+    {field: "firstName",        check: (value) => value.length <= 50,                  error: Lang.CurrentLang.FIRSTNAME_TOOLONG},
+    {field: "lastName",         check: (value) => value.length <= 50,                  error: Lang.CurrentLang.LASTNAME_TOOLONG},
+    {field: "email",            check: (value) => value.length <= 64,                  error: Lang.CurrentLang.EMAIL_TOOLONG},
+    {field: "email",            check: (value) => value.match(re.REGEX_EMAIL) != null, error: Lang.CurrentLang.EMAIL_INVALID},
+    {field: "phone",            check: (value) => isPhoneNumber(value),                error: Lang.CurrentLang.PHONE_INVALID},
 
-    {field: "password-confirm", check: (value, modal) => value === modal.get("password"), error: "Les mots de passe ne correspondent pas."},
-    {field: "password",         check: (value) => value.length >= 10,                     error: "Le mot de passe doit faire au moins 10 caractères."},
-    {field: "password",         check: (value) => value.match(/[A-Z]/g) != null,          error: "Le mot de passe doit contenir au moins une majuscule."},
-    {field: "password",         check: (value) => value.match(/[a-z]/g) != null,          error: "Le mot de passe doit contenir au moins une minuscule."},
-    {field: "password",         check: (value) => value.match(/[0-9]/g) != null,          error: "Le mot de passe doit contenir au moins un chiffre."},
-    {field: "password",         check: (value) => value.match(/[^A-Za-z0-9]/g) != null,   error: "Le mot de passe doit contenir au moins un caractère spécial."}
+    {field: "password-confirm", check: (value, modal) => value === modal.get("password"), error: Lang.CurrentLang.PASSWORD_UNMATCH},
+    {field: "password",         check: (value) => value.length >= 10,                     error: Lang.CurrentLang.PASSWORD_ERRLEN},
+    {field: "password",         check: (value) => value.match(/[A-Z]/g) != null,          error: Lang.CurrentLang.PASSWORD_ERRMAJ},
+    {field: "password",         check: (value) => value.match(/[a-z]/g) != null,          error: Lang.CurrentLang.PASSWORD_ERRMIN},
+    {field: "password",         check: (value) => value.match(/[0-9]/g) != null,          error: Lang.CurrentLang.PASSWORD_ERRNBR},
+    {field: "password",         check: (value) => value.match(/[^A-Za-z0-9]/g) != null,   error: Lang.CurrentLang.PASSWORD_ERRSPE}
 ];
 
 function onCancel(modal) {
@@ -69,7 +61,7 @@ function onCancel(modal) {
 
 function onValidate(modal) {
     return new Promise((resolve, reject) => {
-        const log = modal.log("Vérification des entrées ...", Log.INFO);
+        const log = modal.log(Lang.CurrentLang.INPUT_VERIFICATION + " ...", Log.INFO);
         for (let i = 0; i < field_checks.length; i++) {
             const check = field_checks[i];
             const result = check.check(modal.get(check.field), modal);
@@ -81,7 +73,7 @@ function onValidate(modal) {
                 return;
             }
         }
-        log.update("Envoi des données ...", Log.INFO);
+        log.update(Lang.CurrentLang.DATA_SENDING + " ...", Log.INFO);
 
         const payload = modal.getPayload();
         const userInfos = {
@@ -95,15 +87,15 @@ function onValidate(modal) {
         };
 
         API.execute(API.ROUTE.SIGNUP, API.METHOD.POST, userInfos, API.TYPE.JSON).then(res => {
-            log.update("Compte créé avec succès !", Log.SUCCESS);
+            log.update(Lang.CurrentLang.REGISTER_SUCCESS + " !", Log.SUCCESS);
 
             const user = new User(res.user);
             user.setInformations({token: res.token});
             user.save();
 
-            const email_log = modal.log("Envoi de l'email de vérification ...", Log.INFO);
+            const email_log = modal.log(Lang.CurrentLang.SENDING_EMAILVERIF + " ...", Log.INFO);
             API.execute_logged(API.ROUTE.VERIFY, API.METHOD.POST, user.getCredentials(), {email: userInfos.email}, API.TYPE.JSON).then(res => {
-                email_log.update("Email envoyé avec succès !", Log.SUCCESS);
+                email_log.update(Lang.CurrentLang.SENDING_EMAIL_SUCCESS + " !", Log.SUCCESS);
 
                 setTimeout(() => {
                     log.delete();
@@ -112,7 +104,7 @@ function onValidate(modal) {
                 }, 2000);
 
             }).catch(err => {
-                email_log.update("Erreur : " + err.message, Log.ERROR);
+                email_log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
             
                 setTimeout(() => {
                     log.delete();
@@ -122,7 +114,7 @@ function onValidate(modal) {
             });
 
         }).catch(err => {
-            log.update("Erreur : " + err.message, Log.ERROR);
+            log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
             
             setTimeout(() => {
                 log.delete();
@@ -146,7 +138,10 @@ export default {
         onValidate
     },
     data() {
-        return { User, genres }
+        return { User, genres, lang: Lang.CurrentLang }
+    },
+    mounted() {
+        Lang.AddCallback(lang => this.lang = lang);
     }
 }
 </script>

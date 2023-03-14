@@ -1,3 +1,5 @@
+import Lang from "./Lang";
+
 export function retreiveFields(el) {
     /**@type {HTMLDivElement} */
     const inputs_div = el.$refs["inputs"];
@@ -7,8 +9,7 @@ export function retreiveFields(el) {
         const input = div.querySelector("input");
         if (!input) continue;
 
-        if (input.type == "checkbox")
-            input.value = input.checked ? true : false;
+        input.value = getTypedValue(input);
 
         inputs.push(input);
     }
@@ -26,3 +27,25 @@ export function retreiveFields(el) {
         return true;
     };
 }
+
+export function getTypedValue(input) {
+    switch (input.type) {
+        case "number":
+            return Number(input.value);
+        case "checkbox":
+            return input.checked;
+        default:
+            return input.value;
+    }
+}
+
+export function isPhoneNumber(val) {
+    if (!val) return false;
+    return val.replace(/(\.|\s|-)/g, "").trim().match(/^((00[0-9]{2})?0[0-9][0-9]{8}|\+[0-9]{11,12})$/) != null;
+}
+
+export const genres = [
+    {value: 1,  id: 'MALE'},
+    {value: -1, id: 'UNSPECIFIED'},
+    {value: 0,  id: 'FEMALE'},
+];

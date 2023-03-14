@@ -14,8 +14,8 @@
             ></div>
             <span class="flex grow h-1 w-full bg-slate-200 rounded-lg mb-4 mt-2"></span>
             <div style="animation-delay: 0.2s" class="show-down flex grow-0 h-fit w-full justify-between">
-                <button-text ref="cancel" :action="cancel"> Annuler </button-text>
-                <button-block :disabled="this.disabled != false" ref="validate" :action="validate"> Valider </button-block>
+                <button-text ref="cancel" :action="cancel"> {{ lang.CANCEL }} </button-text>
+                <button-block :disabled="this.disabled != false" ref="validate" :action="validate"> {{ lang.VALIDATE }} </button-block>
             </div>
         </div>
     </div>
@@ -28,6 +28,7 @@ import { goBack, goHome, goTo, goToLink } from '../../scripts/redirects.js';
 import { Log, LogZone } from '../../scripts/Logs.js';
 import { executeAfter } from '../../scripts/Promises.js';
 import { retreiveFields } from '../../scripts/data.js';
+import Lang from '../../scripts/Lang';
 
 export default {
     components: {
@@ -62,7 +63,7 @@ export default {
             required: false
         }
     },
-    data() { return {} },
+    data() { return { lang: Lang.CurrentLang } },
     methods: {
         validate() {
             retreiveFields(this);
@@ -103,6 +104,8 @@ export default {
         }
     },
     mounted() {
+        Lang.AddCallback(lang => this.lang = lang);
+
         this.$el.addEventListener("keydown", ev => {
             if (ev.key == "Enter")
                 this.validate();

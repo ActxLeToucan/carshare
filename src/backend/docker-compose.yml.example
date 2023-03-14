@@ -1,0 +1,49 @@
+version: '3.1'
+
+services:
+  # MariaDB setup
+  db:
+    image: mariadb
+    restart: always
+    command: [
+      '--lower-case-table-names=1'
+    ]
+    ports:
+      - "3306:3306"
+    networks:
+      - carshare_network
+    volumes:
+      - ./db/data:/var/lib/mysql
+    environment:
+      MARIADB_DATABASE: carshare
+      MARIADB_ROOT_PASSWORD: <change_password>
+
+  # Node api setup
+  node:
+    build: .
+    restart: always
+    ports:
+      - "3000:3000"
+    networks:
+      - carshare_network
+    environment:
+      DATABASE_URL: "mysql://root:<change_password>@db:3306/carshare"
+      JWT_SECRET: '<change_secret>'
+      NODE_ENV: 'production'
+      FRONTEND_URL: 'https://carshare.projects.antoinectx.fr'
+      FRONTEND_NAME: 'Car Share'
+      FRONTEND_LOGO: 'https://carshare.projects.antoinectx.fr/img/car.svg'
+
+  # Added adminer (light phpmyadmin), to be able to view the database
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - "8008:8080"
+    networks:
+      - carshare_network
+
+# Common network for all services
+networks:
+  carshare_network:
+    driver: bridge

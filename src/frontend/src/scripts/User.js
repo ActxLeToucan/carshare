@@ -30,18 +30,27 @@ class User {
     level = 0;
     createdAt = null;
     token = null;
+    emailVerifiedOn = null;
 
     constructor(infos) {
-        this.setInformations(infos);
+        this.setInformations(infos, true);
         User.#currentUser = this;
     }
 
-    setInformations(infos) {
-        const props = ["id", "email", "firstName", "lastName", "phone", "avatar", "gender", "hasCar", "mailNotif", "level", "createdAt", "token"];
+    setInformations(infos, checkToken = false) {
+        const props = ["id", "email", "firstName", "lastName", "phone", "avatar", "gender", "hasCar", "mailNotif", "level", "createdAt", "token", "emailVerifiedOn"];
         for (const prop of props) {
             if (this[prop] != infos[prop] && infos[prop] !== undefined) {
                 this[prop] = infos[prop];
             }
+        }
+        if (this.token != null && checkToken) { // verify token
+            API.execute_logged(API.ROUTE.ME, API.METHOD.GET, this.getCredentials()).then(res => {
+                this.setInformations(res, false);
+            }).catch(err => {
+                // token expired or user deleted
+                User.forget();
+            })
         }
     }
 
@@ -51,7 +60,7 @@ class User {
     }
 
     getCredentials() {
-        return new API.Credentials({token: "bearer " + this.token, type: API.Credentials.TYPE.TOKEN});
+        return new API.Credentials({token: "Bearer " + this.token, type: API.Credentials.TYPE.TOKEN});
     }
 }
 

@@ -2,8 +2,12 @@ import type express from 'express';
 import { prisma } from '../app';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { displayableUser, error, info, mail, sendMail, sendMsg } from '../tools/translator';
+import { displayableUserPrivate, error, info, mail, sendMail, sendMsg } from '../tools/translator';
 import * as properties from '../properties';
+import * as _user from './users/_common';
+import { type Prisma } from '@prisma/client';
+import { getPagination } from './_common';
+import { MailerError } from '../tools/mailer';
 
 exports.signup = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const { email, password, lastName, firstName, phone, hasCar, gender } = req.body;
@@ -38,19 +42,15 @@ exports.signup = (req: express.Request, res: express.Response, next: express.Nex
                             gender: genderSanitized
                         }
                     }).then((user) => {
-                        const msg = info.user.created(req, res);
-                        res.status(msg.code).json({
-                            message: msg.msg,
-                            user: displayableUser(user),
-                            token: jwt.sign(
-                                {
-                                    userId: user.id,
-                                    type: 'access'
-                                },
-                                process.env.JWT_SECRET ?? 'secret',
-                                { expiresIn: properties.p.token.access.expiration }
-                            )
-                        });
+                        const token = jwt.sign(
+                            {
+                                userId: user.id,
+                                type: 'access'
+                            },
+                            process.env.JWT_SECRET ?? 'secret',
+                            { expiresIn: properties.p.token.access.expiration }
+                        );
+                        sendMsg(req, res, info.user.created, user, token);
                     }).catch((err) => {
                         console.error(err);
                         sendMsg(req, res, error.generic.internalError);
@@ -83,19 +83,15 @@ exports.login = (req: express.Request, res: express.Response, next: express.Next
                         return;
                     }
 
-                    const msg = info.user.loggedIn(req, res);
-                    res.status(msg.code).json({
-                        message: msg.msg,
-                        userId: user.id,
-                        token: jwt.sign(
-                            {
-                                userId: user.id,
-                                type: 'access'
-                            },
-                            process.env.JWT_SECRET ?? 'secret',
-                            { expiresIn: properties.p.token.access.expiration }
-                        )
-                    });
+                    const token = jwt.sign(
+                        {
+                            userId: user.id,
+                            type: 'access'
+                        },
+                        process.env.JWT_SECRET ?? 'secret',
+                        { expiresIn: properties.p.token.access.expiration }
+                    );
+                    sendMsg(req, res, info.user.loggedIn, user.id, token);
                 }).catch((err) => {
                     console.error(err);
                     sendMsg(req, res, error.generic.internalError);
@@ -106,46 +102,6 @@ exports.login = (req: express.Request, res: express.Response, next: express.Next
         });
 }
 
-exports.getMe = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
-
-    res.status(200).json(displayableUser(res.locals.user));
-}
-
-exports.deleteMe = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
-
-    if (!properties.checkPasswordField(req.body.password, req, res, false)) return;
-
-    bcrypt.compare(req.body.password, res.locals.user.password)
-        .then((valid) => {
-            if (!valid) {
-                sendMsg(req, res, error.auth.invalidCredentials);
-                return;
-            }
-
-            prisma.user.delete({ where: { id: res.locals.user.id } })
-                .then(() => { sendMsg(req, res, info.user.deleted); })
-                .catch((err) => {
-                    console.error(err);
-                    sendMsg(req, res, error.generic.internalError);
-                });
-        }).catch((err) => {
-            console.error(err);
-            sendMsg(req, res, error.generic.internalError);
-        });
-}
-
-exports.updateMe = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    sendMsg(req, res, error.generic.notImplemented);
-}
-
 exports.passwordResetSendEmail = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     if (!properties.checkEmailField(req.body.email, req, res, false)) return;
 
@@ -153,6 +109,11 @@ exports.passwordResetSendEmail = (req: express.Request, res: express.Response, n
         .then((user) => {
             if (user === null) {
                 sendMsg(req, res, info.mailSent.passwordReset);
+                return;
+            }
+
+            if (user.lastPasswordResetEmailedOn !== null && user.lastPasswordResetEmailedOn > new Date(Date.now() - properties.p.mailer.passwordReset.cooldown)) {
+                sendMsg(req, res, error.mailer.cooldown, properties.p.mailer.passwordReset.cooldownTxt);
                 return;
             }
 
@@ -168,8 +129,53 @@ exports.passwordResetSendEmail = (req: express.Request, res: express.Response, n
             const frontendPath = `${String(process.env.FRONTEND_URL)}/password-reset`;
 
             sendMail(req, mail.password.reset, user, token, frontendPath)
-                .then(() => { sendMsg(req, res, info.mailSent.passwordReset); })
-                .catch((err) => {
+                .then(() => {
+                    prisma.user.update({
+                        where: { id: user.id },
+                        data: { lastPasswordResetEmailedOn: new Date() }
+                    }).then(() => {
+                        sendMsg(req, res, info.mailSent.passwordReset);
+                    }).catch((err) => {
+                        console.error(err);
+                        sendMsg(req, res, error.generic.internalError);
+                    });
+                }).catch((err) => {
+                    console.error(err);
+                    sendMsg(req, res, error.generic.internalError);
+                });
+        }).catch((err) => {
+            console.error(err);
+            if (err instanceof MailerError) {
+                sendMsg(req, res, error.mailer.disabled);
+                return;
+            }
+            sendMsg(req, res, error.generic.internalError);
+        });
+}
+
+exports.updatePassword = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    if (!properties.checkPasswordField(req.body.password, req, res)) return;
+    if (!properties.checkOldPasswordField(req.body.oldPassword, req, res)) return;
+
+    bcrypt.compare(req.body.oldPassword, res.locals.user.password)
+        .then((valid) => {
+            if (!valid) {
+                sendMsg(req, res, error.auth.wrongPassword);
+                return;
+            }
+
+            bcrypt.hash(req.body.password, properties.p.password.salt)
+                .then((hash) => {
+                    prisma.user.update({
+                        where: { id: res.locals.user.id },
+                        data: { password: hash }
+                    }).then(() => {
+                        sendMsg(req, res, info.user.passwordChanged);
+                    }).catch((err) => {
+                        console.error(err);
+                        sendMsg(req, res, error.generic.internalError);
+                    });
+                }).catch((err) => {
                     console.error(err);
                     sendMsg(req, res, error.generic.internalError);
                 });
@@ -179,33 +185,14 @@ exports.passwordResetSendEmail = (req: express.Request, res: express.Response, n
         });
 }
 
-exports.passwordReset = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
+exports.emailVerificationSendEmail = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    if (res.locals.user.emailVerifiedOn !== null) {
+        sendMsg(req, res, error.email.alreadyVerified);
         return;
     }
-    if (!properties.checkPasswordField(req.body.password, req, res)) return;
 
-    bcrypt.hash(req.body.password, properties.p.password.salt)
-        .then((hash) => {
-            prisma.user.update({
-                where: { id: res.locals.user.id },
-                data: { password: hash }
-            }).then(() => {
-                sendMsg(req, res, info.user.passwordChanged);
-            }).catch((err) => {
-                console.error(err);
-                sendMsg(req, res, error.generic.internalError);
-            });
-        }).catch((err) => {
-            console.error(err);
-            sendMsg(req, res, error.generic.internalError);
-        });
-}
-
-exports.emailVerificationSendEmail = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
+    if (res.locals.user.lastEmailVerificationEmailedOn !== null && res.locals.user.lastEmailVerificationEmailedOn > new Date(Date.now() - properties.p.mailer.emailVerification.cooldown)) {
+        sendMsg(req, res, error.mailer.cooldown, properties.p.mailer.emailVerification.cooldownTxt);
         return;
     }
 
@@ -219,19 +206,27 @@ exports.emailVerificationSendEmail = (req: express.Request, res: express.Respons
     );
 
     sendMail(req, mail.email.verification, res.locals.user, token)
-        .then(() => { sendMsg(req, res, info.mailSent.emailVerification); })
-        .catch((err) => {
+        .then(() => {
+            prisma.user.update({
+                where: { id: res.locals.user.id },
+                data: { lastEmailVerificationEmailedOn: new Date() }
+            }).then(() => {
+                sendMsg(req, res, info.mailSent.emailVerification);
+            }).catch((err) => {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
+            });
+        }).catch((err) => {
             console.error(err);
+            if (err instanceof MailerError) {
+                sendMsg(req, res, error.mailer.disabled);
+                return;
+            }
             sendMsg(req, res, error.generic.internalError);
         });
 }
 
 exports.emailVerification = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
-
     prisma.user.update({
         where: { id: res.locals.user.id },
         data: { emailVerifiedOn: new Date() }
@@ -241,4 +236,89 @@ exports.emailVerification = (req: express.Request, res: express.Response, next: 
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
     });
+}
+
+exports.getAllUsers = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const pagination = getPagination(req);
+
+    const lastName = String(req.query.lastName ?? '');
+    const firstName = String(req.query.firstName ?? '');
+    const email = String(req.query.email ?? '');
+
+    const where: { lastName?: any, firstName?: any, email?: any } = {};
+    if (lastName !== '') { where.lastName = { startsWith: lastName }; }
+    if (firstName !== '') { where.firstName = { startsWith: firstName }; }
+    if (email !== '') { where.email = { startsWith: email }; }
+
+    prisma.user.findMany<Prisma.UserFindManyArgs>({
+        where,
+        skip: pagination.offset,
+        take: pagination.limit,
+        orderBy: [
+            {
+                id: 'asc'
+            }
+        ]
+    })
+        .then(users => {
+            res.status(200).json(users.map(displayableUserPrivate));
+        })
+        .catch(err => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
+}
+
+exports.deleteUser = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const userId = properties.sanitizeUserId(req.params.id, req, res);
+    if (userId === null) return;
+
+    prisma.user.findUnique({ where: { id: userId } })
+        .then(user => {
+            if (user == null) {
+                sendMsg(req, res, error.user.notFound);
+                return;
+            }
+
+            if (res.locals.user.level <= user.level) {
+                sendMsg(req, res, error.auth.insufficientPrivileges);
+                return;
+            }
+
+            prisma.user.delete({ where: { id: userId } })
+                .then(() => { sendMsg(req, res, info.user.deleted); })
+                .catch((err) => {
+                    console.error(err);
+                    sendMsg(req, res, error.generic.internalError);
+                });
+        }).catch((err) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
+}
+
+exports.updateUser = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const userId = properties.sanitizeUserId(req.params.id, req, res);
+    if (userId === null) return;
+
+    prisma.user.findUnique({ where: { id: userId } })
+        .then(user => {
+            if (user == null) {
+                sendMsg(req, res, error.user.notFound);
+                return;
+            }
+
+            if (res.locals.user.level <= user.level) {
+                sendMsg(req, res, error.auth.insufficientPrivileges);
+                return;
+            }
+
+            _user.update(req, res, userId, true).catch((err) => {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
+            });
+        }).catch((err) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
 }
