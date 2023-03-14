@@ -361,8 +361,7 @@ const error: TranslationsMessageHTTP = {
             },
             code: 404
         })
-    }
-
+    },
 }
 
 const info: TranslationsMessageHTTP = {

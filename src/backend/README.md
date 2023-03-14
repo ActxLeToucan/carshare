@@ -21,9 +21,9 @@ npm i
 ```bash
 npm i -g nodemon
 ```
-3. Copier le fichier [`.env.example`](.env.example) et le renommer en `.env`
+3. Copier le fichier [`.env.example`](.env) et le renommer en `.env`
 4. Modifier les variables d'environnement du fichier `.env` pour qu'elles correspondent à votre configuration
-5. Copier le fichier [`mail.config.json.example`](mail.config.json.example) et le renommer en `mail.config.json`
+5. Copier le fichier [`mail.config.json.example`](mail.config.json) et le renommer en `mail.config.json`
 6. Compléter le fichier `mail.config.json` avec les informations de votre serveur SMTP, ou désactiver l'envoi d'emails en mettant `enabled` à `false`
 7. Initialiser la base de données
 ```bash
@@ -66,13 +66,13 @@ Vous devez avoir les outils suivants installés sur votre machine :
 
 #### Installation
 1. Cloner le dépôt et se placer dans le dossier [backend](.)
-2. Copier le fichier [`docker-compose.yml.example`](docker-compose.yml.example) et le renommer en `docker-compose.yml`
+2. Copier le fichier [`docker-compose.yml.example`](docker-compose.yml) et le renommer en `docker-compose.yml`
 3. Modifier les variables d'environnement :
    * `MARIADB_ROOT_PASSWORD` du conteneur `db`
    * `DATABASE_URL` du conteneur `node`
    * `JWT_SECRET` du conteneur `node`
 4. (optionnel) Modifier les ports des conteneurs si vous avez déjà des services qui utilisent ces ports
-5. Copier le fichier [`mail.config.json.example`](mail.config.json.example) et le renommer en `mail.config.json`
+5. Copier le fichier [`mail.config.json.example`](mail.config.json) et le renommer en `mail.config.json`
 6. Compléter le fichier `mail.config.json` avec les informations de votre serveur SMTP
 7. Lancer les conteneurs
 ```bash
@@ -99,10 +99,10 @@ npm i
 ```bash
 npm i -g pm2
 ```
-3. Copier le fichier [`.env.example`](.env.example) et le renommer en `.env`
+3. Copier le fichier [`.env.example`](.env) et le renommer en `.env`
 4. Modifier les variables d'environnement du fichier `.env` pour qu'elles correspondent à votre configuration
 5. Modifier la variable d'environnement `NODE_ENV` pour qu'elle vaille `production`
-6. Copier le fichier [`mail.config.json.example`](mail.config.json.example) et le renommer en `mail.config.json`
+6. Copier le fichier [`mail.config.json.example`](mail.config.json) et le renommer en `mail.config.json`
 7. Compléter le fichier `mail.config.json` avec les informations de votre serveur SMTP
 8. Initialiser la base de données
 ```bash
