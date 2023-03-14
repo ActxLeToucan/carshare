@@ -712,6 +712,18 @@ const info = {
                 travel,
                 numberOfEtape: nbEtape
             }
+        }),
+
+        updated: (req: Request, travel: Travel, nbEtape: object) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Trajet modifié',
+                en: 'Travel updated'
+            },
+            code: 201,
+            data: {
+                travel,
+                numberOfEtape: nbEtape
+            }
         })
     },
     group: {
