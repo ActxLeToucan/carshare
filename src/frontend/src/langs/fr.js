@@ -41,6 +41,7 @@ export default {
     BACK: "Retour",
     CREATE: "Créer",
     DISCONNECT: "Se déconnecter",
+    LOAD_MORE: "Charger plus",
 
     // register
     REGISTER_TITLE: "Inscription",

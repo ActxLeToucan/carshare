@@ -41,6 +41,7 @@ export default {
     BACK: "Back",
     CREATE: "Create",
     DISCONNECT: "Disconnect",
+    LOAD_MORE: "Load more",
 
     // register
     REGISTER_TITLE: "Register",

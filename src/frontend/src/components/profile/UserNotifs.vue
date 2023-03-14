@@ -2,16 +2,8 @@
     <div class="md:show-up flex flex-col grow">
         <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> {{ lang.MY_NOTIFS }} </p>
         <div class="flex flex-col md:w-fit w-full md:mx-auto px-4">
-            <button-block v-show="notifs.length > 0 && !loading" class="w-fit mt-8 ml-auto" color="red" :action="deleteAllShow">
-                <trash-icon class="w-7 h-7 mr-1.5 inline"></trash-icon><p class="inline">{{ lang.DELETE_ALL }}</p>
-            </button-block>
-            <div
-                ref="log-zone"
-                class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
-                style="max-height: 0;"
-            />
             <div class="flex grow h-fit min-w-[60vw] md:max-w-[70vw]">
-                <div v-show="loading" class="flex flex-col justify-center mx-auto">
+                <div v-show="loading && !minorLoading" class="flex flex-col justify-center mx-auto">
 
                     <div class="flex flex-col justify-center py-4 my-4 rounded-lg bg-slate-100 px-4">
                         <p class="text-xl text-center text-slate-500 font-bold mx-auto"> {{ lang.LOADING_NOTIFS }} </p>
@@ -35,7 +27,16 @@
                     </div>
 
                 </div>
-                <div v-if="notifs.length > 0 && !loading" class="flex-col w-full">
+                <div v-if="notifs.length > 0 && (!loading || minorLoading)" class="flex-col w-full mb-12">
+
+                    <button-block class="w-fit mt-8 ml-auto" color="red" :action="deleteAllShow">
+                        <trash-icon class="w-7 h-7 mr-1.5 inline"></trash-icon><p class="inline">{{ lang.DELETE_ALL }}</p>
+                    </button-block>
+                    <div
+                        ref="log-zone"
+                        class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
+                        style="max-height: 0;"
+                    />
 
                     <card v-for="notif in notifs" :key="notif.id"
                             class="py-4 my-4 rounded-lg px-4 hover:bg-slate-100 transition-all w-full text-left
@@ -55,6 +56,9 @@
                             </div>
                         </div>
                     </card>
+                    <button-block v-show="isThereMore" :disabled="loading" class="w-fit mt-8 mx-auto" :action="getNotifs">
+                        <PlusIcon class="w-7 h-7 mr-1.5 inline"></PlusIcon><p class="inline">{{ lang.LOAD_MORE }}</p>
+                    </button-block>
 
                 </div>
             </div>
@@ -79,36 +83,39 @@ import Card from "../cards/Card.vue";
 import ButtonBlock from "../inputs/ButtonBlock.vue";
 import ButtonText from "../inputs/ButtonText.vue";
 import ButtonTab from "../inputs/ButtonTab.vue";
-import {TrashIcon} from "@heroicons/vue/20/solid";
+import {TrashIcon, PlusIcon} from "@heroicons/vue/20/solid";
 import Popup from "../cards/Popup.vue";
 import {Log, LogZone} from "../../scripts/Logs";
 
 export default {
     name: "UserNotifs",
-    components: {Popup, ButtonTab, ButtonText, ButtonBlock, Card, TrashIcon},
+    components: {Popup, ButtonTab, ButtonText, ButtonBlock, Card, TrashIcon, PlusIcon},
     data() {
         return {
             lang: Lang.CurrentLang,
             notifs: [],
             loading: true,
-            error: null
+            minorLoading: false,
+            error: null,
+            next: 0
         }
     },
     mounted() {
         Lang.AddCallback(lang => this.lang = lang);
-
-        this.logZone = new LogZone(this.$refs["log-zone"]);
-
         this.getNotifs();
+    },
+    computed: {
+        isThereMore() {
+            return this.next !== 0 && this.next !== null;
+        }
     },
     methods: {
         getNotifs() {
-            // TODO: gérer pagination
             this.loading = true;
-            API.execute_logged(API.ROUTE.MY_NOTIFS, API.METHOD.GET, User.CurrentUser?.getCredentials()).then((data) => {
-                data = data.data;
-                data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                this.notifs = data;
+            API.execute_logged(`${API.ROUTE.MY_NOTIFS}?offset=${this.next}`, API.METHOD.GET, User.CurrentUser?.getCredentials()).then((data) => {
+                this.upsertNotifs(...data.data);
+                this.next = data.next;
+                this.minorLoading = true;
             }).catch(err => {
                 this.error = err.message;
                 this.notifs = [];
@@ -116,11 +123,25 @@ export default {
                 this.loading = false;
             });
         },
+        upsertNotifs(...n) {
+            const notifs = this.notifs;
+            for (const notif of n) {
+                const index = notifs.findIndex(n => n.id === notif.id);
+                if (index !== -1) {
+                    notifs[index] = notif;
+                } else {
+                    notifs.push(notif);
+                }
+            }
+            notifs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            this.notifs = notifs;
+            return this.notifs.length - notifs.length;
+        },
         deleteOne(notif) {
             this.notifs = this.notifs.filter(n => n.id !== notif.id);
+            this.next -= 1;
             API.execute_logged(`${API.ROUTE.NOTIFS}/${notif.id}`, API.METHOD.DELETE, User.CurrentUser?.getCredentials()).catch(err => {
-                this.notifs.push(notif);
-                this.notifs.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                this.next += this.upsertNotifs(notif);
                 const log = this.notifsLog(`${this.lang.ERROR} : ${err.message}`, Log.ERROR);
                 setTimeout(() => {
                     log.delete();
@@ -159,7 +180,10 @@ export default {
             notif.type = 'request.old';
         },
         notifsLog(msg, type = Log.INFO) {
-            if (!this.logZone) return null;
+            if (!this.logZone) {
+                this.logZone = new LogZone(this.$refs["log-zone"]);
+                if (!this.logZone) return;
+            }
             const log = new Log(msg, type);
             log.attachTo(this.logZone);
             return log;
