@@ -362,6 +362,23 @@ const error: TranslationsMessageHTTP = {
             code: 404
         })
     },
+
+    travel: {
+        notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Trajet introuvable.',
+                en: 'Travel not found.'
+            },
+            code: 404
+        }),
+        invalidId: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'L\'identifiant du trajet est invalide.',
+                en: 'Travel id is invalid.'
+            },
+            code: 400
+        })
+    },
 }
 
 const info: TranslationsMessageHTTP = {
