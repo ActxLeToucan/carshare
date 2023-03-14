@@ -374,7 +374,7 @@ const error: TranslationsMessageHTTP = {
         invalidId: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'L\'identifiant du trajet est invalide.',
-                en: 'Travel id is invalid.'
+                en: 'Travel id is invalid. '
             },
             code: 400
         })
