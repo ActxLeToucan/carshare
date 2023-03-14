@@ -26,7 +26,7 @@
 
                 <div
                     class="flex flex-col md:w-[50%] w-full grow md:px-2"
-                    :class="isMobile && selectedTab == 1 ? 'hidden' : ''"
+                    :class="isMobile? (selectedTab == 1 ? 'hidden' : 'show-right') : ''"
                 >
                     <card class="flex flex-col w-fit mx-auto space-y-4 max-w-full">
                         <input-choice name="trip-type" :label="lang.TRIP_TYPE" :list="tripTypes"
@@ -88,13 +88,13 @@
 
                 <div
                     class="flex flex-col md:w-[50%] grow w-full md:px-2"
-                    :class="isMobile && selectedTab == 0 ? 'hidden' : ''"
+                    :class="isMobile? (selectedTab == 0 ? 'hidden' : 'show-left') : ''"
                 >
 
-                    <div class="flex flex-col w-fit mx-auto">
+                    <div class="flex flex-col w-fit mx-auto max-w-full">
 
                         <!-- START SECTION -->
-                        <card class="flex flex-col my-2 p-1 w-full">
+                        <card class="flex flex-col mb-2 p-2 w-full">
                             <input-text
                                 class="my-1"
                                 ref="startstep-input" :label="lang.TRIP_START"
@@ -129,7 +129,7 @@
                             <!-- IN BETWEEN STEPS SECTION -->
                             <div class="flex flex-col" v-for="(step, index) in tripSteps" :key="step.id">
                                 <div class="flex items-center">
-                                    <card class="flex flex-col w-full my-2 p-1">
+                                    <card class="flex flex-col w-full my-2 p-2">
                                         <div class="flex grow w-full h-0 justify-end">
                                             <button class="flex rounded-md h-fit w-fit text-slate-500 pl-2 hover:text-red-500 cursor-pointer -translate-y-4 translate-x-4 transition-all"
                                                 v-on:click="() => delStep(index)">
@@ -170,7 +170,7 @@
                         </div>
 
                         <!-- END STEP -->
-                        <card class="flex flex-col my-2 p-1 w-full">
+                        <card class="flex flex-col mt-2 p-2 w-full">
                             <input-text
                                 class="my-1"
                                 ref="endstep-input" :label="lang.TRIP_END"
@@ -433,10 +433,14 @@ export default {
                 data.maxPassengers,
             ) + "\n";
 
+            desc += "\r";
+
             desc += formatString(
                 data.groupId? Lang.CurrentLang.CONFIRM_TRIP_PRIVATE: Lang.CurrentLang.CONFIRM_TRIP_PUBLIC,
                 this.selectedGroup?.name
             ) + "\n";
+
+            desc += "\r";
 
             desc += formatString(
                 data.steps.length > 2? (
@@ -456,9 +460,11 @@ export default {
                 ) + "\n";
             });
 
+            desc += "\r";
+
             desc += formatString(
                 data.description == ""? Lang.CurrentLang.CONFIRM_TRIP_NO_INFOS: Lang.CurrentLang.CONFIRM_TRIP_INFOS,
-                "\n" + data.description
+                "\n" + stylize(data.description)
             );
 
             const lines = desc.split("\n");
@@ -466,7 +472,12 @@ export default {
             lines.forEach(line => {
                 const p = document.createElement("p");
                 p.classList.add("text-md", "text-gray-500", "font-semibold");
-                p.innerHTML = line;
+                let text = line;
+                if (line.startsWith("\r")) {
+                    p.classList.add("mt-4");
+                    text = line.substring(1);
+                }
+                p.innerHTML = text;
                 tripDesc.appendChild(p);
             });
 
