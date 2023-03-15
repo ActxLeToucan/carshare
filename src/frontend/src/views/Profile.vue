@@ -1,7 +1,7 @@
 <template>
-    <div class="flex grow flex-col min-h-0 max-h-full 'dark': isDarkMode }" :class="{ 'dark': isDarkMode }">
+    <div class="flex grow flex-col min-h-0 max-h-screen">
         <topbar></topbar>
-        <div class="flex md:flex-row flex-col grow max-h-full min-h-0">
+        <div class="flex md:flex-row flex-col grow max-h-min min-h-0">
             <div ref="tabs-zone"
                 class="show-right flex flex-col items-center h-full md:w-min w-full min-h-0 px-8 py-4 space-y-4 md:border-r-8 border-teal-500 mx-auto overflow-hidden">
                 <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> {{ lang.PROFILE }} </p>
@@ -24,7 +24,7 @@
                     </svg>
                 </button>
 
-                <tab-window defaultHash="#infos" class="md:pt-0 pt-5">
+                <tab-window defaultHash="#infos" class="md:pt-0 pt-5 max-h-full">
 
                     <tab-div hash="#infos" class="flex flex-col items-center">
                         <user-infos></user-infos>
