@@ -52,12 +52,16 @@ export const genres = [
 
 export const langues = [
     {value: 'en',  id: 'ENGLISH'},
-    { value: 'fr', id: 'FRENSH' },
-   
+    { value: 'fr', id: 'FRENCH' },
 ];
 
 export const theme = [
     {value: 'dark', id: 'DARKMODE' },
     {value: 'clair',  id: 'LIGHTMODE'},
     { value: 'defaut', id: 'DEFAULTMODE' },
+];
+export const levels = [
+    {value: 0, id: 'USER'},
+    {value: 1, id: 'ADMIN'},
+    {value: 2, id: 'SUPER_ADMIN'},
 ];

@@ -40,7 +40,7 @@
                         <input-text   name="phone"     :label="lang.PHONE"          :placeholder="lang.PHONE" :value="selectedUser.phone"></input-text>
                         <input-choice name="gender"    :label="lang.GENDER"         :value="selectedUser.gender" :list="genres"></input-choice>
                         <input-switch name="hasCar"    :label="lang.I_HAVE_A_CAR"   :value="selectedUser.hasCar"></input-switch>
-                        <!-- TODO: Add an input for the level -->
+                        <input-choice name="level"     :label="lang.LEVEL"          :value="selectedUser.level" :list="levels"></input-choice>
                     </div>
                     <div
                         ref="user-log-zone"
@@ -85,7 +85,7 @@ import AdminUserCard from './AdminUserCard.vue';
 import Popup from '../cards/Popup.vue';
 import Card from '../cards/Card.vue';
 import {Log, LogZone} from '../../scripts/Logs.js';
-import {genres, isPhoneNumber} from '../../scripts/data';
+import {genres, isPhoneNumber, levels} from '../../scripts/data';
 
 import {
     MagnifyingGlassIcon
@@ -238,7 +238,7 @@ export default {
                 }
             }
 
-            const props = ["lastName", "firstName", "email", "phone", "gender", "hasCar"];
+            const props = ["lastName", "firstName", "email", "phone", "gender", "hasCar", "level"];
             const newData = {};
             for (const prop of props) {
                 const input = this.$el.querySelector(`input[name="${prop}"]`);
@@ -275,6 +275,7 @@ export default {
             selectedUser: null,
             isMobile: window.innerWidth < 768,
             genres,
+            levels,
             lang: Lang.CurrentLang,
             pagination: API.createPagination(),
             formUser: {
