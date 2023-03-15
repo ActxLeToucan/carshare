@@ -254,8 +254,8 @@ const error = {
         }),
         tooHigh: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'a mountain too [H]igh | Le niveau est plus élevé que votre propre niveau.',
-                en: 'Level is higher than your own level.'
+                fr: 'a mountain too [H]igh | Le niveau est trop élevé par rapport à votre niveau.',
+                en: 'Level is too high compared to your level.'
             },
             code: 403
         })
