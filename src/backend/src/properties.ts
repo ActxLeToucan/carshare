@@ -556,7 +556,7 @@ function checkDatesOrder (date1: any, date2: any, req: express.Request, res: exp
     if (!checkDateField(date2, true, req, res)) return false;
 
     if (new Date(date1).getTime() === new Date(date2).getTime()) {
-        sendMsg(req, res, error.date.isSame);
+        sendMsg(req, res, error.date.identical);
         return false;
     }
 
@@ -615,7 +615,7 @@ function checkListOfEtapeField (value: any, req: express.Request, res: express.R
         sendMsg(req, res, error.etapes.etapeMin, p.listOfEtape.minLength);
         return false;
     }
-    
+
     let j: number = 1;
     for (const i in value) {
         if (!checkDateField(value[i].date, true, req, res)) return false;

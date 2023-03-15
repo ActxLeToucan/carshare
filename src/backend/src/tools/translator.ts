@@ -321,7 +321,7 @@ const error = {
             },
             code: 400
         }),
-        isSame: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        identical: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Les dates mises sont les mêmes.',
                 en: 'The dates are the same.'
@@ -542,15 +542,15 @@ const error = {
         }),
         badOrder: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Les dates mises ne sont pas dans le bonne ordre.',
-                en: 'The dates are not in the right order.'
+                fr: 'Les dates données ne sont pas dans le bon ordre.',
+                en: 'The dates given are not in the right order.'
             },
             code: 400
         }),
         alreadyTravel: (req: Request, dateDeb: Date, dateFin: Date) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Le conducteur a déjà un trajet de prévue le ${dateDeb.toLocaleString('fr-FR')} à ${dateFin.toLocaleString('fr-FR')} .`,
-                en: `The driver already has a scheduled trip on ${dateDeb.toLocaleString('en-US')} to ${dateFin.toLocaleString('en-US')} .`
+                fr: `Le conducteur a déjà un trajet de prévu du ${dateDeb.toLocaleString('fr-FR')} au ${dateFin.toLocaleString('fr-FR')}.`,
+                en: `The driver already has a trip planned from ${dateDeb.toLocaleString('en-US')} to ${dateFin.toLocaleString('en-US')}.`
             },
             code: 400
         })
