@@ -156,7 +156,7 @@ export default {
     THEME: " Theme :  ", 
     DEFAULTMODE: "default",
     ENGLISH: "English ", 
-    FRENSH: "Frensh", 
+    FRENCH: "French", 
     LANG : "Please choose a language" , 
     MODE : "Please choose a theme" , 
     

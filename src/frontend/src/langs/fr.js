@@ -160,7 +160,7 @@ export default {
     THEME: " Théme   ", 
     DEFAULTMODE: "Par défaut",
     ENGLISH: "Anglais ", 
-    FRENSH : "Français" , 
+    FRENCH : "Français" , 
     LANGUES: "Langues  ",
     LANG : "Veuillez choisir une langue" , 
     MODE : "Veuillez choisir une theme" , 

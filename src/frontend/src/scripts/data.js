@@ -52,7 +52,7 @@ export const genres = [
 
 export const langues = [
     {value: 'en',  id: 'ENGLISH'},
-    { value: 'fr', id: 'FRENSH' },
+    { value: 'fr', id: 'FRENCH' },
 ];
 
 export const theme = [
