@@ -27,7 +27,7 @@
                     ref="user-log-zone"
                     class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
                     style="max-height: 0;"
-                ></div>
+                />
                 <div class="flex md:flex-row flex-col md:space-x-4 md:space-y-0 space-y-2 mt-4">
                     <button-block :action="deleteAccount" color="red"> {{ lang.DELETE_ACCOUNT }} </button-block>
                     <div class="flex grow justify-end pl-20">
@@ -45,7 +45,7 @@
                     ref="password-log-zone"
                     class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
                     style="max-height: 0;"
-                ></div>
+                />
                 <div class="flex grow justify-end">
                     <button-block :action="updatePassword" :disabled="!formPassword.buttonEnabled"> {{ lang.EDIT }} </button-block>
                 </div>
@@ -138,17 +138,16 @@ export default {
         },
         removeAccount(popup) {
             return new Promise((resolve, reject) => {
-                const log = popup.log("Suppression du compte...", Log.INFO);
+                const log = popup.log(this.lang.DELETING_ACCOUNT, Log.INFO);
                 API.execute_logged(API.ROUTE.ME, API.METHOD.DELETE, User.CurrentUser?.getCredentials(), {password: popup.get("password")}).then(_ => {
-                    log.update("Compte supprimé avec succès !", Log.SUCCESS);
+                    log.update(this.lang.ACCOUNT_DELETED, Log.SUCCESS);
                     setTimeout(() => {
                         log.delete();
                         this.disconnect();
                         resolve(true);
                     }, 1000);
                 }).catch(err => {
-                    console.error(err);
-                    log.update("Erreur : " + err.message, Log.ERROR);
+                    log.update(this.lang.ERROR + err.message, Log.ERROR);
                     setTimeout(() => {
                         log.delete();
                         resolve(false);
