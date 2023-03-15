@@ -760,13 +760,13 @@ const info = {
 
 const notification = {
     cancelTravel: {
-        titel: (req: Request, user: User, token: string) => msgForLang<>(req, {
+        title: (req: Request, user: User, token: string) => msgForLang<any, any>(req, {
             msg: {
                 fr: "Annulation d'un trajet",
                 eng: "A travel has been canceled"
             }
         }),
-        core: (req: Request, user: User, token: string) => msgForLang<>(req, {
+        core: (req: Request, user: User, token: string) => msgForLang<any, any>(req, {
             msg: {
                 fr: `Le trajet à destination de "" à "" départ le "" a été annulé.`,
                 eng: `The travel to "" from "" at "" has been canceled.` 
@@ -970,4 +970,4 @@ function displayableGroup (group: Group & { users: User[] }) {
     return g;
 }
 
-export { error, info, mail, sendMsg, sendMail, sendRaw, displayableUserPrivate, displayableGroup };
+export { error, info, mail, notification, sendMsg, sendMail, sendRaw, displayableUserPrivate, displayableGroup };

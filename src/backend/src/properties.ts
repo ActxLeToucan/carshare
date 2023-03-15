@@ -599,6 +599,17 @@ function sanitizeNotificationId (id: any, req: express.Request, res: express.Res
     return Number(id);
 }
 
+/**
+ * Send a notification to all given users
+ * @param travelId Email to check
+ * @param users Express request
+ * @param title Express response
+ * @param message If true, check if the email is valid
+ */
+function sendNotification (travelId: number, users: [any], title: string, message: string) {
+    
+}
+
 export {
     p,
     checkEmailField,
@@ -620,6 +631,7 @@ export {
     checkStringField,
     checkListOfEtapeField,
     checkDescriptionField,
-    sanitizeNotificationId
+    sanitizeNotificationId,
+    sendNotification
 
 };

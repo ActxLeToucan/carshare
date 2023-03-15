@@ -2,7 +2,7 @@ import { User } from '@prisma/client';
 import type express from 'express';
 import { prisma } from '../app';
 import * as properties from '../properties';
-import { error, info, sendMsg } from '../tools/translator';
+import { error, info, sendMsg, notification } from '../tools/translator';
 
 exports.myTravels = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     if (res.locals.user === undefined) {
@@ -132,6 +132,7 @@ exports.cancelTravel = (req: express.Request, res: express.Response, next: expre
 
     const dateCheck = new Date(new Date(travel.date).getTime() - 1000 * 60 * 60 * 24);
 
+    //Si possibilité non défini du coup bdd pourrite lol
     if ( !(travel.passagers === undefined || travel.passagers.length == 0) && dateCheck <= new Date() ) {
         sendMsg(req, res, error.travel.unableToCancel);
         return;
@@ -142,10 +143,10 @@ exports.cancelTravel = (req: express.Request, res: express.Response, next: expre
         data: { status: -1 }
     }).then(() => {
         sendMsg(req, res, info.travel.successfulCancel);
-        if ( travel.passagers === undefined || travel.passagers.length > 0 ){
+        if ( travel.passagers !== undefined || travel.passagers.length > 0 ){
             let template = {
-                title: ,
-                message: ,
+                title: notification.cancelTravel.title,
+                message: notification.cancelTravel.core,
                 userId: 0,
                 travelId: travel.id,
                 createdAt: new Date()
