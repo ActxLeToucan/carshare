@@ -1024,18 +1024,25 @@ paths:
           $ref: '#/components/responses/internalError'
   /notifications/:id:
     delete:
-      summary: Delete the notification in params
+      summary: Delete one notification
       description: Delete one notification of the current user with the id in params
       operationId: deleteOneNotification
       tags:
         - Notifications
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
+        - name: id
+          in: path
+          description: Id of the notification
+          required: true
+          schema:
+            type: integer
+            example: 99
       security:
         - bearerAuth: [ ]
       responses:
         '200':
-          description: One notification was deleted
+          description: Notification deleted
           content:
             application/json:
               schema:
