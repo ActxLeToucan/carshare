@@ -512,7 +512,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  users:
+                  data:
                     type: array
                     items:
                       $ref: '#/components/schemas/PrivateUser'
@@ -786,14 +786,17 @@ paths:
               schema:
                 type: object
                 properties:
-                  travelsAsDriver:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Travel'
-                  travelsAsPassenger:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Travel'
+                  data:
+                    type: object
+                    properties:
+                      travelsAsDriver:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Travel'
+                      travelsAsPassenger:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Travel'
                   limit:
                     type: integer
                     example: 10
@@ -862,7 +865,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ArrayOfTravels'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Travel'
         '400':
           description: Bad request
           content:
@@ -967,7 +972,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  notifications:
+                  data:
                     type: array
                     items:
                       $ref: '#/components/schemas/Notification'
@@ -1090,7 +1095,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  groups:
+                  data:
                     type: array
                     items:
                       $ref: '#/components/schemas/Group'
@@ -1190,7 +1195,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  groups:
+                  data:
                     type: array
                     items:
                       $ref: '#/components/schemas/Group'

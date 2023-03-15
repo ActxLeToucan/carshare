@@ -11,7 +11,7 @@ exports.getMyNotifications = (req: express.Request, res: express.Response, _: ex
         where: { userId: res.locals.user.id },
         ...pagination.pagination
     }).then(notifications => {
-        res.status(200).json(pagination.results('notifications', notifications));
+        res.status(200).json(pagination.results(notifications));
     }).catch((err) => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);

@@ -89,6 +89,11 @@ class API {
         USERS: "/users",
         GROUPS: "/groups/my",
         SETTINGS : "/settings/notifications",
+        TRAVELS: {
+            CREATE: "/travels/create",
+            MY: "/travels/my",
+            SEARCH: "/travels/search",
+        }
     };
 
     /**

@@ -22,7 +22,7 @@ export default {
             required: false
         },
         value: {
-            type: [String, Boolean],
+            type: [String, Boolean, Number],
             default: false,
             required: false
         },
@@ -61,6 +61,15 @@ export default {
             }
 
             checkbox.checked = this.state;
+        },
+        applyValue(val) {
+            switch (typeof val) {
+                case "string": this.state = val === "true"; break;
+                case "number": this.state = val > 0; break;
+                case "boolean": this.state = val; break;
+                default: this.state = false; break;
+            }
+            this.updateButton();
         }
     },
     mounted() {
@@ -69,11 +78,11 @@ export default {
             this.updateButton();
         });
         this.updateButton();
+        this.applyValue(this.value);
     },
     watch: {
         value: function (val) {
-            this.state = val;
-            this.updateButton();
+            this.applyValue(val);
         }
     }
 }

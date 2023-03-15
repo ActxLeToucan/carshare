@@ -18,7 +18,7 @@
             <div class="flex w-full flex-col px-8 space-y-4 pt-4 max-w-full min-w-0">
                 <admin-user-card
                     class="min-w-0 w-full show-up" v-for="user in usersList"
-                    :data="user" :key="user.id" :onclick="onCardClicked">
+                    :data="user" :key="user?.id" :onclick="onCardClicked">
                 </admin-user-card>
             </div>
         </div>
@@ -40,7 +40,7 @@
                         <input-text   name="phone"     :label="lang.PHONE"          :placeholder="lang.PHONE" :value="selectedUser.phone"></input-text>
                         <input-choice name="gender"    :label="lang.GENDER"         :value="selectedUser.gender" :list="genres"></input-choice>
                         <input-switch name="hasCar"    :label="lang.I_HAVE_A_CAR"   :value="selectedUser.hasCar"></input-switch>
-                        <!-- TODO: Add an input for the level -->
+                        <input-choice name="level"     :label="lang.LEVEL"          :value="selectedUser.level" :list="levels"></input-choice>
                     </div>
                     <div
                         ref="user-log-zone"
@@ -85,7 +85,7 @@ import AdminUserCard from './AdminUserCard.vue';
 import Popup from '../cards/Popup.vue';
 import Card from '../cards/Card.vue';
 import {Log, LogZone} from '../../scripts/Logs.js';
-import {genres, isPhoneNumber} from '../../scripts/data';
+import {genres, isPhoneNumber, levels} from '../../scripts/data';
 
 import {
     MagnifyingGlassIcon
@@ -103,7 +103,7 @@ function search(obj) {
     const value = obj.$refs['query-zone'].querySelector('input').value;
 
     API.execute_logged(API.ROUTE.USERS + obj.pagination, API.METHOD.GET, User.CurrentUser?.getCredentials(), { search: value }).then((data) => {
-        obj.usersList = data;
+        obj.usersList = data.data ?? data.users;
         log.delete();
     }).catch((err) => {
         log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
@@ -237,7 +237,7 @@ export default {
                 }
             }
 
-            const props = ["lastName", "firstName", "email", "phone", "gender", "hasCar"];
+            const props = ["lastName", "firstName", "email", "phone", "gender", "hasCar", "level"];
             const newData = {};
             for (const prop of props) {
                 const input = this.$el.querySelector(`input[name="${prop}"]`);
@@ -274,6 +274,7 @@ export default {
             selectedUser: null,
             isMobile: window.innerWidth < 768,
             genres,
+            levels,
             lang: Lang.CurrentLang,
             pagination: API.createPagination(),
             formUser: {

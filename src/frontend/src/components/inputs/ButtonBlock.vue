@@ -4,14 +4,14 @@
             ref="btn"
             :to="href ?? ''"
             class="flex items-center justify-center w-fit h-fit py-2 px-4 text-slate-500 text-xl font-bold bg-white rounded-md bg-slate-100 border-b-4 border-slate-200
-                hover:text-slate-50 hover:shadow-md transition-all"
+                outline-none hover:text-slate-50 hover:shadow-md focus:border-teal-500 transition-all"
             :class="'hover:bg-'+color+'-500 hover:border-'+color+'-600'">
             <p class="whitespace-nowrap text-ellipsis max-w-full min-w-0 w-fit h-fit max-h-full min-h-0"> <slot></slot> </p>
         </router-link>
         <button v-if="!href"
             ref="btn-2"
             class="flex items-center justify-center w-fit h-fit py-2 px-4 text-slate-500 text-xl font-bold bg-white rounded-md bg-slate-100 border-b-4 border-slate-200
-                hover:text-slate-50 hover:shadow-md transition-all"
+                outline-none hover:text-slate-50 hover:shadow-md focus:border-teal-500 transition-all"
             :class="'hover:bg-'+color+'-500 hover:border-'+color+'-600'">
             <p class="whitespace-nowrap text-ellipsis max-w-full min-w-0 w-fit h-fit max-h-full min-h-0"> <slot></slot> </p>
         </button>
