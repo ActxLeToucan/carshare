@@ -1,22 +1,22 @@
 <template>
-    <div class="fixed top-0 left-0 w-screen h-screen flex justify-center items-center bg-slate-900/[0.3] opacity-0 pointer-events-none transition-all px-4">
-        <div ref="popup" class="flex flex-col rounded-lg shadow-lg border-4 border-slate-200 bg-slate-50 p-4 space-y-4">
+    <div class="fixed top-0 left-0 w-screen h-screen flex justify-center items-center bg-slate-900/[0.3] opacity-0 pointer-events-none transition-all p-4">
+        <div ref="popup" class="flex flex-col rounded-lg shadow-lg border-4 border-slate-200 bg-slate-50 p-4 space-y-4 max-w-full max-h-full">
             <h1 class="text-xl font-bold text-center" :class="'text-'+color+'-500'"> {{ _title }} </h1>
             <div class="flex flex-col">
                 <p v-for="line in content.split(/\n|\\n/g)" :key="line" class="text-lg font-semibold text-slate-500"> {{ line }} </p>
             </div>
             <div
                 ref="log-zone"
-                class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
+                class="flex flex-col w-full justify-center items-center min-h-max h-max transition-all"
                 style="max-height: 0px;"
             ></div>
-            <div ref="inputs" class="flex flex-col">
+            <div ref="inputs" class="flex flex-col overflow-auto">
                 <slot></slot>
             </div>
             <span class="flex grow h-1 w-full bg-slate-200 rounded-lg mb-4 mt-2"></span>
             <div class="flex justify-between">
                 <button-text ref="btn-cancel"> {{ cancelLabel }} </button-text>
-                <button-block :color="color" ref="btn-validate"> {{ validateLabel }} </button-block>
+                <button-block v-show="showValidate" :color="color" ref="btn-validate"> {{ validateLabel }} </button-block>
             </div>
         </div>
     </div>
@@ -59,6 +59,11 @@ export default {
         validateLabel: {
             type: String,
             default: 'Valider',
+            required: false
+        },
+        showValidate: {
+            type: [Boolean, String],
+            default: true,
             required: false
         },
         oncancel: {
@@ -135,6 +140,27 @@ export default {
     mounted() {
         this._title = this.title;
         document.body.appendChild(this.$el);
+
+        this.$refs["inputs"].addEventListener("keydown", ev => {
+            if (ev.key == "Enter") this.$refs["btn-validate"].$el.click();
+        });
+
+        const el = this.$el;
+        const child = el.firstElementChild;
+        el.addEventListener("click", ev => {
+            const rect = child.getBoundingClientRect();
+            const pos = { x: ev.clientX, y: ev.clientY };
+            if (pos.x < rect.left || pos.x > rect.right || pos.y < rect.top || pos.y > rect.bottom) {
+                this.hide();
+            }
+        });
+
+        window.addEventListener("keydown", ev => {
+            if (ev.key == "Escape") {
+                if (this.$el.classList.contains("opacity-1"))
+                    this.hide();
+            }
+        });
 
         this.$refs["btn-cancel"].$el.addEventListener("click", () => {
             executeAfter(

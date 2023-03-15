@@ -27,6 +27,7 @@ const p = {
         values: [-1, 0, 1]
     },
     userLevel: {
+        user: 0,
         admin: 1
     },
     token: {
@@ -84,6 +85,7 @@ const p = {
         minLength: 2
     },
     query: {
+        defaultLimit: 10,
         minLimit: 1, // in database queries, the minimum value allowed for LIMIT statements
         maxLimit: 50 // the max value allowed for LIMIT statements
     }
@@ -260,7 +262,7 @@ function checkLevelField (level: any, req: express.Request, res: express.Respons
         sendMsg(req, res, error.level.type);
         return false;
     }
-    if (res.locals.user.level < level) {
+    if (res.locals.user.level <= level) {
         sendMsg(req, res, error.level.tooHigh);
         return false;
     }
@@ -469,7 +471,6 @@ function checkMaxPassengersField (value: any, req: express.Request, res: express
  * @param value Value to sanitize
  * @param req Express request
  * @param res Express response
- * @param fieldName Name of the field
  * @returns true if the value is valid and if the value is between -180 and 180, false otherwise
  */
 function checkLngField (value: any, req: express.Request, res: express.Response): boolean {
@@ -495,7 +496,6 @@ function checkLngField (value: any, req: express.Request, res: express.Response)
  * @param value Value to sanitize
  * @param req Express request
  * @param res Express response
- * @param fieldName Name of the field
  * @returns true if the value is valid and if the value is between -90 and 90, false otherwise
  */
 function checkLatField (value: any, req: express.Request, res: express.Response): boolean {
@@ -563,15 +563,15 @@ function checkStringField (value: any, req: express.Request, res: express.Respon
  */
 function checkListOfEtapeField (value: any, req: express.Request, res: express.Response): boolean {
     if (value === undefined || value === '') {
-        sendMsg(req, res, error.etape.required, 'listOfEtape');
+        sendMsg(req, res, error.etapes.required);
         return false;
     }
     if (typeof value !== 'object') {
-        sendMsg(req, res, error.etape.type, 'listOfEtape');
+        sendMsg(req, res, error.etapes.type);
         return false;
     }
     if (value.length < 2) {
-        sendMsg(req, res, error.etape.etapeMin, p.listOfEtape.minLength);
+        sendMsg(req, res, error.etapes.etapeMin, p.listOfEtape.minLength);
         return false;
     }
     for (const i in value) {

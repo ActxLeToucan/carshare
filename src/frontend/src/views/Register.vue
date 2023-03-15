@@ -31,12 +31,7 @@ import re from '../scripts/Regex';
 import API from '../scripts/API';
 import Lang from '../scripts/Lang';
 import { Log } from '../scripts/Logs';
-import { genres } from '../scripts/data';
-
-function isPhoneNumber(val) {
-    if (!val) return false;
-    return val.replace(/(\.|\s|-)/g, "").trim().match(/^((00[0-9]{2})?0[0-9][0-9]{8}|\+[0-9]{11,12})$/) != null;
-}
+import { genres, isPhoneNumber } from '../scripts/data';
 
 const field_checks = [
     {field: "firstName",        check: (value) => value.length > 0, error: Lang.CurrentLang.FIRSTNAME_SPECIFY},

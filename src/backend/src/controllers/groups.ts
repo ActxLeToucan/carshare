@@ -2,13 +2,9 @@ import type express from 'express';
 import { displayableGroup, error, info, sendMsg } from '../tools/translator';
 import * as properties from '../properties';
 import { prisma } from '../app';
+import { type Pagination, preparePagination } from './_common';
 
-exports.createGroup = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
-
+exports.createGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { name } = req.body;
     if (!properties.checkGroupNameField(name, req, res)) return;
     prisma.group.create({
@@ -32,20 +28,30 @@ exports.createGroup = (req: express.Request, res: express.Response, next: expres
 }
 
 exports.getMyGroups = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
+    getGroups(req, res, next, false, (_) => ({
+        creatorId: res.locals.user.id
+    }));
+}
+
+exports.searchGroups = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    getGroups(req, res, next, true, (pagination) => ({
+        name: {
+            contains: pagination.query
+        }
+    }));
+}
+
+function getGroups (req: express.Request, res: express.Response, next: express.NextFunction, searchMode: boolean, where: (pagination: Pagination) => any) {
+    const pagination = preparePagination(req, searchMode);
 
     prisma.group.findMany({
-        where: {
-            creatorId: res.locals.user.id
-        },
+        where: where(pagination),
         include: {
             users: true
-        }
+        },
+        ...pagination.pagination
     }).then((groups) => {
-        res.status(200).json(groups.map(displayableGroup));
+        res.status(200).json(pagination.results(groups.map(displayableGroup)));
     }).catch((err) => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);

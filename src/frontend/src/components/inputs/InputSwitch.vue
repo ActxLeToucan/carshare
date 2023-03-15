@@ -22,18 +22,13 @@ export default {
             required: false
         },
         value: {
-            type: [String, Boolean],
+            type: [String, Boolean, Number],
             default: false,
             required: false
         },
         name: {
             type: String,
             default: "",
-            required: false
-        },
-        onchange: {
-            type: Function,
-            default: (state) => { },
             required: false
         }
     },
@@ -45,9 +40,7 @@ export default {
                 default: this.state = false; break;
             }
         }
-        return {
-            state: false
-        }
+        return {};
     },
     methods: {
         updateButton() {
@@ -68,20 +61,28 @@ export default {
             }
 
             checkbox.checked = this.state;
+        },
+        applyValue(val) {
+            switch (typeof val) {
+                case "string": this.state = val === "true"; break;
+                case "number": this.state = val > 0; break;
+                case "boolean": this.state = val; break;
+                default: this.state = false; break;
+            }
+            this.updateButton();
         }
     },
     mounted() {
         this.$refs["switch"].addEventListener("click", ev => {
             this.state = !this.state;
-            this.onchange(this.state);
             this.updateButton();
         });
         this.updateButton();
+        this.applyValue(this.value);
     },
     watch: {
         value: function (val) {
-            this.state = val;
-            this.updateButton();
+            this.applyValue(val);
         }
     }
 }

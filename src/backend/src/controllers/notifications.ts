@@ -2,30 +2,23 @@ import type express from 'express';
 import { prisma } from '../app';
 import { error, info, sendMsg } from '../tools/translator';
 import * as properties from '../properties';
+import { preparePagination } from './_common';
 
-exports.myNotifications = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
+exports.getMyNotifications = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    const pagination = preparePagination(req, false);
 
     prisma.notification.findMany({
-        where: { userId: res.locals.user.id }
-
+        where: { userId: res.locals.user.id },
+        ...pagination.pagination
     }).then(notifications => {
-        res.status(200).json(notifications);
+        res.status(200).json(pagination.results(notifications));
     }).catch((err) => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
     });
 }
 
-exports.deleteAllNotification = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
-
+exports.deleteAllNotifications = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     prisma.notification.deleteMany({
         where: { userId: res.locals.user.id }
 
@@ -37,11 +30,7 @@ exports.deleteAllNotification = (req: express.Request, res: express.Response, ne
     });
 }
 
-exports.deleteOneNotification = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
+exports.deleteOneNotification = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const notifId = properties.sanitizeNotificationId(req.params.id, req, res);
     if (notifId === null) return;
 
