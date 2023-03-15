@@ -32,17 +32,11 @@
                     <button-block class="w-fit mt-8 ml-auto" color="red" :action="deleteAllShow">
                         <trash-icon class="w-7 h-7 mr-1.5 inline"></trash-icon><p class="inline">{{ lang.DELETE_ALL }}</p>
                     </button-block>
-                    <div
-                        ref="log-zone"
-                        class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
-                        style="max-height: 0;"
-                    />
 
                     <card v-for="notif in notifs" :key="notif.id"
-                            class="py-4 my-4 rounded-lg px-4 hover:bg-slate-100 transition-all w-full text-left
-                                    text-slate-600">
+                            class="py-4 my-4 rounded-lg px-4 hover:bg-slate-100 transition-all w-full text-left text-slate-600">
                         <div class="w-full">
-                            <button-block class="float-right ml-2" color="red" :action="() => deleteOne(notif)">
+                            <button-block class="float-right ml-2" :disabled="notif.locked" color="red" :action="() => deleteOne(notif)">
                                 <trash-icon class="w-7 h-7"></trash-icon>
                             </button-block>
                             <p class="font-bold">
@@ -54,6 +48,11 @@
                                 <button-block class="inline-block mr-4"         :action="() => acceptRequest(notif)">Accepter</button-block>
                                 <button-block class="inline-block" color="red"  :action="() => refuseRequest(notif)">Refuser</button-block>
                             </div>
+                            <div
+                                :ref="`log-notif-${notif.id}`"
+                                class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
+                                style="max-height: 0;"
+                            />
                         </div>
                     </card>
                     <button-block v-show="isThereMore" :disabled="loading" class="w-fit mt-8 mx-auto" :action="getNotifs">
@@ -103,6 +102,7 @@ export default {
     mounted() {
         Lang.AddCallback(lang => this.lang = lang);
         this.getNotifs();
+        this.logZones = {};
     },
     computed: {
         isThereMore() {
@@ -138,11 +138,13 @@ export default {
             return this.notifs.length - notifs.length;
         },
         deleteOne(notif) {
-            this.notifs = this.notifs.filter(n => n.id !== notif.id);
-            this.next -= 1;
-            API.execute_logged(`${API.ROUTE.NOTIFS}/${notif.id}`, API.METHOD.DELETE, User.CurrentUser?.getCredentials()).catch(err => {
-                this.next += this.upsertNotifs(notif);
-                const log = this.notifsLog(`${this.lang.ERROR} : ${err.message}`, Log.ERROR);
+            notif.locked = true;
+            const log = this.notifLog(notif, this.lang.DELETING + '...', Log.INFO);
+            API.execute_logged(`${API.ROUTE.NOTIFS}/{notif.id}`, API.METHOD.DELETE, User.CurrentUser?.getCredentials()).then(_ => {
+                this.notifs = this.notifs.filter(n => n.id !== notif.id);
+            }).catch(err => {
+                log.update(this.lang.ERROR + " : " + err.message, Log.ERROR);
+                notif.locked = false;
                 setTimeout(() => {
                     log.delete();
                 }, 6000);
@@ -179,13 +181,14 @@ export default {
             // TODO: send refuse request with SENDER: ${notif.userId} and TRAVEL: ${notif.travelId} TO: ${notif.senderId}
             notif.type = 'request.old';
         },
-        notifsLog(msg, type = Log.INFO) {
-            if (!this.logZone) {
-                this.logZone = new LogZone(this.$refs["log-zone"]);
-                if (!this.logZone) return;
+        notifLog(notif, msg, type = Log.INFO) {
+            if (!this.logZones[notif.id]) {
+                const dom = this.$refs["log-notif-"+notif.id][0];
+                this.logZones[notif.id] = new LogZone(dom);
+                if (!this.logZones[notif.id]) return;
             }
             const log = new Log(msg, type);
-            log.attachTo(this.logZone);
+            log.attachTo(this.logZones[notif.id]);
             return log;
         },
     }
