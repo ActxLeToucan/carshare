@@ -690,12 +690,6 @@ paths:
             schema:
               type: object
               properties:
-                departureDate:
-                  type: string
-                  example: 2023-03-16T09:15:36.000Z
-                arrivalDate:
-                  type: string
-                  example: 2023-03-17T09:15:36.000Z
                 maxPassengers:
                   type: integer
                   example: 10
@@ -718,16 +712,20 @@ paths:
                       context: 54, Meurthe-et-Moselle, Grand Est
                       lat: 48.683188
                       lng: 6.1877
+                      date: 2023-04-16T09:15:36.000Z
                     - label: 2ter Boulevard Charlemagne 54000 Laxou
                       city: Laxou
                       context: 54, Meurthe-et-Moselle, Grand Est
                       lat: 49.683188
                       lng: 6.5877
+                      date: 2023-04-16T219:15:36.000Z
                     - label: 1801 chemin Napoléon 55000 Metz
                       city: Metz
                       context: 55, Moselle, Grand Est
                       lat: 78.683188
                       lng: 6.1877
+                      date: 2023-04-17T09:15:36.000Z
+
 
       responses:
         '201':
@@ -754,7 +752,6 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
-
   /travels/my:
     get:
       summary: My travels
@@ -778,7 +775,7 @@ paths:
                   travelsAsDriver:
                     $ref: '#/components/schemas/ArrayOfTravels'
                   travelsAsPassenger:
-                      $ref: '#/components/schemas/ArrayOfTravels'
+                    $ref: '#/components/schemas/ArrayOfTravels'
         '401':
           $ref: '#/components/responses/noToken'
         '498':
@@ -1449,12 +1446,6 @@ components:
             id:
               type: integer
               example: 2
-            departureDate:
-              type: string
-              example: 2023-03-16T09:15:36.000Z
-            arrivalDate:
-              type: string
-              example: 2023-03-17T09:15:36.000Z
             maxPassengers:
               type: integer
               example: 10
