@@ -156,7 +156,7 @@ export default {
     TRIPS: "Trips",
 
     //parametres
-    GET_NOTIFIED: "Get notified by e-mail :",
+    GET_NOTIFIED: "Notify by email :",
     DARKMODE: "Dark", 
     LIGHTMODE: "Light", 
     THEME: " Theme :  ", 

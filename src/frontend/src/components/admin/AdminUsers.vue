@@ -154,6 +154,7 @@ export default {
         },
         onCardClicked(user) {
             this.selectedUser = user;
+            console.log("user22" , this.selectedUser)
             this.displayPage(PAGE.RESULTS);
         },
         searchLog(msg, type = Log.INFO) {

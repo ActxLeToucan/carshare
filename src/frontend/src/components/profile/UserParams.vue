@@ -60,11 +60,11 @@ export default {
     mounted() {
         Lang.AddCallback(lang => this.lang = lang);
         if (User.CurrentUser == null) return;
-        console.log("mail" , User.CurrentUser.mailNotif)
+
     },
     methods: {
      onchangeTheme(e) {
-            console.log(e.target.value);
+          
             this.SelectedTheme = e.target.value;
            
             if (this.SelectedTheme === 'dark') {
@@ -83,7 +83,7 @@ export default {
             }
         },
         onchangeLang(e) {
-            console.log(e.target.value);
+         
             this.SelectedLang = e.target.value;
             if (this.SelectedLang === 'fr') {
                 // Charger la langue française
@@ -95,18 +95,16 @@ export default {
         },
         beNotified(state) {
             this.User.CurrentUser.mailNotif = state;
-            console.log("stat", state)
             const { id } = this;
-             console.log("id", this.User.CurrentUser?.id)
+
             const data = {
                 "value": state ,
             }
             API.execute_logged(API.ROUTE.SETTINGS , API.METHOD.PATCH, User.CurrentUser?.getCredentials() ).then((data) => {
-               console.log("succes")
+            
             }).catch(err => {
                 console.error(err);
                // state = !state; 
-                console.log("stat", state)
             });
         }, 
         
