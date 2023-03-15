@@ -34,14 +34,8 @@
                     </button-block>
 
                     <card v-for="notif in notifs" :key="notif.id"
-                            class="py-4 my-4 rounded-lg px-4 hover:bg-slate-100 transition-all w-full text-left
-                                    text-slate-600">
+                            class="py-4 my-4 rounded-lg px-4 hover:bg-slate-100 transition-all w-full text-left text-slate-600">
                         <div class="w-full">
-                            <div
-                                :ref="`log-notif-${notif.id}`"
-                                class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
-                                style="max-height: 0;"
-                            />
                             <button-block class="float-right ml-2" :disabled="notif.locked" color="red" :action="() => deleteOne(notif)">
                                 <trash-icon class="w-7 h-7"></trash-icon>
                             </button-block>
@@ -54,6 +48,11 @@
                                 <button-block class="inline-block mr-4"         :action="() => acceptRequest(notif)">Accepter</button-block>
                                 <button-block class="inline-block" color="red"  :action="() => refuseRequest(notif)">Refuser</button-block>
                             </div>
+                            <div
+                                :ref="`log-notif-${notif.id}`"
+                                class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
+                                style="max-height: 0;"
+                            />
                         </div>
                     </card>
                     <button-block v-show="isThereMore" :disabled="loading" class="w-fit mt-8 mx-auto" :action="getNotifs">
@@ -103,7 +102,7 @@ export default {
     mounted() {
         Lang.AddCallback(lang => this.lang = lang);
         this.getNotifs();
-        //V2 this.logZones = {};
+        this.logZones = {};
     },
     computed: {
         isThereMore() {
@@ -183,21 +182,13 @@ export default {
             notif.type = 'request.old';
         },
         notifLog(notif, msg, type = Log.INFO) {
-            /* V2
             if (!this.logZones[notif.id]) {
-                this.logZones[notif.id] = new LogZone(this.$refs[`log-notif-${notif.id}`]);
+                const dom = this.$refs["log-notif-"+notif.id][0];
+                this.logZones[notif.id] = new LogZone(dom);
                 if (!this.logZones[notif.id]) return;
             }
             const log = new Log(msg, type);
             log.attachTo(this.logZones[notif.id]);
-            return log;
-             */
-            if (!notif.logZone) {
-                notif.logZone = new LogZone(this.$refs[`log-notif-${notif.id}`]);
-                if (!notif.logZone) return;
-            }
-            const log = new Log(msg, type);
-            log.attachTo(notif.logZone);
             return log;
         },
     }
