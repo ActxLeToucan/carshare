@@ -327,13 +327,6 @@ const error = {
                 en: 'The dates are the same.'
             },
             code: 400
-        }),
-        badOrder: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Les dates mises ne sont pas dans le bonne ordre.',
-                en: 'The dates are not in the right order.'
-            },
-            code: 400
         })
     },
     ville: {
@@ -550,6 +543,20 @@ const error = {
             msg: {
                 fr: 'Les étapes doivent être un tableau.',
                 en: 'Etapes must be an array.'
+            },
+            code: 400
+        }),
+        badOrder: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Les dates mises ne sont pas dans le bonne ordre.',
+                en: 'The dates are not in the right order.'
+            },
+            code: 400
+        }),
+        alreadyTravel: (req: Request, dateDeb: Date, dateFin: Date) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Le conducteur a déjà un trajet de prévue le ${dateDeb.toLocaleString('fr-FR')} à ${dateFin.toLocaleString('fr-FR')} .`,
+                en: `The driver already has a scheduled trip on ${dateDeb.toLocaleString('en-US')} to ${dateFin.toLocaleString('en-US')} .`
             },
             code: 400
         })

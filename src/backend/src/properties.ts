@@ -561,10 +561,37 @@ function checkDatesOrder (date1: any, date2: any, req: express.Request, res: exp
         return false;
     }
 
-    if(new Date(date1)> new Date(date2)){
-        sendMsg(req, res, error.date.badOrder);
+    if (new Date(date1) > new Date(date2)) {
+        sendMsg(req, res, error.etapes.badOrder);
         return false;
     }
+    return true;
+}
+
+/**
+ * Check if the user doesn't have a trip yet
+ * If the user have already a travel, send an error message to the client
+ * @param dateMin Date to check
+ * @param dateMax Date to check
+ * @param req Express request
+ * @param res Express response
+ * @returns true if the user doesn't have a trip , false otherwise
+ */
+function checkTravelAlready (dateMin: any, dateMax: any, etapes: any, req: express.Request, res: express.Response): boolean {
+    if (new Date(dateMin) >= new Date(etapes[0].date) && new Date(dateMin) <= new Date(etapes[etapes.length - 1].date)) {
+        sendMsg(req, res, error.etapes.alreadyTravel, new Date(etapes[0].date), new Date(etapes[etapes.length - 1].date));
+        return false;
+    }
+
+    if (new Date(dateMax) >= new Date(etapes[0].date) && new Date(dateMax) <= new Date(etapes[etapes.length - 1].date)) {
+        sendMsg(req, res, error.etapes.alreadyTravel, new Date(etapes[0].date), new Date(etapes[etapes.length - 1].date));
+        return false;
+    }
+    if ((new Date(dateMin) <= new Date(etapes[0].date) && new Date(dateMax) >= new Date(etapes[0].date)) && (new Date(dateMin) <= new Date(etapes[etapes.length - 1].date) && new Date(dateMax) >= new Date(etapes[etapes.length - 1].date))) {
+        sendMsg(req, res, error.etapes.alreadyTravel, new Date(etapes[0].date), new Date(etapes[etapes.length - 1].date));
+        return false;
+    }
+
     return true;
 }
 
@@ -592,7 +619,7 @@ function checkListOfEtapeField (value: any, req: express.Request, res: express.R
 
     const tabUniqueDate = new Set(...value.map((e: any) => e.date));
 
-    if (tabUniqueDate.size === value.length){
+    if (tabUniqueDate.size === value.length) {
         sendMsg(req, res, error.etapes.required);
         return false;
     }
@@ -600,7 +627,7 @@ function checkListOfEtapeField (value: any, req: express.Request, res: express.R
     for (const i in value) {
         if (!checkDateField(value[i].date, true, req, res)) return false;
 
-        if( i != String(value.length-1)){
+        if (i !== String(value.length - 1)) {
             if (!checkDatesOrder(value[i].date, value[i2].date, req, res)) return false;
         }
 
@@ -610,7 +637,7 @@ function checkListOfEtapeField (value: any, req: express.Request, res: express.R
         if (!checkLatField(value[i].lat, req, res)) return false;
         if (!checkLngField(value[i].lng, req, res)) return false;
 
-        i2+=1;
+        i2 += 1;
     }
     return true;
 }
@@ -650,5 +677,6 @@ export {
     checkStringField,
     checkListOfEtapeField,
     checkDescriptionField,
-    sanitizeNotificationId
+    sanitizeNotificationId,
+    checkTravelAlready
 };
