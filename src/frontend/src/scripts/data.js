@@ -53,7 +53,6 @@ export const genres = [
 export const langues = [
     {value: 'en',  id: 'ENGLISH'},
     { value: 'fr', id: 'FRENSH' },
-    {value:'lang', id: 'LANG' ,  "selected": true},
    
 ];
 
@@ -61,6 +60,4 @@ export const theme = [
     {value: 'dark', id: 'DARKMODE' },
     {value: 'clair',  id: 'LIGHTMODE'},
     { value: 'defaut', id: 'DEFAULTMODE' },
-    {value:'theme', id: 'MODE' ,  "selected": true  },
-   
 ];
