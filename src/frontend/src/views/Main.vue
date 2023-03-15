@@ -29,8 +29,10 @@
                             </div>
 
                             <div class="flex md:flex-row flex-col md:space-x-2 items-center w-min">
-                                <selector ref="startSelector" :oncompletion="searchCities" :onclick="onstartselected" :x="isMobile?-17:1" :y="isMobile?8:4"></selector>
-                                <input-text name="startingpoint" class="w-48 mx-auto max-w-fit" :placeholder="lang.STARTING_POINT" dark="true"></input-text>
+                                <div class="flex flex-col">
+                                    <input-text name="startingpoint" class="w-48 mx-auto max-w-fit" :placeholder="lang.STARTING_POINT" dark="true"></input-text>
+                                    <selector ref="startSelector" :oncompletion="searchCities" :onclick="onstartselected"></selector>
+                                </div>
                                 <!-- <div class="flex justify-center items-center"> -->
                                     <!-- <div class="h-0 w-0"> -->
                                         <button-block class="w-fit" color="slate" :action="reverseInputs"> <!-- -translate-x-[50%] -translate-y-[50%] -->
@@ -39,8 +41,10 @@
                                         </button-block>
                                     <!-- </div> -->
                                 <!-- </div> -->
-                                <selector ref="endSelector" :oncompletion="searchCities" :onclick="onendselected" :x="isMobile?-17:1" :y="isMobile?8:4"></selector>
-                                <input-text name="endingpoint" class="w-48 mx-auto max-w-fit" :placeholder="lang.ENDING_POINT" dark="true"></input-text>
+                                <div class="flex flex-col">
+                                    <input-text name="endingpoint" class="w-48 mx-auto max-w-fit" :placeholder="lang.ENDING_POINT" dark="true"></input-text>
+                                    <selector ref="endSelector" :oncompletion="searchCities" :onclick="onendselected"></selector>
+                                </div>
                             </div>
                             <span class="md:block hidden bg-teal-600 w-1 h-14 rounded-lg"></span>
                             <div class="flex md:flex-row flex-col md:space-x-2 md:space-y-2 space-y-0 w-min">
@@ -53,7 +57,7 @@
                         </div>
                         <div style="animation-delay: 400ms;" class="show-up flex w-full justify-end mt-4">
 
-                            <button-block class="shadow-lg" href="createTrip"> Créer un trajet </button-block>
+                            <button-block class="shadow-lg" href="/trips/new"> Créer un trajet </button-block>
 
                         </div>
                     </div>
@@ -184,7 +188,7 @@ export default {
     },
     name: 'Main',
     data() {
-        return { startCities, lang: Lang.CurrentLang, isMobile: window.innerWidth < 768 }
+        return { startCities, lang: Lang.CurrentLang }
     },
     methods: {
         onstartselected(city) {

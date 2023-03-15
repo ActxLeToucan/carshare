@@ -13,7 +13,7 @@ class Log {
         this.type = type;
         this.dom = document.createElement("p");
         this.dom.innerHTML = msg;
-        applyClasses(this.dom, "text-lg h-fit font-semibold transition-all overflow-hidden " + this.type);
+        applyClasses(this.dom, "text-lg h-fit text-center font-semibold transition-all overflow-hidden " + this.type);
         this.dom.style.maxHeight = "100px";
     }
 
