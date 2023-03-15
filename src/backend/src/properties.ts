@@ -1,6 +1,8 @@
 import type express from 'express';
-import { error, sendMsg, type Variants } from './tools/translator';
+import { error, info, sendMsg, type Variants } from './tools/translator';
 import IsEmail from 'isemail';
+import { User } from '@prisma/client';
+import { prisma } from './app';
 
 const p = {
     email: {
@@ -606,8 +608,28 @@ function sanitizeNotificationId (id: any, req: express.Request, res: express.Res
  * @param title Express response
  * @param message If true, check if the email is valid
  */
-function sendNotification (travelId: number, users: [any], title: string, message: string) {
-    
+function sendNotification (travelId: number | null = null, users: [User], title: string, message: string, req: express.Request, res: express.Response) {
+    let template = {
+        title: title,
+        message: message,
+        userId: 0,
+        travelId: travelId,
+        createdAt: new Date()
+    };
+    let data: any[] = [];
+    users.forEach((element: User) => {
+        template.userId = element.id
+        data.push(template)
+    });
+
+    prisma.notification.createMany({
+        data
+    }).then(() => {
+        sendMsg(req, res, info.notification.sent);
+    }).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
 }
 
 export {
