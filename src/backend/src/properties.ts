@@ -262,7 +262,7 @@ function checkLevelField (level: any, req: express.Request, res: express.Respons
         sendMsg(req, res, error.level.type);
         return false;
     }
-    if (res.locals.user.level < level) {
+    if (res.locals.user.level <= level) {
         sendMsg(req, res, error.level.tooHigh);
         return false;
     }

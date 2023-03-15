@@ -91,6 +91,11 @@ class API {
         NOTIFS: "/notifications",
         MY_NOTIFS: "/notifications/my",
         ALL_NOITFS: "/notifications/all",
+        TRAVELS: {
+            CREATE: "/travels/create",
+            MY: "/travels/my",
+            SEARCH: "/travels/search",
+        }
     };
 
     /**
