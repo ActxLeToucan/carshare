@@ -46,7 +46,7 @@ export default {
             theme,
             SelectedLang: '',
             SelectedTheme: '',
-            selected: '' , 
+            selected: '', 
 
             formProperties: {
                 properties: {
