@@ -7,7 +7,7 @@
             </div>
             <div
                 ref="log-zone"
-                class="flex flex-col w-full justify-center items-center min-h-max h-max transition-all overflow-y-auto"
+                class="flex flex-col w-full justify-center items-center min-h-max h-max transition-all"
                 style="max-height: 0px;"
             ></div>
             <div ref="inputs" class="flex flex-col overflow-auto">
