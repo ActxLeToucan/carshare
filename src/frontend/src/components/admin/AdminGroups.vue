@@ -15,10 +15,10 @@
                 style="max-height: 0;"
             ></div>
             <div class="flex w-full flex-col px-8 space-y-4 pt-4 max-w-full min-w-0">
-                <admin-user-card
+               <admin-group-card
                     class="min-w-0 w-full show-up" v-for="group in groups"
                     :data="group" :key="group?.id" :onclick="onCardClicked">
-                </admin-user-card>
+                </admin-group-card>
             </div>
         </div>
         <div ref="result-zone" class="flex flex-col grow px-4 p-4 overflow-auto">
@@ -75,7 +75,7 @@ import InputText from '../inputs/InputText.vue';
 import InputSwitch from '../inputs/InputSwitch.vue';
 import InputChoice from '../inputs/InputChoice.vue';
 import ButtonBlock from '../inputs/ButtonBlock.vue';
-import AdminUserCard from './AdminUserCard.vue';
+import AdminGroupCard from './AdminGroupCard.vue';
 import Popup from '../cards/Popup.vue';
 import Card from '../cards/Card.vue';
 import { Log, LogZone } from '../../scripts/Logs.js';
@@ -116,12 +116,13 @@ export default {
         TabDiv,
         InputText,
         ButtonBlock,
-        AdminUserCard,
+        AdminGroupCard,
         InputSwitch,
         InputChoice,
         Card,
         MagnifyingGlassIcon,
-        Popup
+        Popup,
+        
     },
     methods: {
           displayPage(page) {
