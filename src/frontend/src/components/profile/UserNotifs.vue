@@ -112,7 +112,7 @@ export default {
     methods: {
         getNotifs() {
             this.loading = true;
-            API.execute_logged(`${API.ROUTE.MY_NOTIFS}?offset=${this.next}`, API.METHOD.GET, User.CurrentUser?.getCredentials()).then((data) => {
+            API.execute_logged(API.ROUTE.MY_NOTIFS + API.createPagination(this.next), API.METHOD.GET, User.CurrentUser?.getCredentials()).then((data) => {
                 this.upsertNotifs(...data.data);
                 this.next = data.next;
                 this.minorLoading = true;
