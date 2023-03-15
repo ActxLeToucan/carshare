@@ -38,6 +38,7 @@ export default {
     EDIT: "Modifier",
     DELETE: "Supprimer",
     DELETE_ACCOUNT: "Supprimer le compte",
+    DELETE_GROUP :"Supprimer le groupe " , 
     ADD: "Ajouter",
     SEARCH: "Rechercher",
     VERIFY: "Vérifier",
@@ -74,6 +75,8 @@ export default {
         PASSWORD_SPECIFY: "Veuillez renseignez votre mot de passe",
         PASSWORD_CONFIRM_SPECIFY: "Veuillez confirmer votre mot de passe",
         NAME_SPECIFY: "Veuillez renseignez le nom",
+        GROUPNAME_SPECIFY: "Veuillez renseignez le nom du groupe",
+        CREATOR_SPECIFY: "Veuillez renseignez le nom du créatur",
 
         FIRSTNAME_TOOLONG: "Le nom est trop long",
         LASTNAME_TOOLONG: "Le prénom est trop long",
@@ -135,6 +138,9 @@ export default {
         SELECT_GROUP: "Sélectionnez un groupe",
         SELECT_GROUP_DESC: "Veuillez sélectionner un groupe d'utilisateurs pour pouvoir partager vos trajets avec eux",
         GROUP_SELECTED: "Groupe sélectionné",
+        SEARCH_GROUP: "Rechercher un groupe",
+        GROUP_NAME: "Nom de groupe ",
+        GROUP_CREATOR :"Createur",
 
     // informations
     ADDRESS_NOT_VERIFIED: "Adresse non vérifiée",
@@ -168,6 +174,7 @@ export default {
         // users
         SEARCH_USER: "Rechercher un utilisateur",
         ACCOUNT_DELETE_VERIFY: "Êtes-vous sûr de vouloir supprimer ce compte ?\nCette action est irréversible.",
+        GROUP_DELETE_VERIFY: "Êtes-vous sûr de vouloir supprimer ce groupe ?\nCette action est irréversible.",
         ACCOUNT_EMAIL: "Email du compte",
         EMAIL_VERIFICATION: "Vérification de l'Email",
         EMAIL_UNMATCHING: "L'Email ne correspond pas",
