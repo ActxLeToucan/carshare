@@ -143,7 +143,7 @@ paths:
     get:
       summary: Get user
       description: Get the current user
-      operationId: getCurrentUser
+      operationId: getMe
       tags:
         - Users
       parameters:
@@ -166,7 +166,7 @@ paths:
     delete:
       summary: Delete user
       description: Delete the current user
-      operationId: deleteCurrentUser
+      operationId: deleteMe
       tags:
         - Users
       parameters:
@@ -212,7 +212,7 @@ paths:
     patch:
       summary: Update user
       description: Update the current user
-      operationId: updateCurrentUser
+      operationId: updateMe
       tags:
         - Users
       parameters:
@@ -294,7 +294,7 @@ paths:
     patch:
       summary: Update password
       description: Update the current user's password
-      operationId: updateCurrentUserPassword
+      operationId: updateMyPassword
       tags:
         - Users
       parameters:
@@ -388,7 +388,7 @@ paths:
     patch:
       summary: Password reset
       description: Change the password
-      operationId: passwordReset
+      operationId: resetPassword
       tags:
         - Users
       parameters:
@@ -492,30 +492,16 @@ paths:
 
   /users:
     get:
-      summary: Get all users
-      description: Get all users ordered by their internal id. Only available to admins. Filters (`lastName`, `firstName`, `email`) can be combined together.
-      operationId: getAllUsers
+      summary: Search users
+      description: Search in all users. Only available to admins.
+      operationId: searchUsers
       tags:
         - Users
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/offset'
-        - in: query
-          name: lastName
-          schema:
-            type: string
-          description: Filters results based on last names starting with this value (case-insensitive)
-        - in: query
-          name: firstName
-          schema:
-            type: string
-          description: Filters results based on first names starting with this value (case-insensitive)
-        - in: query
-          name: email
-          schema:
-            type: string
-          description: Filters results based on emails starting with this value (case-insensitive)
+        - $ref: '#/components/parameters/query'
       security:
         - bearerAuth: [ ]
       responses:
@@ -524,7 +510,30 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ArrayOfPrivateUsers'
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/PrivateUser'
+                  query:
+                    type: string
+                    required: false
+                    example: friends
+                  limit:
+                    type: integer
+                    example: 10
+                  offset:
+                    type: integer
+                    example: 0
+                  next:
+                    type: integer
+                    nullable: true
+                    example: 10
+                  prev:
+                    type: integer
+                    nullable: true
+                    example: 0
         '401':
           $ref: '#/components/responses/noToken'
         '403':
@@ -674,10 +683,12 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
-  /travel/create:
+
+  /travels/create:
     post:
       summary: create a new travel
       description: create a new travel with etape
+      operationId: createTravel
       tags:
         - Travels
       parameters:
@@ -756,6 +767,7 @@ paths:
     get:
       summary: My travels
       description: Get all the trips of the current user (as a driver or a passenger).
+      operationId: getMyTravels
       tags:
         - Travels
       parameters:
@@ -772,10 +784,31 @@ paths:
               schema:
                 type: object
                 properties:
-                  travelsAsDriver:
-                    $ref: '#/components/schemas/ArrayOfTravels'
-                  travelsAsPassenger:
-                    $ref: '#/components/schemas/ArrayOfTravels'
+                  data:
+                    type: object
+                    properties:
+                      travelsAsDriver:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Travel'
+                      travelsAsPassenger:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Travel'
+                  limit:
+                    type: integer
+                    example: 10
+                  offset:
+                    type: integer
+                    example: 0
+                  next:
+                    type: integer
+                    nullable: true
+                    example: 10
+                  prev:
+                    type: integer
+                    nullable: true
+                    example: 0
         '401':
           $ref: '#/components/responses/noToken'
         '498':
@@ -787,10 +820,41 @@ paths:
     get:
       summary: Search travels
       description: Get all the trips fitting with the given criteria
+      operationId: searchTravels
       tags:
         - Travels
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
+        - name: date
+          in: query
+          description: Wanted departure date
+          schema:
+            type: string
+            example: 2023-03-16T09:15:36.000Z
+        - name: startCity
+          in: query
+          description: Start city
+          schema:
+            type: string
+            example: Nancy
+        - name: startContext
+          in: query
+          description: Start context
+          schema:
+            type: string
+            example: 54, Meurthe-et-Moselle, Grand Est
+        - name: endCity
+          in: query
+          description: End city
+          schema:
+              type: string
+              example: Metz
+        - name: endContext
+          in: query
+          description: End context
+          schema:
+            type: string
+            example: 55, Moselle, Grand Est
       security:
         - bearerAuth: [ ]
       responses:
@@ -799,7 +863,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ArrayOfTravels'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Travel'
         '400':
           description: Bad request
           content:
@@ -821,6 +887,7 @@ paths:
     get:
       summary: Setting for mail notification
       description: True to have notification sent by mail or false to not be sent mail.
+      operationId: getNotificationSetting
       tags:
         - Settings
       parameters:
@@ -886,7 +953,7 @@ paths:
     get:
       summary: Get the list of notifications
       description: Get all the notifications of the current user.
-      operationId: myNotifications
+      operationId: getMyNotifications
       tags:
         - Notifications
       parameters:
@@ -901,7 +968,26 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ArrayOfNotifications'
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Notification'
+                  limit:
+                    type: integer
+                    example: 10
+                  offset:
+                    type: integer
+                    example: 0
+                  next:
+                    type: integer
+                    nullable: true
+                    example: 10
+                  prev:
+                    type: integer
+                    nullable: true
+                    example: 0
         '401':
           $ref: '#/components/responses/noToken'
         '498':
@@ -912,7 +998,7 @@ paths:
     delete:
       summary: Delete all the notification
       description: Delete all the notification of the current user
-      operationId: deleteAllNotification
+      operationId: deleteAllNotifications
       tags:
         - Notifications
       parameters:
@@ -985,6 +1071,56 @@ paths:
         '500':
           $ref: '#/components/responses/internalError'
 
+  /groups:
+    get:
+      summary: Search groups
+      description: Search in all groups. Only available to admins.
+      operationId: searchGroups
+      tags:
+        - Groups
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+        - $ref: '#/components/parameters/query'
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: A list of the groups
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Group'
+                  query:
+                    type: string
+                    required: false
+                    example: friends
+                  limit:
+                    type: integer
+                    example: 10
+                  offset:
+                    type: integer
+                    example: 0
+                  next:
+                    type: integer
+                    nullable: true
+                    example: 10
+                  prev:
+                    type: integer
+                    nullable: true
+                    example: 0
+        '401':
+          $ref: '#/components/responses/noToken'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
   /groups/my:
     post:
       summary: Create a group
@@ -1055,15 +1191,90 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Group'
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Group'
+                  query:
+                    type: string
+                    required: false
+                    example: friends
+                  limit:
+                    type: integer
+                    example: 10
+                  offset:
+                    type: integer
+                    example: 0
+                  next:
+                    type: integer
+                    nullable: true
+                    example: 10
+                  prev:
+                    type: integer
+                    nullable: true
+                    example: 0
         '401':
           $ref: '#/components/responses/noToken'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
+
+  /docs:
+    get:
+      summary: Get the documentation
+      description: Get the documentation in html
+      operationId: getDocs
+      tags:
+        - Docs
+      responses:
+        '200':
+          description: Documentation
+          content:
+            text/html:
+              schema:
+                type: string
+  /docs/yaml:
+    get:
+      summary: Get the documentation in yaml
+      description: Get the documentation in yaml
+      operationId: getDocsYaml
+      tags:
+        - Docs
+      responses:
+        '200':
+          description: Documentation in yaml
+          content:
+            text/yaml:
+              schema:
+                type: string
+  /docs/favicon:
+    get:
+      summary: Get the favicon
+      description: Redirect to the favicon of the frontend (specified in the .env file)
+      operationId: getFavicon
+      tags:
+        - Docs
+      responses:
+        '302':
+          description: Redirect to the favicon
+          headers:
+            Location:
+              schema:
+                type: string
+              description: The URL to redirect to
+        '500':
+          description: Internal error
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Environment variable "FRONTEND_LOGO" is not defined.
 
 components:
   securitySchemes:
@@ -1090,7 +1301,7 @@ components:
       required: false
       schema:
         type: integer
-        default: 50
+        default: 10
         minimum: 1
         maximum: 50
     offset:
@@ -1102,6 +1313,14 @@ components:
         type: integer
         minimum: 0
         default: 0
+    query:
+      name: query
+      in: query
+      description: The query to search for
+      required: false
+      schema:
+        type: string
+        default: ''
   responses:
     noToken:
       description: Unauthorized
@@ -1321,79 +1540,6 @@ components:
         createdAt:
           type: string
           format: date-time
-    ArrayOfPrivateUsers:
-      type: array
-      items:
-        $ref: '#/components/schemas/PrivateUser'
-      example:
-        - id: 1
-          email: bob@example.com
-          emailVerifiedOn: 2023-01-26T15:26:31.144Z
-          firstName: Bob
-          lastName: LeBricoleur
-          phone: "0321456789"
-          avatar: null
-          gender: -1
-          hasCar: true
-          mailNotif: true
-          level: 3
-          createdAt: 2023-01-26T15:26:31.144Z
-        - id: 2
-          email: laia@cat.world
-          emailVerifiedOn: 2023-02-18T13:19:23.636Z
-          firstName: Laia
-          lastName: Kitten
-          phone: "+330612345678"
-          avatar: null
-          gender: 1
-          hasCar: false
-          mailNotif: true
-          level: 1
-          createdAt: 2023-02-18T13:19:23.636Z
-    ArrayOfTravels:
-      type: array
-      items:
-        $ref: '#/components/schemas/Travel'
-      example:
-        - id: 1
-          departureDate: 2023-02-27T17:52:29.000Z
-          arrivalDate: 2023-02-27T18:00:09.000Z
-          maxPassengers: 2
-          price: 100
-          description: No pets allowed
-          status: 1
-          driverId: 1
-          groupId: null
-          createdAt: 2023-02-27T17:52:29.000Z
-        - id: 2
-          departureDate: 2023-02-27T17:52:29.000Z
-          arrivalDate: 2023-02-27T18:00:09.000Z
-          maxPassengers: 4
-          price: 100
-          description: No pets allowed
-          status: 1
-          driverId: 1
-          groupId: null
-          createdAt: 2023-02-27T17:52:29.000Z
-    ArrayOfNotifications:
-      type: array
-      items:
-        $ref: '#/components/schemas/Notification'
-      example:
-        - id: 1
-          action: null
-          title: Bienvenue sur car share
-          message: Car share, vous souhaite la bienvenue et un agréable moment sur son site
-          userId: 1
-          travelId: null
-          createdAt: 2023-02-27T17:52:29.000Z
-        - id: 2
-          action: null
-          title: Groupe rejoint
-          message: Vous avez rejoint le groupe des bg du 54
-          userId: 1
-          travelId: null
-          createdAt: 2023-02-27T18:00:09.000Z
 
     Notification:
       type: object

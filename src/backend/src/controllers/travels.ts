@@ -2,10 +2,10 @@ import type express from 'express';
 import { prisma } from '../app';
 import * as properties from '../properties';
 import { error, info, sendMsg } from '../tools/translator';
-import { getPagination } from './_common';
+import { preparePagination } from './_common';
 
-exports.myTravels = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const pagination = getPagination(req);
+exports.getMyTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    const pagination = preparePagination(req, false);
 
     prisma.user.findMany({
         where: { id: res.locals.user.id },
@@ -13,21 +13,25 @@ exports.myTravels = (req: express.Request, res: express.Response, next: express.
             travelsAsDriver: true,
             travelsAsPassenger: { select: { travel: true } }
         },
-        skip: pagination.offset,
-        take: pagination.limit
-    }).then(travel => {
-        res.status(200).json(travel);
+        ...pagination.pagination
+    }).then(travels => {
+        res.status(200).json(pagination.results(travels));
     }).catch((err) => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
     });
 }
 
-exports.searchTravels = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const { date, startCity, endCity } = req.query;
+exports.searchTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    const { date, startCity, startContext, endCity, endContext } = req.query;
     if (!properties.checkCityField(startCity, req, res, 'startCity')) return;
     if (!properties.checkCityField(endCity, req, res, 'endCity')) return;
     if (!properties.checkDateField(date, false, req, res)) return;
+    if (startContext !== undefined && !properties.checkStringField(startContext, req, res, 'startContext')) return;
+    if (endContext !== undefined && !properties.checkStringField(endContext, req, res, 'endContext')) return;
+
+    const startCtx = startContext === undefined ? '' : startContext;
+    const endCtx = endContext === undefined ? '' : endContext;
 
     const date1 = new Date(new Date(date as string).getTime() - 1000 * 60 * 60);
     const date2 = new Date(new Date(date as string).getTime() + 1000 * 60 * 60);
@@ -36,7 +40,9 @@ exports.searchTravels = (req: express.Request, res: express.Response, next: expr
                      from travel t
                               inner join etape e1 on e1.travelId = t.id and e1.city = ${startCity}
                               inner join etape e2 on e2.travelId = t.id and e2.city = ${endCity}
-                     where e1.date < e2.date
+                     where e1.\`order\` < e2.\`order\`
+                       and IF(${startCtx} = '', true, e1.context = ${startCtx})
+                       and IF(${endCtx} = '', true, e2.context = ${endCtx})
                        and t.arrivalDate BETWEEN ${date1} and ${date2}`
         .then((data) => {
             res.status(200).json(data);

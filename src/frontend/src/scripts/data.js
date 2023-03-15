@@ -49,3 +49,9 @@ export const genres = [
     {value: -1, id: 'UNSPECIFIED'},
     {value: 0,  id: 'FEMALE'},
 ];
+
+export const levels = [
+    {value: 0, id: 'USER'},
+    {value: 1, id: 'ADMIN'},
+    {value: 2, id: 'SUPER_ADMIN'},
+];

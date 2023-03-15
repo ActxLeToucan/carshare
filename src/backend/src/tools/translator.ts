@@ -254,8 +254,8 @@ const error = {
         }),
         tooHigh: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'a mountain too [H]igh | Le niveau est plus élevé que votre propre niveau.',
-                en: 'Level is higher than your own level.'
+                fr: 'a mountain too [H]igh | Le niveau est trop élevé par rapport à votre niveau.',
+                en: 'Level is too high compared to your level.'
             },
             code: 403
         })
@@ -461,18 +461,12 @@ const error = {
         })
     },
     documentation: {
-        notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        favicon: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: '<head><title>Documentation introuvable</title></head>' +
-                    '<h1>Documentation introuvable</h1>' +
-                    '<p>Si vous êtes le propriétaire du serveur, exécutez "npm run docs" pour la générer.</p>' +
-                    '<p>Vous pouvez également trouver le fichier de documentation (YAML) <a href="/docs/yaml">ici</a>.</p>',
-                en: '<head><title>Documentation not found</title></head>' +
-                    '<h1>Documentation not found</h1>' +
-                    '<p>If you are the owner of the server, run "npm run docs" to generate it.</p>' +
-                    '<p>You can also find the documentation file (YAML) <a href="/docs/yaml">here</a>.</p>'
+                fr: 'La variable d\'environnement "FRONTEND_LOGO" n\'est pas définie.',
+                en: 'Environment variable "FRONTEND_LOGO" is not defined.'
             },
-            code: 404
+            code: 500
         })
     },
     group: {
@@ -607,15 +601,15 @@ const error = {
     city: {
         required: (req: Request, field: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'La ville est requise.',
-                en: 'City is required.'
+                fr: `Le champ "${field}" est requis.`,
+                en: `Field "${field}" is required.`
             },
             code: 400
         }),
         type: (req: Request, field: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'La ville doit être une chaîne de caractères.',
-                en: 'City must be a string.'
+                fr: `Le champ "${field}" doit être une chaîne de caractères.`,
+                en: `Field "${field}" must be a string.`
             },
             code: 400
         })
@@ -792,7 +786,7 @@ const mail = {
         })
     },
     email: {
-        verification: (req: Request, user: User, token: string, frontendPath: string) => msgForLang<TemplateMail, Mail>(req, {
+        verification: (req: Request, user: User, token: string) => msgForLang<TemplateMail, Mail>(req, {
             to: user.email,
             subject: {
                 fr: 'Vérification de votre adresse email',
@@ -887,18 +881,6 @@ function sendMsg (req: Request, res: Response, message: (req: Request, ...args: 
 }
 
 /**
- * Sends a raw text with the given message
- * @param req Express request
- * @param res Express response
- * @param page Message to send
- * @param args Arguments to pass to the message function (if any)
- */
-function sendRaw (req: Request, res: Response, page: (req: Request, ...args: any) => MessageHTTP, ...args: any) {
-    const p = page(req, ...args);
-    res.status(p.code).send(p.msg);
-}
-
-/**
  * Sends an email
  * @param req Express request
  * @param message Message to send
@@ -942,4 +924,4 @@ function displayableGroup (group: Group & { users: User[] }) {
     return g;
 }
 
-export { error, info, mail, sendMsg, sendMail, sendRaw, displayableUserPrivate, displayableGroup };
+export { error, info, mail, sendMsg, sendMail, displayableUserPrivate, displayableGroup };

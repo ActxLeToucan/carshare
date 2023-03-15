@@ -52,7 +52,9 @@
 
                         </div>
                         <div style="animation-delay: 400ms;" class="show-up flex w-full justify-end mt-4">
-                            <button-block class="shadow-lg" href="/trips/new"> {{ lang.CREATE_TRIP }} </button-block>
+
+                            <button-block class="shadow-lg" href="createTrip"> Créer un trajet </button-block>
+
                         </div>
                     </div>
                 </div>

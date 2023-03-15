@@ -10,12 +10,44 @@ import * as properties from '../properties';
 function getPagination (req: express.Request): { limit: number, offset: number } {
     const offset = Number.isNaN(Number(req.query.offset)) ? 0 : Math.max(0, Number(req.query.offset)); // default 0, min 0
     const limit = Number.isNaN(Number(req.query.limit))
-        ? properties.p.query.maxLimit // default
+        ? properties.p.query.defaultLimit
         : Math.min(properties.p.query.maxLimit,
             Math.max(properties.p.query.minLimit, Number(req.query.limit))
-        ); // default max, min p.query.minLimit, max p.query.maxLimit
+        ); // default p.query.defaultLimit, min p.query.minLimit, max p.query.maxLimit
 
     return { limit, offset };
 }
 
-export { getPagination };
+/**
+ * Prepares pagination for a query.
+ * @param req Express request
+ * @param searchMode If true, the query is returned.
+ * @returns An object with the query, pagination params and a function to create the response.
+ */
+function preparePagination (req: express.Request, searchMode: boolean) {
+    const pagination = getPagination(req);
+
+    const q = req.query.query;
+    const query = q === undefined ? undefined : String(q).trim();
+
+    return {
+        query: searchMode ? query : undefined,
+        pagination: {
+            skip: pagination.offset,
+            take: pagination.limit + 1
+        },
+        results: (elements: any[]) => {
+            return {
+                data: elements.slice(0, pagination.limit),
+                query: searchMode ? query : undefined,
+                ...pagination,
+                next: elements.length > pagination.limit ? pagination.offset + pagination.limit : null,
+                prev: pagination.offset - pagination.limit < 0 ? null : pagination.offset - pagination.limit
+            };
+        }
+    }
+}
+
+export type Pagination = ReturnType<typeof preparePagination>;
+
+export { preparePagination };

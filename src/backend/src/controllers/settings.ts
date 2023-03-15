@@ -3,11 +3,11 @@ import { prisma } from '../app';
 import { error, sendMsg, info } from '../tools/translator';
 import * as properties from '../properties';
 
-exports.getSettingsNotifications = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+exports.getNotificationSetting = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     res.status(200).json({ value: res.locals.user.mailNotif });
 }
 
-exports.updateSettingsNotifications = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+exports.updateNotificationSetting = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const value = req.body.value;
 
     if (!properties.checkBooleanField(value, req, res, 'value')) return;
