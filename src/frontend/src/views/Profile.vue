@@ -6,6 +6,7 @@
                 class="show-right flex flex-col items-center h-full md:w-min w-full min-h-0 px-8 py-4 space-y-4 md:border-r-8 border-teal-500 mx-auto overflow-hidden">
                 <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> {{ lang.PROFILE }} </p>
                 <button-tab href="#infos" :default="!isMobile"> {{ lang.MY_INFOS }} </button-tab>
+                <button-tab href="#notifs"> {{ lang.MY_NOTIFS }} </button-tab>
                 <button-tab href="#trips"> {{ lang.MY_TRIPS }} </button-tab>
                 <button-tab href="#groups"> {{ lang.MY_GROUPS }} </button-tab>
                 <button-tab href="#evals"> {{ lang.MY_EVALS }} </button-tab>
@@ -28,6 +29,10 @@
 
                     <tab-div hash="#infos" class="flex flex-col items-center">
                         <user-infos></user-infos>
+                    </tab-div>
+
+                    <tab-div hash="#notifs">
+                        <user-notifs></user-notifs>
                     </tab-div>
 
                     <tab-div hash="#trips">
@@ -58,6 +63,7 @@ import ButtonTab from '../components/inputs/ButtonTab.vue';
 import TabWindow from '../components/cards/TabWindow.vue';
 import TabDiv from '../components/cards/TabDiv.vue';
 import UserInfos from '../components/profile/UserInfos.vue';
+import UserNotifs from '../components/profile/UserNotifs.vue';
 import UserTrips from '../components/profile/UserTrips.vue';
 import UserEvals from '../components/profile/UserEvals.vue';
 import UserParams from '../components/profile/UserParams.vue';
@@ -74,6 +80,7 @@ export default {
         TabWindow,
         TabDiv,
         UserInfos,
+        UserNotifs,
         UserTrips,
         UserEvals,
         UserParams,
