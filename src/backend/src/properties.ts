@@ -615,19 +615,13 @@ function checkListOfEtapeField (value: any, req: express.Request, res: express.R
         sendMsg(req, res, error.etapes.etapeMin, p.listOfEtape.minLength);
         return false;
     }
-
-    const tabUniqueDate = new Set(...value.map((e: any) => e.date));
-
-    if (tabUniqueDate.size === value.length) {
-        sendMsg(req, res, error.etapes.required);
-        return false;
-    }
-    let i2: number = 1;
+    
+    let j: number = 1;
     for (const i in value) {
         if (!checkDateField(value[i].date, true, req, res)) return false;
 
         if (i !== String(value.length - 1)) {
-            if (!checkDatesOrder(value[i].date, value[i2].date, req, res)) return false;
+            if (!checkDatesOrder(value[i].date, value[j].date, req, res)) return false;
         }
 
         if (!checkStringField(value[i].label, req, res, 'label')) return false;
@@ -636,7 +630,7 @@ function checkListOfEtapeField (value: any, req: express.Request, res: express.R
         if (!checkLatField(value[i].lat, req, res)) return false;
         if (!checkLngField(value[i].lng, req, res)) return false;
 
-        i2 += 1;
+        j += 1;
     }
     return true;
 }
