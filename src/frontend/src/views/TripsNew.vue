@@ -118,11 +118,11 @@
                         <div class="flex flex-col">
                             <div class="flex flex-col space-y-2">
                                 <span class="h-4 w-1 bg-slate-300 rounded-md mx-auto"></span>
-                                <div class="flex rounded-md border-2 border-slate-400 w-fit mx-auto text-slate-500 shadow-none
-                                            hover:border-teal-500 hover:text-teal-500 hover:shadow-md cursor-pointer transition-all"
+                                <button class="flex rounded-md border-2 border-slate-400 w-fit mx-auto text-slate-500 shadow-none
+                                            hover:border-teal-500 hover:text-teal-500 hover:shadow-md buttontransition-all"
                                      v-on:click="addStep(0)">
                                     <plus-icon class="w-6 h-6"></plus-icon>
-                                </div>
+                                </button>
                                 <span class="h-4 w-1 bg-slate-300 rounded-md mx-auto"></span>
                             </div>
 
@@ -158,11 +158,11 @@
                                 </div>
                                 <div class="flex flex-col space-y-2">
                                     <span class="h-4 w-1 bg-slate-300 rounded-md mx-auto"></span>
-                                    <div class="flex rounded-md border-2 border-slate-400 w-fit mx-auto text-slate-500 shadow-none
-                                                hover:border-teal-500 hover:text-teal-500 hover:shadow-md cursor-pointer transition-all"
+                                    <button class="flex rounded-md border-2 border-slate-400 w-fit mx-auto text-slate-500 shadow-none
+                                                hover:border-teal-500 hover:text-teal-500 hover:shadow-md transition-all"
                                          v-on:click="() => addStep(index + 1)">
                                         <plus-icon class="w-6 h-6"></plus-icon>
-                                    </div>
+                                    </button>
                                     <span class="h-4 w-1 bg-slate-300 rounded-md mx-auto"></span>
                                 </div>
                             </div>
@@ -170,7 +170,7 @@
                         </div>
 
                         <!-- END STEP -->
-                        <card class="flex flex-col mt-2 p-2 w-full">
+                        <card class="flex flex-col my-2 p-2 w-full">
                             <input-text
                                 class="my-1"
                                 ref="endstep-input" :label="lang.TRIP_END"
@@ -211,6 +211,12 @@
                     <p class="md:text-xl text-lg text-slate-500 font-bold mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full"> {{ group.name }} </p>
                     <p class="md:text-lg text-md text-slate-500 mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full"> {{ group.users.length }} {{ group.users.length == 1? lang.MEMBER: lang.MEMBERS }} </p>
                 </button>
+                <div v-show="groups.length == 0"
+                    class="flex flex-col justify-center py-1 md:m-2 m-1 rounded-md bg-slate-100 px-2 w-fit max-w-[80%] border-2 border-transparent"
+                >
+                    <p class="md:text-xl text-lg text-slate-500 font-bold mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full"> {{ lang.NO_GROUPS }} </p>
+                    <p class="md:text-lg text-md text-slate-500 mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full"> {{ lang.NO_GROUPS_DESC }} </p>
+                </div>
             </div>
         </popup>
         <popup

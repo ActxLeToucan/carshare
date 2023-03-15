@@ -7,7 +7,7 @@
             </div>
             <div
                 ref="log-zone"
-                class="flex flex-col w-full justify-center items-center min-h-max h-max transition-all"
+                class="flex flex-col w-full justify-center items-center min-h-max h-max transition-all overflow-y-auto"
                 style="max-height: 0px;"
             ></div>
             <div ref="inputs" class="flex flex-col overflow-auto">
@@ -152,6 +152,13 @@ export default {
             const pos = { x: ev.clientX, y: ev.clientY };
             if (pos.x < rect.left || pos.x > rect.right || pos.y < rect.top || pos.y > rect.bottom) {
                 this.hide();
+            }
+        });
+
+        window.addEventListener("keydown", ev => {
+            if (ev.key == "Escape") {
+                if (this.$el.classList.contains("opacity-1"))
+                    this.hide();
             }
         });
 
