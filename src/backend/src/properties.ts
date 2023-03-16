@@ -306,6 +306,7 @@ function checkGroupNameField (name: any, req: express.Request, res: express.Resp
  * Check if a date is in a valid format
  * If the date is not valid, send an error message to the client
  * @param date Date to check
+ * @param dateDays boolean add a check for the date 
  * @param req Express request
  * @param res Express response
  * @returns true if the date is valid, false otherwise
@@ -568,13 +569,13 @@ function checkDatesOrder (date1: any, date2: any, req: express.Request, res: exp
 }
 
 /**
- * Check if the user doesn't have a trip yet
+ * Check if the user doesn't has a trip yet
  * If the user have already a travel, send an error message to the client
  * @param dateMin Date to check
  * @param dateMax Date to check
  * @param req Express request
  * @param res Express response
- * @returns true if the user doesn't have a trip , false otherwise
+ * @returns true if the user doesn't has a trip , false otherwise
  */
 function checkTravelAlready (dateMin: any, dateMax: any, etapes: any, req: express.Request, res: express.Response): boolean {
     if (new Date(dateMin) >= new Date(etapes[0].date) && new Date(dateMin) <= new Date(etapes[etapes.length - 1].date)) {
@@ -602,35 +603,35 @@ function checkTravelAlready (dateMin: any, dateMax: any, etapes: any, req: expre
  * @param res Express response
  * @returns true if the value is valid, false otherwise
  */
-function checkListOfEtapeField (value: any, req: express.Request, res: express.Response): boolean {
-    if (value === undefined || value === '') {
+function checkListOfEtapeField (etapes: any, req: express.Request, res: express.Response): boolean {
+    if (etapes === undefined || etapes === '') {
         sendMsg(req, res, error.etapes.required);
         return false;
     }
-    if (typeof value !== 'object') {
+    if (typeof etapes !== 'object') {
         sendMsg(req, res, error.etapes.type);
         return false;
     }
-    if (value.length < 2) {
+    if (etapes.length < 2) {
         sendMsg(req, res, error.etapes.etapeMin, p.listOfEtape.minLength);
         return false;
     }
     
-    let j: number = 1;
-    for (const i in value) {
-        if (!checkDateField(value[i].date, true, req, res)) return false;
+    let incr: number = 1;
+    for (const etape in etapes) {
+        if (!checkDateField(etapes[etape].date, true, req, res)) return false;
 
-        if (i !== String(value.length - 1)) {
-            if (!checkDatesOrder(value[i].date, value[j].date, req, res)) return false;
+        if (etape !== String(etapes.length - 1)) {
+            if (!checkDatesOrder(etapes[etape].date, etapes[incr].date, req, res)) return false;
         }
 
-        if (!checkStringField(value[i].label, req, res, 'label')) return false;
-        if (!checkStringField(value[i].city, req, res, 'city')) return false;
-        if (!checkStringField(value[i].context, req, res, 'context')) return false;
-        if (!checkLatField(value[i].lat, req, res)) return false;
-        if (!checkLngField(value[i].lng, req, res)) return false;
+        if (!checkStringField(etapes[etape].label, req, res, 'label')) return false;
+        if (!checkStringField(etapes[etape].city, req, res, 'city')) return false;
+        if (!checkStringField(etapes[etape].context, req, res, 'context')) return false;
+        if (!checkLatField(etapes[etape].lat, req, res)) return false;
+        if (!checkLngField(etapes[etape].lng, req, res)) return false;
 
-        j += 1;
+        incr += 1;
     }
     return true;
 }
