@@ -335,7 +335,7 @@ export default {
         },
         createTrip(showlogs = true) {
             const toDestination = (obj) => !obj? null: ({label: obj.label, city: obj.city, context: obj.context, lat: obj.lat, lng: obj.lng});
-            const toStep = (obj) => !obj? null: ({destination: toDestination(obj.destination), datetime: obj.datetime});
+            const toStep = (obj) => !obj? null: ({datetime: obj.datetime, ...toDestination(obj.destination)});
 
             const groupID = this.selectedTripType == 1? this.selectedGroup?.id: null;
             const infos = this.$el.querySelector("textarea[name=trip-infos]").value;
@@ -367,7 +367,7 @@ export default {
                         steps.reduce((acc, step) => {
                             if (!acc) return false;
                             if (!step) return false;
-                            if (!step.destination) return false;
+                            if (!step.label) return false;
                             return true;
                         }, true)
                     ,
