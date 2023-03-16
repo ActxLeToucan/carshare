@@ -255,6 +255,7 @@ import {
     XMarkIcon
 } from '@heroicons/vue/24/outline';
 import API from '../scripts/API';
+import { getTypedValue } from '../scripts/data';
 
 const tripTypes = [
     { value: 0, id: 'TRIP_PUBLIC' },
@@ -346,10 +347,10 @@ export default {
                 .map(toStep);
 
             const data = {
-                maxPassengers: slots,
-                price: price,
+                maxPassengers: Number(slots),
+                price: Number(price),
                 description: infos,
-                groupId: groupID,
+                groupId: groupID != null ? Number(groupID) : null,
                 steps: steps
             }
 
