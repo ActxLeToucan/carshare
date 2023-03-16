@@ -335,7 +335,7 @@ export default {
         },
         createTrip(showlogs = true) {
             const toDestination = (obj) => !obj? null: ({label: obj.label, city: obj.city, context: obj.context, lat: obj.lat, lng: obj.lng});
-            const toStep = (obj) => !obj? null: ({datetime: obj.datetime, ...toDestination(obj.destination)});
+            const toStep = (obj) => !obj? null: ({date: obj.datetime, ...toDestination(obj.destination)});
 
             const groupID = this.selectedTripType == 1? this.selectedGroup?.id: null;
             const infos = this.$el.querySelector("textarea[name=trip-infos]").value;
@@ -378,7 +378,7 @@ export default {
                         steps.reduce((acc, step) => {
                             if (!acc) return false;
                             if (!step) return false;
-                            if (!step.datetime) return false;
+                            if (!step.date) return false;
                             return true;
                         }, true)
                     ,
@@ -425,17 +425,17 @@ export default {
             }
 
             const tripDesc = this.$refs['trip-desc'];
-            startDate = getDate(data.steps[0].datetime);
+            startDate = getDate(data.steps[0].date);
 
             let desc = "";
             desc += formatString(
                 Lang.CurrentLang.CONFIRM_TRIP_CONTENT,
-                data.steps[0].destination?.label,
-                data.steps[data.steps.length - 1].destination?.label,
+                data.steps[0]?.label,
+                data.steps[data.steps.length - 1]?.label,
                 startDate,
-                getTime(data.steps[0].datetime),
-                getDate(data.steps[data.steps.length - 1].datetime),
-                getTime(data.steps[data.steps.length - 1].datetime),
+                getTime(data.steps[0].date),
+                getDate(data.steps[data.steps.length - 1].date),
+                getTime(data.steps[data.steps.length - 1].date),
                 data.price,
                 data.maxPassengers,
             ) + "\n";
