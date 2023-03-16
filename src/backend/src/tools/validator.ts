@@ -1,95 +1,7 @@
 import type express from 'express';
-import { error, sendMsg, type Variants } from './translator';
+import { error, sendMsg } from './translator';
 import IsEmail from 'isemail';
-
-const p = {
-    email: {
-        max: 64 // from schema.prisma
-    },
-    password: {
-        min: 10,
-        upper: 1,
-        lower: 1,
-        number: 1,
-        special: 1,
-        salt: 10
-    },
-    lastname: {
-        max: 50 // from schema.prisma
-    },
-    firstname: {
-        max: 50 // from schema.prisma
-    },
-    phone: {
-        max: 16 // from schema.prisma
-    },
-    gender: {
-        values: [-1, 0, 1]
-    },
-    userLevel: {
-        user: 0,
-        admin: 1
-    },
-    token: {
-        access: {
-            expiration: '24h',
-            expirationTxt: {
-                fr: '24 heures',
-                en: '24 hours'
-            } satisfies Variants
-        },
-        passwordReset: {
-            expiration: '1h',
-            expirationTxt: {
-                fr: '1 heure',
-                en: '1 hour'
-            } satisfies Variants
-        },
-        verify: {
-            expiration: '4h',
-            expirationTxt: {
-                fr: '4 heures',
-                en: '4 hours'
-            } satisfies Variants
-        }
-    },
-    url: {
-        passwordReset: `${String(process.env.FRONTEND_URL)}/reinit?token=`,
-        emailVerification: `${String(process.env.FRONTEND_URL)}/validate?token=`
-    },
-    mailer: {
-        passwordReset: {
-            cooldown: 10 * 60 * 1000, // 10 minutes
-            cooldownTxt: {
-                fr: '10 minutes',
-                en: '10 minutes'
-            } satisfies Variants
-        },
-        emailVerification: {
-            cooldown: 10 * 60 * 1000, // 10 minutes
-            cooldownTxt: {
-                fr: '10 minutes',
-                en: '10 minutes'
-            } satisfies Variants
-        }
-    },
-    latitude: {
-        min: -90,
-        max: 90
-    },
-    longitude: {
-        min: -180,
-        max: 180
-    },
-    listOfEtape: {
-        minLength: 2
-    },
-    query: {
-        defaultLimit: 10,
-        minLimit: 1, // in database queries, the minimum value allowed for LIMIT statements
-        maxLimit: 50 // the max value allowed for LIMIT statements
-    }
-} satisfies Record<string, Record<string, any>>;
+import properties from '../properties';
 
 /**
  * Check if the email is in a valid format
@@ -114,8 +26,8 @@ function checkEmailField (email: any, req: express.Request, res: express.Respons
             sendMsg(req, res, error.email.invalid);
             return false;
         }
-        if (email.length > p.email.max) {
-            sendMsg(req, res, error.email.max, p.email.max);
+        if (email.length > properties.email.max) {
+            sendMsg(req, res, error.email.max, properties.email.max);
             return false;
         }
     }
@@ -141,28 +53,28 @@ function checkPasswordField (password: any, req: express.Request, res: express.R
         return false;
     }
     if (checkFormat) {
-        if (password.length < p.password.min) {
-            sendMsg(req, res, error.password.min, p.password.min);
+        if (password.length < properties.password.min) {
+            sendMsg(req, res, error.password.min, properties.password.min);
             return false;
         }
         const upper = password.match(/[A-Z]/g);
-        if (upper === null || upper.length < p.password.upper) {
-            sendMsg(req, res, error.password.upper, p.password.upper);
+        if (upper === null || upper.length < properties.password.upper) {
+            sendMsg(req, res, error.password.upper, properties.password.upper);
             return false;
         }
         const lower = password.match(/[a-z]/g);
-        if (lower === null || lower.length < p.password.lower) {
-            sendMsg(req, res, error.password.lower, p.password.lower);
+        if (lower === null || lower.length < properties.password.lower) {
+            sendMsg(req, res, error.password.lower, properties.password.lower);
             return false;
         }
         const number = password.match(/[0-9]/g);
-        if (number === null || number.length < p.password.number) {
-            sendMsg(req, res, error.password.number, p.password.number);
+        if (number === null || number.length < properties.password.number) {
+            sendMsg(req, res, error.password.number, properties.password.number);
             return false;
         }
         const special = password.match(/[^A-Za-z0-9]/g);
-        if (special === null || special.length < p.password.special) {
-            sendMsg(req, res, error.password.special, p.password.special);
+        if (special === null || special.length < properties.password.special) {
+            sendMsg(req, res, error.password.special, properties.password.special);
             return false;
         }
     }
@@ -206,8 +118,8 @@ function checkLastNameField (lastname: any, req: express.Request, res: express.R
         sendMsg(req, res, error.lastname.type);
         return false;
     }
-    if (lastname.length > p.lastname.max) {
-        sendMsg(req, res, error.lastname.max, p.lastname.max);
+    if (lastname.length > properties.lastname.max) {
+        sendMsg(req, res, error.lastname.max, properties.lastname.max);
         return false;
     }
     if (lastname.match(/[0-9]/g) !== null) {
@@ -234,8 +146,8 @@ function checkFirstNameField (firstname: any, req: express.Request, res: express
         sendMsg(req, res, error.firstname.type);
         return false;
     }
-    if (firstname.length > p.firstname.max) {
-        sendMsg(req, res, error.firstname.max, p.firstname.max);
+    if (firstname.length > properties.firstname.max) {
+        sendMsg(req, res, error.firstname.max, properties.firstname.max);
         return false;
     }
     if (firstname.match(/[0-9]/g) !== null) {
@@ -400,7 +312,7 @@ function sanitizeGender (gender: any): number | undefined {
     if (typeof gender !== 'number') {
         return undefined;
     }
-    if (!p.gender.values.includes(gender)) {
+    if (!properties.gender.values.includes(gender)) {
         return undefined;
     }
     return gender;
@@ -483,7 +395,7 @@ function checkLngField (value: any, req: express.Request, res: express.Response)
     }
 
     if (value < -180 || value > 180) {
-        sendMsg(req, res, error.longitude.minMax, p.longitude.min, p.longitude.max);
+        sendMsg(req, res, error.longitude.minMax, properties.longitude.min, properties.longitude.max);
         return false;
     }
     return true;
@@ -508,7 +420,7 @@ function checkLatField (value: any, req: express.Request, res: express.Response)
     }
 
     if (value < -90 || value > 90) {
-        sendMsg(req, res, error.latitude.minMax, p.latitude.min, p.latitude.max);
+        sendMsg(req, res, error.latitude.minMax, properties.latitude.min, properties.latitude.max);
         return false;
     }
     return true;
@@ -623,7 +535,7 @@ function checkListOfEtapeField (etapes: any, req: express.Request, res: express.
         return false;
     }
     if (etapes.length < 2) {
-        sendMsg(req, res, error.etapes.etapeMin, p.listOfEtape.minLength);
+        sendMsg(req, res, error.etapes.etapeMin, properties.listOfEtape.minLength);
         return false;
     }
 
@@ -663,7 +575,6 @@ function sanitizeNotificationId (id: any, req: express.Request, res: express.Res
 }
 
 export {
-    p,
     checkEmailField,
     checkPasswordField,
     checkOldPasswordField,
