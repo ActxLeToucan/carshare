@@ -1,5 +1,5 @@
 import type express from 'express';
-import { error, sendMsg, type Variants } from './tools/translator';
+import { error, sendMsg, type Variants } from './translator';
 import IsEmail from 'isemail';
 
 const p = {
