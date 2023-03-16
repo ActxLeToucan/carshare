@@ -1471,6 +1471,8 @@ components:
         creatorId:
           type: integer
           example: 1
+        creator:
+          $ref: '#/components/schemas/PublicUser'
         createdAt:
           type: string
           format: date-time

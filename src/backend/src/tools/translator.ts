@@ -690,7 +690,7 @@ const info = {
         })
     },
     group: {
-        created: (req: Request, group: Group & { users: User[] }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        created: (req: Request, group: Group & { users: User[], creator: User }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Groupe créé',
                 en: 'Group created'
@@ -897,9 +897,10 @@ function displayableUserPublic (user: User) {
     return u;
 }
 
-function displayableGroup (group: Group & { users: User[] }) {
+function displayableGroup (group: Group & { users: User[], creator: User }) {
     const g = group as any;
     g.users = g.users.map(displayableUserPublic);
+    g.creator = displayableUserPublic(g.creator);
     return g;
 }
 

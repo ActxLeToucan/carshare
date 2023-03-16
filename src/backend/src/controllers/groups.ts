@@ -47,7 +47,8 @@ function getGroups (req: express.Request, res: express.Response, next: express.N
     prisma.group.findMany({
         where: where(pagination),
         include: {
-            users: true
+            users: true,
+            creator: true
         },
         ...pagination.pagination
     }).then((groups) => {
