@@ -84,7 +84,6 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
         where: {
             driverId: res.locals.user.id,
             status: 0
-
         },
         select: {
             etapes: {
@@ -104,27 +103,23 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
                 price,
                 description,
                 driverId: res.locals.user.id,
-                groupId
+                groupId,
+                etapes: {
+                    create: steps.map((step: { label: string, city: string, context: string, lat: number, lng: number, date: string }) => ({
+                        label: step.label,
+                        city: step.city,
+                        context: step.context,
+                        lat: step.lat,
+                        lng: step.lng,
+                        date: new Date(step.date)
+                    }))
+                }
+            },
+            include: {
+                etapes: true
             }
         }).then((travel) => {
-            const data = Array.from({ length: steps.length }).map((value, index, _) => ({
-                label: steps[index].label,
-                city: steps[index].city,
-                context: steps[index].context,
-                lat: steps[index].lat,
-                lng: steps[index].lng,
-                travelId: travel.id,
-                date: steps[index].date
-            }))
-
-            prisma.etape.createMany({
-                data
-            }).then((etape) => {
-                sendMsg(req, res, info.travel.created, travel, etape);
-            }).catch((err) => {
-                console.error(err);
-                sendMsg(req, res, error.generic.internalError);
-            });
+            sendMsg(req, res, info.travel.created, travel);
         }).catch((err) => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);

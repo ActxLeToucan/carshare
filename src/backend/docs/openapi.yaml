@@ -686,8 +686,8 @@ paths:
 
   /travels/create:
     post:
-      summary: create a new travel
-      description: create a new travel with etape
+      summary: Create a travel
+      description: Create a travel with steps.
       operationId: createTravel
       tags:
         - Travels
@@ -712,8 +712,9 @@ paths:
                   example: Voyage non fumeur
                 groupId:
                   type: integer
-                  example: null
-                listOfEtape:
+                  nullable: true
+                  example: 1
+                steps:
                   type: array
                   items:
                     $ref: '#/components/schemas/Etape'
@@ -736,15 +737,42 @@ paths:
                       lat: 78.683188
                       lng: 6.1877
                       date: 2023-04-17T09:15:36.000Z
-
-
       responses:
         '201':
-          description: travel create
+          description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TravelCreate'
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Travel created"
+                  travel:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 2
+                      maxPassengers:
+                        type: integer
+                        example: 10
+                      price:
+                        type: integer
+                        example: 78
+                      description:
+                        type: string
+                        example: Voyage non fumeur
+                      groupId:
+                        type: integer
+                        example: null
+                      createdAt:
+                        type: string
+                        example: 2023-03-05T13:30:41.483Z
+                      etapes:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Etape'
         '401':
           $ref: '#/components/responses/noToken'
         '400':
@@ -1589,36 +1617,3 @@ components:
           type: string
           format: date-time
           example: 2020-01-01T00:00:00.000Z
-    TravelCreate:
-      type: object
-      properties:
-        message:
-          type: string
-          example: "Travel created"
-        travel:
-          type: object
-          properties:
-            id:
-              type: integer
-              example: 2
-            maxPassengers:
-              type: integer
-              example: 10
-            price:
-              type: integer
-              example: 78
-            description:
-              type: string
-              example: Voyage non fumeur
-            groupId:
-              type: integer
-              example: null
-            createdAt:
-              type: string
-              example: 2023-03-05T13:30:41.483Z
-        numberOfEtape:
-          type: object
-          properties:
-            count:
-              type: integer
-              example: 3

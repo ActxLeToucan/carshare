@@ -292,6 +292,14 @@ function checkBooleanField (value: any, req: express.Request, res: express.Respo
     return true;
 }
 
+/**
+ * Check if the group name is in a valid format
+ * If the group name is not valid, send an error message to the client
+ * @param name Group name to check
+ * @param req Express request
+ * @param res Express response
+ * @returns true if the group name is valid, false otherwise
+ */
 function checkGroupNameField (name: any, req: express.Request, res: express.Response): boolean {
     if (name === undefined || name === '') {
         sendMsg(req, res, error.groupName.required);
@@ -422,7 +430,7 @@ function sanitizeUserId (id: any, req: express.Request, res: express.Response): 
  * @param value Value to sanitize
  * @param req Express request
  * @param res Express response
- * @returns true if the value is valid and it's a positive number, false otherwise
+ * @returns true if the value is valid and a positive number, false otherwise
  */
 function checkPriceField (value: any, req: express.Request, res: express.Response): boolean {
     if (typeof value !== 'number' && value !== undefined && value !== null) {
@@ -443,7 +451,7 @@ function checkPriceField (value: any, req: express.Request, res: express.Respons
  * @param value Value to sanitize
  * @param req Express request
  * @param res Express response
- * @returns true if the value is valid and it's a positive number, false otherwise
+ * @returns true if the value is valid and a positive number, false otherwise
  */
 function checkMaxPassengersField (value: any, req: express.Request, res: express.Response): boolean {
     if (typeof value !== 'number' && value !== undefined && value !== null) {
@@ -571,15 +579,17 @@ function checkDatesOrder (date1: any, date2: any, req: express.Request, res: exp
 }
 
 /**
- * Check if the user doesn't has a trip yet
- * If the user have already a travel, send an error message to the client
+ * Check if the user doesn't have a trip yet
+ * If the user has already a travel, send an error message to the client
  * @param dateMin Date to check
  * @param dateMax Date to check
+ * @param etapes
  * @param req Express request
  * @param res Express response
- * @returns true if the user doesn't has a trip , false otherwise
+ * @returns true if the user doesn't have a trip , false otherwise
  */
 function checkTravelAlready (dateMin: any, dateMax: any, etapes: any, req: express.Request, res: express.Response): boolean {
+    if (etapes.length === 0) return true;
     if (new Date(dateMin) >= new Date(etapes[0].date) && new Date(dateMin) <= new Date(etapes[etapes.length - 1].date)) {
         sendMsg(req, res, error.etapes.alreadyTravel, new Date(etapes[0].date), new Date(etapes[etapes.length - 1].date));
         return false;
@@ -637,6 +647,7 @@ function checkListOfEtapeField (etapes: any, req: express.Request, res: express.
     }
     return true;
 }
+
 /**
 * Sanitize the id of notification
 * @param id id to sanitize
