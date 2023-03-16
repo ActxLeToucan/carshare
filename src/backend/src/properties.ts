@@ -445,12 +445,12 @@ function checkPriceField (value: any, req: express.Request, res: express.Respons
  */
 function checkMaxPassengersField (value: any, req: express.Request, res: express.Response): boolean {
     if (typeof value !== 'number' && value !== undefined && value !== null) {
-        sendMsg(req, res, error.number.type, 'MaxPassengers');
+        sendMsg(req, res, error.number.type, 'maxPassengers');
         return false;
     }
 
     if (value < 1) {
-        sendMsg(req, res, error.number.positive, 'MaxPassengers');
+        sendMsg(req, res, error.number.positive, 'maxPassengers');
         return false;
     }
     return true;
@@ -598,7 +598,7 @@ function checkTravelAlready (dateMin: any, dateMax: any, etapes: any, req: expre
 /**
  * Check if a listOfEtape field is valid
  * If the string is not valid, send an error message to the client
- * @param value Value to sanitize
+ * @param etapes Value to sanitize
  * @param req Express request
  * @param res Express response
  * @returns true if the value is valid, false otherwise

@@ -53,7 +53,7 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
 }
 
 exports.createTravel = async (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const { maxPassengers, price, description, groupId, listOfEtape } = req.body;
+    const { maxPassengers, price, description, groupId, steps } = req.body;
 
     if (!properties.checkMaxPassengersField(maxPassengers, req, res)) return;
     if (!properties.checkPriceField(price, req, res)) return;
@@ -77,7 +77,7 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
             sendMsg(req, res, error.generic.internalError);
         }
     }
-    if (!properties.checkListOfEtapeField(listOfEtape, req, res)) return;
+    if (!properties.checkListOfEtapeField(steps, req, res)) return;
 
     prisma.travel.findMany({
         where: {
@@ -94,7 +94,7 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
         }
     }).then((travels) => {
         for (const elements of travels) {
-            if (!properties.checkTravelAlready(listOfEtape[0].date, listOfEtape[listOfEtape.length - 1].date, elements.etapes, req, res)) return;
+            if (!properties.checkTravelAlready(steps[0].date, steps[steps.length - 1].date, elements.etapes, req, res)) return;
         }
 
         prisma.travel.create({
@@ -106,14 +106,14 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
                 groupId
             }
         }).then((travel) => {
-            const data = Array.from({ length: listOfEtape.length }).map((value, index, _) => ({
-                label: listOfEtape[index].label,
-                city: listOfEtape[index].city,
-                context: listOfEtape[index].context,
-                lat: listOfEtape[index].lat,
-                lng: listOfEtape[index].lng,
+            const data = Array.from({ length: steps.length }).map((value, index, _) => ({
+                label: steps[index].label,
+                city: steps[index].city,
+                context: steps[index].context,
+                lat: steps[index].lat,
+                lng: steps[index].lng,
                 travelId: travel.id,
-                date: listOfEtape[index].date
+                date: steps[index].date
             }))
 
             prisma.etape.createMany({
