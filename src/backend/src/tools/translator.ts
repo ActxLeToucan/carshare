@@ -1,5 +1,5 @@
 import { type Request, type Response } from 'express';
-import { type User, type Travel, type Group } from '@prisma/client';
+import { type User, type Travel, type Group, type Etape } from '@prisma/client';
 
 import { p } from '../properties';
 import { sendMail as mailerSend } from './mailer';
@@ -698,15 +698,14 @@ const info = {
         })
     },
     travel: {
-        created: (req: Request, travel: Travel, nbEtape: object) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        created: (req: Request, travel: Travel & { etapes: Etape[] }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Trajet créé',
                 en: 'Travel created'
             },
             code: 201,
             data: {
-                travel,
-                numberOfEtape: nbEtape
+                travel
             }
         })
     },

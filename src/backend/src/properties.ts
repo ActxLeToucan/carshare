@@ -570,14 +570,16 @@ function checkDatesOrder (date1: any, date2: any, req: express.Request, res: exp
 
 /**
  * Check if the user doesn't has a trip yet
- * If the user have already a travel, send an error message to the client
+ * If the user has already a travel, send an error message to the client
  * @param dateMin Date to check
  * @param dateMax Date to check
+ * @param etapes
  * @param req Express request
  * @param res Express response
  * @returns true if the user doesn't has a trip , false otherwise
  */
 function checkTravelAlready (dateMin: any, dateMax: any, etapes: any, req: express.Request, res: express.Response): boolean {
+    if (etapes.length === 0) return true;
     if (new Date(dateMin) >= new Date(etapes[0].date) && new Date(dateMin) <= new Date(etapes[etapes.length - 1].date)) {
         sendMsg(req, res, error.etapes.alreadyTravel, new Date(etapes[0].date), new Date(etapes[etapes.length - 1].date));
         return false;
