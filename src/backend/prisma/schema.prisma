@@ -27,7 +27,8 @@ model User {
   evaluationsReceived            Evaluation[]   @relation("evaluated")
   travelsAsDriver                Travel[]       @relation("driver")
   travelsAsPassenger             Passenger[]
-  notifications                  Notification[]
+  notifications                  Notification[] @relation("recipient")
+  notificationsSent              Notification[] @relation("sender")
   createdGroups                  Group[]        @relation("creator")
   groups                         Group[]        @relation("users")
   createdAt                      DateTime       @default(now())
@@ -91,13 +92,15 @@ model Evaluation {
 
 model Notification {
   id        Int      @id @default(autoincrement())
-  action    String?  @db.Text
+  type      String?  @db.VarChar(25)
   title     String   @db.Text
   message   String   @db.Text
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], name: "recipient", onDelete: Cascade)
   userId    Int
   travel    Travel?  @relation(fields: [travelId], references: [id], onDelete: SetNull)
   travelId  Int?
+  sender    User?    @relation(fields: [senderId], references: [id], name: "sender", onDelete: SetNull)
+  senderId  Int?
   createdAt DateTime @default(now())
 }
 
