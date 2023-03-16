@@ -306,11 +306,12 @@ function checkGroupNameField (name: any, req: express.Request, res: express.Resp
  * Check if a date is in a valid format
  * If the date is not valid, send an error message to the client
  * @param date Date to check
+ * @param dateDays add a check, if the date must not be within the next 24 hours.
  * @param req Express request
  * @param res Express response
  * @returns true if the date is valid, false otherwise
  */
-function checkDateField (date: any, req: express.Request, res: express.Response): boolean {
+function checkDateField (date: any, dateDays: boolean, req: express.Request, res: express.Response): boolean {
     if (date === undefined || date === '') {
         sendMsg(req, res, error.date.required);
         return false;
@@ -318,6 +319,20 @@ function checkDateField (date: any, req: express.Request, res: express.Response)
     if (isNaN(new Date(date).getTime())) {
         sendMsg(req, res, error.date.invalid);
         return false;
+    }
+    if (new Date(date).getTime() < new Date().getTime()) {
+        sendMsg(req, res, error.date.tooSoon, new Date());
+        return false;
+    }
+
+    if (dateDays) {
+        const dateC = new Date();
+        dateC.setDate(dateC.getDate() + 1);
+
+        if (new Date(date) < dateC) {
+            sendMsg(req, res, error.date.tooSoon, dateC);
+            return false;
+        }
     }
     return true;
 }
@@ -400,30 +415,6 @@ function sanitizeUserId (id: any, req: express.Request, res: express.Response): 
 }
 
 /**
- * Check if depart and arrival date is in a valid format
- * If the date is not valid, send an error message to the client
- * @param date Date to check
- * @param req Express request
- * @param res Express response
- * @returns true if the date is valid, false otherwise
- */
-function checkDateDepartArrivalField (date: any, req: express.Request, res: express.Response): boolean {
-    if (date === undefined || date === '') {
-        sendMsg(req, res, error.date.required);
-        return false;
-    }
-    if (isNaN(new Date(date).getTime())) {
-        sendMsg(req, res, error.date.invalid);
-        return false;
-    }
-    if (new Date(date) < new Date()) {
-        sendMsg(req, res, error.date.tooSoon, new Date());
-        return false;
-    }
-    return true;
-}
-
-/**
  * Check if a price field is valid
  * If the price is not valid, send an error message to the client
  * @param value Value to sanitize
@@ -454,12 +445,12 @@ function checkPriceField (value: any, req: express.Request, res: express.Respons
  */
 function checkMaxPassengersField (value: any, req: express.Request, res: express.Response): boolean {
     if (typeof value !== 'number' && value !== undefined && value !== null) {
-        sendMsg(req, res, error.number.type, 'MaxPassengers');
+        sendMsg(req, res, error.number.type, 'maxPassengers');
         return false;
     }
 
     if (value < 1) {
-        sendMsg(req, res, error.number.positive, 'MaxPassengers');
+        sendMsg(req, res, error.number.positive, 'maxPassengers');
         return false;
     }
     return true;
@@ -554,32 +545,93 @@ function checkStringField (value: any, req: express.Request, res: express.Respon
 }
 
 /**
+ * Check if the dates is in a good order
+ * If the date is not valid, send an error message to the client
+ * @param date1 Date to check
+ * @param date2 Date to check
+ * @param req Express request
+ * @param res Express response
+ * @returns true if the date is in a good order, false otherwise
+ */
+function checkDatesOrder (date1: any, date2: any, req: express.Request, res: express.Response): boolean {
+    if (!checkDateField(date2, true, req, res)) return false;
+
+    if (new Date(date1).getTime() === new Date(date2).getTime()) {
+        sendMsg(req, res, error.date.identical);
+        return false;
+    }
+
+    if (new Date(date1) > new Date(date2)) {
+        sendMsg(req, res, error.etapes.badOrder);
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Check if the user doesn't has a trip yet
+ * If the user have already a travel, send an error message to the client
+ * @param dateMin Date to check
+ * @param dateMax Date to check
+ * @param req Express request
+ * @param res Express response
+ * @returns true if the user doesn't has a trip , false otherwise
+ */
+function checkTravelAlready (dateMin: any, dateMax: any, etapes: any, req: express.Request, res: express.Response): boolean {
+    if (new Date(dateMin) >= new Date(etapes[0].date) && new Date(dateMin) <= new Date(etapes[etapes.length - 1].date)) {
+        sendMsg(req, res, error.etapes.alreadyTravel, new Date(etapes[0].date), new Date(etapes[etapes.length - 1].date));
+        return false;
+    }
+
+    if (new Date(dateMax) >= new Date(etapes[0].date) && new Date(dateMax) <= new Date(etapes[etapes.length - 1].date)) {
+        sendMsg(req, res, error.etapes.alreadyTravel, new Date(etapes[0].date), new Date(etapes[etapes.length - 1].date));
+        return false;
+    }
+    if ((new Date(dateMin) <= new Date(etapes[0].date) && new Date(dateMax) >= new Date(etapes[0].date)) && (new Date(dateMin) <= new Date(etapes[etapes.length - 1].date) && new Date(dateMax) >= new Date(etapes[etapes.length - 1].date))) {
+        sendMsg(req, res, error.etapes.alreadyTravel, new Date(etapes[0].date), new Date(etapes[etapes.length - 1].date));
+        return false;
+    }
+
+    return true;
+}
+
+/**
  * Check if a listOfEtape field is valid
  * If the string is not valid, send an error message to the client
- * @param value Value to sanitize
+ * @param etapes Value to sanitize
  * @param req Express request
  * @param res Express response
  * @returns true if the value is valid, false otherwise
  */
-function checkListOfEtapeField (value: any, req: express.Request, res: express.Response): boolean {
-    if (value === undefined || value === '') {
+function checkListOfEtapeField (etapes: any, req: express.Request, res: express.Response): boolean {
+    if (etapes === undefined || etapes === '') {
         sendMsg(req, res, error.etapes.required);
         return false;
     }
-    if (typeof value !== 'object') {
+    if (typeof etapes !== 'object') {
         sendMsg(req, res, error.etapes.type);
         return false;
     }
-    if (value.length < 2) {
+    if (etapes.length < 2) {
         sendMsg(req, res, error.etapes.etapeMin, p.listOfEtape.minLength);
         return false;
     }
-    for (const i in value) {
-        if (!checkStringField(value[i].label, req, res, 'label')) return false;
-        if (!checkStringField(value[i].city, req, res, 'city')) return false;
-        if (!checkStringField(value[i].context, req, res, 'context')) return false;
-        if (!checkLatField(value[i].lat, req, res)) return false;
-        if (!checkLngField(value[i].lng, req, res)) return false;
+
+    let incr: number = 1;
+    for (const etape in etapes) {
+        if (!checkDateField(etapes[etape].date, true, req, res)) return false;
+
+        if (etape !== String(etapes.length - 1)) {
+            if (!checkDatesOrder(etapes[etape].date, etapes[incr].date, req, res)) return false;
+        }
+
+        if (!checkStringField(etapes[etape].label, req, res, 'label')) return false;
+        if (!checkStringField(etapes[etape].city, req, res, 'city')) return false;
+        if (!checkStringField(etapes[etape].context, req, res, 'context')) return false;
+        if (!checkLatField(etapes[etape].lat, req, res)) return false;
+        if (!checkLngField(etapes[etape].lng, req, res)) return false;
+
+        incr += 1;
     }
     return true;
 }
@@ -614,11 +666,11 @@ export {
     sanitizePhone,
     sanitizeGender,
     sanitizeUserId,
-    checkDateDepartArrivalField,
     checkMaxPassengersField,
     checkPriceField,
     checkStringField,
     checkListOfEtapeField,
     checkDescriptionField,
-    sanitizeNotificationId
+    sanitizeNotificationId,
+    checkTravelAlready
 };
