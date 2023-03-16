@@ -306,7 +306,7 @@ function checkGroupNameField (name: any, req: express.Request, res: express.Resp
  * Check if a date is in a valid format
  * If the date is not valid, send an error message to the client
  * @param date Date to check
- * @param dateDays boolean add a check for the date
+ * @param dateDays add a check, if the date must not be within the next 24 hours.
  * @param req Express request
  * @param res Express response
  * @returns true if the date is valid, false otherwise
