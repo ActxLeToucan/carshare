@@ -140,7 +140,7 @@ export default {
         deleteOne(notif) {
             notif.locked = true;
             const log = this.notifLog(notif, this.lang.DELETING + '...', Log.INFO);
-            API.execute_logged(`${API.ROUTE.NOTIFS}/{notif.id}`, API.METHOD.DELETE, User.CurrentUser?.getCredentials()).then(_ => {
+            API.execute_logged(`${API.ROUTE.NOTIFS}/${notif.id}`, API.METHOD.DELETE, User.CurrentUser?.getCredentials()).then(_ => {
                 this.notifs = this.notifs.filter(n => n.id !== notif.id);
             }).catch(err => {
                 log.update(this.lang.ERROR + " : " + err.message, Log.ERROR);
