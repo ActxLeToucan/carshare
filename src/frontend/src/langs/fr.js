@@ -37,6 +37,7 @@ export default {
     CANCEL: "Annuler",
     EDIT: "Modifier",
     DELETE: "Supprimer",
+    DELETE_ALL: "Tout supprimer",
     DELETE_ACCOUNT: "Supprimer le compte",
     ADD: "Ajouter",
     SEARCH: "Rechercher",
@@ -45,6 +46,7 @@ export default {
     BACK: "Retour",
     CREATE: "Créer",
     DISCONNECT: "Se déconnecter",
+    LOAD_MORE: "Charger plus",
 
     // register
     REGISTER_TITLE: "Inscription",
@@ -105,6 +107,7 @@ export default {
     // profile
     MY_PROFILE: "Mon profil",
     MY_INFOS: "Mes informations",
+    MY_NOTIFS: "Mes notifications",
     MY_EVALS: "Mes notes",
     MY_TRIPS: "Mes trajets",
     MY_GROUPS: "Mes groupes",
@@ -115,6 +118,17 @@ export default {
         PASSWORD_CHANGED: "Mot de passe changé avec succès",
         CHANGING_INFORMATIONS: "Changement des informations",
         INFORMATIONS_CHANGED: "Informations changées avec succès",
+        DELETING_ACCOUNT: "Suppression du compte",
+
+        // notifications
+        NO_NOTIFS: "Vous n'avez aucune notification",
+        NO_NOTIFS_DESC: "Vous avez tout vu ! Il n'y a plus rien à faire ici pour le moment.",
+        LOADING_NOTIFS: "Chargement des notifications",
+        LOADING_NOTIFS_DESC: "Veuillez patienter pendant que nous récupérons vos notifications",
+        DELETE_ALL_NOTIFS: "Supprimer toutes les notifications",
+        DELETE_ALL_NOTIFS_CONFIRMATION: "Êtes-vous sûr de vouloir supprimer toutes vos notifications ?\nElles seront supprimées, même si elles ne sont pas affichées sur cette page.\nCette action est irréversible.",
+        DELETING_NOTIFS: "Suppression des notifications",
+        NOTIFS_DELETED: "Notifications supprimées avec succès",
 
         // groups
         NO_GROUPS: "Vous n'avez encore aucun groupe",

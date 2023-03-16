@@ -52,7 +52,7 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
         });
 }
 
-exports.createTravel = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+exports.createTravel = async (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { maxPassengers, price, description, groupId, listOfEtape } = req.body;
 
     if (!properties.checkMaxPassengersField(maxPassengers, req, res)) return;
@@ -106,8 +106,7 @@ exports.createTravel = async (req: express.Request, res: express.Response, next:
                 groupId
             }
         }).then((travel) => {
-            const data = Array.from({ length: listOfEtape.length }).map((value, index, array) => ({
-
+            const data = Array.from({ length: listOfEtape.length }).map((value, index, _) => ({
                 label: listOfEtape[index].label,
                 city: listOfEtape[index].city,
                 context: listOfEtape[index].context,
@@ -115,7 +114,6 @@ exports.createTravel = async (req: express.Request, res: express.Response, next:
                 lng: listOfEtape[index].lng,
                 travelId: travel.id,
                 date: listOfEtape[index].date
-
             }))
 
             prisma.etape.createMany({

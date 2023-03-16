@@ -9,6 +9,7 @@ exports.getMyNotifications = (req: express.Request, res: express.Response, _: ex
 
     prisma.notification.findMany({
         where: { userId: res.locals.user.id },
+        orderBy: { createdAt: 'desc' },
         ...pagination.pagination
     }).then(notifications => {
         res.status(200).json(pagination.results(notifications));

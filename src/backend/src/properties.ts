@@ -306,7 +306,7 @@ function checkGroupNameField (name: any, req: express.Request, res: express.Resp
  * Check if a date is in a valid format
  * If the date is not valid, send an error message to the client
  * @param date Date to check
- * @param dateDays boolean add a check for the date 
+ * @param dateDays boolean add a check for the date
  * @param req Express request
  * @param res Express response
  * @returns true if the date is valid, false otherwise
@@ -557,7 +557,7 @@ function checkDatesOrder (date1: any, date2: any, req: express.Request, res: exp
     if (!checkDateField(date2, true, req, res)) return false;
 
     if (new Date(date1).getTime() === new Date(date2).getTime()) {
-        sendMsg(req, res, error.date.isSame);
+        sendMsg(req, res, error.date.identical);
         return false;
     }
 
@@ -616,7 +616,7 @@ function checkListOfEtapeField (etapes: any, req: express.Request, res: express.
         sendMsg(req, res, error.etapes.etapeMin, p.listOfEtape.minLength);
         return false;
     }
-    
+
     let incr: number = 1;
     for (const etape in etapes) {
         if (!checkDateField(etapes[etape].date, true, req, res)) return false;
