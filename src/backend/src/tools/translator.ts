@@ -320,6 +320,13 @@ const error = {
                 en: `Date must be greater than ${date.toLocaleString('en-US')}.`
             },
             code: 400
+        }),
+        identical: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Les dates mises sont les mêmes.',
+                en: 'The dates are the same.'
+            },
+            code: 400
         })
     },
     ville: {
@@ -530,6 +537,20 @@ const error = {
             msg: {
                 fr: 'Les étapes doivent être un tableau.',
                 en: 'Etapes must be an array.'
+            },
+            code: 400
+        }),
+        badOrder: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Les dates données ne sont pas dans le bon ordre.',
+                en: 'The dates given are not in the right order.'
+            },
+            code: 400
+        }),
+        alreadyTravel: (req: Request, dateDeb: Date, dateFin: Date) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Le conducteur a déjà un trajet de prévu du ${dateDeb.toLocaleString('fr-FR')} au ${dateFin.toLocaleString('fr-FR')}.`,
+                en: `The driver already has a trip planned from ${dateDeb.toLocaleString('en-US')} to ${dateFin.toLocaleString('en-US')}.`
             },
             code: 400
         })

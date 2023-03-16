@@ -38,8 +38,6 @@ model User {
 
 model Travel {
   id            Int            @id @default(autoincrement())
-  departureDate DateTime
-  arrivalDate   DateTime
   maxPassengers Int            @default(1)
   price         Float          @default(0)
   description   String?        @db.Text
@@ -67,15 +65,15 @@ model Passenger {
 }
 
 model Etape {
-  id       Int    @id @default(autoincrement())
-  label    String @db.Text // ex: "2ter Boulevard Charlemagne 54000 Nancy"
-  city     String @db.Text // ex: "Nancy"
-  context  String @db.Text // ex: "54, Meurthe-et-Moselle, Grand Est"
+  id       Int      @id @default(autoincrement())
+  label    String   @db.Text // ex: "2ter Boulevard Charlemagne 54000 Nancy"
+  city     String   @db.Text // ex: "Nancy"
+  context  String   @db.Text // ex: "54, Meurthe-et-Moselle, Grand Est"
   lat      Float // ex: 48.683188
   lng      Float // ex: 6.161877
-  travel   Travel @relation(fields: [travelId], references: [id], onDelete: Cascade)
+  travel   Travel   @relation(fields: [travelId], references: [id], onDelete: Cascade)
   travelId Int
-  order    Int
+  date     DateTime
 }
 
 model Evaluation {
