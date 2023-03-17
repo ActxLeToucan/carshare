@@ -50,7 +50,7 @@
                     <div class="flex md:flex-row flex-col md:space-x-4 md:space-y-0 space-y-2 mt-4">
                         <button-block :action="showDeletePopup" color="red"> {{ lang.DELETE_ACCOUNT }} </button-block>
                         <div class="flex grow justify-end pl-20">
-                            <button-block :action="updateAccount" :disabled="!formUser.buttonEnabled"> {{ lang.EDIT }} </button-block>
+                            <button-block :action="updateAccount"> {{ lang.EDIT }} </button-block>
                         </div>
                     </div>
                 </card>
