@@ -112,8 +112,6 @@ class API {
         return new Promise((resolve, reject) => {
             if (API.API_URL == null) { API.setURL(config.api.url); }
             if (API.API_URL == null) reject("Error : API host not set");
-
-        
             path = path.replace("/?", "?").replace(/\/\//g, "/");
             let urlparts = path.split("?");
             let base = urlparts.splice(0, 1);
@@ -163,7 +161,6 @@ class API {
                     reject(err);
                 }
             };
-        
 
             fetch(API.API_URL + path, {
                 credentials: "omit",
