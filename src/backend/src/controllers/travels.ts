@@ -157,7 +157,7 @@ exports.cancelTravel = (req: express.Request, res: express.Response, next: expre
         sendMsg(req, res, info.travel.successfulCancel);
         if ( travel.passagers !== undefined || travel.passagers.length > 0 ){
             //TODO Translator for notifications
-            properties.sendNotification(travel.id, travel.passagers.array, "todo annulation", "todo message annulation", req, res);
+            properties.sendNotification(travel.id, null, null, travel.passagers.array, "todo annulation", "todo message annulation", req, res);
         }
     }).catch((err) => {
         console.error(err);

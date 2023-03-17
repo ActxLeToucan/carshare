@@ -671,12 +671,14 @@ function sanitizeNotificationId (id: any, req: express.Request, res: express.Res
  * @param title Express response
  * @param message If true, check if the email is valid
  */
-function sendNotification (travelId: number | null = null, users: [User], title: string, message: string, req: express.Request, res: express.Response) {
+function sendNotification (travelId: number | null = null, type: string | null = null, senderId: number | null = null, users: [User], title: string, message: string, req: express.Request, res: express.Response) {
     let template = {
+        type: type,
         title: title,
         message: message,
         userId: 0,
         travelId: travelId,
+        senderId: senderId,
         createdAt: new Date()
     };
     let data: any[] = [];
