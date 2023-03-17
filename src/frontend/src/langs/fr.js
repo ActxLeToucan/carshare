@@ -153,7 +153,7 @@ export default {
         SELECT_GROUP_DESC: "Veuillez sélectionner un groupe d'utilisateurs pour pouvoir partager vos trajets avec eux",
         GROUP_SELECTED: "Groupe sélectionné",
         SEARCH_GROUP: "Rechercher un groupe",
-        GROUP_NAME: "Nom de groupe ",
+        GROUP_NAME: "Nom de groupe",
         GROUP_CREATOR :"Createur",
 
     // informations
@@ -174,14 +174,14 @@ export default {
 
 
     //parametres
-    GET_NOTIFIED: "Notification par Email :",
+    GET_NOTIFIED: "Notification par Email",
     DARKMODE: "Sombre", 
     LIGHTMODE: "Clair", 
-    THEME: " Théme   ", 
+    THEME: "Théme", 
     DEFAULTMODE: "Par défaut",
-    ENGLISH: "Anglais ", 
+    ENGLISH: "Anglais", 
     FRENCH : "Français" , 
-    LANGUES: "Langues  ",
+    LANGUES: "Langues",
     LANG : "Veuillez choisir une langue" , 
     MODE : "Veuillez choisir une theme" , 
     

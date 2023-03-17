@@ -1,8 +1,10 @@
 <template>
     <div v-on:click="() => { onclick(data); }" class="flex flex-col justify-center rounded-md border-2 border-slate-500 shadow-md p-2 space-y-2 bg-slate-50
-                hover:bg-white hover:border-teal-500 transition-all cursor-pointer">
-        <p class="text-xl font-semibold text-slate-700 text-left whitespace-nowrap text-ellipsis overflow-hidden"> {{ data.firstName }} {{ data.lastName }} </p>
-        <p class="text-xl font-semibold text-slate-500 text-left whitespace-nowrap text-ellipsis overflow-hidden"> {{ data.email }} </p>
+                    hover:bg-white hover:border-teal-500 transition-all cursor-pointer">
+        <p class="text-xl font-semibold text-slate-700 text-left whitespace-nowrap text-ellipsis overflow-hidden"> {{
+            data.firstName }} {{ data.lastName }} </p>
+        <p class="text-xl font-semibold text-slate-500 text-left whitespace-nowrap text-ellipsis overflow-hidden"> {{
+            data.email }} </p>
     </div>
 </template>
 
@@ -17,7 +19,7 @@ export default {
         },
         onclick: {
             type: Function,
-            default: () => {},
+            default: () => { },
             required: false
         }
     },
@@ -25,7 +27,7 @@ export default {
         return {}
     },
     methods: {
-        
+
     }
 }
 </script>

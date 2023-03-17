@@ -8,9 +8,7 @@ export function retreiveFields(el) {
         const div = inputs_div.children[i];
         const input = div.querySelector("input");
         if (!input) continue;
-
         input.value = getTypedValue(input);
-
         inputs.push(input);
     }
 
