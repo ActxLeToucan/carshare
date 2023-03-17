@@ -154,7 +154,7 @@ class API {
                     err.json().then(data => {
                         reject({
                             status: err.status,
-                            message: data.message
+                            message: data.message ?? Lang.CurrentLang.UNKNOWN_ERROR
                         });
                     }).catch(err => reject(err));
                 } else {

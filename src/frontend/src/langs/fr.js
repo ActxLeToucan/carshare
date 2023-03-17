@@ -22,6 +22,7 @@ export default {
     // 404 page
     WOOPS: "Woops !",
     NOT_FOUND: "La page que vous cherchez n'existe pas 🤔",
+    UNKNOWN_ERROR: "Une erreur inconnue est survenue",
 
     // validation page
     VALIDATION_TITLE: "Validation du compte",
@@ -103,6 +104,12 @@ export default {
     DATE: "Date",
     HOUR: "Heure",
     CREATE_TRIP: "Créer un trajet",
+    TRAVEL_CARD_LABEL: "Trajet du {DATE}",
+    SLOTS: "Places",
+    SLOT: "Place",
+    STARTING_POINT_SPECIFY: "Veuillez renseignez le point de départ",
+    ENDING_POINT_SPECIFY: "Veuillez renseignez le point d'arrivée",
+    DATE_SPECIFY: "Veuillez renseignez la date",
 
     // profile
     MY_PROFILE: "Mon profil",

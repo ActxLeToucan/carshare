@@ -30,7 +30,12 @@
 
                             <div class="flex md:flex-row flex-col md:space-x-2 items-center w-min">
                                 <div class="flex flex-col">
-                                    <input-text name="startingpoint" class="w-48 mx-auto max-w-fit" :placeholder="lang.STARTING_POINT" dark="true"></input-text>
+                                    <input-text
+                                        name="startingpoint" class="w-48 mx-auto max-w-fit"
+                                        :placeholder="lang.STARTING_POINT" dark="true"
+                                        :onchange="e => { if (startCity?.value != e.target.value) startCity = null; }"
+                                        :value="startCity?.value"
+                                    ></input-text>
                                     <selector ref="startSelector" :oncompletion="searchCities" :onclick="onstartselected"></selector>
                                 </div>
                                 <!-- <div class="flex justify-center items-center"> -->
@@ -42,20 +47,24 @@
                                     <!-- </div> -->
                                 <!-- </div> -->
                                 <div class="flex flex-col">
-                                    <input-text name="endingpoint" class="w-48 mx-auto max-w-fit" :placeholder="lang.ENDING_POINT" dark="true"></input-text>
+                                    <input-text
+                                        name="endingpoint" class="w-48 mx-auto max-w-fit"
+                                        :placeholder="lang.ENDING_POINT" dark="true"
+                                        :onchange="e => { if (endCity?.value != e.target.value) endCity = null; }"
+                                        :value="endCity?.value"
+                                    ></input-text>
                                     <selector ref="endSelector" :oncompletion="searchCities" :onclick="onendselected"></selector>
                                 </div>
                             </div>
                             <span class="md:block hidden bg-teal-600 w-1 h-14 rounded-lg"></span>
                             <div class="flex md:flex-row flex-col md:space-x-2 md:space-y-2 space-y-0 w-min">
-                                <input-text name="datepoint" class="w-48 mx-auto max-w-fit" placeholder="date" dark="true" type="date"></input-text>
-                                <input-text name="timepoint" class="w-48 mx-auto max-w-fit" placeholder="heure" dark="true" type=time></input-text>
+                                <input-text name="datetime" class="w-48 mx-auto max-w-fit" placeholder="date" dark="true" type="datetime-local"></input-text>
                             </div>
                             <span class="md:block hidden bg-teal-600 w-1 h-14 rounded-lg"></span>
-                            <button-block color="slate" class="mx-auto"> {{ lang.SEARCH }} </button-block>
+                            <button-block color="slate" class="mx-auto" :action="searchTrips"> {{ lang.SEARCH }} </button-block>
 
                         </div>
-                        <div style="animation-delay: 400ms;" class="show-up flex w-full justify-end mt-4">
+                        <div style="animation-delay: 400ms;" class="show-up relative flex w-full justify-end mt-4">
 
                             <button-block class="shadow-lg" href="/trips/new"> Créer un trajet </button-block>
 
@@ -63,8 +72,18 @@
                     </div>
                 </div>
             </div>
-            <div class="flex grow min-h-[50vh]">
+            
+            <div
+                ref="log-zone"
+                class="flex flex-col w-full justify-center items-center min-h-max h-max transition-all"
+                style="max-height: 0px;"
+            ></div>
 
+            <div class="flex grow min-h-[50vh]">
+                <trip-card
+                    v-for="trip in trips" :key="trip.id"
+                    :trip="trip" class="mx-auto"
+                ></trip-card>
             </div>
 
         </div>
@@ -76,6 +95,8 @@ import ButtonBlock from '../components/inputs/ButtonBlock.vue';
 import InputText from '../components/inputs/InputText.vue';
 import Topbar from "../components/topbar/Topbar.vue";
 import Selector from '../components/inputs/Selector.vue';
+import TripCard from '../components/cards/TripCard.vue';
+import { Log, LogZone } from '../scripts/Logs';
 import Car from '../components/Car.vue';
 import BAN from '../scripts/BAN.js';
 import Lang from '../scripts/Lang.js';
@@ -84,8 +105,8 @@ import {
     ArrowsRightLeftIcon,
     ArrowsUpDownIcon
 } from '@heroicons/vue/24/outline';
-
-let startCities = [];
+import API from '../scripts/API';
+import User from '../scripts/User';
 
 let firsttut = false;
 function addtut(dom) {
@@ -184,22 +205,19 @@ export default {
         ArrowsRightLeftIcon,
         ArrowsUpDownIcon,
         Selector,
-        Car
+        Car,
+        TripCard
     },
     name: 'Main',
     data() {
-        return { startCities, lang: Lang.CurrentLang }
+        return { lang: Lang.CurrentLang, trips: [], startCity: {}, endCity: {} }
     },
     methods: {
         onstartselected(city) {
-            if (this.startInput)
-                this.startInput.value = city.value;
-            this.startSelector.setData([]);
+            this.startCity = city;
         },
         onendselected(city) {
-            if (this.endInput)
-                this.endInput.value = city.value;
-            this.endSelector.setData([]);
+            this.endCity = city;
         },
         tuttut() {
             const car = this.$refs["car"];
@@ -215,11 +233,10 @@ export default {
         searchCities(selector, search) {
             BAN.searchCities(search).then(cities => {
                 let index = 0;
-                startCities = cities.map(city => ({ id: index++, value: city.city, desc: city.context }));
-                selector.setData(startCities);
+                const data = cities.map(city => ({ id: index++, value: city.city, desc: city.context }));
+                selector.setData(data);
             }).catch(err => {
-                startCities = [];
-                selector.setData(startCities);
+                selector.setData([]);
             });
         },
         reverseInputs() {
@@ -227,6 +244,68 @@ export default {
             const end = this.endInput.value;
             this.startInput.value = end;
             this.endInput.value = start;
+        },
+        log(msg, type = Log.INFO) {
+            if (!this.logZone) return null;
+            const log = new Log(msg, type);
+            log.attachTo(this.logZone);
+            return log;
+        },
+        searchTrips() {
+            const msg_log = this.log(Lang.CurrentLang.INPUT_VERIFICATION, Log.INFO);
+            const input_date = document.querySelector("input[name=datetime]");
+            const input_start = document.querySelector("input[name=startingpoint]");
+            const input_end = document.querySelector("input[name=endingpoint]");
+
+            const field_checks = [
+                { field: input_start, msg: Lang.CurrentLang.STARTING_POINT_SPECIFY },
+                { field: input_end, msg: Lang.CurrentLang.ENDING_POINT_SPECIFY },
+                { field: input_date, msg: Lang.CurrentLang.DATE_SPECIFY }
+            ];
+
+            for (let i = 0; i < field_checks.length; i++) {
+                const check = field_checks[i];
+                if (check.field.value == "") {
+                    msg_log.update(check.msg, Log.WARNING);
+                    check.field.focus();
+                    setTimeout(() => { msg_log.delete(); }, 6000);
+                    return;
+                }
+            }
+
+            console.log(this.startCity);
+
+            msg_log.update(Lang.CurrentLang.SEARCHING + " ...", Log.INFO);
+            API.execute_logged(API.ROUTE.TRAVELS.SEARCH + API.createParameters({
+                date: input_date.value,
+                startCity: this.startCity.value,
+                endCity: this.endCity.value,
+                startContext: this.startCity.desc,
+                endContext: this.endCity.desc,
+            }), API.METHOD.GET, User.CurrentUser.getCredentials()).then(res => {
+                if (res.data)
+                    this.addTrips(res.data);
+                else this.addTrips(res);
+                msg_log.delete();
+            }).catch(err => {
+                console.error(err);
+                msg_log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
+                setTimeout(() => { msg_log.delete(); }, 5000);
+            });
+        },
+        addTrips(list) {
+            for (const el in list) {
+                this.trips.push({
+                    date: el.steps[0]?.date.toLocalDateString(),
+                    author: el.driver.firstName + el.driver.lastName.substring(0, 1) + ".",
+                    startCity: el.steps[0]?.label,
+                    startTime: el.steps[0]?.date.toLocalTimeString().substring(0, 5),
+                    endCity: el.steps[el.steps.length - 1]?.label,
+                    endTime: el.steps[el.steps.length - 1]?.date.toLocalTimeString().substring(0, 5),
+                    slots: el.maxPassengers - (el.passengers?.length ?? 0),
+                    price: el.price,
+                });
+            }
         }
     },
     mounted() {
@@ -238,8 +317,7 @@ export default {
 
         this.startInput = this.$el.querySelector('input[name="startingpoint"]');
         this.endInput = this.$el.querySelector('input[name="endingpoint"]');
-        this.dateInput = this.$el.querySelector('input[name="datepoint"]');
-        this.timeInput = this.$el.querySelector('input[name="timepoint"]');
+        this.dateInput = this.$el.querySelector('input[name="datetime"]');
         this.startSelector = this.$refs["startSelector"];
         this.endSelector = this.$refs["endSelector"];
 
@@ -247,10 +325,11 @@ export default {
         this.startInput.addEventListener("focus", ev => { settutpos(ev.target); });
         this.endInput.addEventListener("focus", ev => { settutpos(ev.target); });
         this.dateInput.addEventListener("focus", ev => { settutpos(ev.target); });
-        this.timeInput.addEventListener("focus", ev => { settutpos(ev.target); });
 
         this.startSelector.attachInput(this.startInput);
         this.endSelector.attachInput(this.endInput);
+
+        this.logZone = new LogZone(this.$refs["log-zone"]);
     }
 }
 </script>
