@@ -717,7 +717,7 @@ paths:
                 steps:
                   type: array
                   items:
-                    $ref: '#/components/schemas/Etape'
+                    $ref: '#/components/schemas/EtapeInput'
                   example:
                     - label: 2ter Boulevard Charlemagne 54000 Nancy
                       city: Nancy
@@ -1577,7 +1577,6 @@ components:
         createdAt:
           type: string
           format: date-time
-
     Notification:
       type: object
       properties:
@@ -1612,6 +1611,23 @@ components:
         lng:
           type: integer
         travelId:
+          type: integer
+        date:
+          type: string
+          format: date-time
+          example: 2020-01-01T00:00:00.000Z
+    EtapeInput:
+      type: object
+      properties:
+        label:
+          type: string
+        city:
+          type: string
+        context:
+          type: string
+        lat:
+          type: integer
+        lng:
           type: integer
         date:
           type: string
