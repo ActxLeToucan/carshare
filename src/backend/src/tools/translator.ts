@@ -1,7 +1,7 @@
 import { type Request, type Response } from 'express';
-import { type User, type Travel, type Group } from '@prisma/client';
+import { type User, type Travel, type Group, type Etape } from '@prisma/client';
 
-import { p } from '../properties';
+import properties from '../properties';
 import { sendMail as mailerSend } from './mailer';
 
 export type Variants = {
@@ -320,6 +320,13 @@ const error = {
                 en: `Date must be greater than ${date.toLocaleString('en-US')}.`
             },
             code: 400
+        }),
+        identical: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Les dates mises sont les mêmes.',
+                en: 'The dates are the same.'
+            },
+            code: 400
         })
     },
     ville: {
@@ -532,6 +539,20 @@ const error = {
                 en: 'Etapes must be an array.'
             },
             code: 400
+        }),
+        badOrder: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Les dates données ne sont pas dans le bon ordre.',
+                en: 'The dates given are not in the right order.'
+            },
+            code: 400
+        }),
+        alreadyTravel: (req: Request, dateDeb: Date, dateFin: Date) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Le conducteur a déjà un trajet de prévu du ${dateDeb.toLocaleString('fr-FR')} au ${dateFin.toLocaleString('fr-FR')}.`,
+                en: `The driver already has a trip planned from ${dateDeb.toLocaleString('en-US')} to ${dateFin.toLocaleString('en-US')}.`
+            },
+            code: 400
         })
     },
     maxPassengers: {
@@ -677,20 +698,19 @@ const info = {
         })
     },
     travel: {
-        created: (req: Request, travel: Travel, nbEtape: object) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        created: (req: Request, travel: Travel & { etapes: Etape[] }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Trajet créé',
                 en: 'Travel created'
             },
             code: 201,
             data: {
-                travel,
-                numberOfEtape: nbEtape
+                travel
             }
         })
     },
     group: {
-        created: (req: Request, group: Group & { users: User[] }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        created: (req: Request, group: Group & { users: User[], creator: User }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Groupe créé',
                 en: 'Group created'
@@ -732,32 +752,32 @@ const mail = {
                 fr: `${mailHtmlHeader}
                 <p>Bonjour ${user.firstName ?? ''} ${user.lastName ?? ''},</p>
                 <p>Vous avez demandé à réinitialiser votre mot de passe. Pour ce faire, veuillez cliquer sur le lien ci-dessous :</p>
-                <p><a href="${String(p.url.passwordReset)}${token}">${String(p.url.passwordReset)}${token}</a></p>
-                <p>Ce lien est valable ${translate(req, p.token.passwordReset.expirationTxt)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.</p>
+                <p><a href="${String(properties.url.passwordReset)}${token}">${String(properties.url.passwordReset)}${token}</a></p>
+                <p>Ce lien est valable ${translate(req, properties.token.passwordReset.expirationTxt)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.</p>
                 <p>Cordialement,</p>
                 <p>L'équipe de ${process.env.FRONTEND_NAME ?? ''}</p>`,
                 en: `${mailHtmlHeader}
                 <p>Hello ${user.firstName ?? ''} ${user.lastName ?? ''},</p>
                 <p>You requested to reset your password. To do so, please click on the link below :</p>
-                <p><a href="${String(p.url.passwordReset)}${token}">${String(p.url.passwordReset)}${token}</a></p>
-                <p>This link is valid for ${translate(req, p.token.passwordReset.expirationTxt)}. If you did not request this, please ignore this email.</p>
+                <p><a href="${String(properties.url.passwordReset)}${token}">${String(properties.url.passwordReset)}${token}</a></p>
+                <p>This link is valid for ${translate(req, properties.token.passwordReset.expirationTxt)}. If you did not request this, please ignore this email.</p>
                 <p>Best regards,</p>
                 <p>The ${process.env.FRONTEND_NAME ?? ''} team</p>`
             },
             text: {
                 fr: `Bonjour ${user.firstName ?? ''} ${user.lastName ?? ''},
                 Vous avez demandé à réinitialiser votre mot de passe. Pour ce faire, veuillez cliquer sur le lien ci-dessous :
-                ${String(p.url.passwordReset)}${token}
+                ${String(properties.url.passwordReset)}${token}
 
-                Ce lien est valable ${translate(req, p.token.passwordReset.expirationTxt)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.
+                Ce lien est valable ${translate(req, properties.token.passwordReset.expirationTxt)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.
 
                 Cordialement,
                 L'équipe de ${process.env.FRONTEND_NAME ?? ''}`,
                 en: `Hello ${user.firstName ?? ''} ${user.lastName ?? ''},
                 You requested to reset your password. To do so, please click on the link below :
-                ${String(p.url.passwordReset)}${token}
+                ${String(properties.url.passwordReset)}${token}
 
-                This link is valid for ${translate(req, p.token.passwordReset.expirationTxt)}. If you did not request this, please ignore this email.
+                This link is valid for ${translate(req, properties.token.passwordReset.expirationTxt)}. If you did not request this, please ignore this email.
 
                 Best regards,
                 The ${process.env.FRONTEND_NAME ?? ''} team`
@@ -775,32 +795,32 @@ const mail = {
                 fr: `${mailHtmlHeader}
                 <p>Bonjour ${user.firstName ?? ''} ${user.lastName ?? ''},</p>
                 <p>Pour vérifier votre adresse email, veuillez cliquer sur le lien ci-dessous :</p>
-                <p><a href="${String(p.url.emailVerification)}${token}">${String(p.url.emailVerification)}${token}</a></p>
-                <p>Ce lien est valable ${translate(req, p.token.verify.expirationTxt)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.</p>
+                <p><a href="${String(properties.url.emailVerification)}${token}">${String(properties.url.emailVerification)}${token}</a></p>
+                <p>Ce lien est valable ${translate(req, properties.token.verify.expirationTxt)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.</p>
                 <p>Cordialement,</p>
                 <p>L'équipe de ${process.env.FRONTEND_NAME ?? ''}</p>`,
                 en: `${mailHtmlHeader}
                 <p>Hello ${user.firstName ?? ''} ${user.lastName ?? ''},</p>
                 <p>To verify your email address, please click on the link below :</p>
-                <p><a href="${String(p.url.emailVerification)}${token}">${String(p.url.emailVerification)}${token}</a></p>
-                <p>This link is valid for ${translate(req, p.token.verify.expirationTxt)}. If you did not request this, please ignore this email.</p>
+                <p><a href="${String(properties.url.emailVerification)}${token}">${String(properties.url.emailVerification)}${token}</a></p>
+                <p>This link is valid for ${translate(req, properties.token.verify.expirationTxt)}. If you did not request this, please ignore this email.</p>
                 <p>Best regards,</p>
                 <p>The ${process.env.FRONTEND_NAME ?? ''} team</p>`
             },
             text: {
                 fr: `Bonjour ${user.firstName ?? ''} ${user.lastName ?? ''},
                 Pour vérifier votre adresse email, veuillez cliquer sur le lien ci-dessous :
-                ${String(p.url.emailVerification)}${token}
+                ${String(properties.url.emailVerification)}${token}
 
-                Ce lien est valable ${translate(req, p.token.verify.expirationTxt)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.
+                Ce lien est valable ${translate(req, properties.token.verify.expirationTxt)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.
 
                 Cordialement,
                 L'équipe de ${process.env.FRONTEND_NAME ?? ''}`,
                 en: `Hello ${user.firstName ?? ''} ${user.lastName ?? ''},
                 To verify your email address, please click on the link below :
-                ${String(p.url.emailVerification)}${token}
+                ${String(properties.url.emailVerification)}${token}
 
-                This link is valid for ${translate(req, p.token.verify.expirationTxt)}. If you did not request this, please ignore this email.
+                This link is valid for ${translate(req, properties.token.verify.expirationTxt)}. If you did not request this, please ignore this email.
 
                 Best regards,
                 The ${process.env.FRONTEND_NAME ?? ''} team`
@@ -897,9 +917,10 @@ function displayableUserPublic (user: User) {
     return u;
 }
 
-function displayableGroup (group: Group & { users: User[] }) {
+function displayableGroup (group: Group & { users: User[], creator: User }) {
     const g = group as any;
     g.users = g.users.map(displayableUserPublic);
+    g.creator = displayableUserPublic(g.creator);
     return g;
 }
 

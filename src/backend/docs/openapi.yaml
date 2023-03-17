@@ -686,8 +686,8 @@ paths:
 
   /travels/create:
     post:
-      summary: create a new travel
-      description: create a new travel with etape
+      summary: Create a travel
+      description: Create a travel with steps.
       operationId: createTravel
       tags:
         - Travels
@@ -701,12 +701,6 @@ paths:
             schema:
               type: object
               properties:
-                departureDate:
-                  type: string
-                  example: 2023-03-16T09:15:36.000Z
-                arrivalDate:
-                  type: string
-                  example: 2023-03-17T09:15:36.000Z
                 maxPassengers:
                   type: integer
                   example: 10
@@ -718,8 +712,9 @@ paths:
                   example: Voyage non fumeur
                 groupId:
                   type: integer
-                  example: null
-                listOfEtape:
+                  nullable: true
+                  example: 1
+                steps:
                   type: array
                   items:
                     $ref: '#/components/schemas/Etape'
@@ -729,23 +724,55 @@ paths:
                       context: 54, Meurthe-et-Moselle, Grand Est
                       lat: 48.683188
                       lng: 6.1877
+                      date: 2023-04-16T09:15:36.000Z
                     - label: 2ter Boulevard Charlemagne 54000 Laxou
                       city: Laxou
                       context: 54, Meurthe-et-Moselle, Grand Est
                       lat: 49.683188
                       lng: 6.5877
+                      date: 2023-04-16T219:15:36.000Z
                     - label: 1801 chemin Napoléon 55000 Metz
                       city: Metz
                       context: 55, Moselle, Grand Est
                       lat: 78.683188
                       lng: 6.1877
+                      date: 2023-04-17T09:15:36.000Z
       responses:
         '201':
-          description: travel create
+          description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TravelCreate'
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Travel created"
+                  travel:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 2
+                      maxPassengers:
+                        type: integer
+                        example: 10
+                      price:
+                        type: integer
+                        example: 78
+                      description:
+                        type: string
+                        example: Voyage non fumeur
+                      groupId:
+                        type: integer
+                        example: null
+                      createdAt:
+                        type: string
+                        example: 2023-03-05T13:30:41.483Z
+                      etapes:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Etape'
         '401':
           $ref: '#/components/responses/noToken'
         '400':
@@ -764,7 +791,6 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
-
   /travels/my:
     get:
       summary: My travels
@@ -1428,14 +1454,6 @@ components:
         id:
           type: integer
           example: 1
-        departureDate:
-          type: string
-          format: date-time
-          example: 2020-01-01T00:00:00.000Z
-        arrivalDate:
-          type: string
-          format: date-time
-          example: 2020-01-01T00:00:00.000Z
         maxPassengers:
           type: integer
           example: 4
@@ -1471,6 +1489,8 @@ components:
         creatorId:
           type: integer
           example: 1
+        creator:
+          $ref: '#/components/schemas/PublicUser'
         createdAt:
           type: string
           format: date-time
@@ -1593,44 +1613,7 @@ components:
           type: integer
         travelId:
           type: integer
-        order:
-          type: integer
-    TravelCreate:
-      type: object
-      properties:
-        message:
+        date:
           type: string
-          example: "Travel created"
-        travel:
-          type: object
-          properties:
-            id:
-              type: integer
-              example: 2
-            departureDate:
-              type: string
-              example: 2023-03-16T09:15:36.000Z
-            arrivalDate:
-              type: string
-              example: 2023-03-17T09:15:36.000Z
-            maxPassengers:
-              type: integer
-              example: 10
-            price:
-              type: integer
-              example: 78
-            description:
-              type: string
-              example: Voyage non fumeur
-            groupId:
-              type: integer
-              example: null
-            createdAt:
-              type: string
-              example: 2023-03-05T13:30:41.483Z
-        numberOfEtape:
-          type: object
-          properties:
-            count:
-              type: integer
-              example: 3
+          format: date-time
+          example: 2020-01-01T00:00:00.000Z

@@ -1,7 +1,7 @@
 import type express from 'express';
 import { prisma } from '../app';
 import { error, info, sendMsg } from '../tools/translator';
-import * as properties from '../properties';
+import * as validator from '../tools/validator';
 import { preparePagination } from './_common';
 
 exports.getMyNotifications = (req: express.Request, res: express.Response, _: express.NextFunction) => {
@@ -32,7 +32,7 @@ exports.deleteAllNotifications = (req: express.Request, res: express.Response, _
 }
 
 exports.deleteOneNotification = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const notifId = properties.sanitizeNotificationId(req.params.id, req, res);
+    const notifId = validator.sanitizeNotificationId(req.params.id, req, res);
     if (notifId === null) return;
 
     prisma.notification.count({
