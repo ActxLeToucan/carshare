@@ -461,9 +461,9 @@ export default {
                 desc += formatString(
                     Lang.CurrentLang.CONFIRM_TRIP_STEP,
                     index + 1,
-                    step.destination?.label,
-                    getDate(step.datetime),
-                    getTime(step.datetime)
+                    step.label,
+                    getDate(step.date),
+                    getTime(step.date)
                 ) + "\n";
             });
 
@@ -471,7 +471,7 @@ export default {
 
             desc += formatString(
                 data.description == ""? Lang.CurrentLang.CONFIRM_TRIP_NO_INFOS: Lang.CurrentLang.CONFIRM_TRIP_INFOS,
-                "\n" + stylize(data.description)
+                "\n" + data.description.split("\n").map(l => stylize(l)).join("\n")
             );
 
             const lines = desc.split("\n");

@@ -1,6 +1,6 @@
 import type express from 'express';
 import { prisma } from '../app';
-import * as properties from '../properties';
+import * as validator from '../tools/validator';
 import { error, info, sendMsg } from '../tools/translator';
 import { preparePagination } from './_common';
 
@@ -24,11 +24,11 @@ exports.getMyTravels = (req: express.Request, res: express.Response, _: express.
 
 exports.searchTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { date, startCity, startContext, endCity, endContext } = req.query;
-    if (!properties.checkCityField(startCity, req, res, 'startCity')) return;
-    if (!properties.checkCityField(endCity, req, res, 'endCity')) return;
-    if (!properties.checkDateField(date, false, req, res)) return;
-    if (startContext !== undefined && !properties.checkStringField(startContext, req, res, 'startContext')) return;
-    if (endContext !== undefined && !properties.checkStringField(endContext, req, res, 'endContext')) return;
+    if (!validator.checkCityField(startCity, req, res, 'startCity')) return;
+    if (!validator.checkCityField(endCity, req, res, 'endCity')) return;
+    if (!validator.checkDateField(date, false, req, res)) return;
+    if (startContext !== undefined && !validator.checkStringField(startContext, req, res, 'startContext')) return;
+    if (endContext !== undefined && !validator.checkStringField(endContext, req, res, 'endContext')) return;
 
     const startCtx = startContext === undefined ? '' : startContext;
     const endCtx = endContext === undefined ? '' : endContext;
@@ -55,9 +55,9 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
 exports.createTravel = async (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { maxPassengers, price, description, groupId, steps } = req.body;
 
-    if (!properties.checkMaxPassengersField(maxPassengers, req, res)) return;
-    if (!properties.checkPriceField(price, req, res)) return;
-    if (!properties.checkDescriptionField(description, req, res, 'description')) return;
+    if (!validator.checkMaxPassengersField(maxPassengers, req, res)) return;
+    if (!validator.checkPriceField(price, req, res)) return;
+    if (!validator.checkDescriptionField(description, req, res, 'description')) return;
 
     if (typeof groupId === 'number') {
         try {
@@ -77,13 +77,12 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
             sendMsg(req, res, error.generic.internalError);
         }
     }
-    if (!properties.checkListOfEtapeField(steps, req, res)) return;
+    if (!validator.checkListOfEtapeField(steps, req, res)) return;
 
     prisma.travel.findMany({
         where: {
             driverId: res.locals.user.id,
             status: 0
-
         },
         select: {
             etapes: {
@@ -94,7 +93,7 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
         }
     }).then((travels) => {
         for (const elements of travels) {
-            if (!properties.checkTravelAlready(steps[0].date, steps[steps.length - 1].date, elements.etapes, req, res)) return;
+            if (!validator.checkTravelAlready(steps[0].date, steps[steps.length - 1].date, elements.etapes, req, res)) return;
         }
 
         prisma.travel.create({
@@ -103,27 +102,23 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
                 price,
                 description,
                 driverId: res.locals.user.id,
-                groupId
+                groupId,
+                etapes: {
+                    create: steps.map((step: { label: string, city: string, context: string, lat: number, lng: number, date: string }) => ({
+                        label: step.label,
+                        city: step.city,
+                        context: step.context,
+                        lat: step.lat,
+                        lng: step.lng,
+                        date: new Date(step.date)
+                    }))
+                }
+            },
+            include: {
+                etapes: true
             }
         }).then((travel) => {
-            const data = Array.from({ length: steps.length }).map((value, index, _) => ({
-                label: steps[index].label,
-                city: steps[index].city,
-                context: steps[index].context,
-                lat: steps[index].lat,
-                lng: steps[index].lng,
-                travelId: travel.id,
-                date: steps[index].date
-            }))
-
-            prisma.etape.createMany({
-                data
-            }).then((etape) => {
-                sendMsg(req, res, info.travel.created, travel, etape);
-            }).catch((err) => {
-                console.error(err);
-                sendMsg(req, res, error.generic.internalError);
-            });
+            sendMsg(req, res, info.travel.created, travel);
         }).catch((err) => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);
