@@ -1,6 +1,6 @@
 import type express from 'express';
 import { prisma } from '../app';
-import * as properties from '../properties';
+import * as validator from '../tools/validator';
 import { error, info, sendMsg } from '../tools/translator';
 import { preparePagination } from './_common';
 
@@ -24,11 +24,11 @@ exports.getMyTravels = (req: express.Request, res: express.Response, _: express.
 
 exports.searchTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { date, startCity, startContext, endCity, endContext } = req.query;
-    if (!properties.checkCityField(startCity, req, res, 'startCity')) return;
-    if (!properties.checkCityField(endCity, req, res, 'endCity')) return;
-    if (!properties.checkDateField(date, false, req, res)) return;
-    if (startContext !== undefined && !properties.checkStringField(startContext, req, res, 'startContext')) return;
-    if (endContext !== undefined && !properties.checkStringField(endContext, req, res, 'endContext')) return;
+    if (!validator.checkCityField(startCity, req, res, 'startCity')) return;
+    if (!validator.checkCityField(endCity, req, res, 'endCity')) return;
+    if (!validator.checkDateField(date, false, req, res)) return;
+    if (startContext !== undefined && !validator.checkStringField(startContext, req, res, 'startContext')) return;
+    if (endContext !== undefined && !validator.checkStringField(endContext, req, res, 'endContext')) return;
 
     const startCtx = startContext === undefined ? '' : startContext;
     const endCtx = endContext === undefined ? '' : endContext;
@@ -55,9 +55,9 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
 exports.createTravel = async (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { maxPassengers, price, description, groupId, steps } = req.body;
 
-    if (!properties.checkMaxPassengersField(maxPassengers, req, res)) return;
-    if (!properties.checkPriceField(price, req, res)) return;
-    if (!properties.checkDescriptionField(description, req, res, 'description')) return;
+    if (!validator.checkMaxPassengersField(maxPassengers, req, res)) return;
+    if (!validator.checkPriceField(price, req, res)) return;
+    if (!validator.checkDescriptionField(description, req, res, 'description')) return;
 
     if (typeof groupId === 'number') {
         try {
@@ -77,7 +77,7 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
             sendMsg(req, res, error.generic.internalError);
         }
     }
-    if (!properties.checkListOfEtapeField(steps, req, res)) return;
+    if (!validator.checkListOfEtapeField(steps, req, res)) return;
 
     prisma.travel.findMany({
         where: {
@@ -93,7 +93,7 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
         }
     }).then((travels) => {
         for (const elements of travels) {
-            if (!properties.checkTravelAlready(steps[0].date, steps[steps.length - 1].date, elements.etapes, req, res)) return;
+            if (!validator.checkTravelAlready(steps[0].date, steps[steps.length - 1].date, elements.etapes, req, res)) return;
         }
 
         prisma.travel.create({

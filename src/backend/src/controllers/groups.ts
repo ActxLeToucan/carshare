@@ -1,12 +1,12 @@
 import type express from 'express';
 import { displayableGroup, error, info, sendMsg } from '../tools/translator';
-import * as properties from '../properties';
+import * as validator from '../tools/validator';
 import { prisma } from '../app';
 import { type Pagination, preparePagination } from './_common';
 
 exports.createGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { name } = req.body;
-    if (!properties.checkGroupNameField(name, req, res)) return;
+    if (!validator.checkGroupNameField(name, req, res)) return;
     prisma.group.create({
         data: {
             name,

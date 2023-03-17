@@ -1,7 +1,7 @@
 import type express from 'express';
 import { prisma } from '../app';
 import { error, sendMsg, info } from '../tools/translator';
-import * as properties from '../properties';
+import * as validator from '../tools/validator';
 
 exports.getNotificationSetting = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     res.status(200).json({ value: res.locals.user.mailNotif });
@@ -10,7 +10,7 @@ exports.getNotificationSetting = (req: express.Request, res: express.Response, _
 exports.updateNotificationSetting = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const value = req.body.value;
 
-    if (!properties.checkBooleanField(value, req, res, 'value')) return;
+    if (!validator.checkBooleanField(value, req, res, 'value')) return;
 
     prisma.user.update({
         where: { id: res.locals.user.id },
