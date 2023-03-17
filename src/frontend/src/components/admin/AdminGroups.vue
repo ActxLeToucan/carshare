@@ -35,7 +35,8 @@
                         <div class="flex flex-col">
                             <input-text   name="name"  :label="lang.GROUP_NAME"  :placeholder="lang.GROUP_NAME" :value="selectedGroup.name"></input-text>
                             <input-text   name="creator"     :label="lang.GROUP_CREATOR"     :placeholder="lang.GROUP_CREATOR" :value="selectedGroup.creatorId" class="mb-0"></input-text>
-                           
+                            <input-text   name="creator"     :label="lang.GROUP_CREATOR"     :placeholder="lang.GROUP_CREATOR" :value="selectedGroup.creatorId" class="mb-0"></input-text>
+
                         </div>
                          <div
                             ref="user-log-zone"

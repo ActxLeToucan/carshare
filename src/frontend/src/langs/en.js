@@ -153,7 +153,7 @@ export default {
         SELECT_GROUP_DESC: "Please select a group of users to share your trip with",
         GROUP_SELECTED: "Group selected",
     SEARCH_GROUP: "Search group",
-    GROUP_NAME: "Group name ",
+    GROUP_NAME: "Group name",
          GROUP_CREATOR :"Creator" , 
 
     // informations
@@ -172,17 +172,17 @@ export default {
     TRIPS: "Trips",
 
     //parametres
-    GET_NOTIFIED: "Notify by email :",
+    GET_NOTIFIED: "Notify by email",
     DARKMODE: "Dark", 
     LIGHTMODE: "Light", 
-    THEME: " Theme :  ", 
+    THEME: " Theme", 
     DEFAULTMODE: "default",
-    ENGLISH: "English ", 
+    ENGLISH: "English", 
     FRENCH: "French", 
     LANG : "Please choose a language" , 
     MODE : "Please choose a theme" , 
     
-    LANGUES : "Langues : ",
+    LANGUES : "Langues",
         // users
         SEARCH_USER: "Search user",
         ACCOUNT_DELETE_VERIFY: "Are you sure you want to delete this account ?\nThis action is irreversible.",
