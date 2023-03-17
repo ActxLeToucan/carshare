@@ -99,7 +99,6 @@ function search(obj) {
     API.execute_logged(API.ROUTE.GROUPS, API.METHOD.GET, User.CurrentUser?.getCredentials() ,{ search : value}).then((data) => {
         obj.groups = data.data ?? data.group;
         log.delete();
-        console.log("succes");
     }).catch((err) => {
         log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
         setTimeout(() => { log.delete(); }, 4000);
