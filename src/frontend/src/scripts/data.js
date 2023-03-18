@@ -48,15 +48,10 @@ export const genres = [
     {value: 0,  id: 'FEMALE'},
 ];
 
-export const langues = [
-    {value: 'en',  id: 'ENGLISH'},
-    { value: 'fr', id: 'FRENCH' },
-];
-
-export const theme = [
-    {value: 'dark', id: 'DARKMODE' },
-    {value: 'clair',  id: 'LIGHTMODE'},
-    { value: 'defaut', id: 'DEFAULTMODE' },
+export const themes = [
+    {value: 0, id: 'DARKMODE'},
+    {value: 1, id: 'LIGHTMODE'},
+    {value: -1, id: 'DEFAULT'},
 ];
 export const levels = [
     {value: 0, id: 'USER'},

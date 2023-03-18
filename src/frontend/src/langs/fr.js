@@ -18,6 +18,11 @@ export default {
     PRICE: "Prix",
     INFORMATIONS: "Informations",
     STEPS: "Étapes",
+    DEFAULT: "Par défaut",
+
+    // languages
+    ENGLISH: "Anglais",
+    FRENCH: "Français",
 
     // 404 page
     WOOPS: "Woops !",
@@ -163,6 +168,17 @@ export default {
         GROUP_NAME: "Nom de groupe",
         GROUP_CREATOR :"Createur",
 
+        //parametres
+        NOTIF_PARAMS: "Paramètres de notifications",
+        EMAIL_NOTIFICATIONS: "Notifier par email",
+        THEME: "Thème",
+        DARKMODE: "Sombre",
+        LIGHTMODE: "Clair",
+        DISPLAY_PARAMS: "Paramètres d'affichage",
+        LANGUAGES: "Langues",
+        UPDATING_PARAMS: "Mise à jour des paramètres",
+        PARAMS_UPDATED: "Paramètres mis à jour avec succès",
+
     // informations
     ADDRESS_NOT_VERIFIED: "Adresse non vérifiée",
     ADDRESS_VERIFIED: "Adresse vérifiée",
@@ -177,20 +193,6 @@ export default {
     ADMINISTRATION: "Administration",
     USERS: "Utilisateurs",
     TRIPS: "Trajets",
-
-
-
-    //parametres
-    GET_NOTIFIED: "Notification par Email",
-    DARKMODE: "Sombre", 
-    LIGHTMODE: "Clair", 
-    THEME: "Théme", 
-    DEFAULTMODE: "Par défaut",
-    ENGLISH: "Anglais", 
-    FRENCH : "Français" , 
-    LANGUES: "Langues",
-    LANG : "Veuillez choisir une langue" , 
-    MODE : "Veuillez choisir une theme" , 
     
         // users
         SEARCH_USER: "Rechercher un utilisateur",

@@ -18,6 +18,11 @@ export default {
     PRICE: "Price",
     INFORMATIONS: "Informations",
     STEPS: "Steps",
+    DEFAULT: "Default",
+
+    // languages
+    ENGLISH: "English",
+    FRENCH: "French",
 
     // 404 page
     WOOPS: "Oops",
@@ -163,6 +168,15 @@ export default {
         GROUP_NAME: "Group name",
         GROUP_CREATOR :"Creator" , 
 
+        // parametres
+        NOTIF_PARAMS: "Notification settings",
+        EMAIL_NOTIFICATIONS: "Notify by email",
+        THEME: "Theme",
+        DARKMODE: "Dark",
+        LIGHTMODE: "Light",
+        DISPLAY_PARAMS: "Display settings",
+        LANGUAGES: "Languages",
+
     // informations
     ADDRESS_NOT_VERIFIED: "Address not verified",
     ADDRESS_VERIFIED: "Address verified",
@@ -177,18 +191,6 @@ export default {
     ADMINISTRATION: "Administration",
     USERS: "Users",
     TRIPS: "Trips",
-
-    //parametres
-    GET_NOTIFIED: "Notify by email",
-    DARKMODE: "Dark", 
-    LIGHTMODE: "Light", 
-    THEME: " Theme", 
-    DEFAULTMODE: "default",
-    ENGLISH: "English ", 
-    FRENCH: "French", 
-    LANG : "Please choose a language" , 
-    MODE : "Please choose a theme" , 
-    LANGUES: "Langues",
     
         // users
         SEARCH_USER: "Search user",
