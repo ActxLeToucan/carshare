@@ -1,5 +1,5 @@
 <template>
-    <div class="flex grow flex-col min-h-0 max-h-screen">
+    <div class="flex grow flex-col min-h-0 max-h-screen max-w-full">
         <topbar></topbar>
         <div class="flex md:flex-row flex-col grow max-h-min min-h-0">
             <div ref="tabs-zone"
@@ -23,7 +23,7 @@
                     </svg>
                 </button>
 
-                <tab-window defaultHash="#infos" class="md:pt-0 pt-5 max-h-full">
+                <tab-window defaultHash="#infos" class="md:pt-0 pt-5 max-h-full max-w-full">
 
                     <tab-div hash="#infos" class="flex flex-col items-center">
                         <user-infos></user-infos>
