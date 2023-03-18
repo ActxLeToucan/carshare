@@ -47,10 +47,10 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
                      from travel t
                               inner join etape e1 on e1.travelId = t.id and e1.city = ${startCity}
                               inner join etape e2 on e2.travelId = t.id and e2.city = ${endCity}
-                     where e1.\`order\` < e2.\`order\`
+                     where e1.date < e2.date
                        and IF(${startCtx} = '', true, e1.context = ${startCtx})
                        and IF(${endCtx} = '', true, e2.context = ${endCtx})
-                       and t.arrivalDate BETWEEN ${date1} and ${date2}`
+                       and e1.date BETWEEN ${date1} and ${date2}`
         .then((data) => {
             res.status(200).json(data);
         }).catch((err) => {
