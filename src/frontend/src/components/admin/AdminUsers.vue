@@ -1,6 +1,6 @@
 <template>
     <div class="flex md:flex-row flex-col grow max-h-full min-h-0 max-w-full min-w-0">
-        <div ref="query-zone" class="flex flex-col items-center h-full md:w-min w-full min-w-0 max-w-full p-4 md:border-r-8 border-teal-500 mx-auto overflow-hidden">
+        <div ref="query-zone" class="flex flex-col items-center h-full max-h-full md:w-min w-full min-w-0 max-w-full p-4 md:border-r-8 border-teal-500 mx-auto overflow-hidden">
             <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> {{ lang.USERS }} </p>
 
             <p class="text-lg text-slate-500 pt-2 font-semibold mx-auto"> {{ lang.SEARCH_USER }} </p>
@@ -15,11 +15,16 @@
                 class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
                 style="max-height: 0;"
             ></div>
-            <div class="flex w-full flex-col px-8 space-y-4 pt-4 max-w-full min-w-0">
+            <div class="flex grow w-full flex-col px-8 space-y-4 pt-4 max-w-full min-w-0 overflow-y-auto">
                 <admin-user-card
-                    class="min-w-0 w-full show-up" v-for="user in usersList"
+                    class="min-w-0 w-full show-up max-w-[20em]" v-for="user in usersList"
                     :data="user" :key="user?.id" :onclick="onCardClicked">
                 </admin-user-card>
+            </div>
+            <div class="flex w-full justify-evenly items-center mt-4">
+                <button-block :action="() => pagination.previous()"> <chevron-left-icon class="w-8 h-8"></chevron-left-icon> </button-block>
+                <p class="text-xl font-bold text-slate-500"> {{ pagination.index }} </p>
+                <button-block :action="() => pagination.next()"> <chevron-right-icon class="w-8 h-8"></chevron-right-icon> </button-block>
             </div>
         </div>
         <div ref="result-zone" class="flex flex-col grow px-4 p-4 overflow-auto">
@@ -88,7 +93,9 @@ import {Log, LogZone} from '../../scripts/Logs.js';
 import {genres, isPhoneNumber, levels} from '../../scripts/data';
 
 import {
-    MagnifyingGlassIcon
+    MagnifyingGlassIcon,
+    ChevronRightIcon,
+    ChevronLeftIcon
 } from '@heroicons/vue/24/outline';
 import { getTypedValue } from '../../scripts/data.js';
 import Lang from "../../scripts/Lang";
@@ -102,8 +109,10 @@ function search(obj) {
 
     const value = obj.$refs['query-zone'].querySelector('input').value;
 
-    API.execute_logged(API.ROUTE.USERS + obj.pagination, API.METHOD.GET, User.CurrentUser?.getCredentials(), { search: value }).then((data) => {
-        obj.usersList = data.data ?? data.users;
+    API.execute_logged(API.ROUTE.USERS + obj.pagination, API.METHOD.GET, User.CurrentUser?.getCredentials(), { search: value }).then(data => {
+        console.log(data)
+        obj.usersList = data.data;
+        obj.pagination.max = data.next ?? obj.pagination.offset;
         log.delete();
     }).catch((err) => {
         log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
@@ -126,7 +135,9 @@ export default {
         InputChoice,
         Card,
         MagnifyingGlassIcon,
-        Popup
+        Popup,
+        ChevronRightIcon,
+        ChevronLeftIcon,
     },
     methods: {
         displayPage(page) {
@@ -276,7 +287,7 @@ export default {
             genres,
             levels,
             lang: Lang.CurrentLang,
-            pagination: API.createPagination(),
+            pagination: API.createPagination(0, 2),
             formUser: {
                 buttonEnabled: true,
             },
@@ -301,7 +312,11 @@ export default {
         window.addEventListener("resize", _ => {
             this.isMobile = window.innerWidth < 768;
             this.displayPage();
-        })
+        });
+
+        this.pagination.onChanged(() => {
+            this.search();
+        });
     }
 }
 </script>
