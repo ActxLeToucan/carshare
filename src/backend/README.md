@@ -21,15 +21,15 @@ npm i
 ```bash
 npm i -g nodemon
 ```
-3. Copier le fichier [`.env.example`](.env.example) et le renommer en `.env`
-4. Modifier les variables d'environnement du fichier `.env` pour qu'elles correspondent à votre configuration
-5. Copier le fichier [`mail.config.json.example`](mail.config.json.example) et le renommer en `mail.config.json`
-6. Compléter le fichier `mail.config.json` avec les informations de votre serveur SMTP, ou désactiver l'envoi d'emails en mettant `enabled` à `false`
-7. Initialiser la base de données
+4. Copier le fichier [`.env.example`](.env.example) et le renommer en `.env`
+5. Modifier les variables d'environnement du fichier `.env` pour qu'elles correspondent à votre configuration
+6. Copier le fichier [`mail.config.json.example`](mail.config.json.example) et le renommer en `mail.config.json`
+7. Compléter le fichier `mail.config.json` avec les informations de votre serveur SMTP ou désactiver l'envoi d'emails en mettant `enabled` à `false`
+8. Initialiser la base de données
 ```bash
 npx prisma migrate deploy
 ```
-8. Lancer le serveur
+9. Lancer le serveur
 ```bash
 npm run dev
 ```
@@ -99,20 +99,20 @@ npm i
 ```bash
 npm i -g pm2
 ```
-3. Copier le fichier [`.env.example`](.env.example) et le renommer en `.env`
-4. Modifier les variables d'environnement du fichier `.env` pour qu'elles correspondent à votre configuration
-5. Modifier la variable d'environnement `NODE_ENV` pour qu'elle vaille `production`
-6. Copier le fichier [`mail.config.json.example`](mail.config.json.example) et le renommer en `mail.config.json`
-7. Compléter le fichier `mail.config.json` avec les informations de votre serveur SMTP
-8. Initialiser la base de données
+4. Copier le fichier [`.env.example`](.env.example) et le renommer en `.env`
+5. Modifier les variables d'environnement du fichier `.env` pour qu'elles correspondent à votre configuration
+6. Modifier la variable d'environnement `NODE_ENV` pour qu'elle vaille `production`
+7. Copier le fichier [`mail.config.json.example`](mail.config.json.example) et le renommer en `mail.config.json`
+8. Compléter le fichier `mail.config.json` avec les informations de votre serveur SMTP
+9. Initialiser la base de données
 ```bash
 npx prisma migrate dev
 ```
-9. Lancer le serveur
+10. Lancer le serveur
 ```bash
 pm2 start dist/src/server.js --name "backend"
 ```
-10. Configurer le serveur web pour qu'il redirige les requêtes vers le serveur Node.js (reverse proxy)
+11. Configurer le serveur web pour qu'il redirige les requêtes vers le serveur Node.js (reverse proxy)
 
 #### Quelques commandes utiles
 Pour lancer le serveur en mode production sans pm2, exécuter la commande suivante :
