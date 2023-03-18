@@ -23,7 +23,7 @@
             </div>
             <div class="flex w-full justify-evenly items-center mt-4">
                 <button-block :action="() => pagination.previous()" :disabled="!pagination.hasPrevious"> <chevron-left-icon class="w-8 h-8"></chevron-left-icon> </button-block>
-                <p class="text-xl font-bold text-slate-500"> {{ pagination.index }} / {{ pagination.maxIndex }} </p>
+                <p class="text-xl font-bold text-slate-500"> {{ pagination.index + 1 }} / {{ pagination.maxIndex + 1 }} </p>
                 <button-block :action="() => pagination.next()" :disabled="!pagination.hasNext"> <chevron-right-icon class="w-8 h-8"></chevron-right-icon> </button-block>
             </div>
         </div>
