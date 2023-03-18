@@ -12,7 +12,7 @@
             </button>
 
             <div class="flex grow">
-                
+
             </div>
         </div>
     </div>
@@ -34,7 +34,7 @@ export default {
         TabDiv
     },
     methods: {
-        
+
     },
     data() {
         return { User, lang: Lang.CurrentLang }

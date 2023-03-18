@@ -30,6 +30,11 @@ export default {
             type: String,
             default: "",
             required: false
+        },
+        onchange: {
+            type: Function,
+            default: () => { },
+            required: false
         }
     },
     data() {
@@ -62,7 +67,7 @@ export default {
 
             checkbox.checked = this.state;
         },
-        applyValue(val) {
+        applyValue(val, sendEvent = true) {
             switch (typeof val) {
                 case "string": this.state = val === "true"; break;
                 case "number": this.state = val > 0; break;
@@ -70,15 +75,15 @@ export default {
                 default: this.state = false; break;
             }
             this.updateButton();
+            if (sendEvent) this.onchange?.(this.state);
         }
     },
     mounted() {
         this.$refs["switch"].addEventListener("click", ev => {
-            this.state = !this.state;
-            this.updateButton();
+            this.applyValue(!this.state);
         });
         this.updateButton();
-        this.applyValue(this.value);
+        this.applyValue(this.value, false);
     },
     watch: {
         value: function (val) {
