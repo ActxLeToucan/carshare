@@ -17,7 +17,8 @@ exports.createGroup = (req: express.Request, res: express.Response, _: express.N
             }
         },
         include: {
-            users: true
+            users: true,
+            creator: true
         }
     }).then((group) => {
         sendMsg(req, res, info.group.created, group);
