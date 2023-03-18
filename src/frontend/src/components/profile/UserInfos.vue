@@ -2,18 +2,18 @@
     <div class="md:show-up flex flex-col grow">
         <p class="text-2xl text-teal-500 font-bold mx-auto mt-4"> {{ lang.MY_INFOS }} </p>
         <div class="flex flex-col grow justify-evenly items-center">
-            <card class="flex flex-col m-4">
+            <card class="flex flex-col md:m-4 my-4">
                 <div class="flex flex-col" ref="user-inputs">
                     <input-text   name="lastName"  :label="lang.LASTNAME"  :placeholder="lang.LASTNAME"  :value="formProperties.properties.lastName" @input="formProperties.properties.lastName = $event.target.value"></input-text>
                     <input-text   name="firstName" :label="lang.FIRSTNAME" :placeholder="lang.FIRSTNAME" :value="formProperties.properties.firstName" @input="formProperties.properties.firstName = $event.target.value"></input-text>
                     <input-text   name="email"     :label="lang.EMAIL"     :placeholder="lang.EMAIL"     :value="formProperties.properties.email" class="mb-0" @input="formProperties.properties.email = $event.target.value"></input-text>
                     <div class="flex space-x-4">
-                        <p v-if="emailVerified == 'false'" class="ml-auto text-md text-slate-500"> {{ lang.ADDRESS_NOT_VERIFIED }}. </p>
-                        <p v-if="emailVerified == 'true'" class="ml-auto text-md text-slate-500"> {{ lang.ADDRESS_VERIFIED }}. </p>
-                        <p v-if="emailVerified == 'pending'" class="ml-auto text-md text-slate-500"> {{ lang.ADDRESS_VERIFICATION }}. </p>
-                        <p v-if="emailVerified == '429'" class="ml-auto text-md text-red-500"> {{ lang.ADDRESS_ERROR_SPAM }}. </p>
-                        <p v-if="emailVerified == 'error'" class="ml-auto text-md text-red-500"> {{ lang.ADDRESS_ERROR }}. </p>
-                        <p v-if="emailVerified == 'loading'" class="ml-auto text-md text-slate-500"> {{ lang.DATA_SENDING }} </p>
+                        <p v-if="emailVerified == 'false'" class="ml-auto text-md text-slate-500 dark:text-slate-300"> {{ lang.ADDRESS_NOT_VERIFIED }}. </p>
+                        <p v-if="emailVerified == 'true'" class="ml-auto text-md text-slate-500 dark:text-slate-300"> {{ lang.ADDRESS_VERIFIED }}. </p>
+                        <p v-if="emailVerified == 'pending'" class="ml-auto text-md text-slate-500 dark:text-slate-300"> {{ lang.ADDRESS_VERIFICATION }}. </p>
+                        <p v-if="emailVerified == '429'" class="ml-auto text-md text-red-500 dark:text-red-300"> {{ lang.ADDRESS_ERROR_SPAM }}. </p>
+                        <p v-if="emailVerified == 'error'" class="ml-auto text-md text-red-500 dark:text-red-300"> {{ lang.ADDRESS_ERROR }}. </p>
+                        <p v-if="emailVerified == 'loading'" class="ml-auto text-md text-slate-500 dark:text-slate-300"> {{ lang.DATA_SENDING }} </p>
                         <button
                             v-on:click="verifyEmail"
                             v-if="emailVerified !== 'true'"
@@ -27,7 +27,7 @@
                     ref="user-log-zone"
                     class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
                     style="max-height: 0;"
-                ></div>
+                />
                 <div class="flex md:flex-row flex-col md:space-x-4 md:space-y-0 space-y-2 mt-4">
                     <button-block :action="deleteAccount" color="red"> {{ lang.DELETE_ACCOUNT }} </button-block>
                     <div class="flex grow justify-end pl-20">
@@ -35,7 +35,7 @@
                     </div>
                 </div>
             </card>
-            <card class="flex flex-col m-4">
+            <card class="flex flex-col md:m-4 my-4">
                 <div class="flex flex-col" ref="password-inputs">
                     <input-text name="password-old"     :label="lang.OLD_PASSWORD"  :placeholder="lang.OLD_PASSWORD"     :value="formPassword.old"     type="password" @input="formPassword.old = $event.target.value"></input-text>
                     <input-text name="password-new"     :label="lang.NEW_PASSWORD"  :placeholder="lang.NEW_PASSWORD"     :value="formPassword.new"     type="password" @input="formPassword.new = $event.target.value"></input-text>
@@ -45,7 +45,7 @@
                     ref="password-log-zone"
                     class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
                     style="max-height: 0;"
-                ></div>
+                />
                 <div class="flex grow justify-end">
                     <button-block :action="updatePassword" :disabled="!formPassword.buttonEnabled"> {{ lang.EDIT }} </button-block>
                 </div>
@@ -138,17 +138,16 @@ export default {
         },
         removeAccount(popup) {
             return new Promise((resolve, reject) => {
-                const log = popup.log("Suppression du compte...", Log.INFO);
+                const log = popup.log(this.lang.DELETING_ACCOUNT, Log.INFO);
                 API.execute_logged(API.ROUTE.ME, API.METHOD.DELETE, User.CurrentUser?.getCredentials(), {password: popup.get("password")}).then(_ => {
-                    log.update("Compte supprimé avec succès !", Log.SUCCESS);
+                    log.update(this.lang.ACCOUNT_DELETED, Log.SUCCESS);
                     setTimeout(() => {
                         log.delete();
                         this.disconnect();
                         resolve(true);
                     }, 1000);
                 }).catch(err => {
-                    console.error(err);
-                    log.update("Erreur : " + err.message, Log.ERROR);
+                    log.update(this.lang.ERROR + err.message, Log.ERROR);
                     setTimeout(() => {
                         log.delete();
                         resolve(false);

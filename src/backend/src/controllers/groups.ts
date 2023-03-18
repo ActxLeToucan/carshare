@@ -1,12 +1,12 @@
 import type express from 'express';
 import { displayableGroup, error, info, sendMsg } from '../tools/translator';
-import * as properties from '../properties';
+import * as validator from '../tools/validator';
 import { prisma } from '../app';
 import { type Pagination, preparePagination } from './_common';
 
 exports.createGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { name } = req.body;
-    if (!properties.checkGroupNameField(name, req, res)) return;
+    if (!validator.checkGroupNameField(name, req, res)) return;
     prisma.group.create({
         data: {
             name,
@@ -17,7 +17,8 @@ exports.createGroup = (req: express.Request, res: express.Response, _: express.N
             }
         },
         include: {
-            users: true
+            users: true,
+            creator: true
         }
     }).then((group) => {
         sendMsg(req, res, info.group.created, group);
@@ -44,14 +45,20 @@ exports.searchGroups = (req: express.Request, res: express.Response, next: expre
 function getGroups (req: express.Request, res: express.Response, next: express.NextFunction, searchMode: boolean, where: (pagination: Pagination) => any) {
     const pagination = preparePagination(req, searchMode);
 
-    prisma.group.findMany({
-        where: where(pagination),
-        include: {
-            users: true
-        },
-        ...pagination.pagination
-    }).then((groups) => {
-        res.status(200).json(pagination.results(groups.map(displayableGroup)));
+    prisma.group.count().then((count) => {
+        prisma.group.findMany({
+            where: where(pagination),
+            include: {
+                users: true,
+                creator: true
+            },
+            ...pagination.pagination
+        }).then((groups) => {
+            res.status(200).json(pagination.results(groups.map(displayableGroup), count));
+        }).catch((err) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
     }).catch((err) => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);

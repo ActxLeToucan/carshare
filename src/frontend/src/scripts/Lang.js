@@ -3,8 +3,9 @@ import fr from "../langs/fr.js";
 
 class Lang {
     static Langs = [
-        {label: "English", value: "en", data: en},
-        {label: "Français", value: "fr", data: fr},
+        {id: "ENGLISH", value: "en", data: en},
+        {id: "FRENCH", value: "fr", data: fr},
+        {id: "DEFAULT", value: null, data: fr},
     ];
 
     static #callbackIndex = 0;
@@ -43,16 +44,19 @@ class Lang {
         return this.#current_code;
     }
 
-
     static LoadLang(code, save = true) {
-        if (code == null) {
-            code = this.DefaultCode;
+        if (!code) {
+            code = this.#defaultCode;
+            localStorage.removeItem("lang");
             save = false;
         }
 
         code = this.#sanitizeCode(code);
-        if (this.Langs.map(l => l.value).indexOf(code) === -1)
-            return false;
+        if (this.Langs.map(l => l.value).indexOf(code) === -1) {
+            code = this.#defaultCode;
+            localStorage.removeItem("lang");
+            save = false;
+        }
         
         this.#current_lang = this.Langs.find(l => l.value === code).data;
         for (const key in Lang.defaultLanguage) {
