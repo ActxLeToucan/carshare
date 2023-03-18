@@ -18,7 +18,7 @@ export default {
         },
         onclick: {
             type: Function,
-            default: () => { },
+            default: () => {},
             required: false
         }
     },

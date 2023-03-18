@@ -29,35 +29,25 @@
         </div>
         <div ref="result-zone" class="flex flex-col grow px-4 p-4 overflow-auto">
 
-            <button ref="backbtn"
-                class="absolute md:hidden flex rounded-md border-2 border-slate-200 bg-white h-fit w-fit p-2">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="w-8 h-8">
+            <button ref="backbtn" class="absolute md:hidden flex rounded-md border-2 border-slate-200 bg-white h-fit w-fit p-2">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                 </svg>
             </button>
 
             <div v-if="selectedUser != null" class="md:show-up flex flex-col justify-center">
-                <p class="text-2xl text-teal-500 py-2 font-bold mx-auto w-fit"> {{ selectedUser.firstName }} {{
-                    selectedUser.lastName }} </p>
+                <p class="text-2xl text-teal-500 py-2 font-bold mx-auto w-fit"> {{ selectedUser.firstName }} {{ selectedUser.lastName }} </p>
                 <card class="flex flex-col m-4 mx-auto">
                     <div class="flex flex-col">
-                        <input-text name="lastName" :label="lang.LASTNAME" :placeholder="lang.LASTNAME"
-                            :value="selectedUser.lastName"></input-text>
-                        <input-text name="firstName" :label="lang.FIRSTNAME" :placeholder="lang.FIRSTNAME"
-                            :value="selectedUser.firstName"></input-text>
-                        <input-text name="email" :label="lang.EMAIL" :placeholder="lang.EMAIL" :value="selectedUser.email"
-                            class="mb-0"></input-text>
-                        <input-text name="phone" :label="lang.PHONE" :placeholder="lang.PHONE"
-                            :value="selectedUser.phone"></input-text>
-                        <input-choice name="gender" :label="lang.GENDER" :value="selectedUser.gender"
-                            :list="genres"></input-choice>
-                        <input-switch name="hasCar" :label="lang.I_HAVE_A_CAR" :value="selectedUser.hasCar"></input-switch>
-                        <input-choice name="level" :label="lang.LEVEL" :value="selectedUser.level"
-                            :list="levels"></input-choice>
+                        <input-text   name="lastName"  :label="lang.LASTNAME"     :placeholder="lang.LASTNAME"  :value="selectedUser.lastName"></input-text>
+                        <input-text   name="firstName" :label="lang.FIRSTNAME"    :placeholder="lang.FIRSTNAME" :value="selectedUser.firstName"></input-text>
+                        <input-text   name="email"     :label="lang.EMAIL"        :placeholder="lang.EMAIL"     :value="selectedUser.email" class="mb-0"></input-text>
+                        <input-text   name="phone"     :label="lang.PHONE"        :placeholder="lang.PHONE"     :value="selectedUser.phone"></input-text>
+                        <input-choice name="gender"    :label="lang.GENDER"       :value="selectedUser.gender"  :list="genres"></input-choice>
+                        <input-switch name="hasCar"    :label="lang.I_HAVE_A_CAR" :value="selectedUser.hasCar"  ></input-switch>
+                        <input-choice name="level"     :label="lang.LEVEL"        :value="selectedUser.level"   :list="levels"></input-choice>
                     </div>
-                    <div ref="user-log-zone" class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
-                        style="max-height: 0;"></div>
+                    <div ref="user-log-zone" class="flex flex-col w-full items-center h-fit overflow-hidden transition-all" style="max-height: 0;"></div>
                     <div class="flex md:flex-row flex-col md:space-x-4 md:space-y-0 space-y-2 mt-4">
                         <button-block :action="showDeletePopup" color="red"> {{ lang.DELETE_ACCOUNT }} </button-block>
                         <div class="flex grow justify-end pl-20">
@@ -68,9 +58,11 @@
             </div>
 
         </div>
-        <popup color="red" :title="lang.DELETE + ' ' + selectedUser?.firstName + ' ' + selectedUser?.lastName"
+        <popup
+            color="red" :title="lang.DELETE + ' ' + selectedUser?.firstName + ' ' + selectedUser?.lastName"
             :content="lang.ACCOUNT_DELETE_VERIFY" :cancelLabel="lang.CANCEL" :validateLabel="lang.DELETE"
-            :onload="setDeletePopup" :onvalidate="deleteAccount">
+            :onload="setDeletePopup" :onvalidate="deleteAccount"
+        >
             <input-text :label="lang.ACCOUNT_EMAIL" :placeholder="lang.EMAIL" name="email" type="email"></input-text>
         </popup>
     </div>
