@@ -44,15 +44,20 @@ exports.searchGroups = (req: express.Request, res: express.Response, next: expre
 function getGroups (req: express.Request, res: express.Response, next: express.NextFunction, searchMode: boolean, where: (pagination: Pagination) => any) {
     const pagination = preparePagination(req, searchMode);
 
-    prisma.group.findMany({
-        where: where(pagination),
-        include: {
-            users: true,
-            creator: true
-        },
-        ...pagination.pagination
-    }).then((groups) => {
-        res.status(200).json(pagination.results(groups.map(displayableGroup)));
+    prisma.group.count().then((count) => {
+        prisma.group.findMany({
+            where: where(pagination),
+            include: {
+                users: true,
+                creator: true
+            },
+            ...pagination.pagination
+        }).then((groups) => {
+            res.status(200).json(pagination.results(groups.map(displayableGroup), count));
+        }).catch((err) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
     }).catch((err) => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
