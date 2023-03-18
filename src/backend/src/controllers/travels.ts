@@ -59,7 +59,12 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
     if (!validator.checkPriceField(price, req, res)) return;
     if (!validator.checkDescriptionField(description, req, res, 'description')) return;
 
-    if (typeof groupId === 'number') {
+    if (groupId !== undefined && groupId !== null) {
+        if (typeof groupId !== 'number') {
+            sendMsg(req, res, error.group.typeId);
+            return;
+        }
+
         try {
             const count = await prisma.group.count({
                 where: {

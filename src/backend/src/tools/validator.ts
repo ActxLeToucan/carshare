@@ -344,12 +344,12 @@ function sanitizeUserId (id: any, req: express.Request, res: express.Response): 
  */
 function checkPriceField (value: any, req: express.Request, res: express.Response): boolean {
     if (typeof value !== 'number' && value !== undefined && value !== null) {
-        sendMsg(req, res, error.number.type, 'Price');
+        sendMsg(req, res, error.number.type, 'price');
         return false;
     }
 
     if (value < 0) {
-        sendMsg(req, res, error.number.positive, 'Price');
+        sendMsg(req, res, error.number.min, 'price', 0);
         return false;
     }
     return true;
@@ -361,7 +361,7 @@ function checkPriceField (value: any, req: express.Request, res: express.Respons
  * @param value Value to sanitize
  * @param req Express request
  * @param res Express response
- * @returns true if the value is valid and a positive number, false otherwise
+ * @returns true if the value is valid, false otherwise
  */
 function checkMaxPassengersField (value: any, req: express.Request, res: express.Response): boolean {
     if (typeof value !== 'number' && value !== undefined && value !== null) {
@@ -370,7 +370,7 @@ function checkMaxPassengersField (value: any, req: express.Request, res: express
     }
 
     if (value < 1) {
-        sendMsg(req, res, error.number.positive, 'maxPassengers');
+        sendMsg(req, res, error.number.min, 'maxPassengers', 1);
         return false;
     }
     return true;

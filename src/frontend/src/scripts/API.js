@@ -48,6 +48,73 @@ class Credentials {
     }
 }
 
+class Pagination {
+    constructor (offset = 0, limit = 10) {
+        this._offset = 0;
+        this._limit = 10;
+        this._max = 10;
+
+        this.offset = offset;
+        this.limit = limit;
+
+        this._onChanged = null;
+    }
+
+    set offset(offset) {
+        this._offset = offset ?? 0;
+        this._onChanged?.();
+    }
+
+    set limit(limit) {
+        this._limit = limit ?? 10;
+        this._onChanged?.();
+    }
+
+    set max(max) {
+        this._max = max;
+    }
+
+    set index(index) {
+        this.offset = index * this._limit;
+    }
+
+    next() {
+        this._offset += this._limit;
+        if (this._offset > this._max) this._offset = this._max;
+        this._onChanged?.();
+    }
+
+    previous() {
+        this._offset -= this._limit;
+        if (this._offset < 0) this._offset = 0;
+        this._onChanged?.();
+    }
+
+    get index() {
+        return this._offset / this._limit;
+    }
+
+    get max() {
+        return this._max;
+    }
+
+    get offset() {
+        return this._offset;
+    }
+
+    get limit() {
+        return this._limit;
+    }
+
+    onChanged(callback) {
+        this._onChanged = callback;
+    }
+
+    toString() {
+        return API.createParameters({offset: this.offset, limit: this.limit});
+    }
+}
+
 class API {
     static Credentials = Credentials;
 
@@ -154,7 +221,7 @@ class API {
                     err.json().then(data => {
                         reject({
                             status: err.status,
-                            message: data.message
+                            message: data.message ?? Lang.CurrentLang.UNKNOWN_ERROR
                         });
                     }).catch(err => reject(err));
                 } else {
@@ -252,7 +319,7 @@ class API {
      * @returns a string corresponding to the pagination's parameters part of the url
      */
     static createPagination(offset = 0, limit = 10) {
-        return this.createParameters({ offset: offset, limit: limit });
+        return new Pagination(offset, limit);
     }
 }
 

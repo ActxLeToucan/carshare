@@ -1,9 +1,9 @@
 <template>
     <div class="show-up flex flex-col w-fit h-fit max-w-full min-w-0 rounded-lg shadow-lg bg-teal-500 overflow-hidden m-2">
         <div class="flex grow-0 h-fit justify-center items-center px-8 py-1">
-            <h2 class="text-2xl text-teal-50 font-bold"> {{ title }} </h2>
+            <h2 class="text-2xl text-slate-50 dark:text-slate-700 font-bold"> {{ title }} </h2>
         </div>
-        <div class="flex flex-col justify-center items-center px-4 py-2 bg-slate-50 rounded-md m-1">
+        <div class="flex flex-col justify-center items-center px-4 py-2 bg-slate-50 dark:bg-slate-800 rounded-md m-1">
             <div ref="inputs" class="flex flex-col">
                 <slot></slot>
             </div>
@@ -12,7 +12,7 @@
                 class="flex flex-col max-w-full min-w-0 w-full items-center h-fit overflow-hidden transition-all"
                 style="max-height: 0px;"
             ></div>
-            <span class="flex grow h-1 w-full bg-slate-200 rounded-lg mb-4 mt-2"></span>
+            <span class="flex grow h-1 w-full bg-slate-200 dark:bg-slate-600 rounded-lg mb-4 mt-2"></span>
             <div style="animation-delay: 0.2s" class="show-down flex grow-0 h-fit w-full justify-between">
                 <button-text ref="cancel" :action="cancel"> {{ lang.CANCEL }} </button-text>
                 <button-block :disabled="this.disabled != false" ref="validate" :action="validate"> {{ lang.VALIDATE }} </button-block>

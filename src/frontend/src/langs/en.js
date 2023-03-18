@@ -22,6 +22,7 @@ export default {
     // 404 page
     WOOPS: "Oops",
     NOT_FOUND: "The page you are looking for does not exist 🤔",
+    UNKNOWN_ERROR: "A unknown error occured",
 
     // validation page
     VALIDATION_TITLE: "Account validation",
@@ -106,6 +107,12 @@ export default {
     DATE: "Date",
     HOUR: "Hour",
     CREATE_TRIP: "Create a trip",
+    TRAVEL_CARD_LABEL: "Travel of the {DATE}",
+    SLOTS: "Slots",
+    SLOT: "Slot",
+    STARTING_POINT_SPECIFY: "Please specify the starting point",
+    ENDING_POINT_SPECIFY: "Please specify the ending point",
+    DATE_SPECIFY: "Please specify the trip date",
 
     // profile
     MY_PROFILE: "My profile",

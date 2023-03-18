@@ -17,10 +17,8 @@
             </div>
             <div ref="content-zone" class="flex flex-col md:grow min-h-0 max-h-full">
 
-                <button ref="backtabs-btn"
-                    class="absolute md:hidden flex rounded-md border-2 border-slate-200 bg-white h-fit w-fit p-2 m-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                        stroke="currentColor" class="w-8 h-8">
+                <button ref="backtabs-btn" class="absolute md:hidden text-slate-700 dark:text-slate-200 flex rounded-md border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-600 h-fit w-fit p-1 m-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                     </svg>
                 </button>

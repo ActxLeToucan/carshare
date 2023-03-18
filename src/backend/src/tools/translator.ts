@@ -476,8 +476,14 @@ const error = {
                 en: 'Group not found.'
             },
             code: 404
+        }),
+        typeId: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'L\'identifiant du groupe doit être un nombre.',
+                en: 'Group id must be a number.'
+            },
+            code: 400
         })
-
     },
     number: {
         required: (req: Request, fieldName: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
@@ -494,10 +500,10 @@ const error = {
             },
             code: 400
         }),
-        positive: (req: Request, fieldName: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        min: (req: Request, fieldName: string, min: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Le champ "${fieldName}" doit être un nombre positif.`,
-                en: `Field "${fieldName}" must be a positive number.`
+                fr: `Le champ "${fieldName}" doit être supérieur ou égal à ${min}.`,
+                en: `Field "${fieldName}" must be greater than or equal to ${min}.`
             },
             code: 400
         })
@@ -522,7 +528,7 @@ const error = {
         required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Les étapes sont requises.',
-                en: 'Etapes are required.'
+                en: 'Steps are required.'
             },
             code: 400
         }),
@@ -536,7 +542,7 @@ const error = {
         type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Les étapes doivent être un tableau.',
-                en: 'Etapes must be an array.'
+                en: 'Steps must be an array.'
             },
             code: 400
         }),
