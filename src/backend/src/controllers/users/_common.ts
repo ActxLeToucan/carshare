@@ -1,4 +1,4 @@
-import * as properties from '../../properties';
+import * as validator from '../../tools/validator';
 import { prisma } from '../../app';
 import { error, info, sendMsg } from '../../tools/translator';
 import type express from 'express';
@@ -14,19 +14,25 @@ import type express from 'express';
 async function update (req: express.Request, res: express.Response, userId: number, asAdmin: boolean) {
     const { email, lastName, firstName, phone, hasCar, gender, mailNotif, level } = req.body;
 
-    if (email !== undefined && !properties.checkEmailField(email, req, res)) return;
-    if (lastName !== undefined && !properties.checkLastNameField(lastName, req, res)) return;
-    if (firstName !== undefined && !properties.checkFirstNameField(firstName, req, res)) return;
-    if (hasCar !== undefined && !properties.checkBooleanField(hasCar, req, res, 'hasCar')) return;
-    if (mailNotif !== undefined && !properties.checkBooleanField(mailNotif, req, res, 'mailNotif')) return;
-    if (asAdmin && level !== undefined && !properties.checkLevelField(level, req, res)) return;
+    if (email !== undefined && !validator.checkEmailField(email, req, res)) return;
+    if (lastName !== undefined && !validator.checkLastNameField(lastName, req, res)) return;
+    if (firstName !== undefined && !validator.checkFirstNameField(firstName, req, res)) return;
+    if (hasCar !== undefined && !validator.checkBooleanField(hasCar, req, res, 'hasCar')) return;
+    if (mailNotif !== undefined && !validator.checkBooleanField(mailNotif, req, res, 'mailNotif')) return;
+    if (asAdmin && level !== undefined && !validator.checkLevelField(level, req, res)) return;
     let _phoneSanitized;
     if (phone !== undefined) {
-        _phoneSanitized = properties.sanitizePhone(phone, req, res);
+        _phoneSanitized = validator.sanitizePhone(phone, req, res);
         if (_phoneSanitized === null) return;
     }
     const phoneSanitized = _phoneSanitized;
-    const genderSanitized = properties.sanitizeGender(gender);
+    const genderSanitized = validator.sanitizeGender(gender);
+
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (user === null) {
+        sendMsg(req, res, error.user.notFound);
+        return;
+    }
 
     const data = {
         email,
@@ -36,7 +42,7 @@ async function update (req: express.Request, res: express.Response, userId: numb
         hasCar,
         mailNotif,
         gender: genderSanitized,
-        emailVerifiedOn: email !== undefined ? null : undefined,
+        emailVerifiedOn: email !== undefined && email !== user.email ? null : undefined,
         level: asAdmin ? level : undefined
     };
 

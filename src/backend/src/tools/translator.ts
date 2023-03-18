@@ -1,7 +1,7 @@
 import { type Request, type Response } from 'express';
-import { type Group, type User } from '@prisma/client';
+import { type User, type Travel, type Group, type Etape } from '@prisma/client';
 
-import { p } from '../properties';
+import properties from '../properties';
 import { sendMail as mailerSend } from './mailer';
 
 export type Variants = {
@@ -18,17 +18,20 @@ interface TemplateMail {
     text: Variants
     html: Variants
 }
+
 export interface Mail {
     to: string
     subject: string
     text: string
     html: string
 }
+
 interface TemplateMessageHTTP {
     msg: Variants
     code: number
     data?: any
 }
+
 export interface MessageHTTP {
     msg: string
     code: number
@@ -84,22 +87,6 @@ const error = {
             code: 400
         })
     },
-    users: {
-        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Les utilisateurs doivent être un tableau de chaînes de caractères.',
-                en: 'Users must be an array of strings.'
-            },
-            code: 400
-        }),
-        maxPerRequest: (req: Request, length: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: `Vous ne pouvez pas ajouter plus de ${length} utilisateur${length > 1 ? 's' : ''} à la fois.`,
-                en: `You can't add more than ${length} user${length > 1 ? 's' : ''} at once.`
-            },
-            code: 400
-        })
-    },
     password: {
         required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
@@ -147,6 +134,22 @@ const error = {
             msg: {
                 fr: `Le mot de passe doit contenir au moins ${length} caractère${length > 1 ? 's' : ''} spécia${length > 1 ? 'ux' : 'l'}.`,
                 en: `Password must contain at least ${length} special character${length > 1 ? 's' : ''}.`
+            },
+            code: 400
+        })
+    },
+    oldPassword: {
+        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'L\'ancien mot de passe est requis.',
+                en: 'Old password is required.'
+            },
+            code: 400
+        }),
+        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'L\'ancien mot de passe doit être une chaîne de caractères.',
+                en: 'Old password must be a string.'
             },
             code: 400
         })
@@ -251,8 +254,8 @@ const error = {
         }),
         tooHigh: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'a mountain too [H]igh | Le niveau est plus élevé que votre propre niveau.',
-                en: 'Level is higher than your own level.'
+                fr: 'a mountain too [H]igh | Le niveau est trop élevé par rapport à votre niveau.',
+                en: 'Level is too high compared to your level.'
             },
             code: 403
         })
@@ -306,8 +309,38 @@ const error = {
         }),
         tooLate: (req: Request, date: Date) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `La date doit être antérieure à ${date.toLocaleDateString('fr-FR')}.`,
-                en: `Date must be before ${date.toLocaleDateString('en-US')}.`
+                fr: `La date doit être antérieure à ${date.toLocaleString('fr-FR')}.`,
+                en: `Date must be before ${date.toLocaleString('en-US')}.`
+            },
+            code: 400
+        }),
+        tooSoon: (req: Request, date: Date) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `La date doit être supérieur à ${date.toLocaleString('fr-FR')}.`,
+                en: `Date must be greater than ${date.toLocaleString('en-US')}.`
+            },
+            code: 400
+        }),
+        identical: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Les dates mises sont les mêmes.',
+                en: 'The dates are the same.'
+            },
+            code: 400
+        })
+    },
+    ville: {
+        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Le nom de la ville est requis.',
+                en: 'City name is required.'
+            },
+            code: 400
+        }),
+        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Le nom de la ville doit être une chaîne de caractères.',
+                en: 'City name must be a string.'
             },
             code: 400
         })
@@ -418,21 +451,173 @@ const error = {
                 en: `An email has already been sent to this address less than ${translate(req, cooldown)} ago. Please wait before trying again.`
             },
             code: 429
+        }),
+        disabled: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'L\'envoi d\'email est désactivé sur ce serveur.',
+                en: 'Email sending is disabled on this server.'
+            },
+            code: 500
         })
     },
     documentation: {
+        favicon: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'La variable d\'environnement "FRONTEND_LOGO" n\'est pas définie.',
+                en: 'Environment variable "FRONTEND_LOGO" is not defined.'
+            },
+            code: 500
+        })
+    },
+    group: {
         notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: '<head><title>Documentation introuvable</title></head>' +
-                    '<h1>Documentation introuvable</h1>' +
-                    '<p>Si vous êtes le propriétaire du serveur, exécutez "npm run docs" pour la générer.</p>' +
-                    '<p>Vous pouvez également trouver le fichier de documentation (YAML) <a href="/docs/yaml">ici</a>.</p>',
-                en: '<head><title>Documentation not found</title></head>' +
-                    '<h1>Documentation not found</h1>' +
-                    '<p>If you are the owner of the server, run "npm run docs" to generate it.</p>' +
-                    '<p>You can also find the documentation file (YAML) <a href="/docs/yaml">here</a>.</p>'
+                fr: 'Groupe introuvable.',
+                en: 'Group not found.'
             },
             code: 404
+        }),
+        typeId: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'L\'identifiant du groupe doit être un nombre.',
+                en: 'Group id must be a number.'
+            },
+            code: 400
+        })
+    },
+    number: {
+        required: (req: Request, fieldName: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Le champ "${fieldName}" est requis.`,
+                en: `Field "${fieldName}" is required.`
+            },
+            code: 400
+        }),
+        type: (req: Request, fieldName: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Le champ "${fieldName}" doit être un nombre.`,
+                en: `Field "${fieldName}" must be a number.`
+            },
+            code: 400
+        }),
+        min: (req: Request, fieldName: string, min: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Le champ "${fieldName}" doit être supérieur ou égal à ${min}.`,
+                en: `Field "${fieldName}" must be greater than or equal to ${min}.`
+            },
+            code: 400
+        })
+    },
+    string: {
+        required: (req: Request, fieldName: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Le champ "${fieldName}" est requis.`,
+                en: `Field "${fieldName}" is required.`
+            },
+            code: 400
+        }),
+        type: (req: Request, fieldName: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Le champ "${fieldName}" doit être une chaîne de caractères.`,
+                en: `Field "${fieldName}" must be a string.`
+            },
+            code: 400
+        })
+    },
+    etapes: {
+        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Les étapes sont requises.',
+                en: 'Steps are required.'
+            },
+            code: 400
+        }),
+        etapeMin: (req: Request, length: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Un trajet doit comporter au minimum ${length} étape${length > 1 ? 's' : ''}.`,
+                en: `A trip must have at least ${length} step${length > 1 ? 's' : ''}.`
+            },
+            code: 400
+        }),
+        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Les étapes doivent être un tableau.',
+                en: 'Steps must be an array.'
+            },
+            code: 400
+        }),
+        badOrder: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Les dates données ne sont pas dans le bon ordre.',
+                en: 'The dates given are not in the right order.'
+            },
+            code: 400
+        }),
+        alreadyTravel: (req: Request, dateDeb: Date, dateFin: Date) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Le conducteur a déjà un trajet de prévu du ${dateDeb.toLocaleString('fr-FR')} au ${dateFin.toLocaleString('fr-FR')}.`,
+                en: `The driver already has a trip planned from ${dateDeb.toLocaleString('en-US')} to ${dateFin.toLocaleString('en-US')}.`
+            },
+            code: 400
+        })
+    },
+    maxPassengers: {
+        minPassenger: (req: Request, nb: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Le nombre de passagers doit être au minimum de ${nb} personne${nb > 1 ? 's' : ''}.`,
+                en: `The number of passengers must be at least ${nb} person${nb > 1 ? 's' : ''}.`
+            },
+            code: 400
+        })
+    },
+    latitude: {
+        minMax: (req: Request, min: number, max: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `La latitude doit être entre ${min} et ${max}.`,
+                en: `The latitude must be between ${min} and ${max}.`
+            },
+            code: 400
+        })
+    },
+    longitude: {
+        minMax: (req: Request, min: number, max: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `La longitude doit être entre ${min} et ${max}.`,
+                en: `The longitude must be between ${min} and ${max}.`
+            },
+            code: 400
+        })
+    },
+    notification: {
+        notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Notification introuvable.',
+                en: 'Notification not found.'
+            },
+            code: 404
+        }),
+        invalidId: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'L\'identifiant de la notification est invalide.',
+                en: 'Notification id is invalid.'
+            },
+            code: 400
+        })
+    },
+    city: {
+        required: (req: Request, field: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Le champ "${field}" est requis.`,
+                en: `Field "${field}" is required.`
+            },
+            code: 400
+        }),
+        type: (req: Request, field: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Le champ "${field}" doit être une chaîne de caractères.`,
+                en: `Field "${field}" must be a string.`
+            },
+            code: 400
         })
     }
 } satisfies TranslationsMessageHTTP;
@@ -518,8 +703,20 @@ const info = {
             code: 200
         })
     },
+    travel: {
+        created: (req: Request, travel: Travel & { etapes: Etape[] }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Trajet créé',
+                en: 'Travel created'
+            },
+            code: 201,
+            data: {
+                travel
+            }
+        })
+    },
     group: {
-        created: (req: Request, group: Group & { users: User[] }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        created: (req: Request, group: Group & { users: User[], creator: User }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Groupe créé',
                 en: 'Group created'
@@ -533,12 +730,20 @@ const info = {
     notification: {
         deletedAll: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Toutes les notifications ont été supprimées',
-                en: 'All notifications have been removed'
+                fr: 'Notifications supprimées',
+                en: 'Notifications removed'
+            },
+            code: 200
+        }),
+        deletedOne: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Notification supprimée',
+                en: 'Notification removed'
             },
             code: 200
         })
     }
+
 } satisfies TranslationsMessageHTTP;
 
 const mail = {
@@ -553,40 +758,40 @@ const mail = {
                 fr: `${mailHtmlHeader}
                 <p>Bonjour ${user.firstName ?? ''} ${user.lastName ?? ''},</p>
                 <p>Vous avez demandé à réinitialiser votre mot de passe. Pour ce faire, veuillez cliquer sur le lien ci-dessous :</p>
-                <p><a href="${String(p.url.passwordReset)}${token}">${String(p.url.passwordReset)}${token}</a></p>
-                <p>Ce lien est valable ${translate(req, p.token.passwordReset.expirationTxt)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.</p>
+                <p><a href="${String(properties.url.passwordReset)}${token}">${String(properties.url.passwordReset)}${token}</a></p>
+                <p>Ce lien est valable ${translate(req, properties.token.passwordReset.expirationTxt)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.</p>
                 <p>Cordialement,</p>
                 <p>L'équipe de ${process.env.FRONTEND_NAME ?? ''}</p>`,
                 en: `${mailHtmlHeader}
                 <p>Hello ${user.firstName ?? ''} ${user.lastName ?? ''},</p>
                 <p>You requested to reset your password. To do so, please click on the link below :</p>
-                <p><a href="${String(p.url.passwordReset)}${token}">${String(p.url.passwordReset)}${token}</a></p>
-                <p>This link is valid for ${translate(req, p.token.passwordReset.expirationTxt)}. If you did not request this, please ignore this email.</p>
+                <p><a href="${String(properties.url.passwordReset)}${token}">${String(properties.url.passwordReset)}${token}</a></p>
+                <p>This link is valid for ${translate(req, properties.token.passwordReset.expirationTxt)}. If you did not request this, please ignore this email.</p>
                 <p>Best regards,</p>
                 <p>The ${process.env.FRONTEND_NAME ?? ''} team</p>`
             },
             text: {
                 fr: `Bonjour ${user.firstName ?? ''} ${user.lastName ?? ''},
                 Vous avez demandé à réinitialiser votre mot de passe. Pour ce faire, veuillez cliquer sur le lien ci-dessous :
-                ${String(p.url.passwordReset)}${token}
-                
-                Ce lien est valable ${translate(req, p.token.passwordReset.expirationTxt)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.
-                
+                ${String(properties.url.passwordReset)}${token}
+
+                Ce lien est valable ${translate(req, properties.token.passwordReset.expirationTxt)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.
+
                 Cordialement,
                 L'équipe de ${process.env.FRONTEND_NAME ?? ''}`,
                 en: `Hello ${user.firstName ?? ''} ${user.lastName ?? ''},
                 You requested to reset your password. To do so, please click on the link below :
-                ${String(p.url.passwordReset)}${token}
-                
-                This link is valid for ${translate(req, p.token.passwordReset.expirationTxt)}. If you did not request this, please ignore this email.
-                
+                ${String(properties.url.passwordReset)}${token}
+
+                This link is valid for ${translate(req, properties.token.passwordReset.expirationTxt)}. If you did not request this, please ignore this email.
+
                 Best regards,
                 The ${process.env.FRONTEND_NAME ?? ''} team`
             }
         })
     },
     email: {
-        verification: (req: Request, user: User, token: string, frontendPath: string) => msgForLang<TemplateMail, Mail>(req, {
+        verification: (req: Request, user: User, token: string) => msgForLang<TemplateMail, Mail>(req, {
             to: user.email,
             subject: {
                 fr: 'Vérification de votre adresse email',
@@ -596,33 +801,33 @@ const mail = {
                 fr: `${mailHtmlHeader}
                 <p>Bonjour ${user.firstName ?? ''} ${user.lastName ?? ''},</p>
                 <p>Pour vérifier votre adresse email, veuillez cliquer sur le lien ci-dessous :</p>
-                <p><a href="${String(p.url.emailVerification)}${token}">${String(p.url.emailVerification)}${token}</a></p>
-                <p>Ce lien est valable ${translate(req, p.token.verify.expirationTxt)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.</p>
+                <p><a href="${String(properties.url.emailVerification)}${token}">${String(properties.url.emailVerification)}${token}</a></p>
+                <p>Ce lien est valable ${translate(req, properties.token.verify.expirationTxt)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.</p>
                 <p>Cordialement,</p>
                 <p>L'équipe de ${process.env.FRONTEND_NAME ?? ''}</p>`,
                 en: `${mailHtmlHeader}
                 <p>Hello ${user.firstName ?? ''} ${user.lastName ?? ''},</p>
                 <p>To verify your email address, please click on the link below :</p>
-                <p><a href="${String(p.url.emailVerification)}${token}">${String(p.url.emailVerification)}${token}</a></p>
-                <p>This link is valid for ${translate(req, p.token.verify.expirationTxt)}. If you did not request this, please ignore this email.</p>
+                <p><a href="${String(properties.url.emailVerification)}${token}">${String(properties.url.emailVerification)}${token}</a></p>
+                <p>This link is valid for ${translate(req, properties.token.verify.expirationTxt)}. If you did not request this, please ignore this email.</p>
                 <p>Best regards,</p>
                 <p>The ${process.env.FRONTEND_NAME ?? ''} team</p>`
             },
             text: {
                 fr: `Bonjour ${user.firstName ?? ''} ${user.lastName ?? ''},
                 Pour vérifier votre adresse email, veuillez cliquer sur le lien ci-dessous :
-                ${String(p.url.emailVerification)}${token}
-                
-                Ce lien est valable ${translate(req, p.token.verify.expirationTxt)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.
-                
+                ${String(properties.url.emailVerification)}${token}
+
+                Ce lien est valable ${translate(req, properties.token.verify.expirationTxt)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.
+
                 Cordialement,
                 L'équipe de ${process.env.FRONTEND_NAME ?? ''}`,
                 en: `Hello ${user.firstName ?? ''} ${user.lastName ?? ''},
                 To verify your email address, please click on the link below :
-                ${String(p.url.emailVerification)}${token}
-                
-                This link is valid for ${translate(req, p.token.verify.expirationTxt)}. If you did not request this, please ignore this email.
-                
+                ${String(properties.url.emailVerification)}${token}
+
+                This link is valid for ${translate(req, properties.token.verify.expirationTxt)}. If you did not request this, please ignore this email.
+
                 Best regards,
                 The ${process.env.FRONTEND_NAME ?? ''} team`
             }
@@ -681,18 +886,6 @@ function sendMsg (req: Request, res: Response, message: (req: Request, ...args: 
 }
 
 /**
- * Sends a raw text with the given message
- * @param req Express request
- * @param res Express response
- * @param page Message to send
- * @param args Arguments to pass to the message function (if any)
- */
-function sendRaw (req: Request, res: Response, page: (req: Request, ...args: any) => MessageHTTP, ...args: any) {
-    const p = page(req, ...args);
-    res.status(p.code).send(p.msg);
-}
-
-/**
  * Sends an email
  * @param req Express request
  * @param message Message to send
@@ -730,10 +923,11 @@ function displayableUserPublic (user: User) {
     return u;
 }
 
-function displayableGroup (group: Group & { users: User[] }) {
+function displayableGroup (group: Group & { users: User[], creator: User }) {
     const g = group as any;
     g.users = g.users.map(displayableUserPublic);
+    g.creator = displayableUserPublic(g.creator);
     return g;
 }
 
-export { error, info, mail, sendMsg, sendMail, sendRaw, displayableUserPrivate, displayableGroup };
+export { error, info, mail, sendMsg, sendMail, displayableUserPrivate, displayableGroup };
