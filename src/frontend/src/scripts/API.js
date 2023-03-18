@@ -155,6 +155,7 @@ class API {
         RESETPWD: "/users/password-reset",
         USERS: "/users",
         GROUPS: "/groups/my",
+        SETTINGS : "/settings/notifications",
         NOTIFS: "/notifications",
         MY_NOTIFS: "/notifications/my",
         ALL_NOITFS: "/notifications/all",
@@ -178,7 +179,6 @@ class API {
         return new Promise((resolve, reject) => {
             if (API.API_URL == null) { API.setURL(config.api.url); }
             if (API.API_URL == null) reject("Error : API host not set");
-
             path = path.replace("/?", "?").replace(/\/\//g, "/");
             let urlparts = path.split("?");
             let base = urlparts.splice(0, 1);
@@ -228,7 +228,7 @@ class API {
                     reject(err);
                 }
             };
-            
+
             fetch(API.API_URL + path, {
                 credentials: "omit",
                 method: method,

@@ -2,7 +2,8 @@
     <div class="flex grow flex-col min-h-0 max-h-screen">
         <topbar></topbar>
         <div class="flex md:flex-row flex-col grow max-h-min min-h-0">
-            <div ref="tabs-zone" class="show-right flex flex-col items-center h-full md:w-min w-full min-h-0 px-8 py-4 space-y-4 md:border-r-8 border-teal-500 mx-auto overflow-hidden">
+            <div ref="tabs-zone"
+                class="show-right flex flex-col items-center h-full md:w-min w-full min-h-0 px-8 py-4 space-y-4 md:border-r-8 border-teal-500 mx-auto overflow-hidden">
                 <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> {{ lang.PROFILE }} </p>
                 <button-tab href="#infos" :default="!isMobile"> {{ lang.MY_INFOS }} </button-tab>
                 <button-tab href="#notifs"> {{ lang.MY_NOTIFS }} </button-tab>

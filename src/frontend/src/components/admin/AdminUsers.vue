@@ -39,19 +39,15 @@
                 <p class="text-2xl text-teal-500 py-2 font-bold mx-auto w-fit"> {{ selectedUser.firstName }} {{ selectedUser.lastName }} </p>
                 <card class="flex flex-col m-4 mx-auto">
                     <div class="flex flex-col">
-                        <input-text   name="lastName"  :label="lang.LASTNAME"  :placeholder="lang.LASTNAME" :value="selectedUser.lastName"></input-text>
-                        <input-text   name="firstName" :label="lang.FIRSTNAME" :placeholder="lang.FIRSTNAME" :value="selectedUser.firstName"></input-text>
-                        <input-text   name="email"     :label="lang.EMAIL"     :placeholder="lang.EMAIL" :value="selectedUser.email" class="mb-0"></input-text>
-                        <input-text   name="phone"     :label="lang.PHONE"          :placeholder="lang.PHONE" :value="selectedUser.phone"></input-text>
-                        <input-choice name="gender"    :label="lang.GENDER"         :value="selectedUser.gender" :list="genres"></input-choice>
-                        <input-switch name="hasCar"    :label="lang.I_HAVE_A_CAR"   :value="selectedUser.hasCar"></input-switch>
-                        <input-choice name="level"     :label="lang.LEVEL"          :value="selectedUser.level" :list="levels"></input-choice>
+                        <input-text   name="lastName"  :label="lang.LASTNAME"     :placeholder="lang.LASTNAME"  :value="selectedUser.lastName"></input-text>
+                        <input-text   name="firstName" :label="lang.FIRSTNAME"    :placeholder="lang.FIRSTNAME" :value="selectedUser.firstName"></input-text>
+                        <input-text   name="email"     :label="lang.EMAIL"        :placeholder="lang.EMAIL"     :value="selectedUser.email" class="mb-0"></input-text>
+                        <input-text   name="phone"     :label="lang.PHONE"        :placeholder="lang.PHONE"     :value="selectedUser.phone"></input-text>
+                        <input-choice name="gender"    :label="lang.GENDER"       :value="selectedUser.gender"  :list="genres"></input-choice>
+                        <input-switch name="hasCar"    :label="lang.I_HAVE_A_CAR" :value="selectedUser.hasCar"  ></input-switch>
+                        <input-choice name="level"     :label="lang.LEVEL"        :value="selectedUser.level"   :list="levels"></input-choice>
                     </div>
-                    <div
-                        ref="user-log-zone"
-                        class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
-                        style="max-height: 0;"
-                    ></div>
+                    <div ref="user-log-zone" class="flex flex-col w-full items-center h-fit overflow-hidden transition-all" style="max-height: 0;"></div>
                     <div class="flex md:flex-row flex-col md:space-x-4 md:space-y-0 space-y-2 mt-4">
                         <button-block :action="showDeletePopup" color="red"> {{ lang.DELETE_ACCOUNT }} </button-block>
                         <div class="flex grow justify-end pl-20">
@@ -63,13 +59,9 @@
 
         </div>
         <popup
-            color="red"
-            :title="lang.DELETE + ' ' + selectedUser?.firstName + ' ' + selectedUser?.lastName"
-            :content="lang.ACCOUNT_DELETE_VERIFY"
-            :cancelLabel="lang.CANCEL"
-            :validateLabel="lang.DELETE"
-            :onload="setDeletePopup"
-            :onvalidate="deleteAccount"
+            color="red" :title="lang.DELETE + ' ' + selectedUser?.firstName + ' ' + selectedUser?.lastName"
+            :content="lang.ACCOUNT_DELETE_VERIFY" :cancelLabel="lang.CANCEL" :validateLabel="lang.DELETE"
+            :onload="setDeletePopup" :onvalidate="deleteAccount"
         >
             <input-text :label="lang.ACCOUNT_EMAIL" :placeholder="lang.EMAIL" name="email" type="email"></input-text>
         </popup>
@@ -89,8 +81,8 @@ import ButtonBlock from '../inputs/ButtonBlock.vue';
 import AdminUserCard from './AdminUserCard.vue';
 import Popup from '../cards/Popup.vue';
 import Card from '../cards/Card.vue';
-import {Log, LogZone} from '../../scripts/Logs.js';
-import {genres, isPhoneNumber, levels} from '../../scripts/data';
+import { Log, LogZone } from '../../scripts/Logs.js';
+import { genres, isPhoneNumber, levels } from '../../scripts/data';
 
 import {
     MagnifyingGlassIcon,
@@ -224,16 +216,16 @@ export default {
             const log = this.userLog(Lang.CurrentLang.INPUT_VERIFICATION + " ...", Log.INFO);
 
             const field_checks = [
-                {field: "firstName",        check: (value) => value.length > 0, error: Lang.CurrentLang.FIRSTNAME_SPECIFY},
-                {field: "lastName",         check: (value) => value.length > 0, error: Lang.CurrentLang.LASTNAME_SPECIFY},
-                {field: "email",            check: (value) => value.length > 0, error: Lang.CurrentLang.EMAIL_SPECIFY},
-                {field: "phone",            check: (value) => value.length > 0, error: Lang.CurrentLang.PHONE_SPECIFY},
+                { field: "firstName", check: (value) => value.length > 0, error: Lang.CurrentLang.FIRSTNAME_SPECIFY },
+                { field: "lastName", check: (value) => value.length > 0, error: Lang.CurrentLang.LASTNAME_SPECIFY },
+                { field: "email", check: (value) => value.length > 0, error: Lang.CurrentLang.EMAIL_SPECIFY },
+                { field: "phone", check: (value) => value.length > 0, error: Lang.CurrentLang.PHONE_SPECIFY },
 
-                {field: "firstName",        check: (value) => value.length <= 50,                  error: Lang.CurrentLang.FIRSTNAME_TOOLONG},
-                {field: "lastName",         check: (value) => value.length <= 50,                  error: Lang.CurrentLang.LASTNAME_TOOLONG},
-                {field: "email",            check: (value) => value.length <= 64,                  error: Lang.CurrentLang.EMAIL_TOOLONG},
-                {field: "email",            check: (value) => value.match(re.REGEX_EMAIL) != null, error: Lang.CurrentLang.EMAIL_INVALID},
-                {field: "phone",            check: (value) => isPhoneNumber(value),                error: Lang.CurrentLang.PHONE_INVALID},
+                { field: "firstName", check: (value) => value.length <= 50, error: Lang.CurrentLang.FIRSTNAME_TOOLONG },
+                { field: "lastName", check: (value) => value.length <= 50, error: Lang.CurrentLang.LASTNAME_TOOLONG },
+                { field: "email", check: (value) => value.length <= 64, error: Lang.CurrentLang.EMAIL_TOOLONG },
+                { field: "email", check: (value) => value.match(re.REGEX_EMAIL) != null, error: Lang.CurrentLang.EMAIL_INVALID },
+                { field: "phone", check: (value) => isPhoneNumber(value), error: Lang.CurrentLang.PHONE_INVALID },
             ];
 
             for (let i = 0; i < field_checks.length; i++) {

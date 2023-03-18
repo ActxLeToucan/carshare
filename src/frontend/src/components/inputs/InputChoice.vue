@@ -68,7 +68,7 @@ export default {
             required: false
         },
         value: {
-            type: Number,
+            type: [Number, String],
             default: 0,
             required: false
         },
