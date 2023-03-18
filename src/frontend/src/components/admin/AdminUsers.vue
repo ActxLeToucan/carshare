@@ -110,7 +110,6 @@ function search(obj) {
     const value = obj.$refs['query-zone'].querySelector('input').value;
 
     API.execute_logged(API.ROUTE.USERS + obj.pagination, API.METHOD.GET, User.CurrentUser?.getCredentials(), { search: value }).then(data => {
-        console.log(data)
         obj.usersList = data.data;
         obj.pagination.max = data.next ?? obj.pagination.offset;
         log.delete();
@@ -287,7 +286,7 @@ export default {
             genres,
             levels,
             lang: Lang.CurrentLang,
-            pagination: API.createPagination(0, 2),
+            pagination: API.createPagination(0, 5),
             formUser: {
                 buttonEnabled: true,
             },
