@@ -1,14 +1,14 @@
 import type express from 'express';
 import { prisma } from '../app';
+import * as validator from '../tools/validator';
 import { error, sendMsg } from '../tools/translator';
-import * as properties from '../properties';
 
 exports.getUserEvaluation = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     if (res.locals.user === undefined) {
         sendMsg(req, res, error.auth.noToken);
         return;
     }
-    const userId = properties.sanitizeUserId(req.params.id, req, res);
+    const userId = validator.sanitizeUserId(req.params.id, req, res);
     if (userId === null) return;
 
     prisma.evaluation.aggregate({
