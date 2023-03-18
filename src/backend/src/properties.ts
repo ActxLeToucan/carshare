@@ -53,7 +53,8 @@ const properties = {
     },
     url: {
         passwordReset: `${String(process.env.FRONTEND_URL)}/reinit?token=`,
-        emailVerification: `${String(process.env.FRONTEND_URL)}/validate?token=`
+        emailVerification: `${String(process.env.FRONTEND_URL)}/validate?token=`,
+        notifs: `${String(process.env.FRONTEND_URL)}/profile#notifs`
     },
     mailer: {
         passwordReset: {
