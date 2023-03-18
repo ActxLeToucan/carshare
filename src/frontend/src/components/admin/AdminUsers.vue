@@ -22,9 +22,9 @@
                 </admin-user-card>
             </div>
             <div class="flex w-full justify-evenly items-center mt-4">
-                <button-block :action="() => pagination.previous()"> <chevron-left-icon class="w-8 h-8"></chevron-left-icon> </button-block>
-                <p class="text-xl font-bold text-slate-500"> {{ pagination.index }} </p>
-                <button-block :action="() => pagination.next()"> <chevron-right-icon class="w-8 h-8"></chevron-right-icon> </button-block>
+                <button-block :action="() => pagination.previous()" :disabled="!pagination.hasPrevious"> <chevron-left-icon class="w-8 h-8"></chevron-left-icon> </button-block>
+                <p class="text-xl font-bold text-slate-500"> {{ pagination.index }} / {{ pagination.maxIndex }} </p>
+                <button-block :action="() => pagination.next()" :disabled="!pagination.hasNext"> <chevron-right-icon class="w-8 h-8"></chevron-right-icon> </button-block>
             </div>
         </div>
         <div ref="result-zone" class="flex flex-col grow px-4 p-4 overflow-auto">
@@ -101,9 +101,9 @@ function search(obj) {
 
     const value = obj.$refs['query-zone'].querySelector('input').value;
 
-    API.execute_logged(API.ROUTE.USERS + obj.pagination, API.METHOD.GET, User.CurrentUser?.getCredentials(), { search: value }).then(data => {
+    API.execute_logged(API.ROUTE.USERS + obj.pagination + "&query="+value, API.METHOD.GET, User.CurrentUser?.getCredentials()).then(data => {
         obj.usersList = data.data;
-        obj.pagination.max = data.next ?? obj.pagination.offset;
+        obj.pagination.total = data.total;
         log.delete();
     }).catch((err) => {
         log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
