@@ -143,7 +143,7 @@ paths:
     get:
       summary: Get user
       description: Get the current user
-      operationId: getCurrentUser
+      operationId: getMe
       tags:
         - Users
       parameters:
@@ -166,7 +166,7 @@ paths:
     delete:
       summary: Delete user
       description: Delete the current user
-      operationId: deleteCurrentUser
+      operationId: deleteMe
       tags:
         - Users
       parameters:
@@ -212,7 +212,7 @@ paths:
     patch:
       summary: Update user
       description: Update the current user
-      operationId: updateCurrentUser
+      operationId: updateMe
       tags:
         - Users
       parameters:
@@ -294,7 +294,7 @@ paths:
     patch:
       summary: Update password
       description: Update the current user's password
-      operationId: updateCurrentUserPassword
+      operationId: updateMyPassword
       tags:
         - Users
       parameters:
@@ -388,7 +388,7 @@ paths:
     patch:
       summary: Password reset
       description: Change the password
-      operationId: passwordReset
+      operationId: resetPassword
       tags:
         - Users
       parameters:
@@ -494,7 +494,7 @@ paths:
     get:
       summary: Search users
       description: Search in all users. Only available to admins.
-      operationId: searchAllUsers
+      operationId: searchUsers
       tags:
         - Users
       parameters:
@@ -512,7 +512,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  users:
+                  data:
                     type: array
                     items:
                       $ref: '#/components/schemas/PrivateUser'
@@ -683,10 +683,12 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
-  /travel/create:
+
+  /travels/create:
     post:
-      summary: create a new travel
-      description: create a new travel with etape
+      summary: Create a travel
+      description: Create a travel with steps.
+      operationId: createTravel
       tags:
         - Travels
       parameters:
@@ -699,12 +701,6 @@ paths:
             schema:
               type: object
               properties:
-                departureDate:
-                  type: string
-                  example: 2023-03-16T09:15:36.000Z
-                arrivalDate:
-                  type: string
-                  example: 2023-03-17T09:15:36.000Z
                 maxPassengers:
                   type: integer
                   example: 10
@@ -716,35 +712,67 @@ paths:
                   example: Voyage non fumeur
                 groupId:
                   type: integer
-                  example: null
-                listOfEtape:
+                  nullable: true
+                  example: 1
+                steps:
                   type: array
                   items:
-                    $ref: '#/components/schemas/Etape'
+                    $ref: '#/components/schemas/EtapeInput'
                   example:
                     - label: 2ter Boulevard Charlemagne 54000 Nancy
                       city: Nancy
                       context: 54, Meurthe-et-Moselle, Grand Est
                       lat: 48.683188
                       lng: 6.1877
+                      date: 2023-04-16T09:15:36.000Z
                     - label: 2ter Boulevard Charlemagne 54000 Laxou
                       city: Laxou
                       context: 54, Meurthe-et-Moselle, Grand Est
                       lat: 49.683188
                       lng: 6.5877
+                      date: 2023-04-16T219:15:36.000Z
                     - label: 1801 chemin Napoléon 55000 Metz
                       city: Metz
                       context: 55, Moselle, Grand Est
                       lat: 78.683188
                       lng: 6.1877
-
+                      date: 2023-04-17T09:15:36.000Z
       responses:
         '201':
-          description: travel create
+          description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TravelCreate'
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Travel created"
+                  travel:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 2
+                      maxPassengers:
+                        type: integer
+                        example: 10
+                      price:
+                        type: integer
+                        example: 78
+                      description:
+                        type: string
+                        example: Voyage non fumeur
+                      groupId:
+                        type: integer
+                        example: null
+                      createdAt:
+                        type: string
+                        example: 2023-03-05T13:30:41.483Z
+                      etapes:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Etape'
         '401':
           $ref: '#/components/responses/noToken'
         '400':
@@ -763,11 +791,11 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
-
   /travels/my:
     get:
       summary: My travels
       description: Get all the trips of the current user (as a driver or a passenger).
+      operationId: getMyTravels
       tags:
         - Travels
       parameters:
@@ -784,10 +812,31 @@ paths:
               schema:
                 type: object
                 properties:
-                  travelsAsDriver:
-                    $ref: '#/components/schemas/ArrayOfTravels'
-                  travelsAsPassenger:
-                    $ref: '#/components/schemas/ArrayOfTravels'
+                  data:
+                    type: object
+                    properties:
+                      travelsAsDriver:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Travel'
+                      travelsAsPassenger:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Travel'
+                  limit:
+                    type: integer
+                    example: 10
+                  offset:
+                    type: integer
+                    example: 0
+                  next:
+                    type: integer
+                    nullable: true
+                    example: 10
+                  prev:
+                    type: integer
+                    nullable: true
+                    example: 0
         '401':
           $ref: '#/components/responses/noToken'
         '498':
@@ -799,10 +848,41 @@ paths:
     get:
       summary: Search travels
       description: Get all the trips fitting with the given criteria
+      operationId: searchTravels
       tags:
         - Travels
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
+        - name: date
+          in: query
+          description: Wanted departure date
+          schema:
+            type: string
+            example: 2023-03-16T09:15:36.000Z
+        - name: startCity
+          in: query
+          description: Start city
+          schema:
+            type: string
+            example: Nancy
+        - name: startContext
+          in: query
+          description: Start context
+          schema:
+            type: string
+            example: 54, Meurthe-et-Moselle, Grand Est
+        - name: endCity
+          in: query
+          description: End city
+          schema:
+              type: string
+              example: Metz
+        - name: endContext
+          in: query
+          description: End context
+          schema:
+            type: string
+            example: 55, Moselle, Grand Est
       security:
         - bearerAuth: [ ]
       responses:
@@ -811,7 +891,9 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ArrayOfTravels'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Travel'
         '400':
           description: Bad request
           content:
@@ -833,6 +915,7 @@ paths:
     get:
       summary: Setting for mail notification
       description: True to have notification sent by mail or false to not be sent mail.
+      operationId: getNotificationSetting
       tags:
         - Settings
       parameters:
@@ -898,7 +981,7 @@ paths:
     get:
       summary: Get the list of notifications
       description: Get all the notifications of the current user.
-      operationId: myNotifications
+      operationId: getMyNotifications
       tags:
         - Notifications
       parameters:
@@ -913,7 +996,26 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ArrayOfNotifications'
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Notification'
+                  limit:
+                    type: integer
+                    example: 10
+                  offset:
+                    type: integer
+                    example: 0
+                  next:
+                    type: integer
+                    nullable: true
+                    example: 10
+                  prev:
+                    type: integer
+                    nullable: true
+                    example: 0
         '401':
           $ref: '#/components/responses/noToken'
         '498':
@@ -924,7 +1026,7 @@ paths:
     delete:
       summary: Delete all the notification
       description: Delete all the notification of the current user
-      operationId: deleteAllNotification
+      operationId: deleteAllNotifications
       tags:
         - Notifications
       parameters:
@@ -950,18 +1052,25 @@ paths:
           $ref: '#/components/responses/internalError'
   /notifications/:id:
     delete:
-      summary: Delete the notification in params
+      summary: Delete one notification
       description: Delete one notification of the current user with the id in params
       operationId: deleteOneNotification
       tags:
         - Notifications
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
+        - name: id
+          in: path
+          description: Id of the notification
+          required: true
+          schema:
+            type: integer
+            example: 99
       security:
         - bearerAuth: [ ]
       responses:
         '200':
-          description: One notification was deleted
+          description: Notification deleted
           content:
             application/json:
               schema:
@@ -1001,7 +1110,7 @@ paths:
     get:
       summary: Search groups
       description: Search in all groups. Only available to admins.
-      operationId: searchAllGroups
+      operationId: searchGroups
       tags:
         - Groups
       parameters:
@@ -1019,7 +1128,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  groups:
+                  data:
                     type: array
                     items:
                       $ref: '#/components/schemas/Group'
@@ -1117,9 +1226,30 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Group'
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Group'
+                  query:
+                    type: string
+                    required: false
+                    example: friends
+                  limit:
+                    type: integer
+                    example: 10
+                  offset:
+                    type: integer
+                    example: 0
+                  next:
+                    type: integer
+                    nullable: true
+                    example: 10
+                  prev:
+                    type: integer
+                    nullable: true
+                    example: 0
         '401':
           $ref: '#/components/responses/noToken'
         '498':
@@ -1324,14 +1454,6 @@ components:
         id:
           type: integer
           example: 1
-        departureDate:
-          type: string
-          format: date-time
-          example: 2020-01-01T00:00:00.000Z
-        arrivalDate:
-          type: string
-          format: date-time
-          example: 2020-01-01T00:00:00.000Z
         maxPassengers:
           type: integer
           example: 4
@@ -1367,6 +1489,8 @@ components:
         creatorId:
           type: integer
           example: 1
+        creator:
+          $ref: '#/components/schemas/PublicUser'
         createdAt:
           type: string
           format: date-time
@@ -1453,80 +1577,6 @@ components:
         createdAt:
           type: string
           format: date-time
-    ArrayOfPrivateUsers:
-      type: array
-      items:
-        $ref: '#/components/schemas/PrivateUser'
-      example:
-        - id: 1
-          email: bob@example.com
-          emailVerifiedOn: 2023-01-26T15:26:31.144Z
-          firstName: Bob
-          lastName: LeBricoleur
-          phone: "0321456789"
-          avatar: null
-          gender: -1
-          hasCar: true
-          mailNotif: true
-          level: 3
-          createdAt: 2023-01-26T15:26:31.144Z
-        - id: 2
-          email: laia@cat.world
-          emailVerifiedOn: 2023-02-18T13:19:23.636Z
-          firstName: Laia
-          lastName: Kitten
-          phone: "+330612345678"
-          avatar: null
-          gender: 1
-          hasCar: false
-          mailNotif: true
-          level: 1
-          createdAt: 2023-02-18T13:19:23.636Z
-    ArrayOfTravels:
-      type: array
-      items:
-        $ref: '#/components/schemas/Travel'
-      example:
-        - id: 1
-          departureDate: 2023-02-27T17:52:29.000Z
-          arrivalDate: 2023-02-27T18:00:09.000Z
-          maxPassengers: 2
-          price: 100
-          description: No pets allowed
-          status: 1
-          driverId: 1
-          groupId: null
-          createdAt: 2023-02-27T17:52:29.000Z
-        - id: 2
-          departureDate: 2023-02-27T17:52:29.000Z
-          arrivalDate: 2023-02-27T18:00:09.000Z
-          maxPassengers: 4
-          price: 100
-          description: No pets allowed
-          status: 1
-          driverId: 1
-          groupId: null
-          createdAt: 2023-02-27T17:52:29.000Z
-    ArrayOfNotifications:
-      type: array
-      items:
-        $ref: '#/components/schemas/Notification'
-      example:
-        - id: 1
-          action: null
-          title: Bienvenue sur car share
-          message: Car share, vous souhaite la bienvenue et un agréable moment sur son site
-          userId: 1
-          travelId: null
-          createdAt: 2023-02-27T17:52:29.000Z
-        - id: 2
-          action: null
-          title: Groupe rejoint
-          message: Vous avez rejoint le groupe des bg du 54
-          userId: 1
-          travelId: null
-          createdAt: 2023-02-27T18:00:09.000Z
-
     Notification:
       type: object
       properties:
@@ -1562,44 +1612,24 @@ components:
           type: integer
         travelId:
           type: integer
-        order:
-          type: integer
-    TravelCreate:
+        date:
+          type: string
+          format: date-time
+          example: 2020-01-01T00:00:00.000Z
+    EtapeInput:
       type: object
       properties:
-        message:
+        label:
           type: string
-          example: "Travel created"
-        travel:
-          type: object
-          properties:
-            id:
-              type: integer
-              example: 2
-            departureDate:
-              type: string
-              example: 2023-03-16T09:15:36.000Z
-            arrivalDate:
-              type: string
-              example: 2023-03-17T09:15:36.000Z
-            maxPassengers:
-              type: integer
-              example: 10
-            price:
-              type: integer
-              example: 78
-            description:
-              type: string
-              example: Voyage non fumeur
-            groupId:
-              type: integer
-              example: null
-            createdAt:
-              type: string
-              example: 2023-03-05T13:30:41.483Z
-        numberOfEtape:
-          type: object
-          properties:
-            count:
-              type: integer
-              example: 3
+        city:
+          type: string
+        context:
+          type: string
+        lat:
+          type: integer
+        lng:
+          type: integer
+        date:
+          type: string
+          format: date-time
+          example: 2020-01-01T00:00:00.000Z

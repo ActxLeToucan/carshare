@@ -24,7 +24,7 @@
                     </div>
                     <div v-if="groups.length > 0 && !loading" class="flex space-x-4 overflow-x-scroll w-full">
                         
-                        <button v-for="group in groups" :key="group.name" v-on:click="showGroup(group)"
+                        <button v-for="group in groups" :key="group.id" v-on:click="showGroup(group)"
                             class="flex flex-col justify-center py-4 my-4 rounded-lg bg-slate-100 px-4 w-fit max-w-[14em] border-2 border-transparent
                                     hover:border-slate-200 cursor-pointer transition-all"
                         >
@@ -185,7 +185,8 @@ export default {
             this.$refs["loading-desc"].innerHTML = Lang.CurrentLang.LOADING_GROUPS_DESC;
             this.groups.splice(0, this.groups.length);
             API.execute_logged(API.ROUTE.GROUPS, API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
-                res.forEach(group => this.groups.push(group));
+                const data = res.data ?? res.groups;
+                data.forEach(group => this.groups.push(group));
                 this.loading = false;
             }).catch(err => {
                 console.error(err);

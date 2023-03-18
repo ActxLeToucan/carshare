@@ -87,7 +87,15 @@ class API {
         VERIFY: "/users/email-verification",
         RESETPWD: "/users/password-reset",
         USERS: "/users",
-        GROUPS: "/groups/my"
+        GROUPS: "/groups/my",
+        NOTIFS: "/notifications",
+        MY_NOTIFS: "/notifications/my",
+        ALL_NOITFS: "/notifications/all",
+        TRAVELS: {
+            CREATE: "/travels/create",
+            MY: "/travels/my",
+            SEARCH: "/travels/search",
+        }
     };
 
     /**
@@ -96,7 +104,7 @@ class API {
      * @param {string} method API call method (see API.METHOD for possible values)
      * @param {object|string} body API call body (data to send, ignored if METHOD.GET is used)
      * @param {string} type API call data type (see API.TYPE for possible values))  
-     * @param {object[]}} headers API call additionnal headers
+     * @param {object[]} headers API call additional headers
      * @returns a promise resolving when the API call is done
      */
     static execute(path, method = this.METHOD.GET, body = {}, type = this.TYPE.JSON, headers = []) {
@@ -146,7 +154,7 @@ class API {
                     err.json().then(data => {
                         reject({
                             status: err.status,
-                            message: data.message
+                            message: data.message ?? Lang.CurrentLang.UNKNOWN_ERROR
                         });
                     }).catch(err => reject(err));
                 } else {
@@ -239,11 +247,11 @@ class API {
 
     /**
      * Creates pagination parameters from a page index and page number of elements
-     * @param {number} page index of the pagination's page
-     * @param {number} per_page number of elements in one page
+     * @param {number} offset number of elements to skip
+     * @param {number} limit number of elements in one page
      * @returns a string corresponding to the pagination's parameters part of the url
      */
-    static createPagination(limit = 10, offset = 0) {
+    static createPagination(offset = 0, limit = 10) {
         return this.createParameters({ offset: offset, limit: limit });
     }
 }

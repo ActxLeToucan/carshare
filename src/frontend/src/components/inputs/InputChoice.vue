@@ -6,8 +6,8 @@
         <div>
             <select
                 ref="select" name="" id=""
-                class="flex w-fit h-fit bg-white rounded-md text-slate-600 font-bold text-lg whitespace-nowrap text-ellipsis
-                       outline-transparent px-4 py-2 border-b-4 border-sslate-500 transition-all focus:outline hover:border-slate-300"
+                class="flex w-fit h-fit bg-white rounded-md text-slate-600 font-bold text-lg whitespace-nowrap text-ellipsis outline-none
+                       outline-transparent px-4 py-2 border-b-4 border-slate-200 transition-all focus:border-teal-500 hover:border-slate-300"
             >
                 <option v-for="el in this.elements" :value="el.value" :key="el.value"> {{ el.label ?? lang[el.id] }} </option>
             </select>

@@ -10,6 +10,6 @@ router.post('/my', auth.access, emailVerified, controller.createGroup);
 router.get('/my', auth.access, emailVerified, controller.getMyGroups);
 
 // admin routes
-router.get('/', auth.access, emailVerified, admin, controller.getAllGroups);
+router.get('/', auth.access, emailVerified, admin, controller.searchGroups);
 
 module.exports = router;
