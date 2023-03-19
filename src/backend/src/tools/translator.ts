@@ -632,6 +632,15 @@ const error = {
             },
             code: 400
         })
+    },
+    travel: {
+        unableToCancel: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Annulement impossible 24h avant le départ d'un trajet qui possède des passagers.`,
+                en: `Impossible to cancel travel 24h before departure if it has at least one passenger.`
+            },
+            code: 400
+        })
     }
 } satisfies TranslationsMessageHTTP;
 
@@ -726,7 +735,14 @@ const info = {
             data: {
                 travel
             }
-        })
+        }),
+        successfulCancel: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `L'annulement du trajet a été effectué.`,
+                en: `Travel canceled successfully !`
+            },
+            code: 200
+        }),
     },
     group: {
         created: (req: Request, group: Group & { users: User[], creator: User }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
@@ -754,10 +770,34 @@ const info = {
                 en: 'Notification removed'
             },
             code: 200
+        }),
+        sent: (req: Request, user: User) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Les notications ont étés envoyés.',
+                en: 'The notications have been sent.'
+            },
+            code: 200,
         })
     }
 
 } satisfies TranslationsMessageHTTP;
+
+const notification = {
+    cancelTravel: {
+        title: (req: Request, user: User, token: string) => msgForLang<any, any>(req, {
+            msg: {
+                fr: "Annulation d'un trajet",
+                eng: "A travel has been canceled"
+            }
+        }),
+        core: (req: Request, user: User, token: string) => msgForLang<any, any>(req, {
+            msg: {
+                fr: `Le trajet à destination de "" à "" départ le "" a été annulé.`,
+                eng: `The travel to "" from "" at "" has been canceled.` 
+            }
+        })
+    }
+} 
 
 const mail = {
     password: {

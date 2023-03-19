@@ -1,7 +1,9 @@
 import type express from 'express';
-import { error, sendMsg } from './translator';
+import { error, info, sendMsg } from './translator';
 import IsEmail from 'isemail';
 import properties from '../properties';
+import { type User } from '@prisma/client';
+import { prisma } from '../app';
 
 /**
  * Check if the email is in a valid format
@@ -574,6 +576,39 @@ function sanitizeNotificationId (id: any, req: express.Request, res: express.Res
     return Number(id);
 }
 
+/**
+ * Send a notification to all given users
+ * @param travelId Email to check
+ * @param users Express request
+ * @param title Express response
+ * @param message If true, check if the email is valid
+ */
+function sendNotification (travelId: number | null = null, type: string | null = null, senderId: number | null = null, users: [User], title: string, message: string, req: express.Request, res: express.Response) {
+    const template = {
+        type,
+        title,
+        message,
+        userId: 0,
+        travelId,
+        senderId,
+        createdAt: new Date()
+    };
+    const data: any[] = [];
+    users.forEach((element: User) => {
+        template.userId = element.id
+        data.push(template)
+    });
+
+    prisma.notification.createMany({
+        data
+    }).then(() => {
+        sendMsg(req, res, info.notification.sent);
+    }).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
+}
+
 export {
     checkEmailField,
     checkPasswordField,
@@ -594,5 +629,6 @@ export {
     checkListOfEtapeField,
     checkDescriptionField,
     sanitizeNotificationId,
-    checkTravelAlready
+    checkTravelAlready,
+    sendNotification
 };
