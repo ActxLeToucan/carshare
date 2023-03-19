@@ -14,7 +14,12 @@ exports.getMyTravels = (req: express.Request, res: express.Response, _: express.
             where: { id: res.locals.user.id },
             select: {
                 travelsAsDriver: true,
-                travelsAsPassenger: { select: { travel: true } }
+                travelsAsPassenger: {
+                    select: { // TODO: update doc
+                        arrival: true, // TODO: is the travel really needed?
+                        departure: true
+                    }
+                }
             },
             ...pagination.pagination
         }).then(travels => {
