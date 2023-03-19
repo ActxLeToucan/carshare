@@ -8,9 +8,7 @@ export function retreiveFields(el) {
         const div = inputs_div.children[i];
         const input = div.querySelector("input");
         if (!input) continue;
-
         input.value = getTypedValue(input);
-
         inputs.push(input);
     }
 
@@ -50,6 +48,11 @@ export const genres = [
     {value: 0,  id: 'FEMALE'},
 ];
 
+export const themes = [
+    {value: 0, id: 'DARKMODE'},
+    {value: 1, id: 'LIGHTMODE'},
+    {value: -1, id: 'DEFAULT'},
+];
 export const levels = [
     {value: 0, id: 'USER'},
     {value: 1, id: 'ADMIN'},

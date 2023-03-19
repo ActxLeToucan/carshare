@@ -4,10 +4,11 @@
         <div class="flex grow flex-col">
             
             <div class="show-down relative flex w-full min-h-[60vh] bg-teal-500">
-                <img class="z-0 object-cover" src="../assets/img/landscape.svg" alt="">
+                <img class="z-0 object-cover block dark:hidden" src="../assets/img/landscape.svg" alt="">
+                <img class="z-0 object-cover hidden dark:block" src="../assets/img/landscape-dark.svg" alt="">
                 <div class="z-10 absolute top-0 flex flex-col w-full h-0 justify-center items-center md:pt-32 pt-16">
-                    <h1 class="show-down md:text-8xl text-6xl font-extrabold text-white shadow-3D"> {{ lang.CARSHARE }} </h1>
-                    <p style="animation-delay: 200ms;" class="show-down md:text-[1.7em] text-lg font-bold text-white italic shadow-3D"> {{ lang.CARSHARE_DESC }} </p>
+                    <h1 class="show-down md:text-8xl text-6xl font-extrabold text-white dark:text-slate-700 shadow-3D"> {{ lang.CARSHARE }} </h1>
+                    <p style="animation-delay: 200ms;" class="show-down md:text-[1.7em] text-lg font-bold text-white dark:text-slate-700 italic shadow-3D"> {{ lang.CARSHARE_DESC }} </p>
                 </div>
                 <div style="animation-delay: 200ms;" class="show-up z-10 absolute bottom-0 flex w-full h-0 overflow-visible">
                     <div class="flex flex-col w-fit h-fit mx-auto md:-translate-y-full -translate-y-[50%]">
@@ -17,7 +18,7 @@
                                 <div class="absolute bottom-11 left-0">
                                     <div> <!-- FOR CAR MOVEMENTS -->
                                         <div> <!-- FOR CAR SHAKES -->
-                                            <car ref="car" class="car w-20 text-white drop-shadow-md cursor-pointer"
+                                            <car ref="car" class="car w-20 text-white dark:text-slate-600 drop-shadow-md cursor-pointer"
                                                 style="transform: scale(-1, 1);"
                                                 fill="currentColor"
                                                 stroke="none"
@@ -360,7 +361,7 @@ export default {
 .tuttext {
     font-size: 0.8em;
     font-weight: 500;
-    color: #fff;
+    @apply text-white dark:text-slate-700;
 }
 .tutcontainer {
     position: absolute;

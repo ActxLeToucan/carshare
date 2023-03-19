@@ -1,5 +1,5 @@
 <template>
-    <div :id="'tab-' + hash" class="flex grow">
+    <div :id="'tab-' + hash" class="flex grow max-w-full">
         <slot></slot>
     </div>
 </template>

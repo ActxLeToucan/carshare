@@ -7,15 +7,27 @@ import { preparePagination } from './_common';
 exports.getMyTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const pagination = preparePagination(req, false);
 
-    prisma.user.findMany({
-        where: { id: res.locals.user.id },
-        select: {
-            travelsAsDriver: true,
-            travelsAsPassenger: { select: { travel: true } }
-        },
-        ...pagination.pagination
-    }).then(travels => {
-        res.status(200).json(pagination.results(travels));
+    prisma.user.count({
+        where: { id: res.locals.user.id }
+    }).then((count) => {
+        prisma.user.findMany({
+            where: { id: res.locals.user.id },
+            select: {
+                travelsAsDriver: true,
+                travelsAsPassenger: {
+                    select: { // TODO: update doc
+                        arrival: true, // TODO: is the travel really needed?
+                        departure: true
+                    }
+                }
+            },
+            ...pagination.pagination
+        }).then(travels => {
+            res.status(200).json(pagination.results(travels, count));
+        }).catch((err) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
     }).catch((err) => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
@@ -40,10 +52,10 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
                      from travel t
                               inner join etape e1 on e1.travelId = t.id and e1.city = ${startCity}
                               inner join etape e2 on e2.travelId = t.id and e2.city = ${endCity}
-                     where e1.\`order\` < e2.\`order\`
+                     where e1.date < e2.date
                        and IF(${startCtx} = '', true, e1.context = ${startCtx})
                        and IF(${endCtx} = '', true, e2.context = ${endCtx})
-                       and t.arrivalDate BETWEEN ${date1} and ${date2}`
+                       and e1.date BETWEEN ${date1} and ${date2}`
         .then((data) => {
             res.status(200).json(data);
         }).catch((err) => {
