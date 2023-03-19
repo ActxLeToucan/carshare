@@ -534,6 +534,9 @@ paths:
                     type: integer
                     nullable: true
                     example: 0
+                  total:
+                    type: integer
+                    example: 12
         '401':
           $ref: '#/components/responses/noToken'
         '403':
@@ -686,8 +689,8 @@ paths:
 
   /travels/create:
     post:
-      summary: create a new travel
-      description: create a new travel with etape
+      summary: Create a travel
+      description: Create a travel with steps.
       operationId: createTravel
       tags:
         - Travels
@@ -712,11 +715,12 @@ paths:
                   example: Voyage non fumeur
                 groupId:
                   type: integer
-                  example: null
-                listOfEtape:
+                  nullable: true
+                  example: 1
+                steps:
                   type: array
                   items:
-                    $ref: '#/components/schemas/Etape'
+                    $ref: '#/components/schemas/EtapeInput'
                   example:
                     - label: 2ter Boulevard Charlemagne 54000 Nancy
                       city: Nancy
@@ -736,15 +740,42 @@ paths:
                       lat: 78.683188
                       lng: 6.1877
                       date: 2023-04-17T09:15:36.000Z
-
-
       responses:
         '201':
-          description: travel create
+          description: Created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TravelCreate'
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Travel created"
+                  travel:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 2
+                      maxPassengers:
+                        type: integer
+                        example: 10
+                      price:
+                        type: integer
+                        example: 78
+                      description:
+                        type: string
+                        example: Voyage non fumeur
+                      groupId:
+                        type: integer
+                        example: null
+                      createdAt:
+                        type: string
+                        example: 2023-03-05T13:30:41.483Z
+                      etapes:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Etape'
         '401':
           $ref: '#/components/responses/noToken'
         '400':
@@ -794,7 +825,7 @@ paths:
                       travelsAsPassenger:
                         type: array
                         items:
-                          $ref: '#/components/schemas/Travel'
+                          $ref: '#/components/schemas/Passenger'
                   limit:
                     type: integer
                     example: 10
@@ -809,6 +840,9 @@ paths:
                     type: integer
                     nullable: true
                     example: 0
+                  total:
+                    type: integer
+                    example: 12
         '401':
           $ref: '#/components/responses/noToken'
         '498':
@@ -847,8 +881,8 @@ paths:
           in: query
           description: End city
           schema:
-              type: string
-              example: Metz
+            type: string
+            example: Metz
         - name: endContext
           in: query
           description: End context
@@ -1037,6 +1071,9 @@ paths:
                     type: integer
                     nullable: true
                     example: 0
+                  total:
+                    type: integer
+                    example: 12
         '401':
           $ref: '#/components/responses/noToken'
         '498':
@@ -1171,6 +1208,9 @@ paths:
                     type: integer
                     nullable: true
                     example: 0
+                  total:
+                    type: integer
+                    example: 12
         '401':
           $ref: '#/components/responses/noToken'
         '498':
@@ -1271,6 +1311,9 @@ paths:
                     type: integer
                     nullable: true
                     example: 0
+                  total:
+                    type: integer
+                    example: 12
         '401':
           $ref: '#/components/responses/noToken'
         '498':
@@ -1469,6 +1512,29 @@ components:
                 type: string
                 example: This feature is not yet implemented.
   schemas:
+    Passenger:
+      type: object
+      properties:
+        passengerId:
+          type: integer
+          example: 1
+        status:
+          type: integer
+          example: 1
+        comment:
+          type: string
+          nullable: true
+          example: I like cats
+        departureId:
+          type: integer
+          example: 1
+        departure:
+          $ref: '#/components/schemas/Etape'
+        arrivalId:
+          type: integer
+          example: 2
+        arrival:
+          $ref: '#/components/schemas/Etape'
     Travel:
       type: object
       properties:
@@ -1598,7 +1664,6 @@ components:
         createdAt:
           type: string
           format: date-time
-
     Notification:
       type: object
       properties:
@@ -1638,36 +1703,20 @@ components:
           type: string
           format: date-time
           example: 2020-01-01T00:00:00.000Z
-    TravelCreate:
+    EtapeInput:
       type: object
       properties:
-        message:
+        label:
           type: string
-          example: "Travel created"
-        travel:
-          type: object
-          properties:
-            id:
-              type: integer
-              example: 2
-            maxPassengers:
-              type: integer
-              example: 10
-            price:
-              type: integer
-              example: 78
-            description:
-              type: string
-              example: Voyage non fumeur
-            groupId:
-              type: integer
-              example: null
-            createdAt:
-              type: string
-              example: 2023-03-05T13:30:41.483Z
-        numberOfEtape:
-          type: object
-          properties:
-            count:
-              type: integer
-              example: 3
+        city:
+          type: string
+        context:
+          type: string
+        lat:
+          type: integer
+        lng:
+          type: integer
+        date:
+          type: string
+          format: date-time
+          example: 2020-01-01T00:00:00.000Z

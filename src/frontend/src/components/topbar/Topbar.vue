@@ -1,8 +1,8 @@
 <template>
-    <div class="flex flex-col grow-0 h-fit w-full px-4 py-2 bg-slate-50 border-b-8 border-teal-500 items-center">
+    <div class="flex flex-col grow-0 h-fit w-full px-4 py-2 bg-slate-50 dark:bg-slate-800 border-b-8 border-teal-500 items-center">
         <div class="flex grow w-full">
             <router-link to="/" class="flex w-[20%] h-fit py-1">
-                <h1 class="text-slate-500 text-3xl font-extrabold hover:text-teal-500 whitespace-nowrap text-ellipsis transition-all"> {{ lang.CARSHARE }} </h1>
+                <h1 class="text-slate-500 dark:text-slate-300 text-3xl font-extrabold hover:text-teal-500 whitespace-nowrap text-ellipsis transition-all"> {{ lang.CARSHARE }} </h1>
             </router-link>
             <div class="md:flex hidden grow">
                 <div class="flex grow justify-evenly">
@@ -27,7 +27,7 @@
                 <button-text v-for="button in buttons" :key="button.name" :href="button.link" class="mx-auto">
                         {{ lang[button.id] }}
                 </button-text>
-                <span class="flex grow h-1 w-full bg-slate-200 rounded-lg mb-4 mt-2"></span>
+                <span class="flex grow h-1 w-full bg-slate-200 dark:bg-slate-700 rounded-lg mb-4 mt-2"></span>
                 <button-block href="/profile" class="mx-auto"> {{ lang.MY_PROFILE }} </button-block>
             </div>
         </div>

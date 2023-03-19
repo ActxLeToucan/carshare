@@ -3,23 +3,24 @@ import { prisma } from '../app';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { displayableUserPrivate, error, info, mail, sendMail, sendMsg } from '../tools/translator';
-import * as properties from '../properties';
+import * as validator from '../tools/validator';
 import * as _user from './users/_common';
 import { preparePagination } from './_common';
 import { MailerError } from '../tools/mailer';
 import { type User } from '@prisma/client';
+import properties from '../properties';
 
 exports.signup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { email, password, lastName, firstName, phone, hasCar, gender } = req.body;
 
-    if (!properties.checkEmailField(email, req, res)) return;
-    if (!properties.checkPasswordField(password, req, res)) return;
-    if (!properties.checkLastNameField(lastName, req, res)) return;
-    if (!properties.checkFirstNameField(firstName, req, res)) return;
-    const phoneSanitized = properties.sanitizePhone(phone, req, res);
+    if (!validator.checkEmailField(email, req, res)) return;
+    if (!validator.checkPasswordField(password, req, res)) return;
+    if (!validator.checkLastNameField(lastName, req, res)) return;
+    if (!validator.checkFirstNameField(firstName, req, res)) return;
+    const phoneSanitized = validator.sanitizePhone(phone, req, res);
     if (phoneSanitized === null) return;
-    if (hasCar !== undefined && !properties.checkBooleanField(hasCar, req, res, 'hasCar')) return;
-    const genderSanitized = properties.sanitizeGender(gender);
+    if (hasCar !== undefined && !validator.checkBooleanField(hasCar, req, res, 'hasCar')) return;
+    const genderSanitized = validator.sanitizeGender(gender);
 
     prisma.user.count({ where: { email } })
         .then((count) => {
@@ -28,7 +29,7 @@ exports.signup = (req: express.Request, res: express.Response, _: express.NextFu
                 return;
             }
 
-            bcrypt.hash(password, properties.p.password.salt)
+            bcrypt.hash(password, properties.password.salt)
                 .then((hash) => {
                     prisma.user.create({
                         data: {
@@ -48,7 +49,7 @@ exports.signup = (req: express.Request, res: express.Response, _: express.NextFu
                                 type: 'access'
                             },
                             process.env.JWT_SECRET ?? 'secret',
-                            { expiresIn: properties.p.token.access.expiration }
+                            { expiresIn: properties.token.access.expiration }
                         );
                         sendMsg(req, res, info.user.created, user, token);
                     }).catch((err) => {
@@ -66,8 +67,8 @@ exports.signup = (req: express.Request, res: express.Response, _: express.NextFu
 }
 
 exports.login = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    if (!properties.checkEmailField(req.body.email, req, res, false)) return;
-    if (!properties.checkPasswordField(req.body.password, req, res, false)) return;
+    if (!validator.checkEmailField(req.body.email, req, res, false)) return;
+    if (!validator.checkPasswordField(req.body.password, req, res, false)) return;
 
     prisma.user.findUnique({ where: { email: req.body.email } })
         .then((user) => {
@@ -89,7 +90,7 @@ exports.login = (req: express.Request, res: express.Response, _: express.NextFun
                             type: 'access'
                         },
                         process.env.JWT_SECRET ?? 'secret',
-                        { expiresIn: properties.p.token.access.expiration }
+                        { expiresIn: properties.token.access.expiration }
                     );
                     sendMsg(req, res, info.user.loggedIn, user.id, token);
                 }).catch((err) => {
@@ -103,7 +104,7 @@ exports.login = (req: express.Request, res: express.Response, _: express.NextFun
 }
 
 exports.askForPasswordReset = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    if (!properties.checkEmailField(req.body.email, req, res, false)) return;
+    if (!validator.checkEmailField(req.body.email, req, res, false)) return;
 
     prisma.user.findUnique({ where: { email: req.body.email } })
         .then((user) => {
@@ -112,8 +113,8 @@ exports.askForPasswordReset = (req: express.Request, res: express.Response, _: e
                 return;
             }
 
-            if (user.lastPasswordResetEmailedOn !== null && user.lastPasswordResetEmailedOn > new Date(Date.now() - properties.p.mailer.passwordReset.cooldown)) {
-                sendMsg(req, res, error.mailer.cooldown, properties.p.mailer.passwordReset.cooldownTxt);
+            if (user.lastPasswordResetEmailedOn !== null && user.lastPasswordResetEmailedOn > new Date(Date.now() - properties.mailer.passwordReset.cooldown)) {
+                sendMsg(req, res, error.mailer.cooldown, properties.mailer.passwordReset.cooldownTxt);
                 return;
             }
 
@@ -123,7 +124,7 @@ exports.askForPasswordReset = (req: express.Request, res: express.Response, _: e
                     type: 'resetPassword'
                 },
                 process.env.JWT_SECRET ?? 'secret',
-                { expiresIn: properties.p.token.passwordReset.expiration }
+                { expiresIn: properties.token.passwordReset.expiration }
             );
 
             const frontendPath = `${String(process.env.FRONTEND_URL)}/password-reset`;
@@ -158,8 +159,8 @@ exports.resetPassword = (req: express.Request, res: express.Response, next: expr
 }
 
 exports.updatePassword = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    if (!properties.checkPasswordField(req.body.password, req, res)) return;
-    if (!properties.checkOldPasswordField(req.body.oldPassword, req, res)) return;
+    if (!validator.checkPasswordField(req.body.password, req, res)) return;
+    if (!validator.checkOldPasswordField(req.body.oldPassword, req, res)) return;
 
     bcrypt.compare(req.body.oldPassword, res.locals.user.password)
         .then((valid) => {
@@ -168,7 +169,7 @@ exports.updatePassword = (req: express.Request, res: express.Response, _: expres
                 return;
             }
 
-            bcrypt.hash(req.body.password, properties.p.password.salt)
+            bcrypt.hash(req.body.password, properties.password.salt)
                 .then((hash) => {
                     prisma.user.update({
                         where: { id: res.locals.user.id },
@@ -195,8 +196,8 @@ exports.askForEmailVerification = (req: express.Request, res: express.Response, 
         return;
     }
 
-    if (res.locals.user.lastEmailVerificationEmailedOn !== null && res.locals.user.lastEmailVerificationEmailedOn > new Date(Date.now() - properties.p.mailer.emailVerification.cooldown)) {
-        sendMsg(req, res, error.mailer.cooldown, properties.p.mailer.emailVerification.cooldownTxt);
+    if (res.locals.user.lastEmailVerificationEmailedOn !== null && res.locals.user.lastEmailVerificationEmailedOn > new Date(Date.now() - properties.mailer.emailVerification.cooldown)) {
+        sendMsg(req, res, error.mailer.cooldown, properties.mailer.emailVerification.cooldownTxt);
         return;
     }
 
@@ -206,7 +207,7 @@ exports.askForEmailVerification = (req: express.Request, res: express.Response, 
             type: 'verify'
         },
         process.env.JWT_SECRET ?? 'secret',
-        { expiresIn: properties.p.token.verify.expiration }
+        { expiresIn: properties.token.verify.expiration }
     );
 
     sendMail(req, mail.email.verification, res.locals.user, token)
@@ -247,14 +248,24 @@ exports.searchUsers = (req: express.Request, res: express.Response, _: express.N
 
     const q = `%${pagination.query ?? ''}%`;
 
-    prisma.$queryRaw`SELECT *
+    prisma.$queryRaw`SELECT COUNT(*) AS count
+                        FROM user
+                        WHERE IF(${pagination.query !== undefined}, email LIKE ${q}
+                            OR phone LIKE ${q}
+                            OR CONCAT(firstName, ' ', lastName) LIKE ${q}, TRUE)`
+        .then((count: any) => {
+            prisma.$queryRaw`SELECT *
                      FROM user
                      WHERE IF(${pagination.query !== undefined}, email LIKE ${q}
                          OR phone LIKE ${q}
                          OR CONCAT(firstName, ' ', lastName) LIKE ${q}, TRUE)
                      LIMIT ${pagination.pagination.take} OFFSET ${pagination.pagination.skip}`
-        .then(users => {
-            res.status(200).json(pagination.results((users as User[]).map(displayableUserPrivate)));
+                .then(users => {
+                    res.status(200).json(pagination.results((users as User[]).map(displayableUserPrivate), Number(count[0].count)));
+                }).catch(err => {
+                    console.error(err);
+                    sendMsg(req, res, error.generic.internalError);
+                });
         }).catch(err => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);
@@ -262,7 +273,7 @@ exports.searchUsers = (req: express.Request, res: express.Response, _: express.N
 }
 
 exports.deleteUser = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const userId = properties.sanitizeUserId(req.params.id, req, res);
+    const userId = validator.sanitizeUserId(req.params.id, req, res);
     if (userId === null) return;
 
     prisma.user.findUnique({ where: { id: userId } })
@@ -292,7 +303,7 @@ exports.deleteUser = (req: express.Request, res: express.Response, _: express.Ne
 }
 
 exports.updateUser = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const userId = properties.sanitizeUserId(req.params.id, req, res);
+    const userId = validator.sanitizeUserId(req.params.id, req, res);
     if (userId === null) return;
 
     prisma.user.findUnique({ where: { id: userId } })

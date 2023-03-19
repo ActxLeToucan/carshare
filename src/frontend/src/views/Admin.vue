@@ -17,15 +17,15 @@
                 </button>
 
                 <tab-window defaultHash="#users">
-                    <tab-div hash="#users">
+                    <tab-div hash="#users" class="max-h-full">
                         <admin-users></admin-users>
                     </tab-div>
 
-                    <tab-div hash="#groups">
+                    <tab-div hash="#groups" class="max-h-full">
                         <admin-groups></admin-groups>
                     </tab-div>
 
-                    <tab-div hash="#trips">
+                    <tab-div hash="#trips" class="max-h-full">
                         <admin-trips></admin-trips>
                     </tab-div>
                 </tab-window>

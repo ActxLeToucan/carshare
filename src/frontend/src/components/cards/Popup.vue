@@ -1,9 +1,9 @@
 <template>
     <div class="fixed top-0 left-0 w-screen h-screen flex justify-center items-center bg-slate-900/[0.3] opacity-0 pointer-events-none transition-all p-4">
-        <div ref="popup" class="flex flex-col rounded-lg shadow-lg border-4 border-slate-200 bg-slate-50 p-4 space-y-4 max-w-full max-h-full">
+        <div ref="popup" class="flex flex-col rounded-lg shadow-lg border-4 border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 p-4 space-y-4 max-w-full max-h-full">
             <h1 class="text-xl font-bold text-center" :class="'text-'+color+'-500'"> {{ _title }} </h1>
             <div class="flex flex-col">
-                <p v-for="line in content.split(/\n|\\n/g)" :key="line" class="text-lg font-semibold text-slate-500"> {{ line }} </p>
+                <p v-for="line in content.split(/\n|\\n/g)" :key="line" class="text-lg font-semibold text-slate-500 dark:text-slate-400"> {{ line }} </p>
             </div>
             <div
                 ref="log-zone"
@@ -13,7 +13,7 @@
             <div ref="inputs" class="flex flex-col overflow-auto">
                 <slot></slot>
             </div>
-            <span class="flex grow h-1 w-full bg-slate-200 rounded-lg mb-4 mt-2"></span>
+            <span class="flex grow h-1 w-full bg-slate-200 dark:bg-slate-700 rounded-lg mb-4 mt-2"></span>
             <div class="flex justify-between">
                 <button-text ref="btn-cancel"> {{ cancelLabel }} </button-text>
                 <button-block v-show="showValidate" :color="color" ref="btn-validate"> {{ validateLabel }} </button-block>

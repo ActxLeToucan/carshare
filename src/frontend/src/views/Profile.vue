@@ -1,8 +1,9 @@
 <template>
-    <div class="flex grow flex-col min-h-0 max-h-screen">
+    <div class="flex grow flex-col min-h-0 max-h-screen max-w-full">
         <topbar></topbar>
         <div class="flex md:flex-row flex-col grow max-h-min min-h-0">
-            <div ref="tabs-zone" class="show-right flex flex-col items-center h-full md:w-min w-full min-h-0 px-8 py-4 space-y-4 md:border-r-8 border-teal-500 mx-auto overflow-hidden">
+            <div ref="tabs-zone"
+                class="show-right flex flex-col items-center h-full md:w-min w-full min-h-0 px-8 py-4 space-y-4 md:border-r-8 border-teal-500 mx-auto overflow-hidden">
                 <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> {{ lang.PROFILE }} </p>
                 <button-tab href="#infos" :default="!isMobile"> {{ lang.MY_INFOS }} </button-tab>
                 <button-tab href="#notifs"> {{ lang.MY_NOTIFS }} </button-tab>
@@ -16,13 +17,13 @@
             </div>
             <div ref="content-zone" class="flex flex-col md:grow min-h-0 max-h-full">
 
-                <button ref="backtabs-btn" class="absolute md:hidden flex rounded-md border-2 border-slate-200 bg-white h-fit w-fit p-2 m-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                <button ref="backtabs-btn" class="absolute md:hidden text-slate-700 dark:text-slate-200 flex rounded-md border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-600 h-fit w-fit p-1 m-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
                     </svg>
                 </button>
 
-                <tab-window defaultHash="#infos" class="md:pt-0 pt-5 max-h-full">
+                <tab-window defaultHash="#infos" class="md:pt-0 pt-5 max-h-full max-w-full">
 
                     <tab-div hash="#infos" class="flex flex-col items-center">
                         <user-infos></user-infos>
