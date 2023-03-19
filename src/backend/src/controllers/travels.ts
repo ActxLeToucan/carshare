@@ -2,39 +2,8 @@ import type express from 'express';
 import { prisma } from '../app';
 import * as validator from '../tools/validator';
 import { error, info, type Notif, notifs, notify, sendMsg } from '../tools/translator';
-import { preparePagination } from './_common';
 import properties from '../properties';
 import { checkTravelHoursLimit } from '../tools/validator';
-
-exports.getMyTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const pagination = preparePagination(req, false);
-
-    prisma.user.count({
-        where: { id: res.locals.user.id }
-    }).then((count) => {
-        prisma.user.findMany({
-            where: { id: res.locals.user.id },
-            select: {
-                travelsAsDriver: true,
-                travelsAsPassenger: {
-                    include: {
-                        departure: true,
-                        arrival: true
-                    }
-                }
-            },
-            ...pagination.pagination
-        }).then(travels => {
-            res.status(200).json(pagination.results(travels, count));
-        }).catch((err) => {
-            console.error(err);
-            sendMsg(req, res, error.generic.internalError);
-        });
-    }).catch((err) => {
-        console.error(err);
-        sendMsg(req, res, error.generic.internalError);
-    });
-}
 
 exports.searchTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { date, startCity, startContext, endCity, endContext } = req.query;
