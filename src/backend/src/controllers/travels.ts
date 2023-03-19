@@ -208,13 +208,7 @@ exports.cancelTravel = (req: express.Request, res: express.Response, next: expre
                 prisma.notification.createMany({ data }).then(() => {
                     for (const notif of data) {
                         const passenger = passengers.find((p) => p.passengerId === notif.userId);
-                        if (passenger !== undefined) {
-                            notify(passenger.passenger, notif).then(() => {
-                                console.log('Notification sent');
-                            }).catch((err) => {
-                                console.error(err);
-                            });
-                        }
+                        if (passenger !== undefined) notify(passenger.passenger, notif);
                     }
 
                     sendMsg(req, res, info.travel.cancelled);

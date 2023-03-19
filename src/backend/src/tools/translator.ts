@@ -1,5 +1,5 @@
 import { type Request, type Response } from 'express';
-import { type User, type Travel, type Group, type Etape, type Notification, type Passenger } from '@prisma/client';
+import { type User, type Travel, type Group, type Etape, type Passenger } from '@prisma/client';
 
 import properties from '../properties';
 import { sendMail as mailerSend } from './mailer';
@@ -786,34 +786,10 @@ const info = {
                 en: 'Notification removed'
             },
             code: 200
-        }),
-        sent: (req: Request, user: User) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Les notications ont étés envoyés.',
-                en: 'The notications have been sent.'
-            },
-            code: 200
         })
     }
 
 } satisfies TranslationsMessageHTTP;
-
-const notification = {
-    cancelTravel: {
-        title: (req: Request, user: User, token: string) => msgForLang<any, any>(req, {
-            msg: {
-                fr: "Annulation d'un trajet",
-                eng: 'A travel has been cancelled'
-            }
-        }),
-        core: (req: Request, user: User, token: string) => msgForLang<any, any>(req, {
-            msg: {
-                fr: 'Le trajet à destination de "" à "" départ le "" a été annulé.',
-                eng: 'The travel to "" from "" at "" has been cancelled.'
-            }
-        })
-    }
-}
 
 const mail = {
     password: {
@@ -1074,9 +1050,20 @@ async function sendMail (req: Request, message: (req: Request, ...args: any) => 
     return mailerSend(message(req, ...args));
 }
 
-async function notify (user: User, notification: { type: string | null, title: string, message: string, createdAt: Date } & Record<string, any>) {
+/**
+ * Will send a notification to the user
+ * @param user User to notify
+ * @param notification Notification to send
+ */
+function notify (user: User, notification: { type: string | null, title: string, message: string, createdAt: Date } & Record<string, any>) {
     if (!user.mailNotif) return;
-    return mailerSend(mail.notification.new('en', user, notification)); // TODO: get user's language
+    mailerSend(mail.notification.new('en', user, notification)) // TODO: get user's language
+        .then(() => {
+            console.log(`Notification sent to ${user.email}.`);
+        }).catch((err) => {
+            console.error(`Failed to send notification to ${user.email}.`);
+            console.error(err);
+        });
 }
 
 /**
