@@ -4,7 +4,7 @@ import auth from '../middlewares/auth';
 const router = express.Router();
 const controller = require('../controllers/travels');
 
-router.get('/my', auth.access, controller.getMyTravels);
+router.use('/my', auth.access, require('./travels/my'));
 router.post('/create', auth.access, controller.createTravel);
 router.get('/search', auth.access, controller.searchTravels);
 
