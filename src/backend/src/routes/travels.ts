@@ -8,4 +8,7 @@ router.use('/my', auth.access, require('./travels/my'));
 router.post('/create', auth.access, controller.createTravel);
 router.get('/search', auth.access, controller.searchTravels);
 
+// admin routes
+router.get('/', auth.access, controller.getTravels);
+
 module.exports = router;

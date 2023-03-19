@@ -2,6 +2,7 @@ import type express from 'express';
 import { prisma } from '../app';
 import * as validator from '../tools/validator';
 import { error, info, sendMsg } from '../tools/translator';
+import { preparePagination } from './_common';
 
 exports.searchTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { date, startCity, startContext, endCity, endContext } = req.query;
@@ -110,6 +111,25 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
             sendMsg(req, res, error.generic.internalError);
         });
     }).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
+}
+
+exports.getTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    const pagination = preparePagination(req, false);
+
+    prisma.travel.count().then((count) => {
+        prisma.travel.findMany({
+            ...pagination.pagination
+        }
+        ).then(travels => {
+            res.status(200).json(pagination.results(travels, count));
+        }).catch(err => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
+    }).catch(err => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
     });
