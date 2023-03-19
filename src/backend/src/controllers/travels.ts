@@ -20,6 +20,7 @@ exports.getMyTravels = (req: express.Request, res: express.Response, _: express.
                         departure: true
                     }
                 }
+
             },
             ...pagination.pagination
         }).then(travels => {
@@ -144,4 +145,51 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
     });
+}
+exports.bookTravel = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    // TODO : Recuper les info du trajet ciblé et créer la notification correspondante.
+    const { message, travelId } = req.body;
+    prisma.travel.findUnique({
+        where: {
+            id: travelId
+        }
+    }).then((travel) => {
+        if (travel != null && travel.maxPassengers > 1) {
+            prisma.notification.create({
+                data: {
+                    travelId,
+                    message,
+                    senderId: res.locals.user.id,
+                    userId: travel.driverId,
+                    createdAt: new Date(Date.now()),
+                    title: 'Demande de Réservation'
+                }
+            }).then((notification) => {
+                sendMsg(req, res, info.notification.created, notification);
+            }).catch((err) => {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
+            })
+        } else {
+            sendMsg(req, res, error.travel.notFoundOrFull);
+        }
+    }).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    })
+    /*
+    prisma.passenger.create({
+        data: {
+            travelId,
+            status,
+            comment,
+            passengerId: res.locals.user.id
+        }
+    }).then((passenger) => {
+        sendMsg(req, res, info.passenger.created, passenger);
+    }).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    })
+     */
 }

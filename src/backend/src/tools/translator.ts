@@ -469,6 +469,15 @@ const error = {
             code: 500
         })
     },
+    travel: {
+        notFoundOrFull: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Trajet introuvable ou complet.',
+                en: 'Travel not found or full.'
+            },
+            code: 404
+        })
+    },
     group: {
         notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
@@ -728,6 +737,16 @@ const info = {
         })
     },
     notification: {
+        created: (req: Request, notification: Notification) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Notification créée',
+                en: 'Notification created'
+            },
+            code: 201,
+            data: {
+                notification
+            }
+        }),
         deletedAll: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Notifications supprimées',
