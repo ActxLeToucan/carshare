@@ -1691,13 +1691,13 @@ components:
         driver:
           type: object
           properties:
-            _avg:
+            average:
               type: object
               properties:
                 note:
                   type: integer
                   example: 1.5
-            _count:
+            count:
               type: object
               properties:
                 note:
@@ -1706,13 +1706,13 @@ components:
         passenger:
           type: object
           properties:
-            _avg:
+            average:
               type: object
               properties:
                 note:
                   type: integer
                   example: null
-            _count:
+            count:
               type: object
               properties:
                 note:
@@ -1721,9 +1721,9 @@ components:
     EvalutationTravel:
       type: array
       example:
-        - _avg:
-            note: 4,
-          travelId: 1
-        - _avg:
-            note: 0.5,
-          travelId: 2
+        - travelId: 1,
+          average:
+            note: 4
+        - travelId: 2,
+          average:
+            note: 0.75

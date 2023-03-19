@@ -1,14 +1,11 @@
 import type express from 'express';
 import { prisma } from '../app';
 import * as validator from '../tools/validator';
-import { error, sendMsg } from '../tools/translator';
+import { error, sendMsg, displayableAverage } from '../tools/translator';
 
 exports.getUserEvaluation = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
     const userId = validator.sanitizeUserId(req.params.id, req, res);
+
     if (userId === null) return;
 
     prisma.evaluation.aggregate({
@@ -46,6 +43,9 @@ exports.getUserEvaluation = (req: express.Request, res: express.Response, next: 
             }
 
         }).then((passenger) => {
+            passenger = displayableAverage(passenger);
+            driver = displayableAverage(driver);
+
             res.status(200).json({ driver, passenger });
         }).catch((err) => {
             console.error(err);
@@ -69,6 +69,7 @@ exports.getAverageTravel = (req: express.Request, res: express.Response, next: e
         }
 
     }).then((travelsAvg) => {
+        travelsAvg.map(displayableAverage);
         res.status(200).json(travelsAvg);
     }).catch((err) => {
         console.error(err);
