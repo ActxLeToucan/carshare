@@ -15,9 +15,9 @@ exports.getMyTravels = (req: express.Request, res: express.Response, _: express.
             select: {
                 travelsAsDriver: true,
                 travelsAsPassenger: {
-                    select: { // TODO: update doc
-                        arrival: true, // TODO: is the travel really needed?
-                        departure: true
+                    include: {
+                        departure: true,
+                        arrival: true
                     }
                 }
             },
