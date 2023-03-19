@@ -5,26 +5,17 @@
             <div class="flex grow h-fit min-w-[60vw] md:max-w-[70vw]">
                 <div v-show="loading && !minorLoading" class="flex flex-col justify-center mx-auto">
 
-                    <div class="flex flex-col justify-center py-4 my-4 rounded-lg bg-slate-100 px-4">
-                        <p class="text-xl text-center text-slate-500 font-bold mx-auto"> {{ lang.LOADING_NOTIFS }} </p>
-                        <p ref="loading-desc" class="text-xl text-center text-slate-500 mx-auto"> {{ lang.LOADING_NOTIFS_DESC }} </p>
-                    </div>
+                    <badge :title="lang.LOADING_NOTIFS" :content="lang.LOADING_NOTIFS_DESC"></badge>
 
                 </div>
                 <div v-if="!loading && error" class="flex flex-col justify-center mx-auto">
 
-                    <div class="flex flex-col justify-center py-4 my-4 rounded-lg bg-slate-100 px-4">
-                        <p class="text-xl text-center text-slate-500 font-bold mx-auto"> {{ lang.ERROR }} </p>
-                        <p ref="loading-desc" class="text-xl text-center text-slate-500 mx-auto"> {{ this.error }} </p>
-                    </div>
+                    <badge :title="lang.ERROR" :content="this.error"></badge>
 
                 </div>
                 <div v-if="notifs.length === 0 && !loading && !error" class="flex flex-col justify-center mx-auto">
 
-                    <div class="flex flex-col justify-center py-4 my-4 rounded-lg bg-slate-100 px-4">
-                        <p class="text-xl text-center text-slate-500 font-bold mx-auto"> {{ lang.NO_NOTIFS }} </p>
-                        <p class="text-xl text-center text-slate-500 mx-auto"> {{ lang.NO_NOTIFS_DESC }} </p>
-                    </div>
+                    <badge :title="lang.NO_NOTIFS" :content="lang.NO_NOTIFS_DESC"></badge>
 
                 </div>
                 <div v-if="notifs.length > 0 && (!loading || minorLoading)" class="flex-col w-full mb-12">
@@ -34,7 +25,7 @@
                     </button-block>
 
                     <card v-for="notif in notifs" :key="notif.id"
-                            class="py-4 my-4 rounded-lg px-4 hover:bg-slate-100 transition-all w-full text-left text-slate-600">
+                            class="py-4 my-4 rounded-lg px-4 hover:bg-slate-100 hover:dark:bg-slate-700 hover:dark:border-slate-600 transition-all w-full text-left text-slate-600 dark:text-slate-300">
                         <div class="w-full">
                             <button-block class="float-right ml-2" :disabled="notif.locked" color="red" :action="() => deleteOne(notif)">
                                 <trash-icon class="w-7 h-7"></trash-icon>
@@ -79,6 +70,7 @@ import Lang from '../../scripts/Lang'
 import API from "../../scripts/API";
 import User from "../../scripts/User";
 import Card from "../cards/Card.vue";
+import Badge from "../cards/Badge.vue";
 import ButtonBlock from "../inputs/ButtonBlock.vue";
 import ButtonText from "../inputs/ButtonText.vue";
 import ButtonTab from "../inputs/ButtonTab.vue";
@@ -88,7 +80,16 @@ import {Log, LogZone} from "../../scripts/Logs";
 
 export default {
     name: "UserNotifs",
-    components: {Popup, ButtonTab, ButtonText, ButtonBlock, Card, TrashIcon, PlusIcon},
+    components: {
+        Popup, 
+        ButtonTab, 
+        ButtonText, 
+        ButtonBlock, 
+        Card, 
+        Badge,
+        TrashIcon, 
+        PlusIcon
+    },
     data() {
         return {
             lang: Lang.CurrentLang,

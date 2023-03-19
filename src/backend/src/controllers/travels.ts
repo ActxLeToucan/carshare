@@ -1,22 +1,34 @@
 import { User } from '@prisma/client';
 import type express from 'express';
 import { prisma } from '../app';
-import * as properties from '../properties';
-import { error, info, sendMsg} from '../tools/translator';
+import * as validator from '../tools/validator';
+import { error, info, sendMsg } from '../tools/translator';
 import { preparePagination } from './_common';
 
 exports.getMyTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const pagination = preparePagination(req, false);
 
-    prisma.user.findMany({
-        where: { id: res.locals.user.id },
-        select: {
-            travelsAsDriver: true,
-            travelsAsPassenger: { select: { travel: true } }
-        },
-        ...pagination.pagination
-    }).then(travels => {
-        res.status(200).json(pagination.results(travels));
+    prisma.user.count({
+        where: { id: res.locals.user.id }
+    }).then((count) => {
+        prisma.user.findMany({
+            where: { id: res.locals.user.id },
+            select: {
+                travelsAsDriver: true,
+                travelsAsPassenger: {
+                    include: {
+                        departure: true,
+                        arrival: true
+                    }
+                }
+            },
+            ...pagination.pagination
+        }).then(travels => {
+            res.status(200).json(pagination.results(travels, count));
+        }).catch((err) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
     }).catch((err) => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
@@ -25,11 +37,11 @@ exports.getMyTravels = (req: express.Request, res: express.Response, _: express.
 
 exports.searchTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { date, startCity, startContext, endCity, endContext } = req.query;
-    if (!properties.checkCityField(startCity, req, res, 'startCity')) return;
-    if (!properties.checkCityField(endCity, req, res, 'endCity')) return;
-    if (!properties.checkDateField(date, false, req, res)) return;
-    if (startContext !== undefined && !properties.checkStringField(startContext, req, res, 'startContext')) return;
-    if (endContext !== undefined && !properties.checkStringField(endContext, req, res, 'endContext')) return;
+    if (!validator.checkCityField(startCity, req, res, 'startCity')) return;
+    if (!validator.checkCityField(endCity, req, res, 'endCity')) return;
+    if (!validator.checkDateField(date, false, req, res)) return;
+    if (startContext !== undefined && !validator.checkStringField(startContext, req, res, 'startContext')) return;
+    if (endContext !== undefined && !validator.checkStringField(endContext, req, res, 'endContext')) return;
 
     const startCtx = startContext === undefined ? '' : startContext;
     const endCtx = endContext === undefined ? '' : endContext;
@@ -41,10 +53,10 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
                      from travel t
                               inner join etape e1 on e1.travelId = t.id and e1.city = ${startCity}
                               inner join etape e2 on e2.travelId = t.id and e2.city = ${endCity}
-                     where e1.\`order\` < e2.\`order\`
+                     where e1.date < e2.date
                        and IF(${startCtx} = '', true, e1.context = ${startCtx})
                        and IF(${endCtx} = '', true, e2.context = ${endCtx})
-                       and t.arrivalDate BETWEEN ${date1} and ${date2}`
+                       and e1.date BETWEEN ${date1} and ${date2}`
         .then((data) => {
             res.status(200).json(data);
         }).catch((err) => {
@@ -56,11 +68,16 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
 exports.createTravel = async (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { maxPassengers, price, description, groupId, steps } = req.body;
 
-    if (!properties.checkMaxPassengersField(maxPassengers, req, res)) return;
-    if (!properties.checkPriceField(price, req, res)) return;
-    if (!properties.checkDescriptionField(description, req, res, 'description')) return;
+    if (!validator.checkMaxPassengersField(maxPassengers, req, res)) return;
+    if (!validator.checkPriceField(price, req, res)) return;
+    if (!validator.checkDescriptionField(description, req, res, 'description')) return;
 
-    if (typeof groupId === 'number') {
+    if (groupId !== undefined && groupId !== null) {
+        if (typeof groupId !== 'number') {
+            sendMsg(req, res, error.group.typeId);
+            return;
+        }
+
         try {
             const count = await prisma.group.count({
                 where: {
@@ -78,7 +95,7 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
             sendMsg(req, res, error.generic.internalError);
         }
     }
-    if (!properties.checkListOfEtapeField(steps, req, res)) return;
+    if (!validator.checkListOfEtapeField(steps, req, res)) return;
 
     prisma.travel.findMany({
         where: {
@@ -94,7 +111,7 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
         }
     }).then((travels) => {
         for (const elements of travels) {
-            if (!properties.checkTravelAlready(steps[0].date, steps[steps.length - 1].date, elements.etapes, req, res)) return;
+            if (!validator.checkTravelAlready(steps[0].date, steps[steps.length - 1].date, elements.etapes, req, res)) return;
         }
 
         prisma.travel.create({
@@ -138,14 +155,14 @@ exports.cancelTravel = (req: express.Request, res: express.Response, next: expre
 
     const travel = req.body.travel;
 
-    if ( !(res.locals.user.id === travel.driver.id) && !(res.locals.user.level >= 1) ) {
+    if (!(res.locals.user.id === travel.driver.id) && !(res.locals.user.level >= 1)) {
         sendMsg(req, res, error.auth.insufficientPrivileges);
         return;
     }
 
     const dateCheck = new Date(new Date(travel.date).getTime() - 1000 * 60 * 60 * 24);
 
-    if ( !(travel.passagers === undefined || travel.passagers.length == 0) && dateCheck <= new Date() ) {
+    if (!(travel.passagers === undefined || travel.passagers.length == 0) && dateCheck <= new Date()) {
         sendMsg(req, res, error.travel.unableToCancel);
         return;
     }
@@ -155,9 +172,9 @@ exports.cancelTravel = (req: express.Request, res: express.Response, next: expre
         data: { status: -1 }
     }).then(() => {
         sendMsg(req, res, info.travel.successfulCancel);
-        if ( travel.passagers !== undefined || travel.passagers.length > 0 ){
-            //TODO Translator for notifications
-            properties.sendNotification(travel.id, null, null, travel.passagers.array, "todo annulation", "todo message annulation", req, res);
+        if (travel.passagers !== undefined || travel.passagers.length > 0) {
+            // TODO Translator for notifications
+            validator.sendNotification(travel.id, null, null, travel.passagers.array, 'todo annulation', 'todo message annulation', req, res);
         }
     }).catch((err) => {
         console.error(err);
