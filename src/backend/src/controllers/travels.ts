@@ -149,11 +149,16 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
 exports.getTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const pagination = preparePagination(req, false);
 
-    prisma.travel.findMany({
-        ...pagination.pagination
-    }
-    ).then(travels => {
-        res.status(200).json(pagination.results(travels));
+    prisma.travel.count().then((count) => {
+        prisma.travel.findMany({
+            ...pagination.pagination
+        }
+        ).then(travels => {
+            res.status(200).json(pagination.results(travels, count));
+        }).catch(err => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
     }).catch(err => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
