@@ -52,7 +52,7 @@ class Pagination {
     constructor (offset = 0, limit = 10) {
         this._offset = 0;
         this._limit = 10;
-        this._max = 10;
+        this._total = 0;
 
         this.offset = offset;
         this.limit = limit;
@@ -70,8 +70,8 @@ class Pagination {
         this._onChanged?.();
     }
 
-    set max(max) {
-        this._max = max;
+    set total(total) {
+        this._total = total;
     }
 
     set index(index) {
@@ -80,7 +80,7 @@ class Pagination {
 
     next() {
         this._offset += this._limit;
-        if (this._offset > this._max) this._offset = this._max;
+        if (this._offset > this.maxIndex * this.limit) this._offset = this.maxIndex * this.limit;
         this._onChanged?.();
     }
 
@@ -90,12 +90,24 @@ class Pagination {
         this._onChanged?.();
     }
 
+    get hasPrevious() {
+        return this._offset > 0;
+    }
+
+    get hasNext() {
+        return this._offset < this.maxIndex * this.limit;
+    }
+
     get index() {
         return this._offset / this._limit;
     }
 
-    get max() {
-        return this._max;
+    get total() {
+        return this._total;
+    }
+
+    get maxIndex() {
+        return Math.floor(this._total / this._limit);
     }
 
     get offset() {

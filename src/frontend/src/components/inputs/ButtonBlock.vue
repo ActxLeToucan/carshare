@@ -5,14 +5,14 @@
             :to="href ?? ''"
             class="flex items-center justify-center w-fit h-fit py-2 px-4 text-slate-500 dark:text-slate-300 text-xl font-bold bg-white dark:bg-slate-600 rounded-md bg-slate-100 border-b-4 border-slate-200 dark:border-slate-700
                 outline-none hover:text-slate-50 hover:dark:text-slate-200 hover:shadow-md transition-all"
-            :class="'hover:bg-'+color+'-500 hover:border-'+color+'-600  focus:border-'+color+'-500 hover:dark:bg-'+color+'-600 hover:dark:border-'+color+'-700  focus:dark:border-'+color+'-600'">
+            :class="'hover:bg-'+color+'-500 hover:border-'+color+'-600  focus:border-'+color+'-500'">
             <p class="whitespace-nowrap text-ellipsis max-w-full min-w-0 w-fit h-fit max-h-full min-h-0"> <slot></slot> </p>
         </router-link>
         <button v-if="!href"
             ref="btn-2"
             class="flex items-center justify-center w-fit h-fit py-2 px-4 text-slate-500 dark:text-slate-300 text-xl font-bold bg-white dark:bg-slate-600 rounded-md bg-slate-100 border-b-4 border-slate-200 dark:border-slate-700
                 outline-none hover:text-slate-50 hover:dark:text-slate-200 hover:shadow-md transition-all"
-            :class="'hover:bg-'+color+'-500 hover:border-'+color+'-600  focus:border-'+color+'-500 hover:dark:bg-'+color+'-600 hover:dark:border-'+color+'-700  focus:dark:border-'+color+'-600'">
+            :class="'hover:bg-'+color+'-500 hover:border-'+color+'-600  focus:border-'+color+'-500'">
             <p class="whitespace-nowrap text-ellipsis max-w-full min-w-0 w-fit h-fit max-h-full min-h-0"> <slot></slot> </p>
         </button>
         <!-- Just for tailwind to generate classes, not showing nor useful -->
@@ -59,11 +59,19 @@ export default {
         applyDisabled() {
             const el = this.href ? this.$refs["btn"].$el : this.$refs["btn-2"];
             if (this.disabled) {
-                el.classList.remove("text-slate-500", "hover:bg-"+this.color+"-500", "hover:text-slate-50", "hover:shadow-md", "hover:border-"+this.color+"-600");
-                el.classList.add("text-slate-400", "cursor-default");
+                el.classList.remove(
+                    "text-slate-500", "hover:bg-"+this.color+"-500", "hover:text-slate-50", "hover:shadow-md",
+                    "hover:border-"+this.color+"-600", "hover:dark:border-"+this.color+"-700", "focus:dark:border-"+this.color+"-600",
+                    "hover:dark:bg-"+this.color+"-600", "hover:dark:text-slate-200"
+                );
+                el.classList.add("text-slate-400", "dark:text-slate-400", "cursor-default");
             } else {
-                el.classList.remove("text-slate-400", "cursor-default");
-                el.classList.add("text-slate-500", "hover:bg-"+this.color+"-500", "hover:text-slate-50", "hover:shadow-md", "hover:border-"+this.color+"-600");
+                el.classList.remove("text-slate-400", "dark:text-slate-400", "cursor-default");
+                el.classList.add(
+                    "text-slate-500", "hover:bg-"+this.color+"-500", "hover:text-slate-50", "hover:shadow-md",
+                    "hover:border-"+this.color+"-600", "hover:dark:border-"+this.color+"-700", "focus:dark:border-"+this.color+"-600",
+                    "hover:dark:bg-"+this.color+"-600", "hover:dark:text-slate-200"
+                );
             }
         }
     },
