@@ -961,7 +961,7 @@ paths:
 /travels:
     get:
       summary: All travels (admin)
-      description: Get all the travels
+      description: Get all travels
       operationId: getTravels
       tags:
         - Travels
@@ -973,7 +973,7 @@ paths:
         - bearerAuth: [ ]
       responses:
         '200':
-          description: The list of all the travels in the database
+          description: All travels
           content:
             application/json:
               schema:
