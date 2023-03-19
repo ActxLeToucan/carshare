@@ -1,9 +1,10 @@
-import { User } from '@prisma/client';
 import type express from 'express';
 import { prisma } from '../app';
 import * as validator from '../tools/validator';
-import { error, info, sendMsg } from '../tools/translator';
+import { error, info, type Notif, notifs, notify, sendMsg } from '../tools/translator';
 import { preparePagination } from './_common';
+import properties from '../properties';
+import { checkTravelHoursLimit } from '../tools/validator';
 
 exports.getMyTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const pagination = preparePagination(req, false);
@@ -53,7 +54,8 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
                      from travel t
                               inner join etape e1 on e1.travelId = t.id and e1.city = ${startCity}
                               inner join etape e2 on e2.travelId = t.id and e2.city = ${endCity}
-                     where e1.date < e2.date
+                     where t.status = ${properties.travel.status.open}
+                       and e1.date < e2.date
                        and IF(${startCtx} = '', true, e1.context = ${startCtx})
                        and IF(${endCtx} = '', true, e2.context = ${endCtx})
                        and e1.date BETWEEN ${date1} and ${date2}`
@@ -148,34 +150,86 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
 }
 
 exports.cancelTravel = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    if (res.locals.user === undefined) {
-        sendMsg(req, res, error.auth.noToken);
-        return;
-    }
+    const travelId = validator.sanitizeId(req.params.id, req, res);
+    if (travelId === null) return;
 
-    const travel = req.body.travel;
-
-    if (!(res.locals.user.id === travel.driver.id) && !(res.locals.user.level >= 1)) {
-        sendMsg(req, res, error.auth.insufficientPrivileges);
-        return;
-    }
-
-    const dateCheck = new Date(new Date(travel.date).getTime() - 1000 * 60 * 60 * 24);
-
-    if (!(travel.passagers === undefined || travel.passagers.length == 0) && dateCheck <= new Date()) {
-        sendMsg(req, res, error.travel.unableToCancel);
-        return;
-    }
-
-    prisma.travel.update({
-        where: { id: travel.id },
-        data: { status: -1 }
-    }).then(() => {
-        sendMsg(req, res, info.travel.successfulCancel);
-        if (travel.passagers !== undefined || travel.passagers.length > 0) {
-            // TODO Translator for notifications
-            validator.sendNotification(travel.id, null, null, travel.passagers.array, 'todo annulation', 'todo message annulation', req, res);
+    prisma.travel.findUnique({
+        where: { id: travelId },
+        include: {
+            etapes: true
         }
+    }).then((travel) => {
+        if (travel === null) {
+            sendMsg(req, res, error.travel.notFound);
+            return;
+        }
+
+        if (res.locals.user.id !== travel.driverId) {
+            sendMsg(req, res, error.travel.notDriver);
+            return;
+        }
+
+        if (travel.status !== properties.travel.status.open) {
+            sendMsg(req, res, error.travel.notOpen);
+            return;
+        }
+
+        if (!checkTravelHoursLimit(travel.etapes[0].date, req, res)) return;
+
+        prisma.travel.update({
+            where: { id: travelId },
+            data: { status: properties.travel.status.cancelled }
+        }).then(() => {
+            prisma.passenger.findMany({
+                where: {
+                    departure: {
+                        travelId
+                    }
+                },
+                include: {
+                    departure: true,
+                    arrival: true,
+                    passenger: true
+                }
+            }).then((passengers) => {
+                const data = passengers.map((passenger) => {
+                    const notif: Notif = notifs.standard.travelCancelled('en', passenger); // TODO: get user language
+                    return {
+                        userId: passenger.passengerId,
+                        title: notif.title,
+                        message: notif.message,
+                        type: 'standard',
+                        senderId: Number(res.locals.user.id),
+                        travelId: passenger.departure.travelId,
+                        createdAt: new Date()
+                    };
+                });
+
+                prisma.notification.createMany({ data }).then(() => {
+                    for (const notif of data) {
+                        const passenger = passengers.find((p) => p.passengerId === notif.userId);
+                        if (passenger !== undefined) {
+                            notify(passenger.passenger, notif).then(() => {
+                                console.log('Notification sent');
+                            }).catch((err) => {
+                                console.error(err);
+                            });
+                        }
+                    }
+
+                    sendMsg(req, res, info.travel.cancelled);
+                }).catch((err) => {
+                    console.error(err);
+                    sendMsg(req, res, error.generic.internalError);
+                });
+            }).catch((err) => {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
+            });
+        }).catch((err) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
     }).catch((err) => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);

@@ -87,6 +87,14 @@ const properties = {
         defaultLimit: 10,
         minLimit: 1, // in database queries, the minimum value allowed for LIMIT statements
         maxLimit: 50 // the max value allowed for LIMIT statements
+    },
+    travel: {
+        status: {
+            cancelled: -1,
+            open: 0,
+            ended: 1
+        },
+        hoursLimit: 24
     }
 } satisfies Record<string, Record<string, any>>;
 

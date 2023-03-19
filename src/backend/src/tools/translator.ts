@@ -365,11 +365,13 @@ const error = {
                 en: 'User not found.'
             },
             code: 404
-        }),
-        invalidId: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        })
+    },
+    id: {
+        invalid: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'L\'identifiant de l\'utilisateur est invalide.',
-                en: 'User id is invalid.'
+                fr: 'L\'identifiant est invalide.',
+                en: 'Id is invalid.'
             },
             code: 400
         })
@@ -608,13 +610,6 @@ const error = {
                 en: 'Notification not found.'
             },
             code: 404
-        }),
-        invalidId: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'L\'identifiant de la notification est invalide.',
-                en: 'Notification id is invalid.'
-            },
-            code: 400
         })
     },
     city: {
@@ -634,10 +629,31 @@ const error = {
         })
     },
     travel: {
-        unableToCancel: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        notModifiable: (req: Request, hours: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Annulement impossible 24h avant le départ d'un trajet qui possède des passagers.`,
-                en: `Impossible to cancel travel 24h before departure if it has at least one passenger.`
+                fr: `Vous ne pouvez pas modifier un trajet qui commence dans moins de ${hours} heure${hours > 1 ? 's' : ''}.`,
+                en: `You cannot modify a trip that starts in less than ${hours} hour${hours > 1 ? 's' : ''}.`
+            },
+            code: 400
+        }),
+        notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Trajet introuvable.',
+                en: 'Travel not found.'
+            },
+            code: 404
+        }),
+        notDriver: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Vous n\'êtes pas le conducteur de ce trajet.',
+                en: 'You are not the driver of this travel.'
+            },
+            code: 403
+        }),
+        notOpen: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Ce trajet n\'est plus ouvert.',
+                en: 'This travel is no longer open.'
             },
             code: 400
         })
@@ -736,13 +752,13 @@ const info = {
                 travel
             }
         }),
-        successfulCancel: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        cancelled: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `L'annulement du trajet a été effectué.`,
-                en: `Travel canceled successfully !`
+                fr: 'Trajet annulé',
+                en: 'Travel cancelled'
             },
             code: 200
-        }),
+        })
     },
     group: {
         created: (req: Request, group: Group & { users: User[], creator: User }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
@@ -776,7 +792,7 @@ const info = {
                 fr: 'Les notications ont étés envoyés.',
                 en: 'The notications have been sent.'
             },
-            code: 200,
+            code: 200
         })
     }
 
@@ -787,17 +803,17 @@ const notification = {
         title: (req: Request, user: User, token: string) => msgForLang<any, any>(req, {
             msg: {
                 fr: "Annulation d'un trajet",
-                eng: "A travel has been canceled"
+                eng: 'A travel has been cancelled'
             }
         }),
         core: (req: Request, user: User, token: string) => msgForLang<any, any>(req, {
             msg: {
-                fr: `Le trajet à destination de "" à "" départ le "" a été annulé.`,
-                eng: `The travel to "" from "" at "" has been canceled.` 
+                fr: 'Le trajet à destination de "" à "" départ le "" a été annulé.',
+                eng: 'The travel to "" from "" at "" has been cancelled.'
             }
         })
     }
-} 
+}
 
 const mail = {
     password: {
@@ -887,7 +903,7 @@ const mail = {
         })
     },
     notification: {
-        new: (req: Request | string, user: User, notification: Notification) => msgForLang<TemplateMail, Mail>(req, {
+        new: (req: Request | string, user: User, notification: { type: string | null, title: string, message: string, createdAt: Date } & Record<string, any>) => msgForLang<TemplateMail, Mail>(req, {
             to: user.email,
             subject: {
                 fr: `Nouvelle notification : ${notification.title}`,
@@ -957,7 +973,7 @@ const mail = {
 
 const notifs = {
     request: {
-        new: (lang: string, travel: Travel & { etapes: Etape[] }, sender: User, etapeDep: Etape, etapeDest: Etape, passenger: Passenger) => msgForLang<TemplateNotif, Notif>(lang, {
+        new: (lang: string, travel: Travel & { etapes: Etape[] }, sender: User, etapeDep: Etape, etapeDest: Etape, passenger: Passenger) => msgForLang<TemplateNotif, Notif>(lang, { // TODO: revoir les parametres
             title: {
                 fr: 'Nouvelle demande',
                 en: 'New request'
@@ -973,6 +989,18 @@ const notifs = {
                     (passenger.comment === null || passenger.comment === ''
                         ? ''
                         : `\n\n${sender.firstName ?? ''} ${sender.lastName ?? ''} left you the following message:\n${passenger.comment ?? ''}`)
+            }
+        })
+    },
+    standard: {
+        travelCancelled: (lang: string, passenger: (Passenger & { departure: Etape, arrival: Etape, passenger: User })) => msgForLang<TemplateNotif, Notif>(lang, {
+            title: {
+                fr: 'Annulation de trajet',
+                en: 'Travel cancelled'
+            },
+            message: {
+                fr: `Votre trajet de ${passenger.departure.city} à ${passenger.arrival.city} du ${new Date(passenger.departure.date).toLocaleString('fr-FR')} a été annulé par le conducteur.`,
+                en: `Your trip from ${passenger.departure.city} to ${passenger.arrival.city} on ${new Date(passenger.departure.date).toLocaleString('en-US')} has been cancelled by the driver.`
             }
         })
     }
@@ -1046,9 +1074,9 @@ async function sendMail (req: Request, message: (req: Request, ...args: any) => 
     return mailerSend(message(req, ...args));
 }
 
-async function notify (user: User, notification: Notification) {
-    // TODO: get user's language
-    return mailerSend(mail.notification.new('fr', user, notification));
+async function notify (user: User, notification: { type: string | null, title: string, message: string, createdAt: Date } & Record<string, any>) {
+    if (!user.mailNotif) return;
+    return mailerSend(mail.notification.new('en', user, notification)); // TODO: get user's language
 }
 
 /**
