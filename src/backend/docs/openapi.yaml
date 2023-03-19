@@ -825,7 +825,7 @@ paths:
                       travelsAsPassenger:
                         type: array
                         items:
-                          $ref: '#/components/schemas/Travel'
+                          $ref: '#/components/schemas/Passenger'
                   limit:
                     type: integer
                     example: 10
@@ -881,8 +881,8 @@ paths:
           in: query
           description: End city
           schema:
-              type: string
-              example: Metz
+            type: string
+            example: Metz
         - name: endContext
           in: query
           description: End context
@@ -1463,6 +1463,29 @@ components:
                 type: string
                 example: This feature is not yet implemented.
   schemas:
+    Passenger:
+      type: object
+      properties:
+        passengerId:
+          type: integer
+          example: 1
+        status:
+          type: integer
+          example: 1
+        comment:
+          type: string
+          nullable: true
+          example: I like cats
+        departureId:
+          type: integer
+          example: 1
+        departure:
+          $ref: '#/components/schemas/Etape'
+        arrivalId:
+          type: integer
+          example: 2
+        arrival:
+          $ref: '#/components/schemas/Etape'
     Travel:
       type: object
       properties:
