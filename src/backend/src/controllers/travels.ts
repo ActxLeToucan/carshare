@@ -177,19 +177,4 @@ exports.bookTravel = (req: express.Request, res: express.Response, _: express.Ne
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
     })
-    /*
-    prisma.passenger.create({
-        data: {
-            travelId,
-            status,
-            comment,
-            passengerId: res.locals.user.id
-        }
-    }).then((passenger) => {
-        sendMsg(req, res, info.passenger.created, passenger);
-    }).catch((err) => {
-        console.error(err);
-        sendMsg(req, res, error.generic.internalError);
-    })
-     */
 }
