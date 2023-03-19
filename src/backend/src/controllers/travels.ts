@@ -2,6 +2,7 @@ import type express from 'express';
 import { prisma } from '../app';
 import * as validator from '../tools/validator';
 import { error, info, sendMsg } from '../tools/translator';
+import { preparePagination } from './_common';
 
 exports.searchTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { date, startCity, startContext, endCity, endContext } = req.query;
