@@ -10,4 +10,7 @@ router.get('/search', auth.access, controller.searchTravels);
 router.post('/create', auth.access, emailVerified, controller.createTravel);
 router.delete('/:id', auth.access, emailVerified, controller.cancelTravel);
 
+// admin routes
+router.get('/', auth.access, controller.getTravels);
+
 module.exports = router;

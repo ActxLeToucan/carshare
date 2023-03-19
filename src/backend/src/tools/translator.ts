@@ -1102,4 +1102,18 @@ function displayableGroup (group: Group & { users: User[], creator: User }) {
     return g;
 }
 
-export { error, info, mail, notifs, sendMsg, sendMail, notify, displayableUserPrivate, displayableGroup };
+/**
+ * Returns a value with avg and count rename
+ * @param value value to rename avg and count
+ * @returns value with rename
+ */
+function displayableAverage (value: any) {
+    const p = value;
+    p.average = value._avg;
+    delete p._avg;
+    p.count = value._count;
+    delete p._count;
+    return p;
+}
+
+export { error, info, mail, notifs, sendMsg, sendMail, notify, displayableUserPrivate, displayableGroup, displayableAverage };

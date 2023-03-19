@@ -4,6 +4,7 @@ import * as validator from '../tools/validator';
 import { error, info, type Notif, notifs, notify, sendMsg } from '../tools/translator';
 import properties from '../properties';
 import { checkTravelHoursLimit } from '../tools/validator';
+import { preparePagination } from './_common';
 
 exports.searchTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { date, startCity, startContext, endCity, endContext } = req.query;
@@ -194,6 +195,25 @@ exports.cancelTravel = (req: express.Request, res: express.Response, next: expre
             sendMsg(req, res, error.generic.internalError);
         });
     }).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
+}
+
+exports.getTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    const pagination = preparePagination(req, false);
+
+    prisma.travel.count().then((count) => {
+        prisma.travel.findMany({
+            ...pagination.pagination
+        }
+        ).then(travels => {
+            res.status(200).json(pagination.results(travels, count));
+        }).catch(err => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
+    }).catch(err => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
     });
