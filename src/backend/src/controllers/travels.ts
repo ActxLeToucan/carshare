@@ -119,7 +119,7 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
     });
 }
 
-exports.cancelTravel = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+exports.cancelMyTravel = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const travelId = validator.sanitizeId(req.params.id, req, res);
     if (travelId === null) return;
 
