@@ -883,6 +883,55 @@ paths:
         '500':
           $ref: '#/components/responses/internalError'
 
+/travels/all:
+    get:
+      summary: All travels (admin)
+      description: Get all the travels
+      operationId: getTravels
+      tags:
+        - Travels
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: The list of all the travels in the database
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      travelsAsDriver:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Travel'
+                      travelsAsPassenger:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Travel'
+                  limit:
+                    type: integer
+                    example: 10
+                  offset:
+                    type: integer
+                    example: 0
+                  next:
+                    type: integer
+                    nullable: true
+                    example: 10
+                  prev:
+                    type: integer
+                    nullable: true
+                    example: 0
+        '500':
+          $ref: '#/components/responses/internalError'
+
   /settings/notifications:
     get:
       summary: Setting for mail notification

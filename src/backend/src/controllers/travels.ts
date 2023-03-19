@@ -133,3 +133,17 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
         sendMsg(req, res, error.generic.internalError);
     });
 }
+
+exports.getTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    const pagination = preparePagination(req, false);
+
+    prisma.travel.findMany({
+        ...pagination.pagination
+    }
+    ).then(travels => {
+        res.status(200).json(pagination.results(travels));
+    }).catch(err => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
+}
