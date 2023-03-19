@@ -28,9 +28,13 @@ exports.getUserEvaluation = (req: express.Request, res: express.Response, next: 
             where: {
                 evaluatedId: userId,
                 travel: {
-                    passengers: {
+                    etapes: {
                         some: {
-                            passengerId: userId
+                            departuresOfPassengers: {
+                                some: {
+                                    passengerId: userId
+                                }
+                            }
                         }
                     }
                 }
