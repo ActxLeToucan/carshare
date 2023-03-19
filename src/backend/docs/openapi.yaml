@@ -917,7 +917,7 @@ paths:
         '500':
           $ref: '#/components/responses/internalError'
 
-/travels/all:
+/travels:
     get:
       summary: All travels (admin)
       description: Get all the travels
@@ -939,16 +939,9 @@ paths:
                 type: object
                 properties:
                   data:
-                    type: object
-                    properties:
-                      travelsAsDriver:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/Travel'
-                      travelsAsPassenger:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/Travel'
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Travel'
                   limit:
                     type: integer
                     example: 10

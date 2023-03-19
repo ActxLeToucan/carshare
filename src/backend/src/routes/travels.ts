@@ -9,6 +9,6 @@ router.post('/create', auth.access, controller.createTravel);
 router.get('/search', auth.access, controller.searchTravels);
 
 // admin routes
-router.get('/all', auth.access, controller.getTravels);
+router.get('/', auth.access, controller.getTravels);
 
 module.exports = router;
