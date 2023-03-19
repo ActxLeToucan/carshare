@@ -1,3 +1,4 @@
+import { User } from '@prisma/client';
 import type express from 'express';
 import { prisma } from '../app';
 import * as validator from '../tools/validator';
@@ -140,6 +141,41 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
             console.error(err);
             sendMsg(req, res, error.generic.internalError);
         });
+    }).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
+}
+
+exports.cancelTravel = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    if (res.locals.user === undefined) {
+        sendMsg(req, res, error.auth.noToken);
+        return;
+    }
+
+    const travel = req.body.travel;
+
+    if (!(res.locals.user.id === travel.driver.id) && !(res.locals.user.level >= 1)) {
+        sendMsg(req, res, error.auth.insufficientPrivileges);
+        return;
+    }
+
+    const dateCheck = new Date(new Date(travel.date).getTime() - 1000 * 60 * 60 * 24);
+
+    if (!(travel.passagers === undefined || travel.passagers.length == 0) && dateCheck <= new Date()) {
+        sendMsg(req, res, error.travel.unableToCancel);
+        return;
+    }
+
+    prisma.travel.update({
+        where: { id: travel.id },
+        data: { status: -1 }
+    }).then(() => {
+        sendMsg(req, res, info.travel.successfulCancel);
+        if (travel.passagers !== undefined || travel.passagers.length > 0) {
+            // TODO Translator for notifications
+            validator.sendNotification(travel.id, null, null, travel.passagers.array, 'todo annulation', 'todo message annulation', req, res);
+        }
     }).catch((err) => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
