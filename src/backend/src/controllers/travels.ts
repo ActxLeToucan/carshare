@@ -2,6 +2,38 @@ import type express from 'express';
 import { prisma } from '../app';
 import * as validator from '../tools/validator';
 import { error, info, sendMsg } from '../tools/translator';
+import { preparePagination } from './_common';
+
+exports.getMyTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    const pagination = preparePagination(req, false);
+
+    prisma.user.count({
+        where: { id: res.locals.user.id }
+    }).then((count) => {
+        prisma.user.findMany({
+            where: { id: res.locals.user.id },
+            select: {
+                travelsAsDriver: true,
+                travelsAsPassenger: {
+                    select: { // TODO: update doc
+                        arrival: true, // TODO: is the travel really needed?
+                        departure: true
+                    }
+                }
+
+            },
+            ...pagination.pagination
+        }).then(travels => {
+            res.status(200).json(pagination.results(travels, count));
+        }).catch((err) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
+    }).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
+}
 
 exports.searchTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { date, startCity, startContext, endCity, endContext } = req.query;
@@ -113,4 +145,36 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
     });
+}
+exports.bookTravel = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    // TODO : Recuper les info du trajet ciblé et créer la notification correspondante.
+    const { message, travelId } = req.body;
+    prisma.travel.findUnique({
+        where: {
+            id: travelId
+        }
+    }).then((travel) => {
+        if (travel != null && travel.maxPassengers > 1) {
+            prisma.notification.create({
+                data: {
+                    travelId,
+                    message,
+                    senderId: res.locals.user.id,
+                    userId: travel.driverId,
+                    createdAt: new Date(Date.now()),
+                    title: 'Demande de Réservation'
+                }
+            }).then((notification) => {
+                sendMsg(req, res, info.notification.created, notification);
+            }).catch((err) => {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
+            })
+        } else {
+            sendMsg(req, res, error.travel.notFoundOrFull);
+        }
+    }).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    })
 }

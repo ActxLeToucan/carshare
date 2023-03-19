@@ -469,6 +469,15 @@ const error = {
             code: 500
         })
     },
+    travel: {
+        notFoundOrFull: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Trajet introuvable ou complet.',
+                en: 'Travel not found or full.'
+            },
+            code: 404
+        })
+    },
     group: {
         notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
@@ -728,6 +737,16 @@ const info = {
         })
     },
     notification: {
+        created: (req: Request, notification: Notification) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Notification créée',
+                en: 'Notification created'
+            },
+            code: 201,
+            data: {
+                notification
+            }
+        }),
         deletedAll: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Notifications supprimées',
@@ -930,18 +949,4 @@ function displayableGroup (group: Group & { users: User[], creator: User }) {
     return g;
 }
 
-/**
- * Returns a value with avg and count rename
- * @param value value to rename avg and count
- * @returns value with rename
- */
-function displayableAverage (value: any) {
-    const p = value;
-    p.average = value._avg;
-    delete p._avg;
-    p.count = value._count;
-    delete p._count;
-    return p;
-}
-
-export { error, info, mail, sendMsg, sendMail, displayableUserPrivate, displayableGroup, displayableAverage };
+export { error, info, mail, sendMsg, sendMail, displayableUserPrivate, displayableGroup };

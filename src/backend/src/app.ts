@@ -35,7 +35,6 @@ app.use('/travels', dbNeeded, require('./routes/travels'));
 app.use('/notifications', dbNeeded, require('./routes/notifications'));
 app.use('/settings', dbNeeded, require('./routes/settings'));
 app.use('/groups', dbNeeded, require('./routes/groups'));
-app.use('/notations', dbNeeded, require('./routes/notations'));
 
 app.use((req, res) => {
     sendMsg(req, res, error.generic.routeNotFound);
