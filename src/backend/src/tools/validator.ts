@@ -1,7 +1,9 @@
 import type express from 'express';
-import { error, sendMsg } from './translator';
+import { error, info, sendMsg } from './translator';
 import IsEmail from 'isemail';
 import properties from '../properties';
+import { type User } from '@prisma/client';
+import { prisma } from '../app';
 
 /**
  * Check if the email is in a valid format
@@ -246,11 +248,8 @@ function checkDateField (date: any, dateDays: boolean, req: express.Request, res
     }
 
     if (dateDays) {
-        const dateC = new Date();
-        dateC.setDate(dateC.getDate() + 1);
-
-        if (new Date(date) < dateC) {
-            sendMsg(req, res, error.date.tooSoon, dateC);
+        if (dateAddHours(new Date(), properties.travel.hoursLimit) > new Date(date)) {
+            sendMsg(req, res, error.date.tooSoon, dateAddHours(new Date(), properties.travel.hoursLimit));
             return false;
         }
     }
@@ -325,9 +324,9 @@ function sanitizeGender (gender: any): number | undefined {
  * @param res Express response
  * @returns The id number if it is valid, null otherwise
  */
-function sanitizeUserId (id: any, req: express.Request, res: express.Response): number | null {
+function sanitizeId (id: any, req: express.Request, res: express.Response): number | null {
     if (id === '' || Number.isNaN(Number(id))) {
-        sendMsg(req, res, error.user.invalidId);
+        sendMsg(req, res, error.id.invalid);
         return null;
     }
 
@@ -558,20 +557,17 @@ function checkListOfEtapeField (etapes: any, req: express.Request, res: express.
     return true;
 }
 
-/**
-* Sanitize the id of notification
-* @param id id to sanitize
-* @param req Express request
-* @param res Express response
-* @returns The id number if it is valid, null otherwise
-*/
-function sanitizeNotificationId (id: any, req: express.Request, res: express.Response): number | null {
-    if (id === ' ' || Number.isNaN(Number(id))) {
-        sendMsg(req, res, error.notification.invalidId);
-        return null;
+function checkTravelHoursLimit (date: Date, req: express.Request, res: express.Response): boolean {
+    const now = new Date();
+    if (dateAddHours(now, properties.travel.hoursLimit) > date) {
+        sendMsg(req, res, error.travel.notModifiable, properties.travel.hoursLimit);
+        return false;
     }
+    return true;
+}
 
-    return Number(id);
+function dateAddHours (date: Date, hours: number): Date {
+    return new Date(date.getTime() + hours * 60 * 60 * 1000);
 }
 
 export {
@@ -587,12 +583,12 @@ export {
     checkCityField,
     sanitizePhone,
     sanitizeGender,
-    sanitizeUserId,
+    sanitizeId,
     checkMaxPassengersField,
     checkPriceField,
     checkStringField,
     checkListOfEtapeField,
     checkDescriptionField,
-    sanitizeNotificationId,
-    checkTravelAlready
+    checkTravelAlready,
+    checkTravelHoursLimit
 };

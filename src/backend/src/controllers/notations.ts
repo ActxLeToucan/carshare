@@ -4,7 +4,7 @@ import * as validator from '../tools/validator';
 import { error, sendMsg, displayableAverage } from '../tools/translator';
 
 exports.getUserEvaluation = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const userId = validator.sanitizeUserId(req.params.id, req, res);
+    const userId = validator.sanitizeId(req.params.id, req, res);
 
     if (userId === null) return;
 
