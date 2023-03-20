@@ -890,6 +890,63 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
+  /travels/my/:id:
+    delete:
+      summary: Delete my travel
+      description: Delete a travel of the current user.
+      operationId: cancelMyTravel
+      tags:
+        - Travels
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - name: id
+          in: path
+          description: Travel id
+          required: true
+          schema:
+            type: integer
+            example: 1
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Travel cancelled
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Travel deleted"
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Invalid id"
+        '401':
+          $ref: '#/components/responses/noToken'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "You are not the driver of this travel."
+        '404':
+          $ref: '#/components/responses/travelNotFound'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
 
   /travels/search:
     get:
@@ -955,6 +1012,48 @@ paths:
           $ref: '#/components/responses/noToken'
         '498':
           $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+
+  /travels:
+    get:
+      summary: All travels (admin)
+      description: Get all travels
+      operationId: getTravels
+      tags:
+        - Travels
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: All travels
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Travel'
+                  limit:
+                    type: integer
+                    example: 10
+                  offset:
+                    type: integer
+                    example: 0
+                  next:
+                    type: integer
+                    nullable: true
+                    example: 10
+                  prev:
+                    type: integer
+                    nullable: true
+                    example: 0
         '500':
           $ref: '#/components/responses/internalError'
 
@@ -1574,6 +1673,16 @@ components:
               message:
                 type: string
                 example: User not found.
+    travelNotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Travel not found.
     typeError:
       description: Invalid type of value
       content:
