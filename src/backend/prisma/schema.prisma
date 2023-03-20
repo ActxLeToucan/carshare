@@ -53,16 +53,16 @@ model Travel {
 }
 
 model Passenger {
-  passenger   User    @relation(fields: [passengerId], references: [id], onDelete: Cascade)
-  passengerId Int
-  status      Int     @default(0)
-  comment     String? @db.Text
-  departure   Etape   @relation(name: "stepDeparture", fields: [departureId], references: [id], onDelete: Cascade)
-  departureId Int
-  arrival     Etape   @relation(name: "stepArrival", fields: [arrivalId], references: [id], onDelete: Cascade)
-  arrivalId   Int
-
-  @@id([passengerId, departureId, arrivalId])
+  id            Int            @id @default(autoincrement())
+  passenger     User           @relation(fields: [passengerId], references: [id], onDelete: Cascade)
+  passengerId   Int
+  status        Int            @default(0)
+  comment       String?        @db.Text
+  departure     Etape          @relation(name: "stepDeparture", fields: [departureId], references: [id], onDelete: Cascade)
+  departureId   Int
+  arrival       Etape          @relation(name: "stepArrival", fields: [arrivalId], references: [id], onDelete: Cascade)
+  arrivalId     Int
+  notifications Notification[]
 }
 
 model Etape {
@@ -92,17 +92,19 @@ model Evaluation {
 }
 
 model Notification {
-  id        Int      @id @default(autoincrement())
-  type      String?  @db.VarChar(25)
-  title     String   @db.Text
-  message   String   @db.Text
-  user      User     @relation(fields: [userId], references: [id], name: "recipient", onDelete: Cascade)
+  id        Int        @id @default(autoincrement())
+  type      String?    @db.VarChar(25)
+  title     String     @db.Text
+  message   String     @db.Text
+  user      User       @relation(fields: [userId], references: [id], name: "recipient", onDelete: Cascade)
   userId    Int
-  travel    Travel?  @relation(fields: [travelId], references: [id], onDelete: SetNull)
+  travel    Travel?    @relation(fields: [travelId], references: [id], onDelete: SetNull)
   travelId  Int?
-  sender    User?    @relation(fields: [senderId], references: [id], name: "sender", onDelete: SetNull)
+  sender    User?      @relation(fields: [senderId], references: [id], name: "sender", onDelete: SetNull)
   senderId  Int?
-  createdAt DateTime @default(now())
+  createdAt DateTime   @default(now())
+  booking   Passenger? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  bookingId Int?
 }
 
 model Group {
