@@ -2,6 +2,7 @@ import type express from 'express';
 import { prisma } from '../app';
 import * as validator from '../tools/validator';
 import { error, info, sendMsg } from '../tools/translator';
+import { User } from '@prisma/client';
 
 exports.searchTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { date, startCity, startContext, endCity, endContext } = req.query;
@@ -109,6 +110,30 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
             console.error(err);
             sendMsg(req, res, error.generic.internalError);
         });
+    }).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
+}
+
+exports.cancelBooking = (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    const travel = req.body.travel;
+
+    const dateCheck = new Date(new Date(travel.date).getTime() - 1000 * 60 * 60 * 24);
+    console.log(res.locals.user.travelsAsPassenger.id)
+    if ( travel.passagers === undefined && !(travel.id in res.locals.user.travelsAsPassenger.id) && dateCheck <= new Date() ) {
+        sendMsg(req, res, error.travel.unableToCancel);
+        return;
+    }
+
+    const updatedPassengers = travel.passengers.filter((passenger: User) => passenger.id != res.locals.user.id)
+
+    prisma.travel.update({
+        where: { id: travel.id },
+        data: { passengers: updatedPassengers }
+    }).then(() => {
+        sendMsg(req, res, info.travel.successfulCancel);
+        properties.sendNotification(travel.id, null, null, [res.locals.user], "todo annulation", "todo message annulation", req, res);
     }).catch((err) => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
