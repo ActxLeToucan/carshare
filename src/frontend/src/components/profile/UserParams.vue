@@ -16,7 +16,7 @@
             <card class="w-full flex-col max-w-[35em]">
                 <p class="text-xl font-bold text-slate-500 dark:text-slate-300 text-center mx-auto"> {{ lang.DISPLAY_PARAMS }} </p>
                 <input-choice name="theme"    :label="lang.THEME"    :value="selectedTheme"    :list="themes"   :onchange="onThemeChanged"></input-choice>
-                <input-choice name="language" :label="lang.LANGUAGES " :value="selectedLanguage" :list="languages" :onchange="onLanguageChanged"></input-choice>
+                <input-choice name="language" :label="lang.LANGUAGE " :value="selectedLanguage" :list="languages" :onchange="onLanguageChanged"></input-choice>
             </card>
         </div>
     </div>
