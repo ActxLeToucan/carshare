@@ -175,7 +175,9 @@ export default {
         DARKMODE: "Dark",
         LIGHTMODE: "Light",
         DISPLAY_PARAMS: "Display settings",
-        LANGUAGES: "Languages",
+        LANGUAGE: "Language",
+        UPDATING_PARAMS: "Updating parameters",
+        PARAMS_UPDATED: "Parameters updated successfully",
 
     // informations
     ADDRESS_NOT_VERIFIED: "Address not verified",

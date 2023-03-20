@@ -175,7 +175,7 @@ export default {
         DARKMODE: "Sombre",
         LIGHTMODE: "Clair",
         DISPLAY_PARAMS: "Paramètres d'affichage",
-        LANGUAGES: "Langues",
+        LANGUAGE: "Langue",
         UPDATING_PARAMS: "Mise à jour des paramètres",
         PARAMS_UPDATED: "Paramètres mis à jour avec succès",
 
