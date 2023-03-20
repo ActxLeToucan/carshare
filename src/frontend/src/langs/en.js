@@ -118,6 +118,8 @@ export default {
     STARTING_POINT_SPECIFY: "Please specify the starting point",
     ENDING_POINT_SPECIFY: "Please specify the ending point",
     DATE_SPECIFY: "Please specify the trip date",
+    NO_TRIPS: "No trips found",
+    NO_TRIPS_DESC: "No trips found for the selected informations",
 
     // profile
     MY_PROFILE: "My profile",
@@ -175,7 +177,9 @@ export default {
         DARKMODE: "Dark",
         LIGHTMODE: "Light",
         DISPLAY_PARAMS: "Display settings",
-        LANGUAGES: "Languages",
+        LANGUAGE: "Language",
+        UPDATING_PARAMS: "Updating parameters",
+        PARAMS_UPDATED: "Parameters updated successfully",
 
     // informations
     ADDRESS_NOT_VERIFIED: "Address not verified",

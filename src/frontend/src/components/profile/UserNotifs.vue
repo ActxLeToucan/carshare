@@ -1,21 +1,21 @@
 <template>
-    <div class="md:show-up flex flex-col grow">
+    <div class="md:show-up flex flex-col grow max-w-full">
         <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> {{ lang.MY_NOTIFS }} </p>
-        <div class="flex flex-col md:w-fit w-full md:mx-auto px-4">
-            <div class="flex grow h-fit min-w-[60vw] md:max-w-[70vw]">
-                <div v-show="loading && !minorLoading" class="flex flex-col justify-center mx-auto">
+        <div class="flex flex-col md:w-fit w-full md:mx-auto px-4 max-w-full">
+            <div class="flex grow h-fit min-w-[60vw] md:max-w-[70vw] max-w-full">
+                <div v-show="loading && !minorLoading" class="flex flex-col justify-center mx-auto max-w-full">
 
-                    <badge :title="lang.LOADING_NOTIFS" :content="lang.LOADING_NOTIFS_DESC"></badge>
-
-                </div>
-                <div v-if="!loading && error" class="flex flex-col justify-center mx-auto">
-
-                    <badge :title="lang.ERROR" :content="this.error"></badge>
+                    <badge :newline="true" :title="lang.LOADING_NOTIFS" :content="lang.LOADING_NOTIFS_DESC"></badge>
 
                 </div>
-                <div v-if="notifs.length === 0 && !loading && !error" class="flex flex-col justify-center mx-auto">
+                <div v-if="!loading && error" class="flex flex-col justify-center mx-auto max-w-full">
 
-                    <badge :title="lang.NO_NOTIFS" :content="lang.NO_NOTIFS_DESC"></badge>
+                    <badge :newline="true" :title="lang.ERROR" :content="this.error"></badge>
+
+                </div>
+                <div v-if="notifs.length === 0 && !loading && !error" class="flex flex-col justify-center mx-auto max-w-full">
+
+                    <badge :newline="true" :title="lang.NO_NOTIFS" :content="lang.NO_NOTIFS_DESC"></badge>
 
                 </div>
                 <div v-if="notifs.length > 0 && (!loading || minorLoading)" class="flex-col w-full mb-12">

@@ -118,6 +118,8 @@ export default {
     STARTING_POINT_SPECIFY: "Veuillez renseignez le point de départ",
     ENDING_POINT_SPECIFY: "Veuillez renseignez le point d'arrivée",
     DATE_SPECIFY: "Veuillez renseignez la date",
+    NO_TRIPS: "Aucun trajet trouvé",
+    NO_TRIPS_DESC: "Il n'y a aucun trajet trouvé pour les informations renseignées",
 
     // profile
     MY_PROFILE: "Mon profil",
@@ -175,7 +177,7 @@ export default {
         DARKMODE: "Sombre",
         LIGHTMODE: "Clair",
         DISPLAY_PARAMS: "Paramètres d'affichage",
-        LANGUAGES: "Langues",
+        LANGUAGE: "Langue",
         UPDATING_PARAMS: "Mise à jour des paramètres",
         PARAMS_UPDATED: "Paramètres mis à jour avec succès",
 
