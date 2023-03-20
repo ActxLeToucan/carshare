@@ -335,7 +335,7 @@ export default {
         },
         createTrip(showlogs = true) {
             const toDestination = (obj) => !obj? null: ({label: obj.label, city: obj.city, context: obj.context, lat: obj.lat, lng: obj.lng});
-            const toStep = (obj) => !obj? null: ({date: obj.datetime, ...toDestination(obj.destination)});
+            const toStep = (obj) => !obj? null: ({date: obj.dat89etime, ...toDestination(obj.destination)});
 
             const groupID = this.selectedTripType == 1? this.selectedGroup?.id: null;
             const infos = this.$el.querySelector("textarea[name=trip-infos]").value;
@@ -524,3 +524,4 @@ export default {
     }
 }
 </script>
+

@@ -179,11 +179,11 @@ export default {
         UPDATING_PARAMS: "Mise à jour des paramètres",
         PARAMS_UPDATED: "Paramètres mis à jour avec succès",
 
-         //trip
-         FUTURE_TRIPS: "Trajets à venir",
-         PAST_TRIPS: "Trajets passés",
-         TRIP_OFF: "Trajet du",
-         PASSENGER: "passagers",
+        //trip
+        FUTURE_TRIPS: "Trajets à venir",
+        PAST_TRIPS: "Trajets passés",
+        TRIP_OFF: "Trajet du",
+        PASSENGER: "Passagers",
 
 
     // informations
