@@ -617,6 +617,13 @@ const error = {
                 en: 'Notification not found.'
             },
             code: 404
+        }),
+        invalidId: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'L\'identifiant de la notification est invalide.',
+                en: 'Notification id is invalid.'
+            },
+            code: 400
         })
     },
     city: {
@@ -1168,4 +1175,4 @@ function displayableEvaluation (evaluation: Evaluation & { travel: Travel, evalu
     return g;
 }
 
-export { error, info, mail, sendMsg, sendMail, displayableUserPrivate, displayableGroup, displayableAverage, displayableEvaluation };
+export { error, info, mail, notifs, sendMsg, sendMail, notify, displayableUserPrivate, displayableGroup, displayableAverage, displayableEvaluation };
