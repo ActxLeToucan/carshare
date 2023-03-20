@@ -1,7 +1,7 @@
 import type express from 'express';
 import { prisma } from '../app';
 import * as validator from '../tools/validator';
-import { error, sendMsg, displayableAverage } from '../tools/translator';
+import { error, sendMsg, info, displayableAverage } from '../tools/translator';
 
 exports.getUserEvaluation = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const userId = validator.sanitizeId(req.params.id, req, res);
@@ -75,6 +75,41 @@ exports.getAverageTravel = (req: express.Request, res: express.Response, next: e
     }).then((travelsAvg) => {
         travelsAvg.map(displayableAverage);
         res.status(200).json(travelsAvg);
+    }).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
+}
+
+
+exports.deleteEvaluation = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    const notationId = validator.sanitizeId(req.params.id, req, res);
+    if (notationId === null) return;
+
+    prisma.evaluation.count({
+
+        where: {
+            id: notationId,
+            evaluatorId: res.locals.user.id
+        }
+
+    }).then((count) => {
+        if (count <= 0) {
+            sendMsg(req, res, error.evaluation.notFound);
+            return;
+        }
+
+        prisma.evaluation.delete({
+            where: {
+                id: notationId
+
+            }
+        }).then(() => {
+            sendMsg(req, res, info.evaluation.deleted);
+        }).catch((err) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
     }).catch((err) => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
