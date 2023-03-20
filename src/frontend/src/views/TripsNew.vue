@@ -6,16 +6,16 @@
             <div class="flex md:hidden justify-evenly px-1 space-x-1">
 
                 <button
-                    class="p-2 my-2 border-2 bg-slate-100 w-[50%] h-fit text-md font-semibold transition-all"
-                    :class="selectedTab == 0 ? 'bg-teal-500 border-teal-600 text-teal-900' : 'bg-slate-100 border-transparent text-slate-500'"
+                    class="p-2 my-2 border-2 w-[50%] h-fit text-md font-semibold transition-all"
+                    :class="selectedTab == 0 ? 'bg-teal-500 border-teal-600 text-teal-900' : 'bg-slate-100 dark:bg-slate-700 border-transparent text-slate-500 dark:text-slate-400'"
                     v-on:click="() => { selectedTab = 0; }"
                 >
                     {{ lang.INFORMATIONS }}
                 </button>
 
                 <button
-                    class="p-2 my-2 border-2 bg-slate-100 w-[50%] h-fit text-md font-semibold transition-all"
-                    :class="selectedTab == 1 ? 'bg-teal-500 border-teal-600 text-teal-900' : 'bg-slate-100 border-transparent text-slate-500'"
+                    class="p-2 my-2 border-2 w-[50%] h-fit text-md font-semibold transition-all"
+                    :class="selectedTab == 1 ? 'bg-teal-500 border-teal-600 text-teal-900' : 'bg-slate-100 dark:bg-slate-700 border-transparent text-slate-500 dark:text-slate-400'"
                     v-on:click="() => { selectedTab = 1; }"
                 >
                     {{ lang.STEPS }}
@@ -83,7 +83,7 @@
                 </div>
 
                 <div class="md:flex hidden grow w-fit items-center justify-center py-[20vh]">
-                    <span class="w-1 h-full bg-slate-200 rounded-lg"></span>
+                    <span class="w-1 h-full bg-slate-200 dark:bg-slate-700 rounded-lg"></span>
                 </div>
 
                 <div
@@ -117,13 +117,13 @@
 
                         <div class="flex flex-col">
                             <div class="flex flex-col space-y-2">
-                                <span class="h-4 w-1 bg-slate-300 rounded-md mx-auto"></span>
-                                <button class="flex rounded-md border-2 border-slate-400 w-fit mx-auto text-slate-500 shadow-none
+                                <span class="h-4 w-1 bg-slate-300 dark:bg-slate-600 rounded-md mx-auto"></span>
+                                <button class="flex rounded-md border-2 border-slate-400 dark:border-slate-500 w-fit mx-auto text-slate-500 shadow-none
                                             hover:border-teal-500 hover:text-teal-500 hover:shadow-md buttontransition-all"
                                      v-on:click="addStep(0)">
                                     <plus-icon class="w-6 h-6"></plus-icon>
                                 </button>
-                                <span class="h-4 w-1 bg-slate-300 rounded-md mx-auto"></span>
+                                <span class="h-4 w-1 bg-slate-300 dark:bg-slate-600 rounded-md mx-auto"></span>
                             </div>
 
                             <!-- IN BETWEEN STEPS SECTION -->
@@ -157,13 +157,13 @@
                                     </card>
                                 </div>
                                 <div class="flex flex-col space-y-2">
-                                    <span class="h-4 w-1 bg-slate-300 rounded-md mx-auto"></span>
-                                    <button class="flex rounded-md border-2 border-slate-400 w-fit mx-auto text-slate-500 shadow-none
+                                    <span class="h-4 w-1 bg-slate-300 dark:bg-slate-600 rounded-md mx-auto"></span>
+                                    <button class="flex rounded-md border-2 border-slate-400 dark:border-slate-500 w-fit mx-auto text-slate-500 shadow-none
                                                 hover:border-teal-500 hover:text-teal-500 hover:shadow-md transition-all"
                                          v-on:click="() => addStep(index + 1)">
                                         <plus-icon class="w-6 h-6"></plus-icon>
                                     </button>
-                                    <span class="h-4 w-1 bg-slate-300 rounded-md mx-auto"></span>
+                                    <span class="h-4 w-1 bg-slate-300 dark:bg-slate-600 rounded-md mx-auto"></span>
                                 </div>
                             </div>
 

@@ -5,15 +5,15 @@
 
             <div class="flex flex-col w-fit md:mx-auto mx-auto max-w-full px-2">
                 <p class="text-xl text-slate-500 py-2 font-semibold"> {{ lang.MY_GROUPS }} </p>
-                <card class="flex grow h-fit min-w-[60vw] md:max-w-[70vw] max-w-full">
-                    <div v-show="loading" class="flex flex-col justify-center mx-auto">
+                <card class="flex grow h-fit min-w-[60vw] md:max-w-[70vw] w-full overflow-y-auto">
+                    <div v-show="loading" class="flex flex-col justify-center mx-auto max-w-full">
 
-                        <badge :title="lang.LOADING_GROUPS" :content="lang.LOADING_GROUPS_DESC"></badge>
+                        <badge :newline="true" :title="lang.LOADING_GROUPS" :content="lang.LOADING_GROUPS_DESC"></badge>
                         
                     </div>
-                    <div v-if="groups.length == 0 && !loading" class="flex flex-col justify-center mx-auto">
+                    <div v-if="groups.length == 0 && !loading" class="flex flex-col justify-center mx-auto max-w-full">
 
-                        <badge :title="lang.NO_GROUPS" :content="lang.NO_GROUPS_DESC"></badge>
+                        <badge :newline="true" :title="lang.NO_GROUPS" :content="lang.NO_GROUPS_DESC"></badge>
                         
                     </div>
                     <div v-if="groups.length > 0 && !loading" class="flex space-x-4 overflow-x-scroll w-full">
@@ -33,7 +33,7 @@
                 </div>
             </div>
 
-            <div ref="group-zone" class="flex md:w-[60vw] grow md:mx-auto px-2 h-fit mx-auto transition-all overflow-hidden my-4 max-w-full" style="max-height: 0px;">
+            <div ref="group-zone" class="flex md:w-[60vw] md:mx-auto px-2 h-fit mx-auto transition-all overflow-hidden my-4 max-w-full" style="max-height: 0px;">
                 <div class="flex flex-col h-fit grow rounded-lg border-2 border-slate-200 dark:border-slate-700 overflow-hidden">
                     <div class="flex grow justify-between bg-slate-100 dark:bg-slate-700 h-fit items-center">
                         <div class="relative w-8 h-8"></div>
@@ -46,7 +46,7 @@
                         
                         <div v-if="selectedGroup?.users.length == 0" class="flex flex-col justify-center mx-auto max-w-full">
 
-                            <badge class="max-w-full" :title="lang.NO_USERS" :content="lang.NO_USERS_DESC"></badge>
+                            <badge :newline="true" class="max-w-full" :title="lang.NO_USERS" :content="lang.NO_USERS_DESC"></badge>
                             
                         </div>
                         <div v-if="selectedGroup?.users.length > 0" class="flex overflow-x-auto space-x-4 w-full">
