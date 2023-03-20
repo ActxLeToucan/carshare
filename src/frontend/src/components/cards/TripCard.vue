@@ -62,7 +62,7 @@ export default {
         
     },
     mounted() {
-
+        console.log("trip: ", this.trip);
     }
 }
 </script>

@@ -118,6 +118,8 @@ export default {
     STARTING_POINT_SPECIFY: "Please specify the starting point",
     ENDING_POINT_SPECIFY: "Please specify the ending point",
     DATE_SPECIFY: "Please specify the trip date",
+    NO_TRIPS: "No trips found",
+    NO_TRIPS_DESC: "No trips found for the selected informations",
 
     // profile
     MY_PROFILE: "My profile",

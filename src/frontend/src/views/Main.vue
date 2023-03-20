@@ -18,7 +18,7 @@
                                 <div class="absolute bottom-11 left-0">
                                     <div> <!-- FOR CAR MOVEMENTS -->
                                         <div> <!-- FOR CAR SHAKES -->
-                                            <car ref="car" class="car w-20 text-white dark:text-slate-600 drop-shadow-md cursor-pointer"
+                                            <car ref="car" class="car w-20 text-white dark:text-slate-200 drop-shadow-md cursor-pointer"
                                                 style="transform: scale(-1, 1);"
                                                 fill="currentColor"
                                                 stroke="none"
@@ -81,6 +81,21 @@
             ></div>
 
             <div class="flex grow min-h-[50vh]">
+
+                <div ref="err-notfound" class="flex hidden grow h-fit py-8 justify-center items-center">
+                    <card class="flex flex-col justify-center items-center">
+                        <p class="text-2xl text-slate-500 dark:text-slate-400 font-bold"> {{ lang.NO_TRIPS }} </p>
+                        <p class="text-xl text-slate-400 dark:text-slate-500 font-semibold"> {{ lang.NO_TRIPS_DESC }} </p>
+                    </card>
+                </div>
+
+                <div ref="err-fetch" class="flex hidden grow h-fit py-8 justify-center items-center">
+                    <card class="flex flex-col justify-center items-center">
+                        <p class="text-2xl text-slate-500 dark:text-slate-400 font-bold"> {{ lang.ERROR }} </p>
+                        <p ref="err-fetch-msg" class="text-xl text-slate-400 dark:text-slate-500 font-semibold">  </p>
+                    </card>
+                </div>
+
                 <trip-card
                     v-for="trip in trips" :key="trip.id"
                     :trip="trip" class="mx-auto"
@@ -97,6 +112,7 @@ import InputText from '../components/inputs/InputText.vue';
 import Topbar from "../components/topbar/Topbar.vue";
 import Selector from '../components/inputs/Selector.vue';
 import TripCard from '../components/cards/TripCard.vue';
+import Card from '../components/cards/Card.vue';
 import { Log, LogZone } from '../scripts/Logs';
 import Car from '../components/Car.vue';
 import BAN from '../scripts/BAN.js';
@@ -207,6 +223,7 @@ export default {
         ArrowsUpDownIcon,
         Selector,
         Car,
+        Card,
         TripCard
     },
     name: 'Main',
@@ -274,8 +291,6 @@ export default {
                 }
             }
 
-            console.log(this.startCity);
-
             msg_log.update(Lang.CurrentLang.SEARCHING + " ...", Log.INFO);
             API.execute_logged(API.ROUTE.TRAVELS.SEARCH + API.createParameters({
                 date: input_date.value,
@@ -284,26 +299,43 @@ export default {
                 startContext: this.startCity.desc,
                 endContext: this.endCity.desc,
             }), API.METHOD.GET, User.CurrentUser.getCredentials()).then(res => {
-                if (res.data)
-                    this.addTrips(res.data);
-                else this.addTrips(res);
+                this.setTrips(res);
                 msg_log.delete();
             }).catch(err => {
                 console.error(err);
+                this.setTrips(err);
                 msg_log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
                 setTimeout(() => { msg_log.delete(); }, 5000);
             });
         },
-        addTrips(list) {
-            for (const el in list) {
+        setTrips(list) {
+            if (typeof list == "string")
+            {
+                this.$refs["err-fetch"].classList.remove("hidden");
+                this.$refs["err-fetch-msg"].innerText = list;
+                return;
+            } else {
+                this.$refs["err-fetch"].classList.add("hidden");
+            }
+
+            if (list.length == 0) {
+                this.$refs["err-notfound"].classList.remove("hidden");
+                return;
+            } else {
+                this.$refs["err-notfound"].classList.add("hidden");
+            }
+
+            this.trips = [];
+            for (const el of list) {
+                console.log(el)
                 this.trips.push({
-                    date: el.steps[0]?.date.toLocalDateString(),
-                    author: el.driver.firstName + el.driver.lastName.substring(0, 1) + ".",
-                    startCity: el.steps[0]?.label,
-                    startTime: el.steps[0]?.date.toLocalTimeString().substring(0, 5),
-                    endCity: el.steps[el.steps.length - 1]?.label,
-                    endTime: el.steps[el.steps.length - 1]?.date.toLocalTimeString().substring(0, 5),
-                    slots: el.maxPassengers - (el.passengers?.length ?? 0),
+                    date: el.steps == null ? "--noinfo--" : el.steps[0]?.date.toLocalDateString(),
+                    author: el.driver == null ? (el.driverId == undefined ? "--noinfo--" : "ID : " + el.driverId) : el.driver.firstName + el.driver.lastName.substring(0, 1) + ".",
+                    startCity: el.steps == null ? "--noinfo--" : el.steps[0]?.label,
+                    startTime: el.steps == null ? "--noinfo--" : el.steps[0]?.date.toLocalTimeString().substring(0, 5),
+                    endCity: el.steps == null ? "--noinfo--" : el.steps[el.steps.length - 1]?.label,
+                    endTime: el.steps == null ? "--noinfo--" : el.steps[el.steps.length - 1]?.date.toLocalTimeString().substring(0, 5),
+                    slots: el.maxPassengers - (el.passengers == undefined ? 0 : el.passengers?.length),
                     price: el.price,
                 });
             }
@@ -361,7 +393,7 @@ export default {
 .tuttext {
     font-size: 0.8em;
     font-weight: 500;
-    @apply text-white dark:text-slate-700;
+    @apply text-white dark:text-slate-200;
 }
 .tutcontainer {
     position: absolute;
