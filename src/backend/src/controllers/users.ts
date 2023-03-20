@@ -273,7 +273,7 @@ exports.searchUsers = (req: express.Request, res: express.Response, _: express.N
 }
 
 exports.deleteUser = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const userId = validator.sanitizeUserId(req.params.id, req, res);
+    const userId = validator.sanitizeId(req.params.id, req, res);
     if (userId === null) return;
 
     prisma.user.findUnique({ where: { id: userId } })
@@ -303,7 +303,7 @@ exports.deleteUser = (req: express.Request, res: express.Response, _: express.Ne
 }
 
 exports.updateUser = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const userId = validator.sanitizeUserId(req.params.id, req, res);
+    const userId = validator.sanitizeId(req.params.id, req, res);
     if (userId === null) return;
 
     prisma.user.findUnique({ where: { id: userId } })
