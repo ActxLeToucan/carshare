@@ -1,7 +1,7 @@
 import type express from 'express';
-import {prisma} from '../app';
+import { prisma } from '../app';
 import * as validator from '../tools/validator';
-import {error, sendMsg, info, displayableAverage} from '../tools/translator';
+import { error, sendMsg, info, displayableAverage } from '../tools/translator';
 
 exports.getUserEvaluation = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const userId = validator.sanitizeId(req.params.id, req, res);
@@ -50,7 +50,7 @@ exports.getUserEvaluation = (req: express.Request, res: express.Response, next: 
             passenger = displayableAverage(passenger);
             driver = displayableAverage(driver);
 
-            res.status(200).json({driver, passenger});
+            res.status(200).json({ driver, passenger });
         }).catch((err) => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);
@@ -81,9 +81,8 @@ exports.getAverageTravel = (req: express.Request, res: express.Response, next: e
     });
 }
 
-
 exports.createEvaluation = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const {note, travelId, evaluatedId} = req.body;
+    const { note, travelId, evaluatedId } = req.body;
 
     if (!validator.checkNoteField(note, req, res)) return;
     if (!validator.checkNumberField(travelId, req, res, 'travelId')) return;
@@ -170,7 +169,6 @@ exports.createEvaluation = (req: express.Request, res: express.Response, _: expr
                         }]
                     }
                 }).then((count) => {
-
                     if (count === 0) {
                         sendMsg(req, res, error.evaluation.notpossible);
                         return;
@@ -189,7 +187,6 @@ exports.createEvaluation = (req: express.Request, res: express.Response, _: expr
                             evaluated: true
                         }
                     }).then((evaluation) => {
-
                         sendMsg(req, res, info.evaluation.created, evaluation);
                     }).catch((err) => {
                         console.error(err);
