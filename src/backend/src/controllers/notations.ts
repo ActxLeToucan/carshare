@@ -81,7 +81,6 @@ exports.getAverageTravel = (req: express.Request, res: express.Response, next: e
     });
 }
 
-
 exports.deleteEvaluation = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const notationId = validator.sanitizeId(req.params.id, req, res);
     if (notationId === null) return;

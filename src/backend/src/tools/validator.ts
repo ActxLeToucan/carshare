@@ -1,9 +1,7 @@
 import type express from 'express';
-import { error, info, sendMsg } from './translator';
+import { error, sendMsg } from './translator';
 import IsEmail from 'isemail';
 import properties from '../properties';
-import { type User } from '@prisma/client';
-import { prisma } from '../app';
 
 /**
  * Check if the email is in a valid format

@@ -8,5 +8,4 @@ router.get('/travels', auth.access, controller.getAverageTravel);
 router.get('/average/:id', auth.access, controller.getUserEvaluation);
 router.delete('/:id', auth.access, controller.deleteEvaluation);
 
-
 module.exports = router;
