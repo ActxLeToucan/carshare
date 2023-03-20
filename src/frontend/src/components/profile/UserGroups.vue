@@ -33,7 +33,7 @@
                 </div>
             </div>
 
-            <div ref="group-zone" class="flex md:w-[60vw] grow md:mx-auto mx-2 h-fit mx-auto transition-all overflow-hidden my-4" style="max-height: 0px;">
+            <div ref="group-zone" class="flex md:w-[60vw] grow md:mx-auto px-2 h-fit mx-auto transition-all overflow-hidden my-4 max-w-full" style="max-height: 0px;">
                 <div class="flex flex-col h-fit grow rounded-lg border-2 border-slate-200 dark:border-slate-700 overflow-hidden">
                     <div class="flex grow justify-between bg-slate-100 dark:bg-slate-700 h-fit items-center">
                         <div class="relative w-8 h-8"></div>
