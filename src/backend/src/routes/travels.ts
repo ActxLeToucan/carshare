@@ -7,5 +7,6 @@ const controller = require('../controllers/travels');
 router.use('/my', auth.access, require('./travels/my'));
 router.post('/create', auth.access, controller.createTravel);
 router.get('/search', auth.access, controller.searchTravels);
+router.get('/cancel-booking', auth.access, controller.cancelBooking);
 
 module.exports = router;
