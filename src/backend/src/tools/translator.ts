@@ -1,5 +1,5 @@
 import { type Request, type Response } from 'express';
-import { type User, type Travel, type Group, type Etape } from '@prisma/client';
+import { type User, type Travel, type Group, type Etape, type Evaluation } from '@prisma/client';
 
 import properties from '../properties';
 import { sendMail as mailerSend } from './mailer';
@@ -506,6 +506,13 @@ const error = {
                 en: `Field "${fieldName}" must be greater than or equal to ${min}.`
             },
             code: 400
+        }),
+        max: (req: Request, fieldName: string, max: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Le champ "${fieldName}" doit être inférieur ou égal à ${max}.`,
+                en: `Field "${fieldName}" must be less than or equal to ${max}.`
+            },
+            code: 400
         })
     },
     string: {
@@ -619,6 +626,32 @@ const error = {
             },
             code: 400
         })
+    },
+    evaluation: {
+        notpossible: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'La personne que l\'on veut évaluer n\'a jamais fait de trajet avec l\'utilisateur courant.',
+                en: 'The person to be evaluated has never made a trip with the current user.'
+            },
+            code: 404
+        }),
+        alreadyNoted: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'La personne que l\'on veut évaluer a déjà été noté par l\'utilisateur courant.',
+                en: 'The person to be evaluated has already been rated by the current user.'
+            },
+            code: 404
+        })
+    },
+    travel: {
+        notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Trajet introuvable.',
+                en: 'Travel not found.'
+            },
+            code: 404
+        })
+
     }
 } satisfies TranslationsMessageHTTP;
 
@@ -741,6 +774,18 @@ const info = {
                 en: 'Notification removed'
             },
             code: 200
+        })
+    },
+    evaluation: {
+        created: (req: Request, evaluation: Evaluation & { travel: Travel, evaluated: User, evaluator: User }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Evaluation mise',
+                en: 'Evaluation put in'
+            },
+            code: 201,
+            data: {
+                evaluation: displayableEvaluation(evaluation)
+            }
         })
     }
 
@@ -944,4 +989,21 @@ function displayableAverage (value: any) {
     return p;
 }
 
-export { error, info, mail, sendMsg, sendMail, displayableUserPrivate, displayableGroup, displayableAverage };
+/**
+ * Returns a user without some properties for display to other users
+ * @param user User to display
+ * @returns User without some properties
+ * @see displayableUserPrivate
+ */
+function displayableEvaluation (evaluation: Evaluation & { travel: Travel, evaluated: User, evaluator: User }) {
+    const g = evaluation as any;
+    g.evaluated = displayableUserPublic(g.evaluated);
+    g.evaluator = displayableUserPublic(g.evaluator);
+    delete g.createdAt;
+    delete g.travelId;
+    delete g.evaluatedId;
+    delete g.evaluatorId;
+    return g;
+}
+
+export { error, info, mail, sendMsg, sendMail, displayableUserPrivate, displayableGroup, displayableAverage, displayableEvaluation };
