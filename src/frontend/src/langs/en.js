@@ -218,6 +218,7 @@ export default {
     CONFIRM_TRIP: "Confirm trip",
     CONFIRM_TRIP_DESC: "Please verify the informations below before confirming the trip",
     CONFIRM_TRIP_CONTENT: "You are about to create a trip from {0} to {1} starting the {2} at {3} and arriving the {4} at {5}.\nThe trip will be {6} and will have {7} slots available.",
+    CONFIRM_TRIP_CONTENT_1: "You are about to create a trip from {0} to {1} starting the {2} at {3} and arriving the {4} at {5}.\nThe trip will be {6} and will have {7} slot available.",
     CONFIRM_TRIP_PUBLIC: "This trip will be public and everyone will be able to see it",
     CONFIRM_TRIP_PRIVATE: "This trip will be private and only the users of the group {0} will be able to see it",
     CONFIRM_TRIP_INFOS: "Additionnal informations : {0}",

@@ -219,6 +219,7 @@ export default {
     CONFIRM_TRIP: "Confirmer le trajet",
     CONFIRM_TRIP_DESC: "Veuillez vérifier les informations du trajet avant de le créer",
     CONFIRM_TRIP_CONTENT: "Vous allez faire un trajet de {0} à {1}.\nEn partant le {2} à {3} et arrivant le {4} à {5}.\nLe trajet sera au prix de {6}€ par personne et il y aura {7} places disponibles.",
+    CONFIRM_TRIP_CONTENT_1: "Vous allez faire un trajet de {0} à {1}.\nEn partant le {2} à {3} et arrivant le {4} à {5}.\nLe trajet sera au prix de {6}€ par personne et il y aura {7} place disponible.",
     CONFIRM_TRIP_PUBLIC: "Ce trajet sera public et tout le monde pourra le voir",
     CONFIRM_TRIP_PRIVATE: "Ce trajet sera privé et seuls les membres du groupe {0} pourront le voir",
     CONFIRM_TRIP_INFOS: "Informations supplémentaires : {0}",

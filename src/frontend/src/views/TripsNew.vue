@@ -118,7 +118,7 @@
                                         {{ selectedGroup?.name }}
                                     </p>
                                     <p class="text-slate-500 text-md text-center font-base">
-                                        {{ selectedGroup?.users?.length }} {{ (selectedGroup?.users?.length == 1? lang.MEMBER: lang.MEMBERS) }}
+                                        {{ selectedGroup?.users?.length }} {{ (selectedGroup?.users?.length > 1? lang.MEMBERS: lang.MEMBER) }}
                                     </p>
                                 </button>
                             </div>
@@ -288,7 +288,7 @@
                         {{ group.name }}
                     </p>
                     <p class="md:text-lg text-md text-slate-500 mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full">
-                        {{ group.users.length }} {{ group.users.length == 1? lang.MEMBER: lang.MEMBERS }}
+                        {{ group.users.length }} {{ group.users.length > 1? lang.MEMBERS: lang.MEMBER }}
                     </p>
                 </button>
                 <div
@@ -312,7 +312,7 @@
             :onvalidate="uploadTrip"
             :oncancel="() => { $refs['confirm-popup'].hide(); }"
         >
-            <div
+            <diva
                 ref="trip-desc"
                 class="flex flex-col"
             />
@@ -529,7 +529,7 @@ export default {
 
             let desc = "";
             desc += formatString(
-                Lang.CurrentLang.CONFIRM_TRIP_CONTENT,
+                data.maxPassengers > 1 ? Lang.CurrentLang.CONFIRM_TRIP_CONTENT : Lang.CurrentLang.CONFIRM_TRIP_CONTENT_1,
                 data.steps[0]?.label,
                 data.steps[data.steps.length - 1]?.label,
                 startDate,
@@ -543,7 +543,7 @@ export default {
             desc += "\r";
 
             desc += formatString(
-                data.groupId? Lang.CurrentLang.CONFIRM_TRIP_PRIVATE: Lang.CurrentLang.CONFIRM_TRIP_PUBLIC,
+                data.groupId? Lang.CurrentLang.CONFIRM_TRIP_PRIVATE+".": Lang.CurrentLang.CONFIRM_TRIP_PUBLIC+".",
                 this.selectedGroup?.name
             ) + "\n";
 
@@ -552,7 +552,7 @@ export default {
             desc += formatString(
                 data.steps.length > 2? (
                     data.steps.length == 3? Lang.CurrentLang.CONFIRM_TRIP_1_STEP: Lang.CurrentLang.CONFIRM_TRIP_N_STEPS
-                ): Lang.CurrentLang.CONFIRM_TRIP_NO_STEPS,
+                ): Lang.CurrentLang.CONFIRM_TRIP_NO_STEPS+".",
                 data.steps.length - 2
             ) + "\n";
 
@@ -570,7 +570,7 @@ export default {
             desc += "\r";
 
             desc += formatString(
-                data.description == ""? Lang.CurrentLang.CONFIRM_TRIP_NO_INFOS: Lang.CurrentLang.CONFIRM_TRIP_INFOS,
+                data.description == ""? Lang.CurrentLang.CONFIRM_TRIP_NO_INFOS+".": Lang.CurrentLang.CONFIRM_TRIP_INFOS,
                 "\n" + data.description.split("\n").map(l => stylize(l)).join("\n")
             );
 
