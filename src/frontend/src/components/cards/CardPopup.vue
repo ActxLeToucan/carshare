@@ -8,7 +8,7 @@
                 class="text-xl font-bold text-center"
                 :class="'text-'+color+'-500'"
             >
-                {{ _title }}
+                {{ m_title }}
             </h1>
             <div class="flex flex-col">
                 <p
