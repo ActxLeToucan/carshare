@@ -394,11 +394,12 @@ export default {
     },
     methods: {
         searchCities(selector, search) {
-            BAN.searchCities(search).then(cities => {
+            BAN.search(search).then(cities => {
+                console.log(cities);
                 let index = 0;
                 let res = cities.map(city => ({
                     id: index++,
-                    value: city.name,
+                    value: city.label,
                     desc: city.context,
                     label: city.label,
                     city: city.city,

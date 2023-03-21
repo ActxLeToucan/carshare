@@ -2,13 +2,14 @@
     <div class="flex justify-end h-0 w-full pointer-events-none">
         <div
             v-show="m_data.length > 0 && showing"
-            class="show-up h-fit pointer-events-auto flex flex-col rounded-md border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-600 shadow-md overflow-hidden"
+            class="show-up h-fit pointer-events-auto flex flex-col rounded-md border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-600 shadow-md"
             :style="'margin-top: ' + y/2 + 'em; margin-left: ' + x/2 + 'em; z-index: 1000;'"
         >
             <div
                 v-for="el in m_data"
                 :key="el.id"
-                class="cursor-pointer hover:bg-slate-100 hover:dark:bg-slate-500 px-2 py-1"
+                class="cursor-pointer hover:bg-slate-50 hover:dark:bg-slate-500 px-2 py-1 min-w-full rounded-md border-2 border-transparent
+                       w-full hover:border-slate-200 hover:w-fit"
                 @click="() => {onclicked(el);}"
             >
                 <p class="text-lg text-slate-500 dark:text-slate-300 whitespace-nowrap text-ellipsis overflow-hidden font-semibold">
@@ -101,9 +102,11 @@ export default {
             let index = 0;
             for (const child of children) {
                 if (index == this.m_selection) {
-                    child.classList.add("bg-slate-100");
+                    child.classList.add("bg-slate-50", "border-slate-200", "w-fit");
+                    child.classList.remove("w-full", "border-transparent");
                 } else {
-                    child.classList.remove("bg-slate-100");
+                    child.classList.add("w-full", "border-transparent");
+                    child.classList.remove("bg-slate-50", "border-slate-200", "w-fit");
                 }
                 index++;
             }
