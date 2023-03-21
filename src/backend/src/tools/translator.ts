@@ -656,6 +656,20 @@ const error = {
                 en: 'This travel is no longer open.'
             },
             code: 400
+        }),
+        tooLate: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Vous ne pouvez pas réaliser cette action moins de 24h avant le départ.',
+                en: 'This action is forbidden under a 24h margin.'
+            },
+            code: 400
+        }),
+        notAPassenger: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Vous n\'ête pas un passager de ce voyage.',
+                en: 'You are not a passenger of this trip.'
+            },
+            code: 400
         })
     }
 } satisfies TranslationsMessageHTTP;
@@ -758,7 +772,14 @@ const info = {
                 en: 'Travel cancelled'
             },
             code: 200
-        })
+        }),
+        unbooked: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Réservation annulée.',
+                en: 'Unbooked from trip.'
+            },
+            code: 200
+        }),
     },
     group: {
         created: (req: Request, group: Group & { users: User[], creator: User }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
