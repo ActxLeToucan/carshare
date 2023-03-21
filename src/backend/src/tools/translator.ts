@@ -999,7 +999,17 @@ const notifs = {
                 fr: `Votre trajet de ${passenger.departure.city} à ${passenger.arrival.city} du ${new Date(passenger.departure.date).toLocaleString('fr-FR')} a été annulé par le conducteur.`,
                 en: `Your trip from ${passenger.departure.city} to ${passenger.arrival.city} on ${new Date(passenger.departure.date).toLocaleString('en-US')} has been cancelled by the driver.`
             }
-        })
+        }),
+        passengerUnbooked: (lang: string, passenger: (Passenger & { departure: Etape, arrival: Etape, passenger: User })) => msgForLang<TemplateNotif, Notif>(lang, {
+            title: {
+                fr: 'Annulation de réservation',
+                en: 'Booking cancelation'
+            },
+            message: {
+                fr: `Le passager ${passenger.passenger.email} de votre trajet de ${passenger.departure.city} à ${passenger.arrival.city} du ${new Date(passenger.departure.date).toLocaleString('fr-FR')} a annulé sa réservation`,
+                en: `The passenger ${passenger.passenger.email} of your trip from ${passenger.departure.city} to ${passenger.arrival.city} on ${new Date(passenger.departure.date).toLocaleString('en-US')} has cancelled his booking`
+            }
+        }),
     }
 } satisfies TranslationsNotif;
 

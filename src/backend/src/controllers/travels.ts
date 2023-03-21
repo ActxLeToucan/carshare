@@ -138,17 +138,26 @@ exports.cancelBooking = (req: express.Request, res: express.Response, next: expr
         return;
     }
 
-    prisma.passenger.delete({
-        where: { 
-            passengerId_departureId_arrivalId: {
-                passengerId: res.locals.user.id, 
-                departureId: passengerTravel.departure.id, 
-                arrivalId: passengerTravel.arrival.id
-            },
-        }
-    }).then(() => {
+    prisma.passenger.delete(passengerTravel).then(() => {
         sendMsg(req, res, info.travel.unbooked);
-        properties.sendNotification(travel.id, null, null, [res.locals.user], "todo annulation", "todo message annulation", req, res);
+        const notif: Notif = notifs.standard.passengerUnbooked('en', passengerTravel); // TODO: get user language
+        const data = {
+            userId: travel.driver,
+            title: notif.title,
+            message: notif.message,
+            type: 'standard',
+            senderId: Number(res.locals.user.id),
+            travelId: travel.id,
+            createdAt: new Date()
+        };
+
+        prisma.notification.create({ data }).then(() => {
+            notify(travel.driver, notif);
+            sendMsg(req, res, info.travel.cancelled);
+        }).catch((err) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
     }).catch((err) => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
