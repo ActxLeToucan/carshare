@@ -618,7 +618,6 @@ function sanitizeNotificationId (id: any, req: express.Request, res: express.Res
         return null;
     }
     return Number(id);
-
 }
 
 function checkTravelHoursLimit (date: Date, req: express.Request, res: express.Response): boolean {

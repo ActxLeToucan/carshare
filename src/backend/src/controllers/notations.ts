@@ -1,6 +1,8 @@
 import type express from 'express';
 import { prisma } from '../app';
 import * as validator from '../tools/validator';
+import * as properties from '../properties';
+
 import { error, sendMsg, info, displayableAverage } from '../tools/translator';
 
 exports.getUserEvaluation = (req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -120,7 +122,7 @@ exports.createEvaluation = (req: express.Request, res: express.Response, _: expr
                 prisma.travel.count({
                     where: {
                         id: travelId,
-                        status: 1,
+                        status: properties.default.travel.status.ended,
                         OR: [{
                             driverId: evaluatedId,
                             etapes: {
