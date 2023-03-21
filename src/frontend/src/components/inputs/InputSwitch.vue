@@ -4,11 +4,19 @@
             {{ label }}
         </label>
         <div class="flex grow h-fit justify-end items-center">
-            <button ref="switch" class="flex rounded-md bg-slate-200 dark:bg-slate-700 w-12 h-fit cursor-pointer transition-all">
-                <div class="flex bg-white dark:bg-slate-500 rounded h-6 w-6 translate-x-0 transition-all border border-b-4 border-slate-300 dark:border-slate-600"></div>
+            <button
+                ref="switch"
+                class="flex rounded-md bg-slate-200 dark:bg-slate-700 w-12 h-fit cursor-pointer transition-all"
+            >
+                <div class="flex bg-white dark:bg-slate-500 rounded h-6 w-6 translate-x-0 transition-all border border-b-4 border-slate-300 dark:border-slate-600" />
             </button>
         </div>
-        <input ref="checkbox" type="checkbox" :name="name" class="hidden">
+        <input
+            ref="checkbox"
+            type="checkbox"
+            :name="name"
+            class="hidden"
+        >
     </div>
 </template>
 
@@ -40,12 +48,24 @@ export default {
     data() {
         if (this.value != undefined) {
             switch (typeof this.value) {
-                case "string": this.state = this.value === "true"; break;
-                case "boolean": this.state = this.value; break;
-                default: this.state = false; break;
+            case "string": this.state = this.value === "true"; break;
+            case "boolean": this.state = this.value; break;
+            default: this.state = false; break;
             }
         }
         return {};
+    },
+    watch: {
+        value: function (val) {
+            this.applyValue(val);
+        }
+    },
+    mounted() {
+        this.$refs["switch"].addEventListener("click", ev => {
+            this.applyValue(!this.state);
+        });
+        this.updateButton();
+        this.applyValue(this.value, false);
     },
     methods: {
         updateButton() {
@@ -69,25 +89,13 @@ export default {
         },
         applyValue(val, sendEvent = true) {
             switch (typeof val) {
-                case "string": this.state = val === "true"; break;
-                case "number": this.state = val > 0; break;
-                case "boolean": this.state = val; break;
-                default: this.state = false; break;
+            case "string": this.state = val === "true"; break;
+            case "number": this.state = val > 0; break;
+            case "boolean": this.state = val; break;
+            default: this.state = false; break;
             }
             this.updateButton();
             if (sendEvent) this.onchange?.(this.state);
-        }
-    },
-    mounted() {
-        this.$refs["switch"].addEventListener("click", ev => {
-            this.applyValue(!this.state);
-        });
-        this.updateButton();
-        this.applyValue(this.value, false);
-    },
-    watch: {
-        value: function (val) {
-            this.applyValue(val);
         }
     }
 }

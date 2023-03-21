@@ -1113,7 +1113,7 @@ function notify (user: User, notification: { type: string | null, title: string,
  * @param user User to display
  * @see displayableUserPublic
  */
-function displayableUserPrivate (user: User) {
+function displayableUserPrivate (user: User): Partial<User> {
     const u = user as any;
     delete u.password;
     delete u.lastPasswordResetEmailedOn;
@@ -1126,7 +1126,7 @@ function displayableUserPrivate (user: User) {
  * @param user User to display
  * @see displayableUserPrivate
  */
-function displayableUserPublic (user: User) {
+function displayableUserPublic (user: User): Partial<User> {
     const u = displayableUserPrivate(user);
     delete u.mailNotif;
     delete u.createdAt;
@@ -1137,7 +1137,7 @@ function displayableUserPublic (user: User) {
  * Returns a group without some properties for display to all users
  * @param group Group to display
  */
-function displayableGroup (group: Group & { users: User[], creator: User }) {
+function displayableGroup (group: Group & { users: User[], creator: User }): Partial<Group> {
     const g = group as any;
     g.users = g.users.map(displayableUserPublic);
     g.creator = displayableUserPublic(g.creator);
@@ -1175,4 +1175,17 @@ function displayableEvaluation (evaluation: Evaluation & { travel: Travel, evalu
     return g;
 }
 
-export { error, info, mail, notifs, sendMsg, sendMail, notify, displayableUserPrivate, displayableGroup, displayableAverage, displayableEvaluation };
+export {
+    error,
+    info,
+    mail,
+    notifs,
+    sendMsg,
+    sendMail,
+    notify,
+    displayableUserPrivate,
+    displayableUserPublic,
+    displayableGroup,
+    displayableAverage,
+    displayableEvaluation
+};
