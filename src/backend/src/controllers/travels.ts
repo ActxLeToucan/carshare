@@ -1,9 +1,8 @@
 import type express from 'express';
 import { prisma } from '../app';
 import * as validator from '../tools/validator';
-import { type Passenger } from '@prisma/client';
 import { checkTravelHoursLimit } from '../tools/validator';
-import { displayableTravelPublic, displayableUserPublic, type Notif, error, info, notifs, notify, sendMsg } from '../tools/translator';
+import { displayableTravelPublic, displayableUserPublic, error, info, notifs, notify, sendMsg } from '../tools/translator';
 import properties from '../properties';
 import { getMaxPassengers, preparePagination } from './_common';
 
@@ -158,83 +157,6 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
         }).then((travel) => {
             // TODO: notify users in the group
             sendMsg(req, res, info.travel.created, travel);
-        }).catch((err) => {
-            console.error(err);
-            sendMsg(req, res, error.generic.internalError);
-        });
-    }).catch((err) => {
-        console.error(err);
-        sendMsg(req, res, error.generic.internalError);
-    });
-}
-
-exports.cancelBooking = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const travelId = validator.sanitizeId(req.body.id, req, res);
-    if (travelId === null) return;
-
-    prisma.passenger.findMany({
-        where: { passengerId: res.locals.user.id },
-        include: {
-            departure: true,
-            arrival: true,
-            passenger: true
-        }
-    }).then((travelsAsPassenger) => {
-        if (travelsAsPassenger === null) {
-            sendMsg(req, res, error.travel.notAPassenger);
-            return;
-        }
-
-        prisma.travel.findUnique({
-            where: { id: travelId },
-            include: {
-                etapes: true,
-                driver: true
-            }
-        }).then((travel) => {
-            if (travel === null) {
-                sendMsg(req, res, error.travel.notFound);
-                return;
-            }
-
-            const etapesId = travel.etapes.map(elem => elem.id);
-            const passengerTravel = travelsAsPassenger.filter((elem: Passenger) => etapesId.includes(elem.departureId));
-
-            if (passengerTravel === null) {
-                sendMsg(req, res, error.travel.notAPassenger);
-                return;
-            }
-
-            if (!checkTravelHoursLimit(travel.createdAt, req, res)) return;
-
-            prisma.passenger.delete({
-                where: {
-                    passengerId_departureId_arrivalId: {
-                        passengerId: passengerTravel[0].passengerId,
-                        departureId: passengerTravel[0].departureId,
-                        arrivalId: passengerTravel[0].arrivalId
-                    }
-                }
-            }).then(() => {
-                const notif: Notif = notifs.booking.unbooked('en', passengerTravel[0]); // TODO: get user language
-                const data = {
-                    ...notif,
-                    userId: travel.driverId,
-                    senderId: Number(res.locals.user.id),
-                    travelId: travel.id
-                };
-
-                prisma.notification.create({ data }).then(() => {
-                    sendMsg(req, res, info.travel.unbooked);
-                    notify(travel.driver, data);
-                }).catch((err) => {
-                    console.error(err);
-                    sendMsg(req, res, error.generic.internalError);
-                });
-            }).catch((err) => {
-                console.error(err);
-                sendMsg(req, res, error.generic.internalError);
-            });
         }).catch((err) => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);

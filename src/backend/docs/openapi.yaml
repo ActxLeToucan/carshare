@@ -1100,22 +1100,25 @@ paths:
         '500':
           $ref: '#/components/responses/internalError'
 
-  /travels/cancel-booking:
+  /bookings/cancel-booking:
     delete:
       summary: Delete a passenger
       description: Delete a passenger relation, unbooking the user from a trip.
       operationId: cancelBooking
       tags:
-        - Travels
+        - Bookings
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
-        - name: travel
-          in: req
-          description: The travel to be unbooked from
-          required: true
-          schema:
-            type:
-              $ref: '#/components/schemas/Travel'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                travelId:
+                  required: true
+                  type: integer
+                  example: 9
       security:
         - bearerAuth: [ ]
       responses:
@@ -1138,7 +1141,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: Travel is required.
+                    example: TravelId is required.
         '401':
           $ref: '#/components/responses/noToken'
         '403':
