@@ -65,6 +65,7 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
                 try {
                     const count: any = await getMaxPassengers(travel.id, travel.departure, travel.arrival);
                     travel.passengers = Number(count[0].nbPassengers);
+                    if (Number.isNaN(travel.passengers)) throw new Error('Could not get max passengers');
                 } catch (err) {
                     console.error(err);
                     travel.passengers = -1;
@@ -148,6 +149,7 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
                 etapes: true
             }
         }).then((travel) => {
+            // TODO: notify users in the group
             sendMsg(req, res, info.travel.created, travel);
         }).catch((err) => {
             console.error(err);

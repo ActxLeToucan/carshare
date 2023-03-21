@@ -1,9 +1,10 @@
 import type express from 'express';
+import { type Request } from 'express';
 import { prisma } from '../app';
 import { error, info, type MessageHTTP, notifs, notify, sendMsg } from '../tools/translator';
 import properties from '../properties';
 import * as validator from '../tools/validator';
-import { type Request } from 'express';
+import { checkTravelHoursLimit } from '../tools/validator';
 import { getMaxPassengers } from './_common';
 
 exports.acceptBooking = (req: express.Request, res: express.Response, _: express.NextFunction) => {
@@ -22,7 +23,11 @@ function acceptOrRejectBooking (req: express.Request, res: express.Response, sta
         where: { id: bookingId },
         include: {
             departure: {
-                include: { travel: true }
+                include: {
+                    travel: {
+                        include: { etapes: true }
+                    }
+                }
             },
             arrival: true
         }
@@ -42,6 +47,8 @@ function acceptOrRejectBooking (req: express.Request, res: express.Response, sta
             sendMsg(req, res, error.booking.alreadyReplied);
             return;
         }
+
+        if (!checkTravelHoursLimit(booking.departure.travel.etapes[0].date, req, res)) return;
 
         if (status === properties.booking.status.accepted) {
             // check if there is a place left in the car
@@ -107,6 +114,8 @@ function acceptOrRejectBooking (req: express.Request, res: express.Response, sta
                     prisma.notification.update({
                         where: { id: notif.id },
                         data: { ...updatedDriverNotif }
+                    }).then(() => {
+                        sendMsg(req, res, message, booking.passenger);
                     }).catch((err: any) => {
                         console.error(err);
                         sendMsg(req, res, error.generic.internalError);

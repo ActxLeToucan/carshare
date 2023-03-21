@@ -818,15 +818,15 @@ const info = {
     booking: {
         accepted: (req: Request, user: User) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Vous avez accepté la demande de ${user.firstName ?? ''} ${user.lastName ?? ''}.`,
-                en: `You have accepted the request from ${user.firstName ?? ''} ${user.lastName ?? ''}.`
+                fr: `Vous venez d'accepter la demande de ${user.firstName ?? ''} ${user.lastName ?? ''}.`,
+                en: `You have just accepted the request of ${user.firstName ?? ''} ${user.lastName ?? ''}.`
             },
             code: 200
         }),
         rejected: (req: Request, user: User) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Vous avez refusé la demande de ${user.firstName ?? ''} ${user.lastName ?? ''}.`,
-                en: `You have rejected the request from ${user.firstName ?? ''} ${user.lastName ?? ''}.`
+                fr: `Vous venez de refuser la demande de ${user.firstName ?? ''} ${user.lastName ?? ''}.`,
+                en: `You have just rejected the request of ${user.firstName ?? ''} ${user.lastName ?? ''}.`
             },
             code: 200
         })
