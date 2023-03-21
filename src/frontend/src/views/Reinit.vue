@@ -1,27 +1,39 @@
 <template>
     <div class="flex grow flex-col">
-        <topbar v-if="User.CurrentUser != null"></topbar>
+        <topbar v-if="User.CurrentUser != null" />
         <div class="flex grow w-fit flex-col justify-center space-y-6 mx-auto">
-            <modal :oncancel="onCancel" :onvalidate="onValidate" title="Réinitialiser le mot de passe">
+            <card-modal
+                :oncancel="onCancel"
+                :onvalidate="onValidate"
+                title="Réinitialiser le mot de passe"
+            >
                 <div class="py-4">
-                    <p class="text-lg font-semibold text-slate-500"> Veuillez indiquer votre nouveau mot de passe. </p>
+                    <p class="text-lg font-semibold text-slate-500">
+                        Veuillez indiquer votre nouveau mot de passe.
+                    </p>
                 </div>
-                <input-text   name="password"         label="Mot de passe" placeholder="Mot de passe"                 type="password" ></input-text>
-                <input-text   name="password-confirm" label="Confirmation" placeholder="Confirmation du mot de passe" type="password" ></input-text>
-            </modal>
+                <input-text
+                    name="password"
+                    label="Mot de passe"
+                    type="password"
+                />
+                <input-text
+                    name="password-confirm"
+                    label="Confirmation"
+                    placeholder="Confirmation du mot de passe"
+                    type="password"
+                />
+            </card-modal>
         </div>
     </div>
 </template>
 
 <script>
 import Topbar from '../components/topbar/Topbar.vue';
-import Modal from '../components/cards/Modal.vue';
+import CardModal from '../components/cards/CardModal.vue';
 import InputText from '../components/inputs/InputText.vue';
-import InputSwitch from '../components/inputs/InputSwitch.vue';
-import InputChoice from '../components/inputs/InputChoice.vue';
 import { Log } from '../scripts/Logs';
 import User from '../scripts/User';
-import re from '../scripts/Regex';
 import API from '../scripts/API';
 
 function isPhoneNumber(val) {
@@ -98,20 +110,18 @@ function onValidate(modal) {
 }
 
 export default {
+    name: 'ReinitView',
     components: {
         Topbar,
-        Modal,
+        CardModal,
         InputText,
-        InputSwitch,
-        InputChoice
-    },
-    name: 'Register',
-    methods: {
-        onCancel,
-        onValidate
     },
     data() {
         return { User, genres }
+    },
+    methods: {
+        onCancel,
+        onValidate
     }
 }
 </script>
