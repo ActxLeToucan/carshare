@@ -1,6 +1,6 @@
 <template>
     <div class="flex grow bg-slate-50 dark:bg-slate-800 min-w-0 max-w-full">
-        <router-view></router-view>
+        <router-view />
     </div>
 </template>
 
