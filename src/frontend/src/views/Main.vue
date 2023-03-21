@@ -1,29 +1,49 @@
 <template>
     <div class="flex grow flex-col">
-        <topbar></topbar>
+        <topbar />
         <div class="flex grow flex-col">
-            
             <div class="show-down relative flex w-full min-h-[60vh] bg-teal-500">
-                <img class="z-0 object-cover block dark:hidden" src="../assets/img/landscape.svg" alt="">
-                <img class="z-0 object-cover hidden dark:block" src="../assets/img/landscape-dark.svg" alt="">
+                <img
+                    class="z-0 object-cover block dark:hidden"
+                    src="../assets/img/landscape.svg"
+                    alt=""
+                >
+                <img
+                    class="z-0 object-cover hidden dark:block"
+                    src="../assets/img/landscape-dark.svg"
+                    alt=""
+                >
                 <div class="z-10 absolute top-0 flex flex-col w-full h-0 justify-center items-center md:pt-32 pt-16">
-                    <h1 class="show-down md:text-8xl text-6xl font-extrabold text-white dark:text-slate-700 shadow-3D"> {{ lang.CARSHARE }} </h1>
-                    <p style="animation-delay: 200ms;" class="show-down md:text-[1.7em] text-lg font-bold text-white dark:text-slate-700 italic shadow-3D"> {{ lang.CARSHARE_DESC }} </p>
+                    <h1 class="show-down md:text-8xl text-6xl font-extrabold text-white dark:text-slate-700 shadow-3D">
+                        {{ lang.CARSHARE }}
+                    </h1>
+                    <p
+                        style="animation-delay: 200ms;"
+                        class="show-down md:text-[1.7em] text-lg font-bold text-white dark:text-slate-700 italic shadow-3D"
+                    >
+                        {{ lang.CARSHARE_DESC }}
+                    </p>
                 </div>
-                <div style="animation-delay: 200ms;" class="show-up z-10 absolute bottom-0 flex w-full h-0 overflow-visible">
+                <div
+                    style="animation-delay: 200ms;"
+                    class="show-up z-10 absolute bottom-0 flex w-full h-0 overflow-visible"
+                >
                     <div class="flex flex-col w-fit h-fit mx-auto md:-translate-y-full -translate-y-[50%]">
                         <div class="flex md:flex-wrap md:flex-row flex-col justify-center items-center h-fit w-fit mx-auto rounded-md shadow-lg border-2 border-b-4 border-teal-600 bg-teal-500 px-4 py-2 md:space-x-4 md:space-y-0 space-y-4">
-                    
                             <div class="relative h-0 w-0 md:flex hidden">
                                 <div class="absolute bottom-11 left-0">
-                                    <div> <!-- FOR CAR MOVEMENTS -->
-                                        <div> <!-- FOR CAR SHAKES -->
-                                            <car ref="car" class="car w-20 text-white dark:text-slate-200 drop-shadow-md cursor-pointer"
+                                    <div>
+                                        <!-- FOR CAR MOVEMENTS -->
+                                        <div>
+                                            <!-- FOR CAR SHAKES -->
+                                            <car
+                                                ref="car"
+                                                class="car w-20 text-white dark:text-slate-200 drop-shadow-md cursor-pointer"
                                                 style="transform: scale(-1, 1);"
                                                 fill="currentColor"
                                                 stroke="none"
-                                                v-on:click="tuttut">
-                                            </car>
+                                                @click="tuttut"
+                                            />
                                         </div>
                                     </div>
                                 </div>
@@ -32,76 +52,126 @@
                             <div class="flex md:flex-row flex-col md:space-x-2 items-center w-min">
                                 <div class="flex flex-col">
                                     <input-text
-                                        name="startingpoint" class="w-48 mx-auto max-w-fit"
-                                        :placeholder="lang.STARTING_POINT" dark="true"
+                                        name="startingpoint"
+                                        class="w-48 mx-auto max-w-fit"
+                                        :placeholder="lang.STARTING_POINT"
+                                        dark="true"
                                         :onchange="e => { if (startCity?.value != e.target.value) startCity = null; }"
                                         :value="startCity?.value"
-                                    ></input-text>
-                                    <selector ref="startSelector" :oncompletion="searchCities" :onclick="onstartselected"></selector>
+                                    />
+                                    <selector
+                                        ref="startSelector"
+                                        :oncompletion="searchCities"
+                                        :onclick="onstartselected"
+                                    />
                                 </div>
                                 <!-- <div class="flex justify-center items-center"> -->
-                                    <!-- <div class="h-0 w-0"> -->
-                                        <button-block class="w-fit" color="slate" :action="reverseInputs"> <!-- -translate-x-[50%] -translate-y-[50%] -->
-                                            <arrows-right-left-icon class="md:block hidden h-7 w-7"></arrows-right-left-icon>
-                                            <arrows-up-down-icon class="md:hidden block h-7 w-7"></arrows-up-down-icon>
-                                        </button-block>
-                                    <!-- </div> -->
+                                <!-- <div class="h-0 w-0"> -->
+                                <button-block
+                                    class="w-fit"
+                                    color="slate"
+                                    :action="reverseInputs"
+                                >
+                                    <!-- -translate-x-[50%] -translate-y-[50%] -->
+                                    <arrows-right-left-icon class="md:block hidden h-7 w-7" />
+                                    <arrows-up-down-icon class="md:hidden block h-7 w-7" />
+                                </button-block>
+                                <!-- </div> -->
                                 <!-- </div> -->
                                 <div class="flex flex-col">
                                     <input-text
-                                        name="endingpoint" class="w-48 mx-auto max-w-fit"
-                                        :placeholder="lang.ENDING_POINT" dark="true"
+                                        name="endingpoint"
+                                        class="w-48 mx-auto max-w-fit"
+                                        :placeholder="lang.ENDING_POINT"
+                                        dark="true"
                                         :onchange="e => { if (endCity?.value != e.target.value) endCity = null; }"
                                         :value="endCity?.value"
-                                    ></input-text>
-                                    <selector ref="endSelector" :oncompletion="searchCities" :onclick="onendselected"></selector>
+                                    />
+                                    <selector
+                                        ref="endSelector"
+                                        :oncompletion="searchCities"
+                                        :onclick="onendselected"
+                                    />
                                 </div>
                             </div>
-                            <span class="md:block hidden bg-teal-600 w-1 h-14 rounded-lg"></span>
+                            <span class="md:block hidden bg-teal-600 w-1 h-14 rounded-lg" />
                             <div class="flex md:flex-row flex-col md:space-x-2 md:space-y-2 space-y-0 w-min">
-                                <input-text name="datetime" class="w-48 mx-auto max-w-fit" placeholder="date" dark="true" type="datetime-local"></input-text>
+                                <input-text
+                                    name="datetime"
+                                    class="w-48 mx-auto max-w-fit"
+                                    placeholder="date"
+                                    dark="true"
+                                    type="datetime-local"
+                                />
                             </div>
-                            <span class="md:block hidden bg-teal-600 w-1 h-14 rounded-lg"></span>
-                            <button-block color="slate" class="mx-auto" :action="searchTrips"> {{ lang.SEARCH }} </button-block>
-
-                        </div>
-                        <div style="animation-delay: 400ms;" class="show-up relative flex w-full justify-end mt-4">
-
-                            <button-block class="shadow-lg" href="/trips/new"> Créer un trajet </button-block>
-
+                            <span class="md:block hidden bg-teal-600 w-1 h-14 rounded-lg" />
+                            <button-block
+                                color="slate"
+                                class="mx-auto"
+                                :action="searchTrips"
+                            >
+                                {{ lang.SEARCH }}
+                            </button-block>
+                            ../components/cards/Cardborder.vue
+                            <div
+                                style="animation-delay: 400ms;"
+                                class="show-up relative flex w-full justify-end mt-4"
+                            >
+                                <button-block
+                                    class="shadow-lg"
+                                    href="/trips/new"
+                                >
+                                    Créer un trajet
+                                </button-block>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
             
-            <div
-                ref="log-zone"
-                class="flex flex-col w-full justify-center items-center min-h-max h-max transition-all"
-                style="max-height: 0px;"
-            ></div>
+                <div
+                    ref="log-zone"
+                    class="flex flex-col w-full justify-center items-center min-h-max h-max transition-all"
+                    style="max-height: 0px;"
+                />
 
-            <div class="flex grow min-h-[50vh]">
+                <div class="flex grow min-h-[50vh]">
+                    <div
+                        ref="err-notfound"
+                        class="flex hidden grow h-fit py-8 justify-center items-center"
+                    >
+                        <card-border class="flex flex-col justify-center items-center">
+                            <p class="text-2xl text-slate-500 dark:text-slate-400 font-bold">
+                                {{ lang.NO_TRIPS }}
+                            </p>
+                            <p class="text-xl text-slate-400 dark:text-slate-500 font-semibold">
+                                {{ lang.NO_TRIPS_DESC }}
+                            </p>
+                        </card-border>
+                    </div>
 
-                <div ref="err-notfound" class="flex hidden grow h-fit py-8 justify-center items-center">
-                    <card class="flex flex-col justify-center items-center">
-                        <p class="text-2xl text-slate-500 dark:text-slate-400 font-bold"> {{ lang.NO_TRIPS }} </p>
-                        <p class="text-xl text-slate-400 dark:text-slate-500 font-semibold"> {{ lang.NO_TRIPS_DESC }} </p>
-                    </card>
+                    <div
+                        ref="err-fetch"
+                        class="flex hidden grow h-fit py-8 justify-center items-center"
+                    >
+                        <card-border class="flex flex-col justify-center items-center">
+                            <p class="text-2xl text-slate-500 dark:text-slate-400 font-bold">
+                                {{ lang.ERROR }}
+                            </p>
+                            <p
+                                ref="err-fetch-msg"
+                                class="text-xl text-slate-400 dark:text-slate-500 font-semibold"
+                            />
+                        </card-border>
+                    </div>
+
+                    <trip-card
+                        v-for="trip in trips"
+                        :key="trip.id"
+                        :trip="trip"
+                        class="mx-auto"
+                    />
                 </div>
-
-                <div ref="err-fetch" class="flex hidden grow h-fit py-8 justify-center items-center">
-                    <card class="flex flex-col justify-center items-center">
-                        <p class="text-2xl text-slate-500 dark:text-slate-400 font-bold"> {{ lang.ERROR }} </p>
-                        <p ref="err-fetch-msg" class="text-xl text-slate-400 dark:text-slate-500 font-semibold">  </p>
-                    </card>
-                </div>
-
-                <trip-card
-                    v-for="trip in trips" :key="trip.id"
-                    :trip="trip" class="mx-auto"
-                ></trip-card>
             </div>
-
         </div>
     </div>
 </template>
@@ -112,7 +182,7 @@ import InputText from '../components/inputs/InputText.vue';
 import Topbar from "../components/topbar/Topbar.vue";
 import Selector from '../components/inputs/Selector.vue';
 import TripCard from '../components/cards/TripCard.vue';
-import Card from '../components/cards/Card.vue';
+import CardBorder from '../components/cards/CardBorder.vue';
 import { Log, LogZone } from '../scripts/Logs';
 import Car from '../components/Car.vue';
 import BAN from '../scripts/BAN.js';
@@ -215,6 +285,7 @@ function settutpos(el) {
 }
 
 export default {
+    name: 'MainView',
     components: {
         Topbar,
         InputText,
@@ -223,12 +294,34 @@ export default {
         ArrowsUpDownIcon,
         Selector,
         Car,
-        Card,
+        CardBorder,
         TripCard
     },
-    name: 'Main',
     data() {
         return { lang: Lang.CurrentLang, trips: [], startCity: {}, endCity: {} }
+    },
+    mounted() {
+        Lang.AddCallback(lang => this.lang = lang);
+
+        window.addEventListener("resize", ev => {
+            this.isMobile = window.innerWidth < 768;
+        });
+
+        this.startInput = this.$el.querySelector('input[name="startingpoint"]');
+        this.endInput = this.$el.querySelector('input[name="endingpoint"]');
+        this.dateInput = this.$el.querySelector('input[name="datetime"]');
+        this.startSelector = this.$refs["startSelector"];
+        this.endSelector = this.$refs["endSelector"];
+
+        // tut tut movements
+        this.startInput.addEventListener("focus", ev => { settutpos(ev.target); });
+        this.endInput.addEventListener("focus", ev => { settutpos(ev.target); });
+        this.dateInput.addEventListener("focus", ev => { settutpos(ev.target); });
+
+        this.startSelector.attachInput(this.startInput);
+        this.endSelector.attachInput(this.endInput);
+
+        this.logZone = new LogZone(this.$refs["log-zone"]);
     },
     methods: {
         onstartselected(city) {
@@ -340,29 +433,6 @@ export default {
                 });
             }
         }
-    },
-    mounted() {
-        Lang.AddCallback(lang => this.lang = lang);
-
-        window.addEventListener("resize", ev => {
-            this.isMobile = window.innerWidth < 768;
-        });
-
-        this.startInput = this.$el.querySelector('input[name="startingpoint"]');
-        this.endInput = this.$el.querySelector('input[name="endingpoint"]');
-        this.dateInput = this.$el.querySelector('input[name="datetime"]');
-        this.startSelector = this.$refs["startSelector"];
-        this.endSelector = this.$refs["endSelector"];
-
-        // tut tut movements
-        this.startInput.addEventListener("focus", ev => { settutpos(ev.target); });
-        this.endInput.addEventListener("focus", ev => { settutpos(ev.target); });
-        this.dateInput.addEventListener("focus", ev => { settutpos(ev.target); });
-
-        this.startSelector.attachInput(this.startInput);
-        this.endSelector.attachInput(this.endInput);
-
-        this.logZone = new LogZone(this.$refs["log-zone"]);
     }
 }
 </script>
