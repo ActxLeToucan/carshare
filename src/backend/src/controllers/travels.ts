@@ -121,52 +121,71 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
 }
 
 exports.cancelBooking = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const travelId = validator.sanitizeId(req.params.id, req, res);
+    const travelId = validator.sanitizeId(req.body.id, req, res);
     if (travelId === null) return;
 
-    prisma.travel.findUnique({
-        where: { id: travelId },
+    prisma.passenger.findMany({
+        where: { passengerId: res.locals.user.id },
         include: {
-            etapes: true,
-            driver: true
+            departure: true,
+            arrival: true,
+            passenger: true
         }
-    }).then((travel) => {
-        if (travel === null) {
-            sendMsg(req, res, error.travel.notFound);
-            return;
-        }
-        const dateCheck = new Date(new Date(travel.createdAt).getTime() - 1000 * 60 * 60 * 24);
-        console.log(res.locals.user.travelsAsPassenger)
-
-        const etapesId = travel.etapes.map(elem => elem.id);
-        const passengerTravel = res.locals.user.travelsAsPassenger.filter((elem: Passenger) => etapesId.includes(elem.departureId));
-
-        if (passengerTravel === null) {
+    }).then((travelsAsPassenger) => {
+        if (travelsAsPassenger === null) {
             sendMsg(req, res, error.travel.notAPassenger);
             return;
         }
 
-        if (dateCheck <= new Date()) {
-            sendMsg(req, res, error.travel.notModifiable);
-            return;
-        }
+        prisma.travel.findUnique({
+            where: { id: travelId },
+            include: {
+                etapes: true,
+                driver: true
+            }
+        }).then((travel) => {
+            if (travel === null) {
+                sendMsg(req, res, error.travel.notFound);
+                return;
+            }
 
-        prisma.passenger.delete(passengerTravel).then(() => {
-            sendMsg(req, res, info.travel.unbooked);
-            const notif: Notif = notifs.standard.passengerUnbooked('en', passengerTravel); // TODO: get user language
-            const data = {
-                userId: travel.driverId,
-                title: notif.title,
-                message: notif.message,
-                type: 'standard',
-                senderId: Number(res.locals.user.id),
-                travelId: travel.id,
-                createdAt: new Date()
-            };
+            const etapesId = travel.etapes.map(elem => elem.id);
+            const passengerTravel = travelsAsPassenger.filter((elem: Passenger) => etapesId.includes(elem.departureId));
 
-            prisma.notification.create({ data }).then(() => {
-                notify(travel.driver, data);
-                sendMsg(req, res, info.travel.cancelled);
+            if (passengerTravel === null) {
+                sendMsg(req, res, error.travel.notAPassenger);
+                return;
+            }
+
+            if (!checkTravelHoursLimit(travel.createdAt, req, res)) return;
+
+            prisma.passenger.delete({
+                where: {
+                    passengerId_departureId_arrivalId: {
+                        passengerId: passengerTravel[0].passengerId,
+                        departureId: passengerTravel[0].departureId,
+                        arrivalId: passengerTravel[0].arrivalId
+                    }
+                }
+            }).then(() => {
+                const notif: Notif = notifs.standard.passengerUnbooked('en', passengerTravel[0]); // TODO: get user language
+                const data = {
+                    userId: travel.driverId,
+                    title: notif.title,
+                    message: notif.message,
+                    type: 'standard',
+                    senderId: Number(res.locals.user.id),
+                    travelId: travel.id,
+                    createdAt: new Date()
+                };
+
+                prisma.notification.create({ data }).then(() => {
+                    sendMsg(req, res, info.travel.unbooked);
+                    notify(travel.driver, data);
+                }).catch((err) => {
+                    console.error(err);
+                    sendMsg(req, res, error.generic.internalError);
+                });
             }).catch((err) => {
                 console.error(err);
                 sendMsg(req, res, error.generic.internalError);
