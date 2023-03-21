@@ -4,7 +4,7 @@
             {{ lang.MY_INFOS }}
         </p>
         <div class="flex flex-col grow justify-evenly items-center">
-            <card class="flex flex-col md:m-4 my-4">
+            <card-border class="flex flex-col md:m-4 my-4">
                 <div
                     ref="user-inputs"
                     class="flex flex-col"
@@ -118,8 +118,8 @@
                         </button-block>
                     </div>
                 </div>
-            </card>
-            <card class="flex flex-col md:m-4 my-4">
+            </card-border>
+            <card-border class="flex flex-col md:m-4 my-4">
                 <div
                     ref="password-inputs"
                     class="flex flex-col"
@@ -162,7 +162,7 @@
                         {{ lang.EDIT }}
                     </button-block>
                 </div>
-            </card>
+            </card-border>
         </div>
         <card-popup
             color="red"
@@ -188,7 +188,7 @@ import ButtonBlock from '../inputs/ButtonBlock.vue';
 import InputText from '../inputs/InputText.vue';
 import InputChoice from '../inputs/InputChoice.vue';
 import InputSwitch from '../inputs/InputSwitch.vue';
-import Card from '../cards/Card.vue';
+import CardBorder from '../cards/CardBorder.vue';
 import CardPopup from '../cards/CardPopup.vue';
 import { Log, LogZone } from '../../scripts/Logs';
 import { genres, isPhoneNumber } from '../../scripts/data';
@@ -201,7 +201,7 @@ export default {
     name: "UserInfos",
     components: {
         ButtonBlock,
-        Card,
+        CardBorder,
         InputText,
         CardPopup,
         InputChoice,

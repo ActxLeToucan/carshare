@@ -131,10 +131,10 @@ import User from "../../scripts/User";
 import CardBorder from "../cards/CardBorder.vue";
 import CardBadge from "../cards/CardBadge.vue";
 import ButtonBlock from "../inputs/ButtonBlock.vue";
-import ButtonText from "../inputs/ButtonText.vue";
-import ButtonTab from "../inputs/ButtonTab.vue";
+
 import {
     TrashIcon,
+    PlusIcon,
 } from "@heroicons/vue/20/solid";
 import CardPopup from "../cards/CardPopup.vue";
 import { Log, LogZone } from "../../scripts/Logs";

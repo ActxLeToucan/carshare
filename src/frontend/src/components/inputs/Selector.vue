@@ -1,12 +1,12 @@
 <template>
     <div class="flex justify-end h-0 w-full pointer-events-none">
         <div
-            v-show="_data.length > 0 && showing"
+            v-show="m_data.length > 0 && showing"
             class="show-up h-fit pointer-events-auto flex flex-col rounded-md border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-600 shadow-md overflow-hidden"
             :style="'margin-top: ' + y/2 + 'em; margin-left: ' + x/2 + 'em; z-index: 1000;'"
         >
             <div
-                v-for="el in _data"
+                v-for="el in m_data"
                 :key="el.id"
                 class="cursor-pointer hover:bg-slate-100 hover:dark:bg-slate-500 px-2 py-1"
                 @click="() => {onclicked(el);}"
@@ -84,15 +84,15 @@ export default {
     },
     methods: {
         setData(data) {
-            if (this.m_date.length != data.length) this.setSelection(-1);
-            this.m_date = data;
+            if (this.m_data.length != data.length) this.setSelection(-1);
+            this.m_data = data;
             this.showing = true;
         },
         setShowing(showing) {
             this.showing = showing;
         },
         getData() {
-            return this.m_date;
+            return this.m_data;
         },
         setSelection(selection) {
             this.m_selection = typeof(selection) === "string" ? parseInt(selection) : selection;
@@ -171,13 +171,13 @@ export default {
             this.showing = false;
         },
         select() {
-            this.onclicked(this.m_date[this.m_selection]);
+            this.onclicked(this.m_data[this.m_selection]);
         },
         next() {
-            this.setSelection((this.m_selection + 1 == this.m_date.length) ? 0 : this.m_selection + 1);
+            this.setSelection((this.m_selection + 1 == this.m_data.length) ? 0 : this.m_selection + 1);
         },
         prev() {
-            this.setSelection((this.m_selection - 1 < 0) ? this.m_date.length - 1 : this.m_selection - 1);
+            this.setSelection((this.m_selection - 1 < 0) ? this.m_data.length - 1 : this.m_selection - 1);
         }
     }
 }

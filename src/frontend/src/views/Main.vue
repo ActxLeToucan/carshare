@@ -112,18 +112,17 @@
                             >
                                 {{ lang.SEARCH }}
                             </button-block>
-                            ../components/cards/Cardborder.vue
-                            <div
-                                style="animation-delay: 400ms;"
-                                class="show-up relative flex w-full justify-end mt-4"
+                        </div>
+                        <div
+                            style="animation-delay: 400ms;"
+                            class="show-up relative flex w-full justify-end mt-4"
+                        >
+                            <button-block
+                                class="shadow-lg"
+                                href="/trips/new"
                             >
-                                <button-block
-                                    class="shadow-lg"
-                                    href="/trips/new"
-                                >
-                                    Créer un trajet
-                                </button-block>
-                            </div>
+                                Créer un trajet
+                            </button-block>
                         </div>
                     </div>
                 </div>
