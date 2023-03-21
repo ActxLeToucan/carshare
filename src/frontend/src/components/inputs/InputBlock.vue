@@ -1,6 +1,10 @@
 <template>
     <div class="flex grow h-fit w-full min-w-0 flex-col justify-between my-2">
-        <label v-if="label != ''" class="flex text-xl font-bold whitespace-nowrap text-ellipsis w-fit" :class="dark ? ' text-white' : ' text-slate-500 dark:text-slate-400'">
+        <label
+            v-if="label != ''"
+            class="flex text-xl font-bold whitespace-nowrap text-ellipsis w-fit"
+            :class="dark ? ' text-white' : ' text-slate-500 dark:text-slate-400'"
+        >
             {{ label }}
         </label>
         <textarea
@@ -12,13 +16,13 @@
             :name="name"
             :value="value"
             :rows="isMobile? '2': '3'"
-        ></textarea>
+        />
     </div>
 </template>
 
 <script>
 export default {
-    name: '',
+    name: 'InputBlock',
     props: {
         label: {
             type: String,

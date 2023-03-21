@@ -1,101 +1,148 @@
 <template>
     <div class="md:show-up flex flex-col grow max-w-full">
-        <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> {{ lang.MY_GROUPS }} </p>
+        <p class="text-2xl text-teal-500 py-2 font-bold mx-auto">
+            {{ lang.MY_GROUPS }}
+        </p>
         <div class="flex flex-col grow justify-evenly">
-
             <div class="flex flex-col w-fit md:mx-auto mx-auto max-w-full px-2">
-                <p class="text-xl text-slate-500 py-2 font-semibold"> {{ lang.MY_GROUPS }} </p>
+                <p class="text-xl text-slate-500 py-2 font-semibold">
+                    {{ lang.MY_GROUPS }}
+                </p>
                 <card class="flex grow h-fit min-w-[60vw] md:max-w-[70vw] w-full overflow-y-auto">
-                    <div v-show="loading" class="flex flex-col justify-center mx-auto max-w-full">
-
-                        <badge :newline="true" :title="lang.LOADING_GROUPS" :content="lang.LOADING_GROUPS_DESC"></badge>
-                        
+                    <div
+                        v-show="loading"
+                        class="flex flex-col justify-center mx-auto max-w-full"
+                    >
+                        <card-badge
+                            :newline="true"
+                            :title="lang.LOADING_GROUPS"
+                            :content="lang.LOADING_GROUPS_DESC"
+                        />
                     </div>
-                    <div v-if="groups.length == 0 && !loading" class="flex flex-col justify-center mx-auto max-w-full">
-
-                        <badge :newline="true" :title="lang.NO_GROUPS" :content="lang.NO_GROUPS_DESC"></badge>
-                        
+                    <div
+                        v-if="groups.length == 0 && !loading"
+                        class="flex flex-col justify-center mx-auto max-w-full"
+                    >
+                        <card-badge
+                            :newline="true"
+                            :title="lang.NO_GROUPS"
+                            :content="lang.NO_GROUPS_DESC"
+                        />
                     </div>
-                    <div v-if="groups.length > 0 && !loading" class="flex space-x-4 overflow-x-scroll w-full">
-                        
-                        <button v-for="group in groups" :key="group.id" v-on:click="showGroup(group)"
+                    <div
+                        v-if="groups.length > 0 && !loading"
+                        class="flex space-x-4 overflow-x-scroll w-full"
+                    >
+                        <button
+                            v-for="group in groups"
+                            :key="group.id"
                             class="flex flex-col justify-center py-4 my-4 rounded-lg bg-slate-100 dark:bg-slate-700 px-4 w-fit max-w-[14em]
                                     border-2 border-transparent hover:border-slate-200 hover:border-slate-600 cursor-pointer transition-all"
+                            @click="showGroup(group)"
                         >
-                            <p class="text-xl md:text-2xl text-slate-500 dark:text-slate-300 font-bold mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full"> {{ group.name }} </p>
-                            <p class="text-lg md:text-xl text-slate-500 dark:text-slate-400 mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full"> {{ group.users.length }} {{ lang.MEMBERS }} </p>
+                            <p class="text-xl md:text-2xl text-slate-500 dark:text-slate-300 font-bold mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full">
+                                {{ group.name }}
+                            </p>
+                            <p class="text-lg md:text-xl text-slate-500 dark:text-slate-400 mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full">
+                                {{ group.users.length }} {{ lang.MEMBERS }}
+                            </p>
                         </button>
-
                     </div>
                 </card>
                 <div class="flex justify-center mt-4">
-                    <button-block :action="createPopup?.show"> {{ lang.CREATE_GROUP }} </button-block>
+                    <button-block :action="createPopup?.show">
+                        {{ lang.CREATE_GROUP }}
+                    </button-block>
                 </div>
             </div>
 
-            <div ref="group-zone" class="flex md:w-[60vw] md:mx-auto px-2 h-fit mx-auto transition-all overflow-hidden my-4 max-w-full" style="max-height: 0px;">
+            <div
+                ref="group-zone"
+                class="flex md:w-[60vw] md:mx-auto px-2 h-fit mx-auto transition-all overflow-hidden my-4 max-w-full"
+                style="max-height: 0px;"
+            >
                 <div class="flex flex-col h-fit grow rounded-lg border-2 border-slate-200 dark:border-slate-700 overflow-hidden">
                     <div class="flex grow justify-between bg-slate-100 dark:bg-slate-700 h-fit items-center">
-                        <div class="relative w-8 h-8"></div>
+                        <div class="relative w-8 h-8" />
                         <div class="flex grow justify-center py-1 max-w-[80%]">
-                            <p class="text-2xl text-slate-500 dark:text-slate-300 font-bold mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full"> {{ selectedGroup?.name }} </p>
+                            <p class="text-2xl text-slate-500 dark:text-slate-300 font-bold mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full">
+                                {{ selectedGroup?.name }}
+                            </p>
                         </div>
-                        <x-mark-icon class="relative w-8 h-8 mr-1 text-slate-500 dark:text-slate-400 hover:text-slate-600 cursor-pointer transition-all" v-on:click="hideGroupZone()"/>
+                        <x-mark-icon
+                            class="relative w-8 h-8 mr-1 text-slate-500 dark:text-slate-400 hover:text-slate-600 cursor-pointer transition-all"
+                            @click="hideGroupZone()"
+                        />
                     </div>
                     <div class="flex grow h-fit justify-center p-4">
-                        
-                        <div v-if="selectedGroup?.users.length == 0" class="flex flex-col justify-center mx-auto max-w-full">
-
-                            <badge :newline="true" class="max-w-full" :title="lang.NO_USERS" :content="lang.NO_USERS_DESC"></badge>
-                            
+                        <div
+                            v-if="selectedGroup?.users.length == 0"
+                            class="flex flex-col justify-center mx-auto max-w-full"
+                        >
+                            <card-badge
+                                :newline="true"
+                                class="max-w-full"
+                                :title="lang.NO_USERS"
+                                :content="lang.NO_USERS_DESC"
+                            />
                         </div>
-                        <div v-if="selectedGroup?.users.length > 0" class="flex overflow-x-auto space-x-4 w-full">
-                            
-                            <badge
+                        <div
+                            v-if="selectedGroup?.users.length > 0"
+                            class="flex overflow-x-auto space-x-4 w-full"
+                        >
+                            <card-badge
+                                v-for="member in selectedGroup?.users"
+                                :key="member.email"
                                 class="md:max-w-[18em] max-w-[14em]"
-                                v-for="member in selectedGroup?.users" :key="member.email"
-                                :title="member.firstName + ' ' + member.lastName" :content="member.email"
-                            ></badge>
-
+                                :title="member.firstName + ' ' + member.lastName"
+                                :content="member.email"
+                            />
                         </div>
-
                     </div>
                     <div class="flex grow justify-end p-2">
-                        <button-block color="red" :action="deletePopup?.show"> {{ lang.DELETE_GROUP }} </button-block>
+                        <button-block
+                            color="red"
+                            :action="deletePopup?.show"
+                        >
+                            {{ lang.DELETE_GROUP }}
+                        </button-block>
                     </div>
                 </div>
             </div>
-
         </div>
-        <popup
+        <card-popup
             color="red"
             :title="lang.DELETE_GROUP"
             :content="lang.GROUP_DELETE_CONFIRMATION"
-            :cancelLabel="lang.CANCEL"
-            :validateLabel="lang.DELETE"
+            :cancel-label="lang.CANCEL"
+            :validate-label="lang.DELETE"
             :onload="setDeletePopup"
             :onvalidate="removeGroup"
-        ></popup>
-        <popup
+        />
+        <card-popup
             ref="create-popup"
             :title="lang.CREATE_GROUP"
             :content="lang.GROUP_CREATE_CONFIRMATION+'.'"
-            :cancelLabel="lang.CANCEL"
-            :validateLabel="lang.CREATE"
+            :cancel-label="lang.CANCEL"
+            :validate-label="lang.CREATE"
             :onvalidate="createGroup"
         >
-            <input-text :label="lang.GROUP_NAME" :placeholder="lang.GROUP_NAME" name="name"></input-text>
-        </popup>
+            <input-text
+                :label="lang.GROUP_NAME"
+                :placeholder="lang.GROUP_NAME"
+                name="name"
+            />
+        </card-popup>
     </div>
 </template>
 
 <script>
 import Lang from '../../scripts/Lang';
-import Card from '../cards/Card.vue';
-import Badge from '../cards/Badge.vue';
+import Card from '../cards/CardBorder.vue';
+import CardBadge from '../cards/CardBadge.vue';
 import ButtonBlock from '../inputs/ButtonBlock.vue';
 import InputText from '../inputs/InputText.vue';
-import Popup from '../cards/Popup.vue';
+import CardPopup from '../cards/CardPopup.vue';
 
 import {
     XMarkIcon
@@ -108,14 +155,20 @@ export default {
     name: "UserGroups",
     components: {
         Card,
-        Badge,
+        CardBadge,
         ButtonBlock,
         XMarkIcon,
-        Popup,
+        CardPopup,
         InputText
     },
     data() {
         return { groups: [], loading: false, lang: Lang.CurrentLang, selectedGroup: null, deletePopup: null, createPopup: null }
+    },
+    mounted() {
+        Lang.AddCallback(lang => this.lang = lang);
+        this.updateGroups();
+
+        this.createPopup = this.$refs["create-popup"];
     },
     methods: {
         showGroupZone() {
@@ -183,12 +236,6 @@ export default {
                 console.error(err);
             });
         }
-    },
-    mounted() {
-        Lang.AddCallback(lang => this.lang = lang);
-        this.updateGroups();
-
-        this.createPopup = this.$refs["create-popup"];
     }
 }
 </script>

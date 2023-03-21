@@ -28,12 +28,12 @@ export function retreiveFields(el) {
 
 export function getTypedValue(input) {
     switch (input.type) {
-        case "number":
-            return Number(input.value);
-        case "checkbox":
-            return input.checked;
-        default:
-            return input.value;
+    case "number":
+        return Number(input.value);
+    case "checkbox":
+        return input.checked;
+    default:
+        return input.value;
     }
 }
 
