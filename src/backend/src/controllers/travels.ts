@@ -1,17 +1,11 @@
 import type express from 'express';
 import { prisma } from '../app';
 import * as validator from '../tools/validator';
-import {
-    displayableUserPublic,
-    error,
-    info,
-    notifs,
-    notify,
-    sendMsg
-} from '../tools/translator';
-import properties from '../properties';
 import { checkTravelHoursLimit } from '../tools/validator';
+import { displayableUserPublic, error, info, notifs, notify, sendMsg } from '../tools/translator';
+import properties from '../properties';
 import { preparePagination } from './_common';
+import { type Etape } from '@prisma/client';
 
 exports.searchTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { date, startCity, startContext, endCity, endContext } = req.query;
@@ -34,30 +28,30 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
                             u.email     as 'driver.email',
                             u.phone     as 'driver.phone',
                             u.avatar    as 'driver.avatar',
-                            e1.id       as 'departure.id',
-                            e1.label    as 'departure.label',
-                            e1.city     as 'departure.city',
-                            e1.context  as 'departure.context',
-                            e1.lat      as 'departure.lat',
-                            e1.lng      as 'departure.lng',
-                            e1.date     as 'departure.date',
-                            e2.id       as 'arrival.id',
-                            e2.label    as 'arrival.label',
-                            e2.city     as 'arrival.city',
-                            e2.context  as 'arrival.context',
-                            e2.lat      as 'arrival.lat',
-                            e2.lng      as 'arrival.lng',
-                            e2.date     as 'arrival.date'
+                            dep.id      as 'departure.id',
+                            dep.label   as 'departure.label',
+                            dep.city    as 'departure.city',
+                            dep.context as 'departure.context',
+                            dep.lat     as 'departure.lat',
+                            dep.lng     as 'departure.lng',
+                            dep.date    as 'departure.date',
+                            arr.id      as 'arrival.id',
+                            arr.label   as 'arrival.label',
+                            arr.city    as 'arrival.city',
+                            arr.context as 'arrival.context',
+                            arr.lat     as 'arrival.lat',
+                            arr.lng     as 'arrival.lng',
+                            arr.date    as 'arrival.date'
                      from travel t
                               inner join user u on u.id = t.driverId
-                              inner join etape e1 on e1.travelId = t.id and e1.city = ${startCity}
-                              inner join etape e2 on e2.travelId = t.id and e2.city = ${endCity}
+                              inner join etape dep on dep.travelId = t.id and dep.city = ${startCity}
+                              inner join etape arr on arr.travelId = t.id and arr.city = ${endCity}
                      where t.status = ${properties.travel.status.open}
-                       and e1.date < e2.date
-                       and IF(${startCtx} = '', true, e1.context = ${startCtx})
-                       and IF(${endCtx} = '', true, e2.context = ${endCtx})
-                       and e1.date BETWEEN ${date1} and ${date2}`
-        .then((data: any) => {
+                       and dep.date < arr.date
+                       and IF(${startCtx} = '', true, dep.context = ${startCtx})
+                       and IF(${endCtx} = '', true, arr.context = ${endCtx})
+                       and dep.date BETWEEN ${date1} and ${date2}`
+        .then(async (data: any) => {
             for (const travel of data) {
                 for (const key of Object.keys(travel)) {
                     if (key.includes('.')) {
@@ -69,6 +63,13 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
                     }
                 }
                 travel.driver = displayableUserPublic(travel.driver);
+                try {
+                    const count: any = await getMaxPassengers(travel.id, travel.departure, travel.arrival);
+                    travel.passengers = Number(count[0].nbPassengers);
+                } catch (err) {
+                    console.error(err);
+                    travel.passengers = -1;
+                }
             }
             res.status(200).json(data);
         }).catch((err) => {
@@ -259,4 +260,30 @@ exports.getTravels = (req: express.Request, res: express.Response, _: express.Ne
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
     });
+}
+
+/**
+ * Get the max number of passengers for travel between two steps
+ *
+ * @example
+ * The result of the promise can be accessed with the property nbPassengers:
+ * `const max = await getMaxPassengers(travelId, dep, arr);`
+ * `console.log(Number(max[0].nbPassengers));`
+ *
+ * @param travelId id of the travel
+ * @param dep departure step
+ * @param arr arrival step
+ * @returns {PrismaPromise<unknown>} max number of passengers
+ */
+async function getMaxPassengers (travelId: number, dep: Etape, arr: Etape) {
+    return prisma.$queryRaw`select max(nb) as nbPassengers
+                            from (select count(*) as nb
+                                  from etape e
+                                           inner join bookingsteps bs on e.id = bs.stepId and e.travelId = ${travelId}
+                                  where e.id in (select e.id
+                                                 from (travel t join etape e
+                                                       on (t.id = e.travelId))
+                                                 where e.date >= ${dep.date}
+                                                   and e.date < ${arr.date})
+                                  group by bs.stepId) as t`;
 }

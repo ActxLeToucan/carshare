@@ -42,6 +42,8 @@ function acceptOrRejectBooking (req: express.Request, res: express.Response, sta
             return;
         }
 
+        // TODO: check if there is a place left in the car
+
         // accept/reject booking
         prisma.passenger.update({
             where: { id: bookingId },
