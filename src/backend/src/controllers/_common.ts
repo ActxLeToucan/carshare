@@ -1,5 +1,7 @@
 import type express from 'express';
 import properties from '../properties';
+import { type Etape } from '@prisma/client';
+import { prisma } from '../app';
 
 /**
  * Gets pagination query params in the request and returns an object with those values after sanitization.
@@ -49,6 +51,32 @@ function preparePagination (req: express.Request, searchMode: boolean) {
     }
 }
 
+/**
+ * Get the max number of passengers for travel between two steps
+ *
+ * @example
+ * The result of the promise can be accessed with the property nbPassengers:
+ * `const max = await getMaxPassengers(travelId, dep, arr);`
+ * `console.log(Number(max[0].nbPassengers));`
+ *
+ * @param travelId id of the travel
+ * @param dep departure step
+ * @param arr arrival step
+ * @returns {PrismaPromise<unknown>} max number of passengers
+ */
+async function getMaxPassengers (travelId: number, dep: Etape, arr: Etape) {
+    return prisma.$queryRaw`select max(nb) as nbPassengers
+                            from (select count(*) as nb
+                                  from etape e
+                                           inner join bookingsteps bs on e.id = bs.stepId and e.travelId = ${travelId}
+                                  where e.id in (select e.id
+                                                 from (travel t join etape e
+                                                       on (t.id = e.travelId))
+                                                 where e.date >= ${dep.date}
+                                                   and e.date < ${arr.date})
+                                  group by bs.stepId) as t`;
+}
+
 export type Pagination = ReturnType<typeof preparePagination>;
 
-export { preparePagination };
+export { preparePagination, getMaxPassengers };

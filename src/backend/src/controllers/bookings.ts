@@ -4,6 +4,7 @@ import { error, info, type MessageHTTP, notifs, notify, sendMsg } from '../tools
 import properties from '../properties';
 import * as validator from '../tools/validator';
 import { type Request } from 'express';
+import { getMaxPassengers } from './_common';
 
 exports.acceptBooking = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     acceptOrRejectBooking(req, res, properties.booking.status.accepted, info.booking.accepted);
@@ -25,7 +26,7 @@ function acceptOrRejectBooking (req: express.Request, res: express.Response, sta
             },
             arrival: true
         }
-    }).then((booking) => {
+    }).then(async (booking) => {
         // verifications
         if (booking === null) {
             sendMsg(req, res, error.booking.notFound);
@@ -42,7 +43,22 @@ function acceptOrRejectBooking (req: express.Request, res: express.Response, sta
             return;
         }
 
-        // TODO: check if there is a place left in the car
+        if (status === properties.booking.status.accepted) {
+            // check if there is a place left in the car
+            try {
+                const count: any = await getMaxPassengers(booking.departure.travelId, booking.departure, booking.arrival);
+                const passengers = Number(count[0].nbPassengers);
+                if (Number.isNaN(passengers)) throw new Error('Could not get max passengers');
+
+                if (passengers >= booking.departure.travel.maxPassengers) {
+                    sendMsg(req, res, error.travel.noSeats);
+                    return;
+                }
+            } catch (e) {
+                sendMsg(req, res, error.generic.internalError);
+                return;
+            }
+        }
 
         // accept/reject booking
         prisma.passenger.update({

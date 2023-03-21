@@ -660,6 +660,13 @@ const error = {
                 en: 'This travel is no longer open.'
             },
             code: 400
+        }),
+        noSeats: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Ce trajet n\'a plus de place.',
+                en: 'This travel has no more seats.'
+            },
+            code: 400
         })
     },
     booking: {
