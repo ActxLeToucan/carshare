@@ -1411,7 +1411,7 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
-  /notation/:id:
+  /notation/average/:id:
     get:
       summary: Obtaining evaluation averages
       description: Get the averages score when the id was a driver and when it was a passenger
@@ -1505,7 +1505,7 @@ paths:
                   message:
                     type: string
                     example: Recorded evaluation
-                  group:
+                    group:
                     $ref: '#/components/schemas/EvaluationCreate'
         '400':
           description: Bad request
@@ -1519,6 +1519,53 @@ paths:
                     example: travelId is required.
         '401':
           $ref: '#/components/responses/noToken'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+
+  /notations/:id:
+    delete:
+      summary: Delete an evaluation
+      description:  Delete the evaluation, with the id in parameter
+      operationId: deleteEvaluation
+      tags:
+        - Notations
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - name: id
+          in: path
+          description: The id of the evaluation to delete
+          required: true
+          schema:
+            type: integer
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Evaluation removed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Evaluation removed
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Id is invalid.
+        '401':
+          $ref: '#/components/responses/noToken'
+        '404':
+          $ref: '#/components/responses/evaluationNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
@@ -1683,6 +1730,16 @@ components:
               message:
                 type: string
                 example: Travel not found.
+    evaluationNotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Evaluation not found.
     typeError:
       description: Invalid type of value
       content:

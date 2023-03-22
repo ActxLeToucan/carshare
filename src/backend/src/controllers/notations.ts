@@ -211,3 +211,37 @@ exports.createEvaluation = (req: express.Request, res: express.Response, _: expr
         sendMsg(req, res, error.generic.internalError);
     });
 }
+
+exports.deleteEvaluation = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    const notationId = validator.sanitizeId(req.params.id, req, res);
+    if (notationId === null) return;
+
+    prisma.evaluation.count({
+
+        where: {
+            id: notationId,
+            evaluatorId: res.locals.user.id
+        }
+
+    }).then((count) => {
+        if (count <= 0) {
+            sendMsg(req, res, error.evaluation.notFound);
+            return;
+        }
+
+        prisma.evaluation.delete({
+            where: {
+                id: notationId
+
+            }
+        }).then(() => {
+            sendMsg(req, res, info.evaluation.deleted);
+        }).catch((err) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
+    }).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
+}

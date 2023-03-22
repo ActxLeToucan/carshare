@@ -687,6 +687,15 @@ const error = {
             },
             code: 400
         })
+    },
+    evaluation: {
+        notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Evaluation introuvable.',
+                en: 'Evaluation not found.'
+            },
+            code: 404
+        })
     }
 } satisfies TranslationsMessageHTTP;
 
@@ -828,6 +837,13 @@ const info = {
             data: {
                 evaluation: displayableEvaluation(evaluation)
             }
+        }),
+        deleted: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Evaluation retirée',
+                en: 'Evaluation removed'
+            },
+            code: 200
         })
     }
 
