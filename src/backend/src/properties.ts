@@ -100,7 +100,7 @@ const properties = {
         status: {
             cancelled: -1,
             pending: 0,
-            accepted: 1,
+            accepted: 1, // this value can not be changed, it is used in the database
             rejected: 2
         }
     }
