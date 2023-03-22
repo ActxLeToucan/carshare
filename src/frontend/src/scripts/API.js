@@ -210,16 +210,16 @@ class API {
             let reqBody = type == this.TYPE.FORM ? "" : {};
             if (body && type != this.TYPE.FILE) {
                 switch (typeof (body)) {
-                    case "string":
-                        if (body.startsWith("{") && body.endsWith("}"))
-                            body = JSON.parse(body);
+                case "string":
+                    if (body.startsWith("{") && body.endsWith("}"))
+                        body = JSON.parse(body);
                     // pas de break, pour faire le traitement "object" suivant
-                    case "object":
-                        if (type == this.TYPE_FORM)
-                            reqBody = new URLSearchParams(body).toString();
-                        else reqBody = JSON.stringify(body);
-                        break;
-                    default: break;
+                case "object":
+                    if (type == this.TYPE_FORM)
+                        reqBody = new URLSearchParams(body).toString();
+                    else reqBody = JSON.stringify(body);
+                    break;
+                default: break;
                 }
             }
 
@@ -312,15 +312,15 @@ class API {
      */
     static createParameters(params) {
         switch (typeof (params)) {
-            case "string":
-                if (params.startsWith("?")) return params;
-                if (params.startsWith("{") && params.endsWith("}"))
-                    params = JSON.parse(params);
-            case "object":
-                return "?" + new URLSearchParams(params).toString();
-            default:
-                console.error("API Error: Error while creating parameters with argument: ", params);
-                return "";
+        case "string":
+            if (params.startsWith("?")) return params;
+            if (params.startsWith("{") && params.endsWith("}"))
+                params = JSON.parse(params);
+        case "object":
+            return "?" + new URLSearchParams(params).toString();
+        default:
+            console.error("API Error: Error while creating parameters with argument: ", params);
+            return "";
         }
     }
 

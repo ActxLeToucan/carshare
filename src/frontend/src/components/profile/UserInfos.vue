@@ -1,27 +1,101 @@
 <template>
     <div class="md:show-up flex flex-col grow">
-        <p class="text-2xl text-teal-500 font-bold mx-auto mt-4"> {{ lang.MY_INFOS }} </p>
+        <p class="text-2xl text-teal-500 font-bold mx-auto mt-4">
+            {{ lang.MY_INFOS }}
+        </p>
         <div class="flex flex-col grow justify-evenly items-center">
-            <card class="flex flex-col md:m-4 my-4">
-                <div class="flex flex-col" ref="user-inputs">
-                    <input-text   name="lastName"  :label="lang.LASTNAME"  :placeholder="lang.LASTNAME"  :value="formProperties.properties.lastName" @input="formProperties.properties.lastName = $event.target.value"></input-text>
-                    <input-text   name="firstName" :label="lang.FIRSTNAME" :placeholder="lang.FIRSTNAME" :value="formProperties.properties.firstName" @input="formProperties.properties.firstName = $event.target.value"></input-text>
-                    <input-text   name="email"     :label="lang.EMAIL"     :placeholder="lang.EMAIL"     :value="formProperties.properties.email" class="mb-0" @input="formProperties.properties.email = $event.target.value"></input-text>
+            <card-border class="flex flex-col md:m-4 my-4">
+                <div
+                    ref="user-inputs"
+                    class="flex flex-col"
+                >
+                    <input-text
+                        name="lastName"
+                        :label="lang.LASTNAME"
+                        :placeholder="lang.LASTNAME"
+                        :value="formProperties.properties.lastName"
+                        @input="formProperties.properties.lastName = $event.target.value"
+                    />
+                    <input-text
+                        name="firstName"
+                        :label="lang.FIRSTNAME"
+                        :placeholder="lang.FIRSTNAME"
+                        :value="formProperties.properties.firstName"
+                        @input="formProperties.properties.firstName = $event.target.value"
+                    />
+                    <input-text
+                        name="email"
+                        :label="lang.EMAIL"
+                        :placeholder="lang.EMAIL"
+                        :value="formProperties.properties.email"
+                        class="mb-0"
+                        @input="formProperties.properties.email = $event.target.value"
+                    />
                     <div class="flex space-x-4">
-                        <p v-if="emailVerified == 'false'" class="ml-auto text-md text-slate-500 dark:text-slate-300"> {{ lang.ADDRESS_NOT_VERIFIED }}. </p>
-                        <p v-if="emailVerified == 'true'" class="ml-auto text-md text-slate-500 dark:text-slate-300"> {{ lang.ADDRESS_VERIFIED }}. </p>
-                        <p v-if="emailVerified == 'pending'" class="ml-auto text-md text-slate-500 dark:text-slate-300"> {{ lang.ADDRESS_VERIFICATION }}. </p>
-                        <p v-if="emailVerified == '429'" class="ml-auto text-md text-red-500 dark:text-red-300"> {{ lang.ADDRESS_ERROR_SPAM }}. </p>
-                        <p v-if="emailVerified == 'error'" class="ml-auto text-md text-red-500 dark:text-red-300"> {{ lang.ADDRESS_ERROR }}. </p>
-                        <p v-if="emailVerified == 'loading'" class="ml-auto text-md text-slate-500 dark:text-slate-300"> {{ lang.DATA_SENDING }} </p>
+                        <p
+                            v-if="emailVerified == 'false'"
+                            class="ml-auto text-md text-slate-500 dark:text-slate-300"
+                        >
+                            {{ lang.ADDRESS_NOT_VERIFIED }}.
+                        </p>
+                        <p
+                            v-if="emailVerified == 'true'"
+                            class="ml-auto text-md text-slate-500 dark:text-slate-300"
+                        >
+                            {{ lang.ADDRESS_VERIFIED }}.
+                        </p>
+                        <p
+                            v-if="emailVerified == 'pending'"
+                            class="ml-auto text-md text-slate-500 dark:text-slate-300"
+                        >
+                            {{ lang.ADDRESS_VERIFICATION }}.
+                        </p>
+                        <p
+                            v-if="emailVerified == '429'"
+                            class="ml-auto text-md text-red-500 dark:text-red-300"
+                        >
+                            {{ lang.ADDRESS_ERROR_SPAM }}.
+                        </p>
+                        <p
+                            v-if="emailVerified == 'error'"
+                            class="ml-auto text-md text-red-500 dark:text-red-300"
+                        >
+                            {{ lang.ADDRESS_ERROR }}.
+                        </p>
+                        <p
+                            v-if="emailVerified == 'loading'"
+                            class="ml-auto text-md text-slate-500 dark:text-slate-300"
+                        >
+                            {{ lang.DATA_SENDING }}
+                        </p>
                         <button
-                            v-on:click="verifyEmail"
                             v-if="emailVerified !== 'true'"
-                            class="ml-auto font-semibold text-md text-slate-500 hover:text-teal-500 cursor-pointer"> {{ lang.VERIFY }} </button>
+                            class="ml-auto font-semibold text-md text-slate-500 hover:text-teal-500 cursor-pointer"
+                            @click="verifyEmail"
+                        >
+                            {{ lang.VERIFY }}
+                        </button>
                     </div>
-                    <input-text   name="phone"    :label="lang.PHONE"          :placeholder="lang.PHONE" :value="formProperties.properties.phone" @input="formProperties.properties.phone = $event.target.value"></input-text>
-                    <input-choice name="gender"   :label="lang.GENDER"         :value="formProperties.properties.gender" :list="genres" @input="formProperties.properties.gender = Number($event.target.value)"></input-choice>
-                    <input-switch name="hasCar"   :label="lang.I_HAVE_A_CAR"   :value="formProperties.properties.hasCar" :onchange="(state) => this.formProperties.properties.hasCar = state"></input-switch>
+                    <input-text
+                        name="phone"
+                        :label="lang.PHONE"
+                        :placeholder="lang.PHONE"
+                        :value="formProperties.properties.phone"
+                        @input="formProperties.properties.phone = $event.target.value"
+                    />
+                    <input-choice
+                        name="gender"
+                        :label="lang.GENDER"
+                        :value="formProperties.properties.gender"
+                        :list="genres"
+                        @input="formProperties.properties.gender = Number($event.target.value)"
+                    />
+                    <input-switch
+                        name="hasCar"
+                        :label="lang.I_HAVE_A_CAR"
+                        :value="formProperties.properties.hasCar"
+                        :onchange="(state) => formProperties.properties.hasCar = state"
+                    />
                 </div>
                 <div
                     ref="user-log-zone"
@@ -29,17 +103,51 @@
                     style="max-height: 0;"
                 />
                 <div class="flex md:flex-row flex-col md:space-x-4 md:space-y-0 space-y-2 mt-4">
-                    <button-block :action="deleteAccount" color="red"> {{ lang.DELETE_ACCOUNT }} </button-block>
+                    <button-block
+                        :action="deleteAccount"
+                        color="red"
+                    >
+                        {{ lang.DELETE_ACCOUNT }}
+                    </button-block>
                     <div class="flex grow justify-end pl-20">
-                        <button-block :action="updateAccount" :disabled="!formProperties.buttonEnabled"> {{ lang.EDIT }} </button-block>
+                        <button-block
+                            :action="updateAccount"
+                            :disabled="!formProperties.buttonEnabled"
+                        >
+                            {{ lang.EDIT }}
+                        </button-block>
                     </div>
                 </div>
-            </card>
-            <card class="flex flex-col md:m-4 my-4">
-                <div class="flex flex-col" ref="password-inputs">
-                    <input-text name="password-old"     :label="lang.OLD_PASSWORD"  :placeholder="lang.OLD_PASSWORD"     :value="formPassword.old"     type="password" @input="formPassword.old = $event.target.value"></input-text>
-                    <input-text name="password-new"     :label="lang.NEW_PASSWORD"  :placeholder="lang.NEW_PASSWORD"     :value="formPassword.new"     type="password" @input="formPassword.new = $event.target.value"></input-text>
-                    <input-text name="password-confirm" :label="lang.PWD_CONFIRM"   :placeholder="lang.PASSWORD_CONFIRM" :value="formPassword.confirm" type="password" @input="formPassword.confirm = $event.target.value"></input-text>
+            </card-border>
+            <card-border class="flex flex-col md:m-4 my-4">
+                <div
+                    ref="password-inputs"
+                    class="flex flex-col"
+                >
+                    <input-text
+                        name="password-old"
+                        :label="lang.OLD_PASSWORD"
+                        :placeholder="lang.OLD_PASSWORD"
+                        :value="formPassword.old"
+                        type="password"
+                        @input="formPassword.old = $event.target.value"
+                    />
+                    <input-text
+                        name="password-new"
+                        :label="lang.NEW_PASSWORD"
+                        :placeholder="lang.NEW_PASSWORD"
+                        :value="formPassword.new"
+                        type="password"
+                        @input="formPassword.new = $event.target.value"
+                    />
+                    <input-text
+                        name="password-confirm"
+                        :label="lang.PWD_CONFIRM"
+                        :placeholder="lang.PASSWORD_CONFIRM"
+                        :value="formPassword.confirm"
+                        type="password"
+                        @input="formPassword.confirm = $event.target.value"
+                    />
                 </div>
                 <div
                     ref="password-log-zone"
@@ -47,21 +155,31 @@
                     style="max-height: 0;"
                 />
                 <div class="flex grow justify-end">
-                    <button-block :action="updatePassword" :disabled="!formPassword.buttonEnabled"> {{ lang.EDIT }} </button-block>
+                    <button-block
+                        :action="updatePassword"
+                        :disabled="!formPassword.buttonEnabled"
+                    >
+                        {{ lang.EDIT }}
+                    </button-block>
                 </div>
-            </card>
+            </card-border>
         </div>
-        <popup
+        <card-popup
             color="red"
             :title="lang.DELETE_ACCOUNT"
             :content="lang.ACCOUNT_DELETE_CONFIRMATION"
-            :cancelLabel="lang.CANCEL"
-            :validateLabel="lang.DELETE"
+            :cancel-label="lang.CANCEL"
+            :validate-label="lang.DELETE"
             :onload="setDeletePopup"
             :onvalidate="removeAccount"
         >
-            <input-text :label="lang.PASSWORD" :placeholder="lang.PASSWORD" name="password" type="password"></input-text>
-        </popup>
+            <input-text
+                :label="lang.PASSWORD"
+                :placeholder="lang.PASSWORD"
+                name="password"
+                type="password"
+            />
+        </card-popup>
     </div>
 </template>
 
@@ -70,8 +188,8 @@ import ButtonBlock from '../inputs/ButtonBlock.vue';
 import InputText from '../inputs/InputText.vue';
 import InputChoice from '../inputs/InputChoice.vue';
 import InputSwitch from '../inputs/InputSwitch.vue';
-import Card from '../cards/Card.vue';
-import Popup from '../cards/Popup.vue';
+import CardBorder from '../cards/CardBorder.vue';
+import CardPopup from '../cards/CardPopup.vue';
 import { Log, LogZone } from '../../scripts/Logs';
 import { genres, isPhoneNumber } from '../../scripts/data';
 import re from '../../scripts/Regex';
@@ -83,9 +201,9 @@ export default {
     name: "UserInfos",
     components: {
         ButtonBlock,
-        Card,
+        CardBorder,
         InputText,
-        Popup,
+        CardPopup,
         InputChoice,
         InputSwitch
     },
@@ -115,6 +233,47 @@ export default {
             },
             mounted: false,
         }
+    },
+    mounted() {
+        Lang.AddCallback(lang => {
+            this.lang = lang;
+            this.deletePopup.setTitle(lang.DELETE_ACCOUNT);
+        });
+
+        this.$refs["user-inputs"].addEventListener("keydown", ev => {
+            if (ev.key == "Enter") {
+                this.updateAccount();
+                ev.preventDefault();
+            }
+        });
+        this.$refs["password-inputs"].addEventListener("keydown", ev => {
+            if (ev.key == "Enter") {
+                this.updatePassword();
+                ev.preventDefault();
+            }
+        });
+
+        this.userLogZone = new LogZone(this.$refs["user-log-zone"]);
+        this.passwordLogZone = new LogZone(this.$refs["password-log-zone"]);
+
+        const setInputValue = (name, value) => {
+            const input = this.$el.querySelector(`input[name="${name}"]`);
+            if (input) input.value = value;
+        }
+
+        if (User.CurrentUser == null) return;
+        API.execute_logged(API.ROUTE.ME, API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
+            User.CurrentUser?.setInformations(res);
+            User.CurrentUser?.save();
+
+            const fields = ["lastName", "firstName", "email", "phone", "gender", "hasCar"];
+            fields.forEach(field => setInputValue(field, User.CurrentUser[field]));
+
+        }).catch(err => {
+            console.error(err);
+        });
+
+        this.mounted = true;
     },
     methods: {
         userLog(msg, type = Log.INFO) {
@@ -264,47 +423,6 @@ export default {
                 this.formProperties.buttonEnabled = true;
             });
         }
-    },
-    mounted() {
-        Lang.AddCallback(lang => {
-            this.lang = lang;
-            this.deletePopup.setTitle(lang.DELETE_ACCOUNT);
-        });
-
-        this.$refs["user-inputs"].addEventListener("keydown", ev => {
-            if (ev.key == "Enter") {
-                this.updateAccount();
-                ev.preventDefault();
-            }
-        });
-        this.$refs["password-inputs"].addEventListener("keydown", ev => {
-            if (ev.key == "Enter") {
-                this.updatePassword();
-                ev.preventDefault();
-            }
-        });
-
-        this.userLogZone = new LogZone(this.$refs["user-log-zone"]);
-        this.passwordLogZone = new LogZone(this.$refs["password-log-zone"]);
-
-        const setInputValue = (name, value) => {
-            const input = this.$el.querySelector(`input[name="${name}"]`);
-            if (input) input.value = value;
-        }
-
-        if (User.CurrentUser == null) return;
-        API.execute_logged(API.ROUTE.ME, API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
-            User.CurrentUser?.setInformations(res);
-            User.CurrentUser?.save();
-
-            const fields = ["lastName", "firstName", "email", "phone", "gender", "hasCar"];
-            fields.forEach(field => setInputValue(field, User.CurrentUser[field]));
-
-        }).catch(err => {
-            console.error(err);
-        });
-
-        this.mounted = true;
     }
 }
 </script>

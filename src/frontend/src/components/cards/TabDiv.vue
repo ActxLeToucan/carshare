@@ -1,6 +1,9 @@
 <template>
-    <div :id="'tab-' + hash" class="flex grow max-w-full">
-        <slot></slot>
+    <div
+        :id="'tab-' + hash"
+        class="flex grow max-w-full"
+    >
+        <slot />
     </div>
 </template>
 

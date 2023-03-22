@@ -1,21 +1,34 @@
 <template>
     <div class="flex grow flex-col">
-        <topbar v-if="User.CurrentUser != null"></topbar>
+        <topbar v-if="User.CurrentUser != null" />
         <div class="flex grow w-fit flex-col justify-center space-y-6 mx-auto">
-            <modal :oncancel="onCancel" :onvalidate="onValidate" title="Mot de passe oublié">
+            <card-modal
+                :oncancel="onCancel"
+                :onvalidate="onValidate"
+                title="Mot de passe oublié"
+            >
                 <div class="py-4">
-                    <p class="text-lg font-semibold text-slate-500"> Vous avez oublié votre mot de passe ? </p>
-                    <p class="text-lg font-semibold text-slate-500"> Pas de soucis ! Nous vous enverrons un mail pour le réinitialiser. </p>
+                    <p class="text-lg font-semibold text-slate-500">
+                        Vous avez oublié votre mot de passe ?
+                    </p>
+                    <p class="text-lg font-semibold text-slate-500">
+                        Pas de soucis ! Nous vous enverrons un mail pour le réinitialiser.
+                    </p>
                 </div>
-                <input-text   name="email"            label="Email"        placeholder="Adresse mail"                 type="email"    ></input-text>
-            </modal>
+                <input-text
+                    name="email"
+                    label="Email"
+                    placeholder="Adresse mail"
+                    type="email"
+                />
+            </card-modal>
         </div>
     </div>
 </template>
 
 <script>
 import Topbar from '../components/topbar/Topbar.vue';
-import Modal from '../components/cards/Modal.vue';
+import CardModal from '../components/cards/CardModal.vue';
 import InputText from '../components/inputs/InputText.vue';
 import { Log } from '../scripts/Logs';
 import User from '../scripts/User';
@@ -67,18 +80,18 @@ function onValidate(modal) {
 }
 
 export default {
+    name: 'RecoveryView',
     components: {
         Topbar,
-        Modal,
+        CardModal,
         InputText
-    },
-    name: 'Recover',
-    methods: {
-        onCancel,
-        onValidate
     },
     data() {
         return { User }
+    },
+    methods: {
+        onCancel,
+        onValidate
     }
 }
 </script>
