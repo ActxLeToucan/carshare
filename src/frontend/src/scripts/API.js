@@ -173,7 +173,10 @@ class API {
         ALL_NOITFS: "/notifications/all",
         TRAVELS: {
             CREATE: "/travels/create",
-            MY: "/travels/my",
+            MY: {
+                PASSENGER: "/travels/my/passenger",
+                DRIVER: "/travels/my/driver",
+            },
             SEARCH: "/travels/search",
         }
     };
