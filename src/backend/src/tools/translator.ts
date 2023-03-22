@@ -645,8 +645,8 @@ const error = {
     evaluation: {
         notpossible: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'La personne que l\'on veut évaluer n\'a jamais fait de trajet avec l\'utilisateur courant.',
-                en: 'The person to be evaluated has never made a trip with the current user.'
+                fr: 'Vous n\'avez jamais fait de trajet avec la personne que vous voulez évaluer.',
+                en: 'You have never made a trip with the person you want to evaluate.'
             },
             code: 404
         }),
@@ -654,6 +654,13 @@ const error = {
             msg: {
                 fr: 'Vous avez déjà noté cet utilisateur.',
                 en: 'You have already noted this user.'
+            },
+            code: 404
+        }),
+        notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Evaluation introuvable.',
+                en: 'Evaluation not found.'
             },
             code: 404
         })
@@ -686,15 +693,6 @@ const error = {
                 en: 'This travel is no longer open.'
             },
             code: 400
-        })
-    },
-    evaluation: {
-        notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Evaluation introuvable.',
-                en: 'Evaluation not found.'
-            },
-            code: 404
         })
     }
 } satisfies TranslationsMessageHTTP;

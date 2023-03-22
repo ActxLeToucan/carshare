@@ -605,7 +605,6 @@ function checkNumberField (value: any, req: express.Request, res: express.Respon
     return true;
 }
 
-
 function checkTravelHoursLimit (date: Date, req: express.Request, res: express.Response): boolean {
     const now = new Date();
     if (dateAddHours(now, properties.travel.hoursLimit) > date) {
