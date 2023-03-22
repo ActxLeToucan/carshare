@@ -73,7 +73,7 @@ export default {
         return { lang: Lang.CurrentLang }
     },
     mounted() {
-        console.log("trip: ", this.trip);
+        
     },
     methods: {
         

@@ -169,7 +169,7 @@
                                 :label="lang.DATE"
                                 :value="startStep.datetime"
                                 :onchange="e => setStartDate(e.target.value)"
-                                type="datetime-local"
+                                type="datetime"
                             />
                         </card-border>
 
@@ -223,7 +223,7 @@
                                             :label="lang.DATE"
                                             :value="step.datetime"
                                             :onchange="e => setStepDate(index, e.target.value)"
-                                            type="datetime-local"
+                                            type="datetime"
                                         />
                                     </card-border>
                                 </div>
@@ -262,7 +262,7 @@
                                 :label="lang.DATE"
                                 :value="endStep.datetime"
                                 :onchange="e => setEndDate(e.target.value)"
-                                type="datetime-local"
+                                type="datetime"
                             />
                         </card-border>
                     </div>
@@ -435,7 +435,7 @@ export default {
         },
         createTrip(showlogs = true) {
             const toDestination = (obj) => !obj? null: ({label: obj.label, city: obj.city, context: obj.context, lat: obj.lat, lng: obj.lng});
-            const toStep = (obj) => !obj? null: ({date: obj.datetime, ...toDestination(obj.destination)});
+            const toStep = (obj) => !obj? null: ({date: new Date(obj.datetime).toISOString(), ...toDestination(obj.destination)});
 
             const groupID = this.selectedTripType == 1? this.selectedGroup?.id: null;
             const infos = this.$el.querySelector("textarea[name=trip-infos]").value;
