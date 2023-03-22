@@ -8,9 +8,7 @@ export function retreiveFields(el) {
         const div = inputs_div.children[i];
         const input = div.querySelector("input");
         if (!input) continue;
-
         input.value = getTypedValue(input);
-
         inputs.push(input);
     }
 
@@ -30,12 +28,12 @@ export function retreiveFields(el) {
 
 export function getTypedValue(input) {
     switch (input.type) {
-        case "number":
-            return Number(input.value);
-        case "checkbox":
-            return input.checked;
-        default:
-            return input.value;
+    case "number":
+        return Number(input.value);
+    case "checkbox":
+        return input.checked;
+    default:
+        return input.value;
     }
 }
 
@@ -50,15 +48,10 @@ export const genres = [
     {value: 0,  id: 'FEMALE'},
 ];
 
-export const langues = [
-    {value: 'en',  id: 'ENGLISH'},
-    { value: 'fr', id: 'FRENCH' },
-];
-
-export const theme = [
-    {value: 'dark', id: 'DARKMODE' },
-    {value: 'clair',  id: 'LIGHTMODE'},
-    { value: 'defaut', id: 'DEFAULTMODE' },
+export const themes = [
+    {value: 0, id: 'DARKMODE'},
+    {value: 1, id: 'LIGHTMODE'},
+    {value: -1, id: 'DEFAULT'},
 ];
 export const levels = [
     {value: 0, id: 'USER'},

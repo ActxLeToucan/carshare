@@ -1,24 +1,45 @@
 <template>
     <div class="flex grow flex-col">
-        <topbar v-if="User.CurrentUser != null"></topbar>
+        <topbar v-if="User.CurrentUser != null" />
         <div class="flex grow w-fit flex-col justify-center space-y-6 mx-auto min-w-0 max-w-full">
-            <modal :oncancel="onCancel" :onvalidate="onValidate" :title="lang.LOGIN_TITLE">
+            <card-modal
+                :oncancel="onCancel"
+                :onvalidate="onValidate"
+                :title="lang.LOGIN_TITLE"
+            >
                 <div class="py-4">
-                    <p class="text-lg font-semibold text-slate-500"> {{ lang.LOGIN_DESC }}. </p>
+                    <p class="text-lg font-semibold text-slate-500">
+                        {{ lang.LOGIN_DESC }}.
+                    </p>
                 </div>
-                <input-text   name="email"            :label="lang.EMAIL"        :placeholder="lang.EMAIL"           type="email"    ></input-text>
-                <input-text   name="password"         :label="lang.PASSWORD"     :placeholder="lang.PASSWORD"        type="password" ></input-text>
-                <router-link to="/recovery" class="flex items-center justify-center w-fit h-fit text-slate-400 hover:text-teal-500 transition-all">
-                    <p class="text-md font-bold whitespace-nowrap text-ellipsis max-w-full min-w-0 w-fit h-fit max-h-full min-h-0"> {{ lang.FORGOT_PASSWORD }} ? </p>
+                <input-text
+                    name="email"
+                    :label="lang.EMAIL"
+                    :placeholder="lang.EMAIL"
+                    type="email"
+                />
+                <input-text
+                    name="password"
+                    :label="lang.PASSWORD"
+                    :placeholder="lang.PASSWORD"
+                    type="password"
+                />
+                <router-link
+                    to="/recovery"
+                    class="flex items-center justify-center w-fit h-fit text-slate-400 hover:text-teal-500 transition-all"
+                >
+                    <p class="text-md font-bold whitespace-nowrap text-ellipsis max-w-full min-w-0 w-fit h-fit max-h-full min-h-0">
+                        {{ lang.FORGOT_PASSWORD }} ?
+                    </p>
                 </router-link>
-            </modal>
+            </card-modal>
         </div>
     </div>
 </template>
 
 <script>
 import Topbar from '../components/topbar/Topbar.vue';
-import Modal from '../components/cards/Modal.vue';
+import CardModal from '../components/cards/CardModal.vue';
 import InputText from '../components/inputs/InputText.vue';
 import { Log } from '../scripts/Logs';
 import User from '../scripts/User';
@@ -78,21 +99,21 @@ function onValidate(modal) {
 }
 
 export default {
+    name: 'LoginView',
     components: {
         Topbar,
-        Modal,
+        CardModal,
         InputText
-    },
-    name: 'Login',
-    methods: {
-        onCancel,
-        onValidate
     },
     data() {
         return { User, lang: Lang.CurrentLang }
     },
     mounted() {
         Lang.AddCallback(lang => this.lang = lang);
+    },
+    methods: {
+        onCancel,
+        onValidate
     }
 }
 </script>

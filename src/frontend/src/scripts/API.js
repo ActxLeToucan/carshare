@@ -48,6 +48,85 @@ class Credentials {
     }
 }
 
+class Pagination {
+    constructor (offset = 0, limit = 10) {
+        this._offset = 0;
+        this._limit = 10;
+        this._total = 0;
+
+        this.offset = offset;
+        this.limit = limit;
+
+        this._onChanged = null;
+    }
+
+    set offset(offset) {
+        this._offset = offset ?? 0;
+        this._onChanged?.();
+    }
+
+    set limit(limit) {
+        this._limit = limit ?? 10;
+        this._onChanged?.();
+    }
+
+    set total(total) {
+        this._total = total;
+    }
+
+    set index(index) {
+        this.offset = index * this._limit;
+    }
+
+    next() {
+        this._offset += this._limit;
+        if (this._offset > this.maxIndex * this.limit) this._offset = this.maxIndex * this.limit;
+        this._onChanged?.();
+    }
+
+    previous() {
+        this._offset -= this._limit;
+        if (this._offset < 0) this._offset = 0;
+        this._onChanged?.();
+    }
+
+    get hasPrevious() {
+        return this._offset > 0;
+    }
+
+    get hasNext() {
+        return this._offset < this.maxIndex * this.limit;
+    }
+
+    get index() {
+        return this._offset / this._limit;
+    }
+
+    get total() {
+        return this._total;
+    }
+
+    get maxIndex() {
+        return Math.floor(this._total / this._limit);
+    }
+
+    get offset() {
+        return this._offset;
+    }
+
+    get limit() {
+        return this._limit;
+    }
+
+    onChanged(callback) {
+        this._onChanged = callback;
+    }
+
+    toString() {
+        return API.createParameters({offset: this.offset, limit: this.limit});
+    }
+}
+
 class API {
     static Credentials = Credentials;
 
@@ -131,16 +210,16 @@ class API {
             let reqBody = type == this.TYPE.FORM ? "" : {};
             if (body && type != this.TYPE.FILE) {
                 switch (typeof (body)) {
-                    case "string":
-                        if (body.startsWith("{") && body.endsWith("}"))
-                            body = JSON.parse(body);
+                case "string":
+                    if (body.startsWith("{") && body.endsWith("}"))
+                        body = JSON.parse(body);
                     // pas de break, pour faire le traitement "object" suivant
-                    case "object":
-                        if (type == this.TYPE_FORM)
-                            reqBody = new URLSearchParams(body).toString();
-                        else reqBody = JSON.stringify(body);
-                        break;
-                    default: break;
+                case "object":
+                    if (type == this.TYPE_FORM)
+                        reqBody = new URLSearchParams(body).toString();
+                    else reqBody = JSON.stringify(body);
+                    break;
+                default: break;
                 }
             }
 
@@ -154,14 +233,13 @@ class API {
                     err.json().then(data => {
                         reject({
                             status: err.status,
-                            message: data.message
+                            message: data.message ?? Lang.CurrentLang.UNKNOWN_ERROR
                         });
                     }).catch(err => reject(err));
                 } else {
                     reject(err);
                 }
             };
-        
             fetch(API.API_URL + path, {
                 credentials: "omit",
                 method: method,
@@ -233,15 +311,15 @@ class API {
      */
     static createParameters(params) {
         switch (typeof (params)) {
-            case "string":
-                if (params.startsWith("?")) return params;
-                if (params.startsWith("{") && params.endsWith("}"))
-                    params = JSON.parse(params);
-            case "object":
-                return "?" + new URLSearchParams(params).toString();
-            default:
-                console.error("API Error: Error while creating parameters with argument: ", params);
-                return "";
+        case "string":
+            if (params.startsWith("?")) return params;
+            if (params.startsWith("{") && params.endsWith("}"))
+                params = JSON.parse(params);
+        case "object":
+            return "?" + new URLSearchParams(params).toString();
+        default:
+            console.error("API Error: Error while creating parameters with argument: ", params);
+            return "";
         }
     }
 
@@ -252,7 +330,7 @@ class API {
      * @returns a string corresponding to the pagination's parameters part of the url
      */
     static createPagination(offset = 0, limit = 10) {
-        return this.createParameters({ offset: offset, limit: limit });
+        return new Pagination(offset, limit);
     }
 }
 

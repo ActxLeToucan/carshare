@@ -246,11 +246,8 @@ function checkDateField (date: any, dateDays: boolean, req: express.Request, res
     }
 
     if (dateDays) {
-        const dateC = new Date();
-        dateC.setDate(dateC.getDate() + 1);
-
-        if (new Date(date) < dateC) {
-            sendMsg(req, res, error.date.tooSoon, dateC);
+        if (dateAddHours(new Date(), properties.travel.hoursLimit) > new Date(date)) {
+            sendMsg(req, res, error.date.tooSoon, dateAddHours(new Date(), properties.travel.hoursLimit));
             return false;
         }
     }
@@ -325,9 +322,9 @@ function sanitizeGender (gender: any): number | undefined {
  * @param res Express response
  * @returns The id number if it is valid, null otherwise
  */
-function sanitizeUserId (id: any, req: express.Request, res: express.Response): number | null {
+function sanitizeId (id: any, req: express.Request, res: express.Response): number | null {
     if (id === '' || Number.isNaN(Number(id))) {
-        sendMsg(req, res, error.user.invalidId);
+        sendMsg(req, res, error.id.invalid);
         return null;
     }
 
@@ -344,12 +341,12 @@ function sanitizeUserId (id: any, req: express.Request, res: express.Response): 
  */
 function checkPriceField (value: any, req: express.Request, res: express.Response): boolean {
     if (typeof value !== 'number' && value !== undefined && value !== null) {
-        sendMsg(req, res, error.number.type, 'Price');
+        sendMsg(req, res, error.number.type, 'price');
         return false;
     }
 
     if (value < 0) {
-        sendMsg(req, res, error.number.positive, 'Price');
+        sendMsg(req, res, error.number.min, 'price', 0);
         return false;
     }
     return true;
@@ -361,7 +358,7 @@ function checkPriceField (value: any, req: express.Request, res: express.Respons
  * @param value Value to sanitize
  * @param req Express request
  * @param res Express response
- * @returns true if the value is valid and a positive number, false otherwise
+ * @returns true if the value is valid, false otherwise
  */
 function checkMaxPassengersField (value: any, req: express.Request, res: express.Response): boolean {
     if (typeof value !== 'number' && value !== undefined && value !== null) {
@@ -370,7 +367,7 @@ function checkMaxPassengersField (value: any, req: express.Request, res: express
     }
 
     if (value < 1) {
-        sendMsg(req, res, error.number.positive, 'maxPassengers');
+        sendMsg(req, res, error.number.min, 'maxPassengers', 1);
         return false;
     }
     return true;
@@ -559,19 +556,66 @@ function checkListOfEtapeField (etapes: any, req: express.Request, res: express.
 }
 
 /**
-* Sanitize the id of notification
-* @param id id to sanitize
-* @param req Express request
-* @param res Express response
-* @returns The id number if it is valid, null otherwise
-*/
-function sanitizeNotificationId (id: any, req: express.Request, res: express.Response): number | null {
-    if (id === ' ' || Number.isNaN(Number(id))) {
-        sendMsg(req, res, error.notification.invalidId);
-        return null;
+ * Check if a note field is valid
+ * If the note is not valid, send an error message to the client
+ * @param value Value to sanitize
+ * @param req Express request
+ * @param res Express response
+ * @returns true if the value is valid, false otherwise
+ */
+function checkNoteField (value: any, req: express.Request, res: express.Response): boolean {
+    if (value === undefined || value === '') {
+        sendMsg(req, res, error.number.required, 'note');
+        return false;
+    }
+    if (typeof value !== 'number') {
+        sendMsg(req, res, error.number.type, 'note');
+        return false;
     }
 
-    return Number(id);
+    if (value < 0) {
+        sendMsg(req, res, error.number.min, 'note', 0);
+        return false;
+    }
+    if (value > 5) {
+        sendMsg(req, res, error.number.min, 'note', 5);
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Check if a number field is valid
+ * If the number is not valid, send an error message to the client
+ * @param value Value to sanitize
+ * @param req Express request
+ * @param res Express response
+ * @param fieldName Name of the field
+ * @returns true if the value is valid, false otherwise
+ */
+function checkNumberField (value: any, req: express.Request, res: express.Response, fieldName: string): boolean {
+    if (value === undefined || value === '') {
+        sendMsg(req, res, error.number.required, fieldName);
+        return false;
+    }
+    if (typeof value !== 'number') {
+        sendMsg(req, res, error.number.type, fieldName);
+        return false;
+    }
+    return true;
+}
+
+function checkTravelHoursLimit (date: Date, req: express.Request, res: express.Response): boolean {
+    const now = new Date();
+    if (dateAddHours(now, properties.travel.hoursLimit) > date) {
+        sendMsg(req, res, error.travel.notModifiable, properties.travel.hoursLimit);
+        return false;
+    }
+    return true;
+}
+
+function dateAddHours (date: Date, hours: number): Date {
+    return new Date(date.getTime() + hours * 60 * 60 * 1000);
 }
 
 export {
@@ -587,12 +631,15 @@ export {
     checkCityField,
     sanitizePhone,
     sanitizeGender,
-    sanitizeUserId,
+    sanitizeId,
     checkMaxPassengersField,
     checkPriceField,
     checkStringField,
     checkListOfEtapeField,
     checkDescriptionField,
-    sanitizeNotificationId,
-    checkTravelAlready
+    checkTravelAlready,
+    checkNoteField,
+    checkNumberField,
+    checkTravelHoursLimit
+
 };

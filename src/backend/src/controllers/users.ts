@@ -248,14 +248,24 @@ exports.searchUsers = (req: express.Request, res: express.Response, _: express.N
 
     const q = `%${pagination.query ?? ''}%`;
 
-    prisma.$queryRaw`SELECT *
+    prisma.$queryRaw`SELECT COUNT(*) AS count
+                        FROM user
+                        WHERE IF(${pagination.query !== undefined}, email LIKE ${q}
+                            OR phone LIKE ${q}
+                            OR CONCAT(firstName, ' ', lastName) LIKE ${q}, TRUE)`
+        .then((count: any) => {
+            prisma.$queryRaw`SELECT *
                      FROM user
                      WHERE IF(${pagination.query !== undefined}, email LIKE ${q}
                          OR phone LIKE ${q}
                          OR CONCAT(firstName, ' ', lastName) LIKE ${q}, TRUE)
                      LIMIT ${pagination.pagination.take} OFFSET ${pagination.pagination.skip}`
-        .then(users => {
-            res.status(200).json(pagination.results((users as User[]).map(displayableUserPrivate)));
+                .then(users => {
+                    res.status(200).json(pagination.results((users as User[]).map(displayableUserPrivate), Number(count[0].count)));
+                }).catch(err => {
+                    console.error(err);
+                    sendMsg(req, res, error.generic.internalError);
+                });
         }).catch(err => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);
@@ -263,7 +273,7 @@ exports.searchUsers = (req: express.Request, res: express.Response, _: express.N
 }
 
 exports.deleteUser = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const userId = validator.sanitizeUserId(req.params.id, req, res);
+    const userId = validator.sanitizeId(req.params.id, req, res);
     if (userId === null) return;
 
     prisma.user.findUnique({ where: { id: userId } })
@@ -293,7 +303,7 @@ exports.deleteUser = (req: express.Request, res: express.Response, _: express.Ne
 }
 
 exports.updateUser = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const userId = validator.sanitizeUserId(req.params.id, req, res);
+    const userId = validator.sanitizeId(req.params.id, req, res);
     if (userId === null) return;
 
     prisma.user.findUnique({ where: { id: userId } })

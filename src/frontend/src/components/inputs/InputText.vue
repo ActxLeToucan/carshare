@@ -1,11 +1,15 @@
 <template>
     <div class="flex grow h-fit w-full md:flex-row min-w-0 flex-col justify-between md:space-x-8 md:items-center my-2">
-        <label v-if="label != ''" class="flex text-xl font-bold whitespace-nowrap text-ellipsis w-fit" :class="dark ? ' text-white' : ' text-slate-500'">
+        <label
+            v-if="label != ''"
+            class="flex text-xl dark:text-slate-400 font-bold whitespace-nowrap text-ellipsis w-fit"
+            :class="dark ? ' text-white' : ' text-slate-500'"
+        >
             {{ label }}
         </label>
         <input
-            class="flex h-fit bg-white border-b-4 border-slate-200 rounded-md px-4 py-2 font-bold text-lg whitespace-nowrap max-w-full min-w-0
-                   text-ellipsis hover:border-slate-300 transition-all focus:outline outline-transparent"
+            class="flex h-fit bg-white dark:bg-slate-600 border-b-4 border-slate-200 dark:border-slate-700 rounded-md px-4 py-2 font-bold text-lg whitespace-nowrap max-w-full min-w-0
+                   text-slate-500 dark:text-slate-200 text-ellipsis hover:border-slate-300 transition-all focus:outline outline-transparent"
             :class="dark ? ' text-slate-600 placeholder-slate-400 focus:border-slate-500 ' : ' text-slate-600 placeholder-slate-600/[0.5]  focus:border-teal-500 '"
             :placeholder="placeholder"
             :type="type"
@@ -19,7 +23,7 @@
 
 <script>
 export default {
-    name: '',
+    name: 'InputText',
     props: {
         label: {
             type: String,

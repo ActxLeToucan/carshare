@@ -53,7 +53,7 @@
                     </card>
                 </div>
         </div>
-        <popup
+        <card-popup
                 color="red"
                 :title = "this.lang.DELETE + ' ' + this.selectedGroup?.name"
                 :content="lang.GROUP_DELETE_VERIFY"
@@ -62,7 +62,7 @@
                 :onload="setDeletePopup"
                 :onvalidate="deleteAccount"
             >
-        </popup>
+        </card-popup>
     </div>
 </template>
 
@@ -77,8 +77,8 @@ import InputSwitch from '../inputs/InputSwitch.vue';
 import InputChoice from '../inputs/InputChoice.vue';
 import ButtonBlock from '../inputs/ButtonBlock.vue';
 import AdminGroupCard from './AdminGroupCard.vue';
-import Popup from '../cards/Popup.vue';
-import Card from '../cards/Card.vue';
+import Popup from '../cards/CardPopup.vue';
+import Card from '../cards/CardBorder.vue';
 import { Log, LogZone } from '../../scripts/Logs.js';
 import { genres, isPhoneNumber, levels } from '../../scripts/data';
 

@@ -1,5 +1,5 @@
 import { type Request, type Response } from 'express';
-import { type User, type Travel, type Group, type Etape } from '@prisma/client';
+import { type User, type Travel, type Group, type Etape, type Passenger, type Evaluation } from '@prisma/client';
 
 import properties from '../properties';
 import { sendMail as mailerSend } from './mailer';
@@ -7,10 +7,11 @@ import { sendMail as mailerSend } from './mailer';
 export type Variants = {
     en: any
 } & Record<string, any>;
-type TemplateMessage = TemplateMail | TemplateMessageHTTP;
-type Message = Mail | MessageHTTP;
+type TemplateMessage = TemplateMail | TemplateMessageHTTP | TemplateNotif;
+type Message = Mail | MessageHTTP | Notif;
 type TranslationsMessageHTTP = Record<string, Record<string, (req: Request, ...args: any) => MessageHTTP>>;
 type TranslationsMail = Record<string, Record<string, (req: Request, ...args: any) => Mail>>;
+type TranslationsNotif = Record<string, Record<string, (lang: string, ...args: any) => Notif>>;
 
 interface TemplateMail {
     to: string
@@ -35,6 +36,18 @@ interface TemplateMessageHTTP {
 export interface MessageHTTP {
     msg: string
     code: number
+    data?: any
+}
+
+interface TemplateNotif {
+    title: Variants
+    message: Variants
+    data?: any
+}
+
+export interface Notif {
+    title: string
+    message: string
     data?: any
 }
 
@@ -352,11 +365,13 @@ const error = {
                 en: 'User not found.'
             },
             code: 404
-        }),
-        invalidId: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        })
+    },
+    id: {
+        invalid: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'L\'identifiant de l\'utilisateur est invalide.',
-                en: 'User id is invalid.'
+                fr: 'L\'identifiant est invalide.',
+                en: 'Id is invalid.'
             },
             code: 400
         })
@@ -476,8 +491,14 @@ const error = {
                 en: 'Group not found.'
             },
             code: 404
+        }),
+        typeId: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'L\'identifiant du groupe doit être un nombre.',
+                en: 'Group id must be a number.'
+            },
+            code: 400
         })
-
     },
     number: {
         required: (req: Request, fieldName: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
@@ -494,10 +515,17 @@ const error = {
             },
             code: 400
         }),
-        positive: (req: Request, fieldName: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        min: (req: Request, fieldName: string, min: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Le champ "${fieldName}" doit être un nombre positif.`,
-                en: `Field "${fieldName}" must be a positive number.`
+                fr: `Le champ "${fieldName}" doit être supérieur ou égal à ${min}.`,
+                en: `Field "${fieldName}" must be greater than or equal to ${min}.`
+            },
+            code: 400
+        }),
+        max: (req: Request, fieldName: string, max: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Le champ "${fieldName}" doit être inférieur ou égal à ${max}.`,
+                en: `Field "${fieldName}" must be less than or equal to ${max}.`
             },
             code: 400
         })
@@ -522,7 +550,7 @@ const error = {
         required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Les étapes sont requises.',
-                en: 'Etapes are required.'
+                en: 'Steps are required.'
             },
             code: 400
         }),
@@ -536,7 +564,7 @@ const error = {
         type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Les étapes doivent être un tableau.',
-                en: 'Etapes must be an array.'
+                en: 'Steps must be an array.'
             },
             code: 400
         }),
@@ -610,6 +638,59 @@ const error = {
             msg: {
                 fr: `Le champ "${field}" doit être une chaîne de caractères.`,
                 en: `Field "${field}" must be a string.`
+            },
+            code: 400
+        })
+    },
+    evaluation: {
+        notpossible: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Vous n\'avez jamais fait de trajet avec la personne que vous voulez évaluer.',
+                en: 'You have never made a trip with the person you want to evaluate.'
+            },
+            code: 404
+        }),
+        alreadyNoted: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Vous avez déjà noté cet utilisateur.',
+                en: 'You have already noted this user.'
+            },
+            code: 404
+        }),
+        notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Evaluation introuvable.',
+                en: 'Evaluation not found.'
+            },
+            code: 404
+        })
+    },
+    travel: {
+        notModifiable: (req: Request, hours: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Vous ne pouvez pas modifier un trajet qui commence dans moins de ${hours} heure${hours > 1 ? 's' : ''}.`,
+                en: `You cannot modify a trip that starts in less than ${hours} hour${hours > 1 ? 's' : ''}.`
+            },
+            code: 400
+        }),
+        notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Trajet introuvable.',
+                en: 'Travel not found.'
+            },
+            code: 404
+        }),
+        notDriver: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Vous n\'êtes pas le conducteur de ce trajet.',
+                en: 'You are not the driver of this travel.'
+            },
+            code: 403
+        }),
+        notOpen: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Ce trajet n\'est plus ouvert.',
+                en: 'This travel is no longer open.'
             },
             code: 400
         })
@@ -707,6 +788,13 @@ const info = {
             data: {
                 travel
             }
+        }),
+        cancelled: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Trajet annulé',
+                en: 'Travel cancelled'
+            },
+            code: 200
         })
     },
     group: {
@@ -719,6 +807,13 @@ const info = {
             data: {
                 group: displayableGroup(group)
             }
+        }),
+        deleted: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Groupe supprimé',
+                en: 'Group removed'
+            },
+            code: 200
         })
     },
     notification: {
@@ -733,6 +828,25 @@ const info = {
             msg: {
                 fr: 'Notification supprimée',
                 en: 'Notification removed'
+            },
+            code: 200
+        })
+    },
+    evaluation: {
+        created: (req: Request, evaluation: Evaluation & { travel: Travel, evaluated: User, evaluator: User }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Évaluation enregistrée',
+                en: 'Recorded evaluation'
+            },
+            code: 201,
+            data: {
+                evaluation: displayableEvaluation(evaluation)
+            }
+        }),
+        deleted: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Evaluation retirée',
+                en: 'Evaluation removed'
             },
             code: 200
         })
@@ -826,22 +940,124 @@ const mail = {
                 The ${process.env.FRONTEND_NAME ?? ''} team`
             }
         })
+    },
+    notification: {
+        new: (req: Request | string, user: User, notification: { type: string | null, title: string, message: string, createdAt: Date } & Record<string, any>) => msgForLang<TemplateMail, Mail>(req, {
+            to: user.email,
+            subject: {
+                fr: `Nouvelle notification : ${notification.title}`,
+                en: `New notification : ${notification.title}`
+            },
+            html: {
+                fr: `${mailHtmlHeader}
+                <p>Bonjour ${user.firstName ?? ''} ${user.lastName ?? ''},</p>
+                <p>Vous avez reçu une nouvelle notification :</p>
+                <div style="border: 1px solid #ccc; border-radius: 0.5em; padding: 1em; margin: 1em 0;">
+                    <div style="font-weight: bold;">
+                        <p style="font-size: 0.8em; opacity: 0.5;">${new Date(notification.createdAt).toLocaleString('fr-FR')}</p>
+                        <p>${notification.title}</p>
+                    </div>
+                    <p style="margin-top: 0.5em;">${notification.message}</p>
+                </div>
+                ${notification.type === 'request'
+                    ? `<p>Pour accepter ou refuser cette demande, <a href="${String(properties.url.notifs)}">rendez-vous sur votre espace personnel</a>.</p>`
+                    : ''}
+                <p>Cordialement,</p>
+                <p>L'équipe de ${process.env.FRONTEND_NAME ?? ''}</p>`,
+                en: `${mailHtmlHeader}
+                <p>Hello ${user.firstName ?? ''} ${user.lastName ?? ''},</p>
+                <p>You received a new notification:</p>
+                <div style="border: 1px solid #ccc; border-radius: 0.5em; padding: 1em; margin: 1em 0;">
+                    <div style="font-weight: bold;">
+                        <p style="font-size: 0.8em; opacity: 0.5;">${new Date(notification.createdAt).toLocaleString('en-US')}</p>
+                        <p>${notification.title}</p>
+                    </div>
+                    <p style="margin-top: 0.5em;">${notification.message}</p>
+                </div>
+                ${notification.type === 'request'
+                    ? `<p>To accept or refuse this request, <a href="${String(properties.url.notifs)}">go to your personal space</a>.</p>`
+                    : ''}
+                <p>Best regards,</p>
+                <p>The ${process.env.FRONTEND_NAME ?? ''} team</p>`
+            },
+            text: {
+                fr: `Bonjour ${user.firstName ?? ''} ${user.lastName ?? ''},
+                Vous avez reçu une nouvelle notification :
+                ${notification.title}
+                ${new Date(notification.createdAt).toLocaleString('fr-FR')}
+                ${notification.message}
+
+                ${notification.type === 'request'
+                    ? `\nPour accepter ou refuser cette demande, rendez-vous sur votre espace personnel : ${String(properties.url.notifs)}\n`
+                    : ''}
+
+                Cordialement,
+                L'équipe de ${process.env.FRONTEND_NAME ?? ''}`,
+                en: `Hello ${user.firstName ?? ''} ${user.lastName ?? ''},
+                You received a new notification :
+                ${notification.title}
+                ${new Date(notification.createdAt).toLocaleString('en-US')}
+                ${notification.message}
+
+                ${notification.type === 'request'
+                    ? `\nTo accept or refuse this request, go to your personal space : ${String(properties.url.notifs)}\n`
+                    : ''}
+
+                Best regards,
+                The ${process.env.FRONTEND_NAME ?? ''} team`
+            }
+        })
     }
 } satisfies TranslationsMail;
 
+const notifs = {
+    request: {
+        new: (lang: string, travel: Travel & { etapes: Etape[] }, sender: User, etapeDep: Etape, etapeDest: Etape, passenger: Passenger) => msgForLang<TemplateNotif, Notif>(lang, { // TODO: revoir les parametres
+            title: {
+                fr: 'Nouvelle demande',
+                en: 'New request'
+            },
+            message: {
+                fr: `${sender.firstName ?? ''} ${sender.lastName ?? ''} souhaite vous accompagner sur le trajet ${travel.etapes[0].city} - ${travel.etapes[travel.etapes.length - 1].city}` +
+                 `(du ${new Date(travel.etapes[0].date).toLocaleString('fr-FR')}) de l'étape ${etapeDep.city} à ${etapeDest.city}.` +
+                    (passenger.comment === null || passenger.comment === ''
+                        ? ''
+                        : `\n\n${sender.firstName ?? ''} ${sender.lastName ?? ''} vous a laissé le message suivant :\n${passenger.comment ?? ''}`),
+                en: `${sender.firstName ?? ''} ${sender.lastName ?? ''} wants to accompany you on the trip ${travel.etapes[0].city} - ${travel.etapes[travel.etapes.length - 1].city}` +
+                    `(from ${new Date(travel.etapes[0].date).toLocaleString('en-US')}) from the step ${etapeDep.city} to ${etapeDest.city}.` +
+                    (passenger.comment === null || passenger.comment === ''
+                        ? ''
+                        : `\n\n${sender.firstName ?? ''} ${sender.lastName ?? ''} left you the following message:\n${passenger.comment ?? ''}`)
+            }
+        })
+    },
+    standard: {
+        travelCancelled: (lang: string, passenger: (Passenger & { departure: Etape, arrival: Etape, passenger: User })) => msgForLang<TemplateNotif, Notif>(lang, {
+            title: {
+                fr: 'Annulation de trajet',
+                en: 'Travel cancelled'
+            },
+            message: {
+                fr: `Votre trajet de ${passenger.departure.city} à ${passenger.arrival.city} du ${new Date(passenger.departure.date).toLocaleString('fr-FR')} a été annulé par le conducteur.`,
+                en: `Your trip from ${passenger.departure.city} to ${passenger.arrival.city} on ${new Date(passenger.departure.date).toLocaleString('en-US')} has been cancelled by the driver.`
+            }
+        })
+    }
+} satisfies TranslationsNotif;
+
 /**
  * Returns the message for the language of the request
- * @param req Express request
+ * @param langOrRequest Language or request
  * @param message Message to translate
  * @returns Translated message
  */
-function msgForLang<T extends TemplateMessage, U extends Message> (req: Request, message: T): U {
+function msgForLang<T extends TemplateMessage, U extends Message> (langOrRequest: string | Request, message: T): U {
     const newMessage: Record<any, any> = {};
 
     for (const key in message) {
         const value = message[key];
         if (areVariants(value)) {
-            newMessage[key] = translate(req, value);
+            newMessage[key] = translate(langOrRequest, value);
         } else {
             newMessage[key] = message[key];
         }
@@ -850,18 +1066,25 @@ function msgForLang<T extends TemplateMessage, U extends Message> (req: Request,
     return newMessage as U;
 }
 
+/**
+ * Checks if the given object is a Variants object
+ * @param obj Object to check
+ */
 function areVariants (obj: any): obj is Variants {
     return typeof obj === 'object' && 'en' in obj;
 }
 
 /**
  * Translates a message by choosing the right variant
- * @param req Express request
+ * @param langOrRequest Language or request
  * @param variants Variants of the message
  * @returns Translated message
  */
-function translate (req: Request, variants: Variants): string {
-    return variants[req.acceptsLanguages().find((lang) => lang in variants) ?? 'en'];
+function translate (langOrRequest: string | Request, variants: Variants): string {
+    if (typeof langOrRequest === 'string') {
+        return variants[langOrRequest] ?? variants.en;
+    }
+    return variants[langOrRequest.acceptsLanguages().find((lang) => lang in variants) ?? 'en'];
 }
 
 /**
@@ -891,12 +1114,27 @@ async function sendMail (req: Request, message: (req: Request, ...args: any) => 
 }
 
 /**
+ * Will send a notification to the user
+ * @param user User to notify
+ * @param notification Notification to send
+ */
+function notify (user: User, notification: { type: string | null, title: string, message: string, createdAt: Date } & Record<string, any>) {
+    if (!user.mailNotif) return;
+    mailerSend(mail.notification.new('en', user, notification)) // TODO: get user's language
+        .then(() => {
+            console.log(`Notification sent to ${user.email}.`);
+        }).catch((err) => {
+            console.error(`Failed to send notification to ${user.email}.`);
+            console.error(err);
+        });
+}
+
+/**
  * Returns a user without some properties for display to the user itself or to admins
  * @param user User to display
- * @returns User without some properties
  * @see displayableUserPublic
  */
-function displayableUserPrivate (user: User) {
+function displayableUserPrivate (user: User): Partial<User> {
     const u = user as any;
     delete u.password;
     delete u.lastPasswordResetEmailedOn;
@@ -907,21 +1145,68 @@ function displayableUserPrivate (user: User) {
 /**
  * Returns a user without some properties for display to other users
  * @param user User to display
- * @returns User without some properties
  * @see displayableUserPrivate
  */
-function displayableUserPublic (user: User) {
+function displayableUserPublic (user: User): Partial<User> {
     const u = displayableUserPrivate(user);
     delete u.mailNotif;
     delete u.createdAt;
     return u;
 }
 
-function displayableGroup (group: Group & { users: User[], creator: User }) {
+/**
+ * Returns a group without some properties for display to all users
+ * @param group Group to display
+ */
+function displayableGroup (group: Group & { users: User[], creator: User }): Partial<Group> {
     const g = group as any;
     g.users = g.users.map(displayableUserPublic);
     g.creator = displayableUserPublic(g.creator);
     return g;
 }
 
-export { error, info, mail, sendMsg, sendMail, displayableUserPrivate, displayableGroup };
+/**
+ * Returns a value with avg and count rename
+ * @param value value to rename avg and count
+ * @returns value with rename
+ */
+function displayableAverage (value: any) {
+    const p = value;
+    p.average = value._avg;
+    delete p._avg;
+    p.count = value._count;
+    delete p._count;
+    return p;
+}
+
+/**
+ * Returns a user without some properties for display to other users
+ * @param user User to display
+ * @returns User without some properties
+ * @see displayableUserPrivate
+ */
+function displayableEvaluation (evaluation: Evaluation & { travel: Travel, evaluated: User, evaluator: User }) {
+    const g = evaluation as any;
+    g.evaluated = displayableUserPublic(g.evaluated);
+    g.evaluator = displayableUserPublic(g.evaluator);
+    delete g.createdAt;
+    delete g.travelId;
+    delete g.evaluatedId;
+    delete g.evaluatorId;
+    return g;
+}
+
+export {
+    error,
+    info,
+    mail,
+    notifs,
+    sendMsg,
+    sendMail,
+    notify,
+    displayableUserPrivate,
+    displayableUserPublic,
+    displayableGroup,
+    displayableAverage,
+    displayableEvaluation
+};

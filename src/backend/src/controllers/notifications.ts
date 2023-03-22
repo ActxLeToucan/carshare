@@ -7,12 +7,19 @@ import { preparePagination } from './_common';
 exports.getMyNotifications = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const pagination = preparePagination(req, false);
 
-    prisma.notification.findMany({
-        where: { userId: res.locals.user.id },
-        orderBy: { createdAt: 'desc' },
-        ...pagination.pagination
-    }).then(notifications => {
-        res.status(200).json(pagination.results(notifications));
+    prisma.notification.count({
+        where: { userId: res.locals.user.id }
+    }).then((count) => {
+        prisma.notification.findMany({
+            where: { userId: res.locals.user.id },
+            orderBy: { createdAt: 'desc' },
+            ...pagination.pagination
+        }).then(notifications => {
+            res.status(200).json(pagination.results(notifications, count));
+        }).catch((err) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
     }).catch((err) => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
@@ -32,7 +39,7 @@ exports.deleteAllNotifications = (req: express.Request, res: express.Response, _
 }
 
 exports.deleteOneNotification = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const notifId = validator.sanitizeNotificationId(req.params.id, req, res);
+    const notifId = validator.sanitizeId(req.params.id, req, res);
     if (notifId === null) return;
 
     prisma.notification.count({

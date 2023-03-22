@@ -1,18 +1,31 @@
 <template>
     <div class="flex h-fit w-full justify-between md:space-x-8 items-center my-2">
-        <label class="flex text-xl text-slate-500 font-bold whitespace-nowrap text-ellipsis w-fit">
+        <label class="flex text-xl text-slate-500 dark:text-slate-400 font-bold whitespace-nowrap text-ellipsis w-fit">
             {{ label }}
         </label>
         <div>
             <select
-                ref="select" name="" id=""
-                class="flex w-fit h-fit bg-white rounded-md text-slate-600 font-bold text-lg whitespace-nowrap text-ellipsis outline-none
-                       outline-transparent px-4 py-2 border-b-4 border-slate-200 transition-all focus:border-teal-500 hover:border-slate-300"
+                id=""
+                ref="select"
+                name=""
+                class="flex w-fit h-fit bg-white dark:bg-slate-600 rounded-md text-slate-600 dark:text-slate-300 font-bold text-lg whitespace-nowrap text-ellipsis outline-none
+                       outline-transparent px-4 py-2 border-b-4 border-slate-200 dark:border-slate-700 transition-all focus:border-teal-500 hover:border-slate-300"
             >
-                <option v-for="el in this.elements" :value="el.value" :key="el.value"> {{ el.label ?? lang[el.id] }} </option>
+                <option
+                    v-for="el in elements"
+                    :key="el.value"
+                    :value="el.value"
+                >
+                    {{ el.label ?? lang[el.id] }}
+                </option>
             </select>
         </div>
-        <input ref="input" :name="name" type="number" class="hidden">
+        <input
+            ref="input"
+            :name="name"
+            type="number"
+            class="hidden"
+        >
     </div>
 </template>
 
@@ -54,13 +67,8 @@ function setup(obj) {
 }
 
 export default {
-    name: 'Choice',
-    data() {
-        setup(this);
-        return { lang: Lang.CurrentLang };
-    },
+    name: 'InputChoice',
     components: {},
-    methods: {},
     props: {
         label: {
             type: String,
@@ -68,23 +76,33 @@ export default {
             required: false
         },
         value: {
-            type: Number,
+            type: [Number, String],
             default: 0,
             required: false
         },
         list: {
             type: Array,
-            default: [],
+            default: () => [],
             required: true
         },
         onchange: {
             type: Function,
+            default: null,
             required: false
         },
         name: {
             type: String,
             default: "",
             required: false
+        }
+    },
+    data() {
+        setup(this);
+        return { lang: Lang.CurrentLang };
+    },
+    watch: {
+        value: function (val) {
+            this.setSelected(val);
         }
     },
     mounted() {
@@ -105,10 +123,6 @@ export default {
             this.setSelected(e.target.value);
         });
     },
-    watch: {
-        value: function (val) {
-            this.setSelected(val);
-        }
-    }
+    methods: {}
 }
 </script>
