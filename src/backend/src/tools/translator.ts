@@ -782,7 +782,7 @@ const info = {
         }),
         deleted: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Groupe supprimée',
+                fr: 'Groupe supprimé',
                 en: 'Group removed'
             },
             code: 200
