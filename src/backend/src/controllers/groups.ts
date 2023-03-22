@@ -64,3 +64,35 @@ function getGroups (req: express.Request, res: express.Response, next: express.N
         sendMsg(req, res, error.generic.internalError);
     });
 }
+
+exports.deleteGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    const groupId = validator.sanitizeId(req.params.id, req, res);
+    if (groupId === null) return;
+
+    prisma.group.count({
+        where: {
+            id: groupId
+        }
+
+    }).then((count) => {
+        if (count <= 0) {
+            sendMsg(req, res, error.group.notFound);
+            return;
+        }
+
+        prisma.group.delete({
+            where: {
+                id: groupId
+
+            }
+        }).then(() => {
+            sendMsg(req, res, info.group.deleted);
+        }).catch((err) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
+    }).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
+}
