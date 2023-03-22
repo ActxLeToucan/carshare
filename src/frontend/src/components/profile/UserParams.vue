@@ -1,33 +1,53 @@
 <template>
-  
-    <div class="md:show-up flex flex-col grow" >
-        <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> {{ lang.PARAMS }} </p> 
+    <div class="md:show-up flex flex-col grow">
+        <p class="text-2xl text-teal-500 py-2 font-bold mx-auto">
+            {{ lang.PARAMS }}
+        </p> 
         <div class="flex flex-col grow justify-evenly items-center p-4 space-y-4">
-            <card class="w-full flex-col max-w-[35em]">
-                <p class="text-xl font-bold text-slate-500 dark:text-slate-300 text-center mx-auto"> {{ lang.NOTIF_PARAMS }} </p>
-                <input-switch name="mail-notif" :label="lang.EMAIL_NOTIFICATIONS" :value="User?.CurrentUser?.mailNotif" :onchange="onEmailNotifChanged"></input-switch>
+            <card-border class="w-full flex-col max-w-[35em]">
+                <p class="text-xl font-bold text-slate-500 dark:text-slate-300 text-center mx-auto">
+                    {{ lang.NOTIF_PARAMS }}
+                </p>
+                <input-switch
+                    name="mail-notif"
+                    :label="lang.EMAIL_NOTIFICATIONS"
+                    :value="User?.CurrentUser?.mailNotif"
+                    :onchange="onEmailNotifChanged"
+                />
                 <div
                     ref="log-zone"
                     class="flex flex-col w-full justify-center items-center min-h-max h-max transition-all"
                     style="max-height: 0px;"
-                ></div>
-            </card>
+                />
+            </card-border>
 
-            <card class="w-full flex-col max-w-[35em]">
-                <p class="text-xl font-bold text-slate-500 dark:text-slate-300 text-center mx-auto"> {{ lang.DISPLAY_PARAMS }} </p>
-                <input-choice name="theme"    :label="lang.THEME"    :value="selectedTheme"    :list="themes"   :onchange="onThemeChanged"></input-choice>
-                <input-choice name="language" :label="lang.LANGUAGES " :value="selectedLanguage" :list="languages" :onchange="onLanguageChanged"></input-choice>
-            </card>
+            <card-border class="w-full flex-col max-w-[35em]">
+                <p class="text-xl font-bold text-slate-500 dark:text-slate-300 text-center mx-auto">
+                    {{ lang.DISPLAY_PARAMS }}
+                </p>
+                <input-choice
+                    name="theme"
+                    :value="selectedTheme"
+                    :list="themes"
+                    :onchange="onThemeChanged"
+                />
+                <input-choice
+                    name="language"
+                    :label="lang.LANGUAGE "
+                    :value="selectedLanguage"
+                    :list="languages"
+                    :onchange="onLanguageChanged"
+                />
+            </card-border>
         </div>
     </div>
-    
 </template>
 
 <script>
 
 import InputSwitch from '../inputs/InputSwitch.vue';
 import InputChoice from '../inputs/InputChoice.vue'
-import Card from '../cards/Card.vue';
+import CardBorder from '../cards/CardBorder.vue';
 import Lang from '../../scripts/Lang';
 import { themes } from '../../scripts/data';
 import User from '../../scripts/User';
@@ -39,7 +59,7 @@ export default {
     components: {
         InputSwitch,
         InputChoice,
-        Card
+        CardBorder
     },
     data() {
         return {
@@ -50,6 +70,12 @@ export default {
             themes,
             languages: Lang.Langs,
         }
+    },
+    mounted() {
+        Lang.AddCallback(lang => this.lang = lang);
+        if (User.CurrentUser == null) return;
+
+        this.logZone = new LogZone(this.$refs["log-zone"]);
     },
     methods: {
         log(msg, type = Log.INFO) {
@@ -101,12 +127,6 @@ export default {
             if (themeStored) return Number(themeStored) ?? -1;
             return -1;
         }
-    },
-    mounted() {
-        Lang.AddCallback(lang => this.lang = lang);
-        if (User.CurrentUser == null) return;
-
-        this.logZone = new LogZone(this.$refs["log-zone"]);
     }
 }
 </script>

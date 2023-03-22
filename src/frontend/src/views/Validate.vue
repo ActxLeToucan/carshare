@@ -1,32 +1,34 @@
 <template>
     <div class="flex grow flex-col">
-        <topbar v-if="User.CurrentUser != null"></topbar>
+        <topbar v-if="User.CurrentUser != null" />
         <div class="flex grow w-fit flex-col justify-center mx-auto">
-            <card class="flex-col space-y-6">
-                <p class="text-4xl font-bold text-slate-500 text-center"> {{ lang.VALIDATION_TITLE }} </p>
-                <p ref="msg" class="text-lg font-semibold text-slate-500 text-center"> {{ lang.VALIDATION_LOADING }} ... </p>
-            </card>
-        </div>
+            <card-border class="flex-col space-y-6">
+                <p class="text-4xl font-bold text-slate-500 text-center">
+                    {{ lang.VALIDATION_TITLE }}
+                </p>
+                <p
+                    ref="msg"
+                    class="text-lg font-semibold text-slate-500 text-center"
+                >
+                    {{ lang.VALIDATION_LOADING }} ...
+                </p>
+            </card-border>
+        </div>../components/cards/Cardborder.vue
     </div>
 </template>
 
 <script>
 import Topbar from '../components/topbar/Topbar.vue';
-import Modal from '../components/cards/Modal.vue';
-import Card from '../components/cards/Card.vue';
+import CardBorder from '../components/cards/CardBorder.vue';
 import API from '../scripts/API';
 import User from '../scripts/User';
 import Lang from '../scripts/Lang';
 
 export default {
+    name: 'ValidateView',
     components: {
         Topbar,
-        Modal,
-        Card
-    },
-    name: 'Register',
-    methods: {
-        
+        CardBorder
     },
     data() {
         return { User, lang: Lang.CurrentLang }
@@ -52,6 +54,9 @@ export default {
             msg.classList.add("text-red-500");
             msg.innerText = this.lang.ERROR + " : " + err.message;
         });
+    },
+    methods: {
+        
     }
 }
 </script>

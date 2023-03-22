@@ -1,236 +1,322 @@
 <template>
     <div class="flex grow flex-col max-w-full">
-        <topbar v-show="User.CurrentUser != null"></topbar>
+        <topbar v-show="User.CurrentUser != null" />
         <div class="flex grow flex-col">
-            <p class="text-2xl text-teal-500 font-bold mx-auto md:my-4 my-2"> {{ lang.CREATE_TRIP }} </p>
+            <p class="text-2xl text-teal-500 font-bold mx-auto md:my-4 my-2">
+                {{ lang.CREATE_TRIP }}
+            </p>
             <div class="flex md:hidden justify-evenly px-1 space-x-1">
-
                 <button
-                    class="p-2 my-2 border-2 bg-slate-100 w-[50%] h-fit text-md font-semibold transition-all"
-                    :class="selectedTab == 0 ? 'bg-teal-500 border-teal-600 text-teal-900' : 'bg-slate-100 border-transparent text-slate-500'"
-                    v-on:click="() => { selectedTab = 0; }"
+                    class="p-2 my-2 border-2 w-[50%] h-fit text-md font-semibold transition-all"
+                    :class="selectedTab == 0 ? 'bg-teal-500 border-teal-600 text-teal-900' : 'bg-slate-100 dark:bg-slate-700 border-transparent text-slate-500 dark:text-slate-400'"
+                    @click="() => { selectedTab = 0; }"
                 >
                     {{ lang.INFORMATIONS }}
                 </button>
 
                 <button
-                    class="p-2 my-2 border-2 bg-slate-100 w-[50%] h-fit text-md font-semibold transition-all"
-                    :class="selectedTab == 1 ? 'bg-teal-500 border-teal-600 text-teal-900' : 'bg-slate-100 border-transparent text-slate-500'"
-                    v-on:click="() => { selectedTab = 1; }"
+                    class="p-2 my-2 border-2 w-[50%] h-fit text-md font-semibold transition-all"
+                    :class="selectedTab == 1 ? 'bg-teal-500 border-teal-600 text-teal-900' : 'bg-slate-100 dark:bg-slate-700 border-transparent text-slate-500 dark:text-slate-400'"
+                    @click="() => { selectedTab = 1; }"
                 >
                     {{ lang.STEPS }}
                 </button>
-
             </div>
             <div class="flex md:flex-row flex-col grow h-full">
-
                 <div
                     class="flex flex-col md:w-[50%] w-full grow md:px-2"
                     :class="isMobile? (selectedTab == 1 ? 'hidden' : 'show-right') : ''"
                 >
-                    <card class="flex flex-col w-fit mx-auto space-y-4 max-w-full">
-                        <input-choice name="trip-type" :label="lang.TRIP_TYPE" :list="tripTypes"
-                            :onchange="val => selectedTripType = Number(val)" :value="selectedTripType"
-                        ></input-choice>
-                        <input-text class="max-w-full" name="trip-slots" :label="lang.TRIP_SLOTS" type="number" value="0" min="0"></input-text>
-                        <input-text class="max-w-full" name="trip-price" :label="lang.PRICE" type="number" value="0" min="0"></input-text>
-                        <input-block class="max-w-full" name="trip-infos" :label="lang.TRIP_INFO" type="text" value=""></input-block>
-                    </card>
+                    <card-border class="flex flex-col w-fit mx-auto space-y-4 max-w-full">
+                        <input-choice
+                            name="trip-type"
+                            :label="lang.TRIP_TYPE"
+                            :list="tripTypes"
+                            :onchange="val => selectedTripType = Number(val)"
+                            :value="selectedTripType"
+                        />
+                        <input-text
+                            class="max-w-full"
+                            name="trip-slots"
+                            :label="lang.TRIP_SLOTS"
+                            type="number"
+                            value="0"
+                            min="0"
+                        />
+                        <input-text
+                            class="max-w-full"
+                            name="trip-price"
+                            :label="lang.PRICE"
+                            type="number"
+                            value="0"
+                            min="0"
+                        />
+                        <input-block
+                            class="max-w-full"
+                            name="trip-infos"
+                            :label="lang.TRIP_INFO"
+                            type="text"
+                            value=""
+                        />
+                    </card-border>
                     <div class="flex flex-col grow justify-evenly items-center my-4 space-y-4">
-
                         <!-- GROUP SELECTION -->
-                        <card v-show="selectedTripType == 1">
-                            
-                            <div v-show="selectedGroup == null" class="flex flex-col justify-center">
-                                <p class="text-slate-500 text-lg text-center font-base"> {{ lang.SELECT_GROUP }} </p>
+                        <card-border v-show="selectedTripType == 1">
+                            <div
+                                v-show="selectedGroup == null"
+                                class="flex flex-col justify-center"
+                            >
+                                <p class="text-slate-500 text-lg text-center font-base">
+                                    {{ lang.SELECT_GROUP }}
+                                </p>
                                 <button
                                     class="p-2 mt-2 mx-auto text-slate-400 rounded-lg border-2 border-transparent hover:bg-slate-100 hover:border-slate-200 transition-all"
-                                    v-on:click="() => { this.$refs['group-popup'].show(); }"
+                                    @click="() => { $refs['group-popup'].show(); }"
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke-width="1.5"
+                                        stroke="currentColor"
+                                        class="w-10 h-10"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
+                                        />
                                     </svg>
                                 </button>
                             </div>
-                            <div v-show="selectedGroup != null" class="flex flex-col justify-center">
-                                <p class="text-slate-500 text-lg text-center font-base"> {{ lang.GROUP_SELECTED }} </p>
+                            <div
+                                v-show="selectedGroup != null"
+                                class="flex flex-col justify-center"
+                            >
+                                <p class="text-slate-500 text-lg text-center font-base">
+                                    {{ lang.GROUP_SELECTED }}
+                                </p>
                                 <button
                                     class="p-2 mt-2 mx-auto text-slate-400 rounded-lg border-2 border-transparent hover:bg-slate-100 hover:border-slate-200 transition-all"
-                                    v-on:click="() => { this.$refs['group-popup'].show(); }"
+                                    @click="() => { $refs['group-popup'].show(); }"
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-10 h-10 mx-auto">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
+                                    <svg
+                                        xmlns="http://www.w3.org/2000/svg"
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke-width="1.5"
+                                        stroke="currentColor"
+                                        class="w-10 h-10 mx-auto"
+                                    >
+                                        <path
+                                            stroke-linecap="round"
+                                            stroke-linejoin="round"
+                                            d="M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z"
+                                        />
                                     </svg>
-                                    <p class="text-slate-500 text-lg text-center font-semibold"> {{ selectedGroup?.name }} </p>
-                                    <p class="text-slate-500 text-md text-center font-base"> {{ selectedGroup?.users?.length }} {{ (selectedGroup?.users?.length == 1? lang.MEMBER: lang.MEMBERS) }} </p>
+                                    <p class="text-slate-500 text-lg text-center font-semibold">
+                                        {{ selectedGroup?.name }}
+                                    </p>
+                                    <p class="text-slate-500 text-md text-center font-base">
+                                        {{ selectedGroup?.users?.length }} {{ (selectedGroup?.users?.length > 1? lang.MEMBERS: lang.MEMBER) }}
+                                    </p>
                                 </button>
                             </div>
-
-                        </card>
-
+                        </card-border>
                     </div>
                     <div
                         ref="log-zone"
                         class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
                         style="max-height: 0px;"
-                    ></div>
+                    />
                     <div class="flex w-full md:justify-evenly justify-between items-end my-4 md:px-0 px-4">
-
-                        <button-text :action="goBack"> {{ lang.CANCEL }} </button-text>
-                        <button-block :action="showValidatePopup"> {{ lang.CREATE }} </button-block>
-
+                        <button-text :action="goBack">
+                            {{ lang.CANCEL }}
+                        </button-text>
+                        <button-block :action="showValidatePopup">
+                            {{ lang.CREATE }}
+                        </button-block>
                     </div>
                 </div>
 
                 <div class="md:flex hidden grow w-fit items-center justify-center py-[20vh]">
-                    <span class="w-1 h-full bg-slate-200 rounded-lg"></span>
+                    <span class="w-1 h-full bg-slate-200 dark:bg-slate-700 rounded-lg" />
                 </div>
 
                 <div
                     class="flex flex-col md:w-[50%] grow w-full md:px-2"
                     :class="isMobile? (selectedTab == 0 ? 'hidden' : 'show-left') : ''"
                 >
-
                     <div class="flex flex-col w-fit mx-auto max-w-full">
-
                         <!-- START SECTION -->
-                        <card class="flex flex-col mb-2 p-2 w-full">
+                        <card-border class="flex flex-col mb-2 p-2 w-full">
                             <input-text
+                                ref="startstep-input"
                                 class="my-1"
-                                ref="startstep-input" :label="lang.TRIP_START"
+                                :label="lang.TRIP_START"
                                 :onchange="e => { if (startStep.destination?.value != e.target.value) startStep.destination = null; }"
-                                :value="startStep.destination?.value">
-                            </input-text>
+                                :value="startStep.destination?.value"
+                            />
                             <selector
-                                ref="start-selector" :oncompletion="searchCities"
-                                :onclick="city => { this.startStep.destination = city; }"
-                                :onload="sel => sel.attachInput(this.$refs['startstep-input'].$el.querySelector('input'))">
-                            </selector>
+                                ref="start-selector"
+                                :oncompletion="searchCities"
+                                :onclick="city => { startStep.destination = city; }"
+                                :onload="sel => sel.attachInput($refs['startstep-input'].$el.querySelector('input'))"
+                            />
                             <input-text
-                                class="my-1" 
-                                ref="startstep-date"
+                                ref="startstep-date" 
+                                class="my-1"
                                 :label="lang.DATE"
-                                :value="startStep.datetime" :onchange="e => setStartDate(e.target.value)"
-                                type="datetime-local">
-                            </input-text>
-                        </card>
+                                :value="startStep.datetime"
+                                :onchange="e => setStartDate(e.target.value)"
+                                type="datetime-local"
+                            />
+                        </card-border>
 
                         <div class="flex flex-col">
                             <div class="flex flex-col space-y-2">
-                                <span class="h-4 w-1 bg-slate-300 rounded-md mx-auto"></span>
-                                <button class="flex rounded-md border-2 border-slate-400 w-fit mx-auto text-slate-500 shadow-none
+                                <span class="h-4 w-1 bg-slate-300 dark:bg-slate-600 rounded-md mx-auto" />
+                                <button
+                                    class="flex rounded-md border-2 border-slate-400 dark:border-slate-500 w-fit mx-auto text-slate-500 shadow-none
                                             hover:border-teal-500 hover:text-teal-500 hover:shadow-md buttontransition-all"
-                                     v-on:click="addStep(0)">
-                                    <plus-icon class="w-6 h-6"></plus-icon>
+                                    @click="addStep(0)"
+                                >
+                                    <plus-icon class="w-6 h-6" />
                                 </button>
-                                <span class="h-4 w-1 bg-slate-300 rounded-md mx-auto"></span>
+                                <span class="h-4 w-1 bg-slate-300 dark:bg-slate-600 rounded-md mx-auto" />
                             </div>
 
                             <!-- IN BETWEEN STEPS SECTION -->
-                            <div class="flex flex-col" v-for="(step, index) in tripSteps" :key="step.id">
+                            <div
+                                v-for="(step, index) in tripSteps"
+                                :key="step.id"
+                                class="flex flex-col"
+                            >
                                 <div class="flex items-center">
-                                    <card class="flex flex-col w-full my-2 p-2">
+                                    <card-border class="flex flex-col w-full my-2 p-2">
                                         <div class="flex grow w-full h-0 justify-end">
-                                            <button class="flex rounded-md h-fit w-fit text-slate-500 pl-2 hover:text-red-500 cursor-pointer -translate-y-4 translate-x-4 transition-all"
-                                                v-on:click="() => delStep(index)">
-                                                <x-mark-icon class="w-6 h-6"></x-mark-icon>
+                                            <button
+                                                class="flex rounded-md h-fit w-fit text-slate-500 pl-2 hover:text-red-500 cursor-pointer -translate-y-4 translate-x-4 transition-all"
+                                                @click="() => delStep(index)"
+                                            >
+                                                <x-mark-icon class="w-6 h-6" />
                                             </button>
                                         </div>
                                         <input-text
                                             class="my-1" 
-                                            :name="'midpoint-input-' + index" :label="lang.TRIP_STEP + ' ' + (index+1)" type="text"
+                                            :name="'midpoint-input-' + index"
+                                            :label="lang.TRIP_STEP + ' ' + (index+1)"
+                                            type="text"
                                             :onchange="e => { if (step.destination?.value != e.target.value) step.destination = null; }"
-                                            :value="step.destination?.value">
-                                        </input-text>
+                                            :value="step.destination?.value"
+                                        />
                                         <selector
+                                            :ref="'mid-selector-' + index"
                                             class="ml-auto"
-                                            :ref="'mid-selector-' + index" :oncompletion="searchCities"
+                                            :oncompletion="searchCities"
                                             :onclick="city => { step.destination = city; }"
-                                            :onload="sel => sel.attachInput(this.$el.querySelector('input[name=midpoint-input-' + index + ']'))">
-                                        </selector>
+                                            :onload="sel => sel.attachInput($el.querySelector('input[name=midpoint-input-' + index + ']'))"
+                                        />
                                         <input-text
-                                            class="my-1" 
-                                            :ref="'midpoint-date-' + index" :label="lang.DATE"
-                                            :value="step.datetime" :onchange="e => setStepDate(index, e.target.value)"
-                                            type="datetime-local">
-                                        </input-text>
-                                    </card>
+                                            :ref="'midpoint-date-' + index" 
+                                            class="my-1"
+                                            :label="lang.DATE"
+                                            :value="step.datetime"
+                                            :onchange="e => setStepDate(index, e.target.value)"
+                                            type="datetime-local"
+                                        />
+                                    </card-border>
                                 </div>
                                 <div class="flex flex-col space-y-2">
-                                    <span class="h-4 w-1 bg-slate-300 rounded-md mx-auto"></span>
-                                    <button class="flex rounded-md border-2 border-slate-400 w-fit mx-auto text-slate-500 shadow-none
+                                    <span class="h-4 w-1 bg-slate-300 dark:bg-slate-600 rounded-md mx-auto" />
+                                    <button
+                                        class="flex rounded-md border-2 border-slate-400 dark:border-slate-500 w-fit mx-auto text-slate-500 shadow-none
                                                 hover:border-teal-500 hover:text-teal-500 hover:shadow-md transition-all"
-                                         v-on:click="() => addStep(index + 1)">
-                                        <plus-icon class="w-6 h-6"></plus-icon>
+                                        @click="() => addStep(index + 1)"
+                                    >
+                                        <plus-icon class="w-6 h-6" />
                                     </button>
-                                    <span class="h-4 w-1 bg-slate-300 rounded-md mx-auto"></span>
+                                    <span class="h-4 w-1 bg-slate-300 dark:bg-slate-600 rounded-md mx-auto" />
                                 </div>
                             </div>
-
                         </div>
 
                         <!-- END STEP -->
-                        <card class="flex flex-col my-2 p-2 w-full">
+                        <card-border class="flex flex-col mb-2 p-2 w-full">
                             <input-text
+                                ref="endstep-input"
                                 class="my-1"
-                                ref="endstep-input" :label="lang.TRIP_END"
+                                :label="lang.TRIP_END"
                                 :onchange="e => { if (endStep.destination?.value != e.target.value) endStep.destination = null; }"
-                                :value="endStep.destination?.value">
-                            </input-text>
+                                :value="endStep.destination?.value"
+                            />
                             <selector
-                                ref="start-selector" :oncompletion="searchCities"
-                                :onclick="city => { this.endStep.destination = city; }"
-                                :onload="sel => sel.attachInput(this.$refs['endstep-input'].$el.querySelector('input'))">
-                            </selector>
+                                ref="start-selector"
+                                :oncompletion="searchCities"
+                                :onclick="city => { endStep.destination = city; }"
+                                :onload="sel => sel.attachInput($refs['endstep-input'].$el.querySelector('input'))"
+                            />
                             <input-text
-                                class="my-1" 
-                                ref="endstep-date"
+                                ref="endstep-date" 
+                                class="my-1"
                                 :label="lang.DATE"
-                                :value="endStep.datetime" :onchange="e => setEndDate(e.target.value)"
-                                type="datetime-local">
-                            </input-text>
-                        </card>
+                                :value="endStep.datetime"
+                                :onchange="e => setEndDate(e.target.value)"
+                                type="datetime-local"
+                            />
+                        </card-border>
                     </div>
-
                 </div>
-
             </div>
         </div>
-        <popup
+        <card-popup
             ref="group-popup"
             :title="lang.SELECT_GROUP"
             :content="lang.SELECT_GROUP_DESC"
-            :showValidate="false"
-            :oncancel="() => { selectedGroup = null; this.$refs['group-popup'].hide();}"
+            :show-validate="false"
+            :oncancel="() => { selectedGroup = null; $refs['group-popup'].hide();}"
         >
             <div class="flex flex-wrap justify-evenly md:max-w-[50vw] overflow-auto max-h-[50vh]">
-                <button v-for="group in groups" :key="group.name" v-on:click="() => { selectedGroup = group; $refs['group-popup'].hide(); }"
+                <button
+                    v-for="group in groups"
+                    :key="group.name"
                     class="flex flex-col justify-center py-1 md:m-2 m-1 rounded-md bg-slate-100 px-2 w-fit max-w-[14em] border-2 border-transparent
                             hover:border-slate-200 cursor-pointer transition-all"
+                    @click="() => { selectedGroup = group; $refs['group-popup'].hide(); }"
                 >
-                    <p class="md:text-xl text-lg text-slate-500 font-bold mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full"> {{ group.name }} </p>
-                    <p class="md:text-lg text-md text-slate-500 mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full"> {{ group.users.length }} {{ group.users.length == 1? lang.MEMBER: lang.MEMBERS }} </p>
+                    <p class="md:text-xl text-lg text-slate-500 font-bold mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full">
+                        {{ group.name }}
+                    </p>
+                    <p class="md:text-lg text-md text-slate-500 mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full">
+                        {{ group.users.length }} {{ group.users.length > 1? lang.MEMBERS: lang.MEMBER }}
+                    </p>
                 </button>
-                <div v-show="groups.length == 0"
+                <div
+                    v-show="groups.length == 0"
                     class="flex flex-col justify-center py-1 md:m-2 m-1 rounded-md bg-slate-100 px-2 w-fit max-w-[80%] border-2 border-transparent"
                 >
-                    <p class="md:text-xl text-lg text-slate-500 font-bold mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full"> {{ lang.NO_GROUPS }} </p>
-                    <p class="md:text-lg text-md text-slate-500 mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full"> {{ lang.NO_GROUPS_DESC }} </p>
+                    <p class="md:text-xl text-lg text-slate-500 font-bold mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full">
+                        {{ lang.NO_GROUPS }}
+                    </p>
+                    <p class="md:text-lg text-md text-slate-500 mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full">
+                        {{ lang.NO_GROUPS_DESC }}
+                    </p>
                 </div>
             </div>
-        </popup>
-        <popup
+        </card-popup>
+        <card-popup
             ref="confirm-popup"
             :title="lang.CONFIRM_TRIP"
             :content="lang.CONFIRM_TRIP_DESC"
-            :showValidate="true"
+            :show-validate="true"
             :onvalidate="uploadTrip"
-            :oncancel="() => { this.$refs['confirm-popup'].hide(); }"
+            :oncancel="() => { $refs['confirm-popup'].hide(); }"
         >
-            <div ref="trip-desc" class="flex flex-col">
-
-            </div>
-        </popup>
+            <diva
+                ref="trip-desc"
+                class="flex flex-col"
+            />
+        </card-popup>
     </div>
 </template>
 
@@ -241,8 +327,8 @@ import InputChoice from '../components/inputs/InputChoice.vue';
 import InputText from '../components/inputs/InputText.vue';
 import InputBlock from '../components/inputs/InputBlock.vue';
 import Topbar from "../components/topbar/Topbar.vue";
-import Popup from "../components/cards/Popup.vue";
-import Card from '../components/cards/Card.vue';
+import CardPopup from "../components/cards/CardPopup.vue";
+import CardBorder from '../components/cards/CardBorder.vue';
 import { goBack } from "../scripts/redirects.js";
 import User from "../scripts/User.js";
 import Lang from "../scripts/Lang.js";
@@ -274,8 +360,8 @@ export default {
         PlusIcon,
         XMarkIcon,
         Selector,
-        Card,
-        Popup
+        CardBorder,
+        CardPopup
     },
     data() {
         return {
@@ -293,13 +379,27 @@ export default {
             isMobile: window.innerWidth < 768,
         }
     },
+    mounted() {
+        this.logZone = new LogZone(this.$refs['log-zone']);
+
+        this.groups.splice(0, this.groups.length);
+        API.execute_logged(API.ROUTE.GROUPS, API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
+            const data = res.data ?? res.groups;
+            data.forEach(group => this.groups.push(group));
+        }).catch(err => {
+            console.error(err);
+        });
+
+        window.addEventListener('resize', () => { this.isMobile = window.innerWidth < 768; });
+    },
     methods: {
         searchCities(selector, search) {
-            BAN.searchCities(search).then(cities => {
+            BAN.search(search).then(cities => {
+                console.log(cities);
                 let index = 0;
                 let res = cities.map(city => ({
                     id: index++,
-                    value: city.name,
+                    value: city.label,
                     desc: city.context,
                     label: city.label,
                     city: city.city,
@@ -429,7 +529,7 @@ export default {
 
             let desc = "";
             desc += formatString(
-                Lang.CurrentLang.CONFIRM_TRIP_CONTENT,
+                data.maxPassengers > 1 ? Lang.CurrentLang.CONFIRM_TRIP_CONTENT : Lang.CurrentLang.CONFIRM_TRIP_CONTENT_1,
                 data.steps[0]?.label,
                 data.steps[data.steps.length - 1]?.label,
                 startDate,
@@ -443,7 +543,7 @@ export default {
             desc += "\r";
 
             desc += formatString(
-                data.groupId? Lang.CurrentLang.CONFIRM_TRIP_PRIVATE: Lang.CurrentLang.CONFIRM_TRIP_PUBLIC,
+                data.groupId? Lang.CurrentLang.CONFIRM_TRIP_PRIVATE+".": Lang.CurrentLang.CONFIRM_TRIP_PUBLIC+".",
                 this.selectedGroup?.name
             ) + "\n";
 
@@ -452,7 +552,7 @@ export default {
             desc += formatString(
                 data.steps.length > 2? (
                     data.steps.length == 3? Lang.CurrentLang.CONFIRM_TRIP_1_STEP: Lang.CurrentLang.CONFIRM_TRIP_N_STEPS
-                ): Lang.CurrentLang.CONFIRM_TRIP_NO_STEPS,
+                ): Lang.CurrentLang.CONFIRM_TRIP_NO_STEPS+".",
                 data.steps.length - 2
             ) + "\n";
 
@@ -470,7 +570,7 @@ export default {
             desc += "\r";
 
             desc += formatString(
-                data.description == ""? Lang.CurrentLang.CONFIRM_TRIP_NO_INFOS: Lang.CurrentLang.CONFIRM_TRIP_INFOS,
+                data.description == ""? Lang.CurrentLang.CONFIRM_TRIP_NO_INFOS+".": Lang.CurrentLang.CONFIRM_TRIP_INFOS,
                 "\n" + data.description.split("\n").map(l => stylize(l)).join("\n")
             );
 
@@ -508,19 +608,6 @@ export default {
                 }, 6000);
             });
         }
-    },
-    mounted() {
-        this.logZone = new LogZone(this.$refs['log-zone']);
-
-        this.groups.splice(0, this.groups.length);
-        API.execute_logged(API.ROUTE.GROUPS, API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
-            const data = res.data ?? res.groups;
-            data.forEach(group => this.groups.push(group));
-        }).catch(err => {
-            console.error(err);
-        });
-
-        window.addEventListener('resize', () => { this.isMobile = window.innerWidth < 768; });
     }
 }
 </script>

@@ -1,7 +1,15 @@
 import type express from 'express';
 import { prisma } from '../app';
 import * as validator from '../tools/validator';
-import { error, info, type Notif, notifs, notify, sendMsg } from '../tools/translator';
+import {
+    displayableUserPublic,
+    error,
+    info,
+    type Notif,
+    notifs,
+    notify,
+    sendMsg
+} from '../tools/translator';
 import properties from '../properties';
 import { checkTravelHoursLimit } from '../tools/validator';
 import { preparePagination } from './_common';
@@ -20,8 +28,29 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
     const date1 = new Date(new Date(date as string).getTime() - 1000 * 60 * 60);
     const date2 = new Date(new Date(date as string).getTime() + 1000 * 60 * 60);
 
-    prisma.$queryRaw`select t.*
+    prisma.$queryRaw`select t.*,
+                            u.id        as 'driver.id',
+                            u.firstname as 'driver.firstname',
+                            u.lastname  as 'driver.lastname',
+                            u.email     as 'driver.email',
+                            u.phone     as 'driver.phone',
+                            u.avatar    as 'driver.avatar',
+                            e1.id       as 'departure.id',
+                            e1.label    as 'departure.label',
+                            e1.city     as 'departure.city',
+                            e1.context  as 'departure.context',
+                            e1.lat      as 'departure.lat',
+                            e1.lng      as 'departure.lng',
+                            e1.date     as 'departure.date',
+                            e2.id       as 'arrival.id',
+                            e2.label    as 'arrival.label',
+                            e2.city     as 'arrival.city',
+                            e2.context  as 'arrival.context',
+                            e2.lat      as 'arrival.lat',
+                            e2.lng      as 'arrival.lng',
+                            e2.date     as 'arrival.date'
                      from travel t
+                              inner join user u on u.id = t.driverId
                               inner join etape e1 on e1.travelId = t.id and e1.city = ${startCity}
                               inner join etape e2 on e2.travelId = t.id and e2.city = ${endCity}
                      where t.status = ${properties.travel.status.open}
@@ -29,7 +58,19 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
                        and IF(${startCtx} = '', true, e1.context = ${startCtx})
                        and IF(${endCtx} = '', true, e2.context = ${endCtx})
                        and e1.date BETWEEN ${date1} and ${date2}`
-        .then((data) => {
+        .then((data: any) => {
+            for (const travel of data) {
+                for (const key of Object.keys(travel)) {
+                    if (key.includes('.')) {
+                        const [parent, child] = key.split('.');
+                        travel[parent] = travel[parent] ?? {};
+                        travel[parent][child] = travel[key];
+                        // eslint-disable-next-line @typescript-eslint/no-dynamic-delete
+                        delete travel[key];
+                    }
+                }
+                travel.driver = displayableUserPublic(travel.driver);
+            }
             res.status(200).json(data);
         }).catch((err) => {
             console.log(err);

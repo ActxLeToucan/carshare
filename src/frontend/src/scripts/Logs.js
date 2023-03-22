@@ -82,13 +82,13 @@ class LogZone {
 
     #getLogSize() {
         switch (this.dom.children.length) {
-            case 1:
-                return this.dom.children[0].getBoundingClientRect().height;
-            case 2:
-                return this.dom.children[1].getBoundingClientRect().top -
+        case 1:
+            return this.dom.children[0].getBoundingClientRect().height;
+        case 2:
+            return this.dom.children[1].getBoundingClientRect().top -
                        this.dom.children[0].getBoundingClientRect().top;
-            default:
-                return 56;
+        default:
+            return 56;
         }
     }
 
@@ -119,24 +119,24 @@ class LogZone {
 
     hasLog(log) {
         switch (typeof log) {
-            case "object":
-                return this.logs.includes(log);
-            case "number":
-                return this.logs.some(l => l.id === log);
-            default: return false;
+        case "object":
+            return this.logs.includes(log);
+        case "number":
+            return this.logs.some(l => l.id === log);
+        default: return false;
         }
     }
 
     removeLog(log) {
         switch (typeof log) {
-            case "object":
-                this.toremove.push(log);
-                break;
-            case "number":
-                const l = this.logs.find(l => l.id === log);
-                if (l) this.toremove.push(l);
-                break;
-            default: break;
+        case "object":
+            this.toremove.push(log);
+            break;
+        case "number":
+            const l = this.logs.find(l => l.id === log);
+            if (l) this.toremove.push(l);
+            break;
+        default: break;
         }
         this.render();
     }

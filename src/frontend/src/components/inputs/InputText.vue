@@ -1,6 +1,10 @@
 <template>
     <div class="flex grow h-fit w-full md:flex-row min-w-0 flex-col justify-between md:space-x-8 md:items-center my-2">
-        <label v-if="label != ''" class="flex text-xl dark:text-slate-400 font-bold whitespace-nowrap text-ellipsis w-fit" :class="dark ? ' text-white' : ' text-slate-500'">
+        <label
+            v-if="label != ''"
+            class="flex text-xl dark:text-slate-400 font-bold whitespace-nowrap text-ellipsis w-fit"
+            :class="dark ? ' text-white' : ' text-slate-500'"
+        >
             {{ label }}
         </label>
         <input
@@ -19,7 +23,7 @@
 
 <script>
 export default {
-    name: '',
+    name: 'InputText',
     props: {
         label: {
             type: String,
