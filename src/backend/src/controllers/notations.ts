@@ -1,7 +1,9 @@
 import type express from 'express';
 import { prisma } from '../app';
 import * as validator from '../tools/validator';
-import { error, sendMsg, displayableAverage } from '../tools/translator';
+import properties from '../properties';
+
+import { error, sendMsg, info, displayableAverage } from '../tools/translator';
 
 exports.getUserEvaluation = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const userId = validator.sanitizeId(req.params.id, req, res);
@@ -75,6 +77,169 @@ exports.getAverageTravel = (req: express.Request, res: express.Response, next: e
     }).then((travelsAvg) => {
         travelsAvg.map(displayableAverage);
         res.status(200).json(travelsAvg);
+    }).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
+}
+
+exports.createEvaluation = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    const { note, travelId, evaluatedId } = req.body;
+
+    if (!validator.checkNoteField(note, req, res)) return;
+    if (!validator.checkNumberField(travelId, req, res, 'travelId')) return;
+    if (!validator.checkNumberField(evaluatedId, req, res, 'evaluatedId')) return;
+
+    prisma.travel.count({
+        where: {
+            id: travelId
+        }
+    }).then((count) => {
+        if (count === 0) {
+            sendMsg(req, res, error.travel.notFound);
+            return;
+        }
+        prisma.user.count({
+            where: {
+                id: evaluatedId
+            }
+        }).then((count) => {
+            if (count === 0) {
+                sendMsg(req, res, error.user.notFound);
+                return;
+            }
+            prisma.evaluation.count({
+                where: {
+                    travelId,
+                    evaluatedId,
+                    evaluatorId: res.locals.user.id
+                }
+            }).then((count) => {
+                if (count !== 0) {
+                    sendMsg(req, res, error.evaluation.alreadyNoted);
+                    return;
+                }
+                prisma.travel.count({
+                    where: {
+                        id: travelId,
+                        status: properties.travel.status.ended,
+                        OR: [{
+                            driverId: evaluatedId,
+                            etapes: {
+                                some: {
+                                    departuresOfPassengers: {
+                                        some: {
+                                            passengerId: res.locals.user.id
+                                        }
+                                    }
+                                }
+                            }
+                        }, {
+                            driverId: res.locals.user.id,
+                            etapes: {
+                                some: {
+                                    departuresOfPassengers: {
+                                        some: {
+                                            passengerId: evaluatedId
+                                        }
+                                    }
+                                }
+                            }
+                        }, {
+                            AND: [{
+                                etapes: {
+                                    some: {
+                                        departuresOfPassengers: {
+                                            some: {
+                                                passengerId: res.locals.user.id
+                                            }
+                                        }
+                                    }
+                                }
+                            }, {
+                                etapes: {
+                                    some: {
+                                        departuresOfPassengers: {
+                                            some: {
+                                                passengerId: evaluatedId
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            ]
+                        }]
+                    }
+                }).then((count) => {
+                    if (count === 0) {
+                        sendMsg(req, res, error.evaluation.notpossible);
+                        return;
+                    }
+
+                    prisma.evaluation.create({
+                        data: {
+                            note,
+                            travelId,
+                            evaluatorId: res.locals.user.id,
+                            evaluatedId
+                        },
+                        include: {
+                            travel: true,
+                            evaluator: true,
+                            evaluated: true
+                        }
+                    }).then((evaluation) => {
+                        sendMsg(req, res, info.evaluation.created, evaluation);
+                    }).catch((err) => {
+                        console.error(err);
+                        sendMsg(req, res, error.generic.internalError);
+                    });
+                }).catch((err) => {
+                    console.error(err);
+                    sendMsg(req, res, error.generic.internalError);
+                });
+            }).catch((err) => {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
+            })
+        }).catch((err) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
+    }).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
+}
+
+exports.deleteEvaluation = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    const notationId = validator.sanitizeId(req.params.id, req, res);
+    if (notationId === null) return;
+
+    prisma.evaluation.count({
+
+        where: {
+            id: notationId,
+            evaluatorId: res.locals.user.id
+        }
+
+    }).then((count) => {
+        if (count <= 0) {
+            sendMsg(req, res, error.evaluation.notFound);
+            return;
+        }
+
+        prisma.evaluation.delete({
+            where: {
+                id: notationId
+
+            }
+        }).then(() => {
+            sendMsg(req, res, info.evaluation.deleted);
+        }).catch((err) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
     }).catch((err) => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);

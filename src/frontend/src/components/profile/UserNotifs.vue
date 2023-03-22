@@ -99,18 +99,18 @@
                                 style="max-height: 0"
                             />
                         </div>
-                        <button-block
-                            v-show="isThereMore"
-                            :disabled="loading"
-                            class="w-fit mt-8 mx-auto"
-                            :action="getNotifs"
-                        >
-                            <PlusIcon class="w-7 h-7 mr-1.5 inline" />
-                            <p class="inline">
-                                {{ lang.LOAD_MORE }}
-                            </p>
-                        </button-block>
                     </card-border>
+                    <button-block
+                        v-show="isThereMore"
+                        :disabled="loading"
+                        class="w-fit mt-8 mx-auto"
+                        :action="getNotifs"
+                    >
+                        <PlusIcon class="w-7 h-7 mr-1.5 inline" />
+                        <p class="inline">
+                            {{ lang.LOAD_MORE }}
+                        </p>
+                    </button-block>
                 </div>
             </div>
         </div>

@@ -556,6 +556,56 @@ function checkListOfEtapeField (etapes: any, req: express.Request, res: express.
 }
 
 /**
+ * Check if a note field is valid
+ * If the note is not valid, send an error message to the client
+ * @param value Value to sanitize
+ * @param req Express request
+ * @param res Express response
+ * @returns true if the value is valid, false otherwise
+ */
+function checkNoteField (value: any, req: express.Request, res: express.Response): boolean {
+    if (value === undefined || value === '') {
+        sendMsg(req, res, error.number.required, 'note');
+        return false;
+    }
+    if (typeof value !== 'number') {
+        sendMsg(req, res, error.number.type, 'note');
+        return false;
+    }
+
+    if (value < 0) {
+        sendMsg(req, res, error.number.min, 'note', 0);
+        return false;
+    }
+    if (value > 5) {
+        sendMsg(req, res, error.number.min, 'note', 5);
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Check if a number field is valid
+ * If the number is not valid, send an error message to the client
+ * @param value Value to sanitize
+ * @param req Express request
+ * @param res Express response
+ * @param fieldName Name of the field
+ * @returns true if the value is valid, false otherwise
+ */
+function checkNumberField (value: any, req: express.Request, res: express.Response, fieldName: string): boolean {
+    if (value === undefined || value === '') {
+        sendMsg(req, res, error.number.required, fieldName);
+        return false;
+    }
+    if (typeof value !== 'number') {
+        sendMsg(req, res, error.number.type, fieldName);
+        return false;
+    }
+    return true;
+}
+
+/**
  * Check if a date is in the future ({@link properties.travel.hoursLimit} hours)
  * If the date is not valid, send an error message to the client
  * @param date Date to check
@@ -602,5 +652,7 @@ export {
     checkListOfEtapeField,
     checkDescriptionField,
     checkTravelAlready,
+    checkNoteField,
+    checkNumberField,
     checkTravelHoursLimit
 };

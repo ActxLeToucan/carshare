@@ -1,5 +1,5 @@
 import { type Request, type Response } from 'express';
-import { type User, type Travel, type Group, type Etape, type Passenger, type Notification } from '@prisma/client';
+import { type User, type Travel, type Group, type Etape, type Passenger, type Notification, type Evaluation } from '@prisma/client';
 
 import properties from '../properties';
 import { sendMail as mailerSend } from './mailer';
@@ -525,6 +525,13 @@ const error = {
                 en: `Field "${fieldName}" must be greater than or equal to ${min}.`
             },
             code: 400
+        }),
+        max: (req: Request, fieldName: string, max: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Le champ "${fieldName}" doit être inférieur ou égal à ${max}.`,
+                en: `Field "${fieldName}" must be less than or equal to ${max}.`
+            },
+            code: 400
         })
     },
     string: {
@@ -630,6 +637,29 @@ const error = {
                 en: `Field "${field}" must be a string.`
             },
             code: 400
+        })
+    },
+    evaluation: {
+        notpossible: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Vous n\'avez jamais fait de trajet avec la personne que vous voulez évaluer.',
+                en: 'You have never made a trip with the person you want to evaluate.'
+            },
+            code: 404
+        }),
+        alreadyNoted: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Vous avez déjà noté cet utilisateur.',
+                en: 'You have already noted this user.'
+            },
+            code: 404
+        }),
+        notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Evaluation introuvable.',
+                en: 'Evaluation not found.'
+            },
+            code: 404
         })
     },
     travel: {
@@ -797,6 +827,13 @@ const info = {
             data: {
                 group: displayableGroup(group)
             }
+        }),
+        deleted: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Groupe supprimé',
+                en: 'Group removed'
+            },
+            code: 200
         })
     },
     notification: {
@@ -811,6 +848,25 @@ const info = {
             msg: {
                 fr: 'Notification supprimée',
                 en: 'Notification removed'
+            },
+            code: 200
+        })
+    },
+    evaluation: {
+        created: (req: Request, evaluation: Evaluation & { travel: Travel, evaluated: User, evaluator: User }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Évaluation enregistrée',
+                en: 'Recorded evaluation'
+            },
+            code: 201,
+            data: {
+                evaluation: displayableEvaluation(evaluation)
+            }
+        }),
+        deleted: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Evaluation retirée',
+                en: 'Evaluation removed'
             },
             code: 200
         })
@@ -965,11 +1021,11 @@ const mail = {
                 ${notification.title}
                 ${new Date(notification.createdAt).toLocaleString('fr-FR')}
                 ${notification.message}
-                
+
                 ${notification.type === 'request'
                     ? `\nPour accepter ou refuser cette demande, rendez-vous sur votre espace personnel : ${String(properties.url.notifs)}\n`
                     : ''}
-                
+
                 Cordialement,
                 L'équipe de ${process.env.FRONTEND_NAME ?? ''}`,
                 en: `Hello ${user.firstName ?? ''} ${user.lastName ?? ''},
@@ -977,11 +1033,11 @@ const mail = {
                 ${notification.title}
                 ${new Date(notification.createdAt).toLocaleString('en-US')}
                 ${notification.message}
-                
+
                 ${notification.type === 'request'
                     ? `\nTo accept or refuse this request, go to your personal space : ${String(properties.url.notifs)}\n`
                     : ''}
-                    
+
                 Best regards,
                 The ${process.env.FRONTEND_NAME ?? ''} team`
             }
@@ -1240,6 +1296,23 @@ function displayableAverage (value: any) {
     return p;
 }
 
+/**
+ * Returns a user without some properties for display to other users
+ * @param user User to display
+ * @returns User without some properties
+ * @see displayableUserPrivate
+ */
+function displayableEvaluation (evaluation: Evaluation & { travel: Travel, evaluated: User, evaluator: User }) {
+    const g = evaluation as any;
+    g.evaluated = displayableUserPublic(g.evaluated);
+    g.evaluator = displayableUserPublic(g.evaluator);
+    delete g.createdAt;
+    delete g.travelId;
+    delete g.evaluatedId;
+    delete g.evaluatorId;
+    return g;
+}
+
 export {
     error,
     info,
@@ -1251,5 +1324,6 @@ export {
     displayableUserPrivate,
     displayableUserPublic,
     displayableGroup,
-    displayableAverage
+    displayableAverage,
+    displayableEvaluation
 };
