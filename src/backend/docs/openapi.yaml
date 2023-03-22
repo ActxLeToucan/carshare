@@ -1463,6 +1463,67 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
+  /notation/my:
+    post:
+      summary: Create an evaluation
+      description: Create an evaluation on a past trip, with a note between 0 and 5.
+      operationId: createEvaluation
+      tags:
+        - Notations
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        description: The evaluation to create
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                note:
+                  type: integer
+                  required: true
+                  example: 3
+                travelId:
+                  type: integer
+                  required: true
+                  example: 2
+                evaluatedId:
+                  type: integer
+                  required: true
+                  example: 5
+      responses:
+        '200':
+          description: Group created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Recorded evaluation
+                    group:
+                    $ref: '#/components/schemas/EvaluationCreate'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: travelId is required.
+        '401':
+          $ref: '#/components/responses/noToken'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+
   /notations/:id:
     delete:
       summary: Delete an evaluation
@@ -1970,3 +2031,53 @@ components:
         - travelId: 2,
           average:
             note: 0.75
+    EvaluationCreate:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 2
+        note:
+          type: integer
+          example: 4
+        travel:
+          type: array
+          items:
+            $ref: '#/components/schemas/Travel'
+        evaluator:
+          type: array
+          items:
+            $ref: '#/components/schemas/PrivateUser'
+        evaluated:
+          type: array
+          items:
+            $ref: '#/components/schemas/PrivateUser'
+    Travel:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        maxPassengers:
+          type: integer
+          example: 4
+          default: 1
+        price:
+          type: number
+          example: 24.5
+          default: 0
+        description:
+          type: string
+          nullable: true
+          example: "Non-smoking travel"
+        driverId:
+          type: integer
+          example: 1
+        groupId:
+          type: integer
+          nullable: true
+          default: null
+        createdAt:
+          type: string
+          format: date-time
+          example: 2020-01-01T00:00:00.000Z
