@@ -997,7 +997,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Travel'
+                  $ref: '#/components/schemas/TravelSearch'
         '400':
           description: Bad request
           content:
@@ -1576,7 +1576,7 @@ paths:
   /notations/:id:
     delete:
       summary: Delete an evaluation
-      description:  Delete the evaluation, with the id in parameter
+      description: Delete the evaluation, with the id in parameter
       operationId: deleteEvaluation
       tags:
         - Notations
@@ -1619,6 +1619,105 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
+
+  /bookings/:id/accept:
+    patch:
+      summary: Accept a booking
+      description: Accept a booking, with the id in parameter
+      operationId: acceptBooking
+      tags:
+        - Bookings
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - name: id
+          in: path
+          description: The id of the booking to accept
+          required: true
+          schema:
+            type: integer
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Booking accepted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: You have just accepted the request of John Doe.
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Id is invalid.
+        '401':
+          $ref: '#/components/responses/noToken'
+        '403':
+          $ref: '#/components/responses/notDriver'
+        '404':
+          $ref: '#/components/responses/bookingNotFound'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+
+  /bookings/:id/reject:
+    patch:
+      summary: Reject a booking
+      description: Reject a booking, with the id in parameter
+      operationId: rejectBooking
+      tags:
+        - Bookings
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - name: id
+          in: path
+          description: The id of the booking to reject
+          required: true
+          schema:
+            type: integer
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Booking rejected
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: You have just rejected the request of John Doe.
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Id is invalid.
+        '401':
+          $ref: '#/components/responses/noToken'
+        '403':
+          $ref: '#/components/responses/notDriver'
+        '404':
+          $ref: '#/components/responses/bookingNotFound'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+
   /docs:
     get:
       summary: Get the documentation
@@ -1759,6 +1858,26 @@ components:
               message:
                 type: string
                 example: Invalid credentials provided.
+    notDriver:
+      description: Not a driver
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: You are not the driver of this travel.
+    bookingNotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Booking not found.
     userNotFound:
       description: Not found
       content:
@@ -1864,7 +1983,7 @@ components:
           example: 2
         arrival:
           $ref: '#/components/schemas/Etape'
-    Travel:
+    TravelSearch:
       type: object
       properties:
         id:
@@ -1878,6 +1997,7 @@ components:
           example: 100
         description:
           type: string
+          nullable: true
           example: No pets allowed
         status:
           type: integer
@@ -1893,6 +2013,16 @@ components:
           type: string
           format: date-time
           example: 2020-01-01T00:00:00.000Z
+        driver:
+          $ref: '#/components/schemas/PublicUser'
+        departure:
+          $ref: '#/components/schemas/Etape'
+        arrival:
+          $ref: '#/components/schemas/Etape'
+        passengers:
+          type: integer
+          example: 2
+          description: The maximum number of passengers between the departure and the arrival
     Group:
       type: object
       properties:

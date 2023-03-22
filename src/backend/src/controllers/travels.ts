@@ -1,18 +1,10 @@
 import type express from 'express';
 import { prisma } from '../app';
 import * as validator from '../tools/validator';
-import {
-    displayableUserPublic,
-    error,
-    info,
-    type Notif,
-    notifs,
-    notify,
-    sendMsg
-} from '../tools/translator';
-import properties from '../properties';
 import { checkTravelHoursLimit } from '../tools/validator';
-import { preparePagination } from './_common';
+import { displayableUserPublic, error, info, notifs, notify, sendMsg } from '../tools/translator';
+import properties from '../properties';
+import { getMaxPassengers, preparePagination } from './_common';
 
 exports.searchTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { date, startCity, startContext, endCity, endContext } = req.query;
@@ -29,36 +21,42 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
     const date2 = new Date(new Date(date as string).getTime() + 1000 * 60 * 60);
 
     prisma.$queryRaw`select t.*,
-                            u.id        as 'driver.id',
-                            u.firstname as 'driver.firstname',
-                            u.lastname  as 'driver.lastname',
-                            u.email     as 'driver.email',
-                            u.phone     as 'driver.phone',
-                            u.avatar    as 'driver.avatar',
-                            e1.id       as 'departure.id',
-                            e1.label    as 'departure.label',
-                            e1.city     as 'departure.city',
-                            e1.context  as 'departure.context',
-                            e1.lat      as 'departure.lat',
-                            e1.lng      as 'departure.lng',
-                            e1.date     as 'departure.date',
-                            e2.id       as 'arrival.id',
-                            e2.label    as 'arrival.label',
-                            e2.city     as 'arrival.city',
-                            e2.context  as 'arrival.context',
-                            e2.lat      as 'arrival.lat',
-                            e2.lng      as 'arrival.lng',
-                            e2.date     as 'arrival.date'
+                            u.id              as 'driver.id',
+                            u.email           as 'driver.email',
+                            u.emailVerifiedOn as 'driver.emailVerifiedOn',
+                            u.firstName       as 'driver.firstName',
+                            u.lastName        as 'driver.lastName',
+                            u.phone           as 'driver.phone',
+                            u.avatar          as 'driver.avatar',
+                            u.gender          as 'driver.gender',
+                            u.hasCar          as 'driver.hasCar',
+                            u.level           as 'driver.level',
+                            dep.id            as 'departure.id',
+                            dep.label         as 'departure.label',
+                            dep.city          as 'departure.city',
+                            dep.context       as 'departure.context',
+                            dep.lat           as 'departure.lat',
+                            dep.lng           as 'departure.lng',
+                            dep.travelId      as 'departure.travelId',
+                            dep.date          as 'departure.date',
+                            arr.id            as 'arrival.id',
+                            arr.label         as 'arrival.label',
+                            arr.city          as 'arrival.city',
+                            arr.context       as 'arrival.context',
+                            arr.lat           as 'arrival.lat',
+                            arr.lng           as 'arrival.lng',
+                            arr.travelId      as 'arrival.travelId',
+                            arr.date          as 'arrival.date'
                      from travel t
                               inner join user u on u.id = t.driverId
-                              inner join etape e1 on e1.travelId = t.id and e1.city = ${startCity}
-                              inner join etape e2 on e2.travelId = t.id and e2.city = ${endCity}
+                              inner join etape dep on dep.travelId = t.id and dep.city = ${startCity}
+                              inner join etape arr on arr.travelId = t.id and arr.city = ${endCity}
                      where t.status = ${properties.travel.status.open}
-                       and e1.date < e2.date
-                       and IF(${startCtx} = '', true, e1.context = ${startCtx})
-                       and IF(${endCtx} = '', true, e2.context = ${endCtx})
-                       and e1.date BETWEEN ${date1} and ${date2}`
-        .then((data: any) => {
+                       and dep.date < arr.date
+                       and IF(${startCtx} = '', true, dep.context = ${startCtx})
+                       and IF(${endCtx} = '', true, arr.context = ${endCtx})
+                       and dep.date BETWEEN ${date1} and ${date2}`
+        .then(async (data: any) => {
             for (const travel of data) {
                 for (const key of Object.keys(travel)) {
                     if (key.includes('.')) {
@@ -70,6 +68,14 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
                     }
                 }
                 travel.driver = displayableUserPublic(travel.driver);
+                try {
+                    const count: any = await getMaxPassengers(travel.id, travel.departure, travel.arrival);
+                    travel.passengers = Number(count[0].nbPassengers);
+                    if (Number.isNaN(travel.passengers)) throw new Error('Could not get max passengers');
+                } catch (err) {
+                    console.error(err);
+                    travel.passengers = -1;
+                }
             }
             res.status(200).json(data);
         }).catch((err) => {
@@ -149,6 +155,7 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
                 etapes: true
             }
         }).then((travel) => {
+            // TODO: notify users in the group
             sendMsg(req, res, info.travel.created, travel);
         }).catch((err) => {
             console.error(err);
@@ -170,6 +177,7 @@ exports.cancelMyTravel = (req: express.Request, res: express.Response, _: expres
             etapes: true
         }
     }).then((travel) => {
+        // verifications
         if (travel === null) {
             sendMsg(req, res, error.travel.notFound);
             return;
@@ -187,10 +195,12 @@ exports.cancelMyTravel = (req: express.Request, res: express.Response, _: expres
 
         if (!checkTravelHoursLimit(travel.etapes[0].date, req, res)) return;
 
+        // cancel travel
         prisma.travel.update({
             where: { id: travelId },
             data: { status: properties.travel.status.cancelled }
         }).then(() => {
+            // get passengers and send notifications
             prisma.passenger.findMany({
                 where: {
                     departure: {
@@ -204,21 +214,20 @@ exports.cancelMyTravel = (req: express.Request, res: express.Response, _: expres
                 }
             }).then((passengers) => {
                 const data = passengers.map((passenger) => {
-                    const notif: Notif = notifs.standard.travelCancelled('en', passenger); // TODO: get user language
+                    const notif = notifs.travel.cancelled('en', passenger); // TODO: get user language
                     return {
+                        ...notif,
                         userId: passenger.passengerId,
-                        title: notif.title,
-                        message: notif.message,
-                        type: 'standard',
                         senderId: Number(res.locals.user.id),
-                        travelId: passenger.departure.travelId,
-                        createdAt: new Date()
+                        travelId: passenger.departure.travelId
                     };
                 });
 
+                // create notifications
                 prisma.notification.createMany({ data }).then(() => {
                     for (const notif of data) {
                         const passenger = passengers.find((p) => p.passengerId === notif.userId);
+                        // send email notification
                         if (passenger !== undefined) notify(passenger.passenger, notif);
                     }
 

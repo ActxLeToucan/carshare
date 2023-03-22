@@ -29,7 +29,6 @@ exports.getMyNotifications = (req: express.Request, res: express.Response, _: ex
 exports.deleteAllNotifications = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     prisma.notification.deleteMany({
         where: { userId: res.locals.user.id }
-
     }).then(() => {
         sendMsg(req, res, info.notification.deletedAll);
     }).catch((err) => {
@@ -55,10 +54,7 @@ exports.deleteOneNotification = (req: express.Request, res: express.Response, _:
         }
 
         prisma.notification.delete({
-            where: {
-                id: notifId
-
-            }
+            where: { id: notifId }
         }).then(() => {
             sendMsg(req, res, info.notification.deletedOne);
         }).catch((err) => {
