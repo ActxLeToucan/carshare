@@ -5,6 +5,7 @@ const router = express.Router();
 const controller = require('../controllers/notations');
 
 router.get('/travels', auth.access, controller.getAverageTravel);
-router.get('/:id', auth.access, controller.getUserEvaluation);
+router.get('/average/:id', auth.access, controller.getUserEvaluation);
+router.delete('/:id', auth.access, controller.deleteEvaluation);
 
 module.exports = router;
