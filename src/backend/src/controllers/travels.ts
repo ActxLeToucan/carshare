@@ -121,27 +121,25 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
 }
 
 exports.cancelBooking = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const travel = req.body.travel;
-
-    if (travel === null) {
-        sendMsg(req, res, error.travel.required);
-        return;
-    }
+    const travelId = validator.sanitizeId(req.params.id, req, res);
+    if (travelId === null) return;
 
     prisma.travel.findUnique({
-        where: { id: travel.travelId },
+        where: { id: travelId },
         include: {
-            etapes: true
+            etapes: true,
+            driver: true
         }
-    }).then((travelRes) => {
-        if (travelRes === null) {
+    }).then((travel) => {
+        if (travel === null) {
             sendMsg(req, res, error.travel.notFound);
             return;
         }
-        const dateCheck = new Date(new Date(travel.date).getTime() - 1000 * 60 * 60 * 24);
-        console.log(res.locals.user.travelsAsPassenger.id)
+        const dateCheck = new Date(new Date(travel.createdAt).getTime() - 1000 * 60 * 60 * 24);
+        console.log(res.locals.user.travelsAsPassenger)
 
-        const passengerTravel = res.locals.user.travelsAsPassenger.filter((elem: Passenger) => travel.steps.id.include(elem.departureId));
+        const etapesId = travel.etapes.map(elem => elem.id);
+        const passengerTravel = res.locals.user.travelsAsPassenger.filter((elem: Passenger) => etapesId.includes(elem.departureId));
 
         if (passengerTravel === null) {
             sendMsg(req, res, error.travel.notAPassenger);
@@ -157,7 +155,7 @@ exports.cancelBooking = (req: express.Request, res: express.Response, next: expr
             sendMsg(req, res, info.travel.unbooked);
             const notif: Notif = notifs.standard.passengerUnbooked('en', passengerTravel); // TODO: get user language
             const data = {
-                userId: travel.driver,
+                userId: travel.driverId,
                 title: notif.title,
                 message: notif.message,
                 type: 'standard',
