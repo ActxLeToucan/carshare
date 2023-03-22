@@ -1,6 +1,6 @@
 <template>
-    <div class="flex flex-col grow overflow-scroll">
-        <slot></slot>
+    <div class="flex flex-col grow overflow-y-auto">
+        <slot />
     </div>
 </template>
 
@@ -19,12 +19,14 @@ export default {
             activeHash: this.defaultHash
         }
     },
-    methods: {
-        setActiveHash(hash) {
-            this.activeHash = hash;
-        },
-        getTab(hash) {
-            return document.getElementById('tab-' + hash);
+    watch: {
+        '$route.hash': function (newVal, oldVal) {
+            if (newVal != '') {
+                this.activeHash = newVal;
+            } else {
+                this.activeHash = this.defaultHash;
+            }
+            this.update();
         }
     },
     mounted() {
@@ -43,14 +45,12 @@ export default {
         };
         this.update();
     },
-    watch: {
-        '$route.hash': function (newVal, oldVal) {
-            if (newVal != '') {
-                this.activeHash = newVal;
-            } else {
-                this.activeHash = this.defaultHash;
-            }
-            this.update();
+    methods: {
+        setActiveHash(hash) {
+            this.activeHash = hash;
+        },
+        getTab(hash) {
+            return document.getElementById('tab-' + hash);
         }
     }
 }

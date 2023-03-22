@@ -9,13 +9,13 @@ const emailVerified = require('../middlewares/emailVerified');
 router.use('/me', auth.access, require('./users/me'));
 router.post('/signup', controller.signup);
 router.post('/login', controller.login);
-router.post('/password-reset', controller.passwordResetSendEmail);
-router.patch('/password-reset', auth.resetPassword, controller.updatePassword);
-router.post('/email-verification', auth.access, controller.emailVerificationSendEmail);
+router.post('/password-reset', controller.askForPasswordReset);
+router.patch('/password-reset', auth.resetPassword, controller.resetPassword);
+router.post('/email-verification', auth.access, controller.askForEmailVerification);
 router.patch('/email-verification', auth.verify, controller.emailVerification);
 
 // admin routes
-router.get('/', auth.access, emailVerified, admin, controller.getAllUsers);
+router.get('/', auth.access, emailVerified, admin, controller.searchUsers);
 router.delete('/:id', auth.access, emailVerified, admin, controller.deleteUser);
 router.patch('/:id', auth.access, emailVerified, admin, controller.updateUser);
 

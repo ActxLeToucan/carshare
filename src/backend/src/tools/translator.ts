@@ -1,16 +1,17 @@
 import { type Request, type Response } from 'express';
-import { type User, type Travel, type Group } from '@prisma/client';
+import { type User, type Travel, type Group, type Etape, type Passenger } from '@prisma/client';
 
-import { p } from '../properties';
+import properties from '../properties';
 import { sendMail as mailerSend } from './mailer';
 
 export type Variants = {
     en: any
 } & Record<string, any>;
-type TemplateMessage = TemplateMail | TemplateMessageHTTP;
-type Message = Mail | MessageHTTP;
+type TemplateMessage = TemplateMail | TemplateMessageHTTP | TemplateNotif;
+type Message = Mail | MessageHTTP | Notif;
 type TranslationsMessageHTTP = Record<string, Record<string, (req: Request, ...args: any) => MessageHTTP>>;
 type TranslationsMail = Record<string, Record<string, (req: Request, ...args: any) => Mail>>;
+type TranslationsNotif = Record<string, Record<string, (lang: string, ...args: any) => Notif>>;
 
 interface TemplateMail {
     to: string
@@ -35,6 +36,18 @@ interface TemplateMessageHTTP {
 export interface MessageHTTP {
     msg: string
     code: number
+    data?: any
+}
+
+interface TemplateNotif {
+    title: Variants
+    message: Variants
+    data?: any
+}
+
+export interface Notif {
+    title: string
+    message: string
     data?: any
 }
 
@@ -179,7 +192,7 @@ const error = {
         number: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Le nom ne peut pas contenir de chiffre.',
-                en: 'Lastname can contain number.'
+                en: 'Lastname cannot contain number.'
             },
             code: 400
         })
@@ -254,8 +267,8 @@ const error = {
         }),
         tooHigh: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'a mountain too [H]igh | Le niveau est plus élevé que votre propre niveau.',
-                en: 'Level is higher than your own level.'
+                fr: 'a mountain too [H]igh | Le niveau est trop élevé par rapport à votre niveau.',
+                en: 'Level is too high compared to your level.'
             },
             code: 403
         })
@@ -320,6 +333,13 @@ const error = {
                 en: `Date must be greater than ${date.toLocaleString('en-US')}.`
             },
             code: 400
+        }),
+        identical: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Les dates mises sont les mêmes.',
+                en: 'The dates are the same.'
+            },
+            code: 400
         })
     },
     ville: {
@@ -345,33 +365,17 @@ const error = {
                 en: 'User not found.'
             },
             code: 404
-        }),
-        invalidId: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        })
+    },
+    id: {
+        invalid: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'L\'identifiant de l\'utilisateur est invalide.',
-                en: 'User id is invalid.'
+                fr: 'L\'identifiant est invalide.',
+                en: 'Id is invalid.'
             },
             code: 400
         })
     },
-
-    travel: {
-        notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Trajet introuvable.',
-                en: 'Travel not found.'
-            },
-            code: 404
-        }),
-        invalidId: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'L\'identifiant du trajet est invalide.',
-                en: 'Travel id is invalid.'
-            },
-            code: 400
-        })
-    },
-
     db: {
         notReachable: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
@@ -472,18 +476,12 @@ const error = {
         })
     },
     documentation: {
-        notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        favicon: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: '<head><title>Documentation introuvable</title></head>' +
-                    '<h1>Documentation introuvable</h1>' +
-                    '<p>Si vous êtes le propriétaire du serveur, exécutez "npm run docs" pour la générer.</p>' +
-                    '<p>Vous pouvez également trouver le fichier de documentation (YAML) <a href="/docs/yaml">ici</a>.</p>',
-                en: '<head><title>Documentation not found</title></head>' +
-                    '<h1>Documentation not found</h1>' +
-                    '<p>If you are the owner of the server, run "npm run docs" to generate it.</p>' +
-                    '<p>You can also find the documentation file (YAML) <a href="/docs/yaml">here</a>.</p>'
+                fr: 'La variable d\'environnement "FRONTEND_LOGO" n\'est pas définie.',
+                en: 'Environment variable "FRONTEND_LOGO" is not defined.'
             },
-            code: 404
+            code: 500
         })
     },
     group: {
@@ -493,8 +491,14 @@ const error = {
                 en: 'Group not found.'
             },
             code: 404
+        }),
+        typeId: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'L\'identifiant du groupe doit être un nombre.',
+                en: 'Group id must be a number.'
+            },
+            code: 400
         })
-
     },
     number: {
         required: (req: Request, fieldName: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
@@ -511,10 +515,10 @@ const error = {
             },
             code: 400
         }),
-        positive: (req: Request, fieldName: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        min: (req: Request, fieldName: string, min: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Le champ "${fieldName}" doit être un nombre positif.`,
-                en: `Field "${fieldName}" must be a positive number.`
+                fr: `Le champ "${fieldName}" doit être supérieur ou égal à ${min}.`,
+                en: `Field "${fieldName}" must be greater than or equal to ${min}.`
             },
             code: 400
         })
@@ -539,7 +543,7 @@ const error = {
         required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Les étapes sont requises.',
-                en: 'Etapes are required.'
+                en: 'Steps are required.'
             },
             code: 400
         }),
@@ -553,7 +557,21 @@ const error = {
         type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Les étapes doivent être un tableau.',
-                en: 'Etapes must be an array.'
+                en: 'Steps must be an array.'
+            },
+            code: 400
+        }),
+        badOrder: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Les dates données ne sont pas dans le bon ordre.',
+                en: 'The dates given are not in the right order.'
+            },
+            code: 400
+        }),
+        alreadyTravel: (req: Request, dateDeb: Date, dateFin: Date) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Le conducteur a déjà un trajet de prévu du ${dateDeb.toLocaleString('fr-FR')} au ${dateFin.toLocaleString('fr-FR')}.`,
+                en: `The driver already has a trip planned from ${dateDeb.toLocaleString('en-US')} to ${dateFin.toLocaleString('en-US')}.`
             },
             code: 400
         })
@@ -592,29 +610,61 @@ const error = {
                 en: 'Notification not found.'
             },
             code: 404
-        }),
-        invalidId: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'L\'identifiant de la notification est invalide.',
-                en: 'Notification id is invalid.'
-            },
-            code: 400
         })
     },
     city: {
         required: (req: Request, field: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'La ville est requise.',
-                en: 'City is required.'
+                fr: `Le champ "${field}" est requis.`,
+                en: `Field "${field}" is required.`
             },
             code: 400
         }),
         type: (req: Request, field: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'La ville doit être une chaîne de caractères.',
-                en: 'City must be a string.'
+                fr: `Le champ "${field}" doit être une chaîne de caractères.`,
+                en: `Field "${field}" must be a string.`
             },
             code: 400
+        })
+    },
+    travel: {
+        notModifiable: (req: Request, hours: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Vous ne pouvez pas modifier un trajet qui commence dans moins de ${hours} heure${hours > 1 ? 's' : ''}.`,
+                en: `You cannot modify a trip that starts in less than ${hours} hour${hours > 1 ? 's' : ''}.`
+            },
+            code: 400
+        }),
+        notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Trajet introuvable.',
+                en: 'Travel not found.'
+            },
+            code: 404
+        }),
+        notDriver: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Vous n\'êtes pas le conducteur de ce trajet.',
+                en: 'You are not the driver of this travel.'
+            },
+            code: 403
+        }),
+        notOpen: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Ce trajet n\'est plus ouvert.',
+                en: 'This travel is no longer open.'
+            },
+            code: 400
+        })
+    },
+    evaluation: {
+        notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Evaluation introuvable.',
+                en: 'Evaluation not found.'
+            },
+            code: 404
         })
     }
 } satisfies TranslationsMessageHTTP;
@@ -700,34 +750,27 @@ const info = {
             code: 200
         })
     },
-
     travel: {
-        created: (req: Request, travel: Travel, nbEtape: object) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        created: (req: Request, travel: Travel & { etapes: Etape[] }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Trajet créé',
                 en: 'Travel created'
             },
             code: 201,
             data: {
-                travel,
-                numberOfEtape: nbEtape
+                travel
             }
         }),
-
-        updated: (req: Request, travel: Travel, nbEtape: object) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        cancelled: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Trajet modifié',
-                en: 'Travel updated'
+                fr: 'Trajet annulé',
+                en: 'Travel cancelled'
             },
-            code: 201,
-            data: {
-                travel,
-                numberOfEtape: nbEtape
-            }
+            code: 200
         })
     },
     group: {
-        created: (req: Request, group: Group & { users: User[] }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        created: (req: Request, group: Group & { users: User[], creator: User }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Groupe créé',
                 en: 'Group created'
@@ -753,6 +796,15 @@ const info = {
             },
             code: 200
         })
+    },
+    evaluation: {
+        deleted: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Evaluation retirée',
+                en: 'Evaluation removed'
+            },
+            code: 200
+        })
     }
 
 } satisfies TranslationsMessageHTTP;
@@ -769,32 +821,32 @@ const mail = {
                 fr: `${mailHtmlHeader}
                 <p>Bonjour ${user.firstName ?? ''} ${user.lastName ?? ''},</p>
                 <p>Vous avez demandé à réinitialiser votre mot de passe. Pour ce faire, veuillez cliquer sur le lien ci-dessous :</p>
-                <p><a href="${String(p.url.passwordReset)}${token}">${String(p.url.passwordReset)}${token}</a></p>
-                <p>Ce lien est valable ${translate(req, p.token.passwordReset.expirationTxt)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.</p>
+                <p><a href="${String(properties.url.passwordReset)}${token}">${String(properties.url.passwordReset)}${token}</a></p>
+                <p>Ce lien est valable ${translate(req, properties.token.passwordReset.expirationTxt)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.</p>
                 <p>Cordialement,</p>
                 <p>L'équipe de ${process.env.FRONTEND_NAME ?? ''}</p>`,
                 en: `${mailHtmlHeader}
                 <p>Hello ${user.firstName ?? ''} ${user.lastName ?? ''},</p>
                 <p>You requested to reset your password. To do so, please click on the link below :</p>
-                <p><a href="${String(p.url.passwordReset)}${token}">${String(p.url.passwordReset)}${token}</a></p>
-                <p>This link is valid for ${translate(req, p.token.passwordReset.expirationTxt)}. If you did not request this, please ignore this email.</p>
+                <p><a href="${String(properties.url.passwordReset)}${token}">${String(properties.url.passwordReset)}${token}</a></p>
+                <p>This link is valid for ${translate(req, properties.token.passwordReset.expirationTxt)}. If you did not request this, please ignore this email.</p>
                 <p>Best regards,</p>
                 <p>The ${process.env.FRONTEND_NAME ?? ''} team</p>`
             },
             text: {
                 fr: `Bonjour ${user.firstName ?? ''} ${user.lastName ?? ''},
                 Vous avez demandé à réinitialiser votre mot de passe. Pour ce faire, veuillez cliquer sur le lien ci-dessous :
-                ${String(p.url.passwordReset)}${token}
+                ${String(properties.url.passwordReset)}${token}
 
-                Ce lien est valable ${translate(req, p.token.passwordReset.expirationTxt)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.
+                Ce lien est valable ${translate(req, properties.token.passwordReset.expirationTxt)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.
 
                 Cordialement,
                 L'équipe de ${process.env.FRONTEND_NAME ?? ''}`,
                 en: `Hello ${user.firstName ?? ''} ${user.lastName ?? ''},
                 You requested to reset your password. To do so, please click on the link below :
-                ${String(p.url.passwordReset)}${token}
+                ${String(properties.url.passwordReset)}${token}
 
-                This link is valid for ${translate(req, p.token.passwordReset.expirationTxt)}. If you did not request this, please ignore this email.
+                This link is valid for ${translate(req, properties.token.passwordReset.expirationTxt)}. If you did not request this, please ignore this email.
 
                 Best regards,
                 The ${process.env.FRONTEND_NAME ?? ''} team`
@@ -802,7 +854,7 @@ const mail = {
         })
     },
     email: {
-        verification: (req: Request, user: User, token: string, frontendPath: string) => msgForLang<TemplateMail, Mail>(req, {
+        verification: (req: Request, user: User, token: string) => msgForLang<TemplateMail, Mail>(req, {
             to: user.email,
             subject: {
                 fr: 'Vérification de votre adresse email',
@@ -812,33 +864,100 @@ const mail = {
                 fr: `${mailHtmlHeader}
                 <p>Bonjour ${user.firstName ?? ''} ${user.lastName ?? ''},</p>
                 <p>Pour vérifier votre adresse email, veuillez cliquer sur le lien ci-dessous :</p>
-                <p><a href="${String(p.url.emailVerification)}${token}">${String(p.url.emailVerification)}${token}</a></p>
-                <p>Ce lien est valable ${translate(req, p.token.verify.expirationTxt)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.</p>
+                <p><a href="${String(properties.url.emailVerification)}${token}">${String(properties.url.emailVerification)}${token}</a></p>
+                <p>Ce lien est valable ${translate(req, properties.token.verify.expirationTxt)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.</p>
                 <p>Cordialement,</p>
                 <p>L'équipe de ${process.env.FRONTEND_NAME ?? ''}</p>`,
                 en: `${mailHtmlHeader}
                 <p>Hello ${user.firstName ?? ''} ${user.lastName ?? ''},</p>
                 <p>To verify your email address, please click on the link below :</p>
-                <p><a href="${String(p.url.emailVerification)}${token}">${String(p.url.emailVerification)}${token}</a></p>
-                <p>This link is valid for ${translate(req, p.token.verify.expirationTxt)}. If you did not request this, please ignore this email.</p>
+                <p><a href="${String(properties.url.emailVerification)}${token}">${String(properties.url.emailVerification)}${token}</a></p>
+                <p>This link is valid for ${translate(req, properties.token.verify.expirationTxt)}. If you did not request this, please ignore this email.</p>
                 <p>Best regards,</p>
                 <p>The ${process.env.FRONTEND_NAME ?? ''} team</p>`
             },
             text: {
                 fr: `Bonjour ${user.firstName ?? ''} ${user.lastName ?? ''},
                 Pour vérifier votre adresse email, veuillez cliquer sur le lien ci-dessous :
-                ${String(p.url.emailVerification)}${token}
+                ${String(properties.url.emailVerification)}${token}
 
-                Ce lien est valable ${translate(req, p.token.verify.expirationTxt)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.
+                Ce lien est valable ${translate(req, properties.token.verify.expirationTxt)}. Si vous n'êtes pas à l'origine de cette demande, veuillez ignorer cet email.
 
                 Cordialement,
                 L'équipe de ${process.env.FRONTEND_NAME ?? ''}`,
                 en: `Hello ${user.firstName ?? ''} ${user.lastName ?? ''},
                 To verify your email address, please click on the link below :
-                ${String(p.url.emailVerification)}${token}
+                ${String(properties.url.emailVerification)}${token}
 
-                This link is valid for ${translate(req, p.token.verify.expirationTxt)}. If you did not request this, please ignore this email.
+                This link is valid for ${translate(req, properties.token.verify.expirationTxt)}. If you did not request this, please ignore this email.
 
+                Best regards,
+                The ${process.env.FRONTEND_NAME ?? ''} team`
+            }
+        })
+    },
+    notification: {
+        new: (req: Request | string, user: User, notification: { type: string | null, title: string, message: string, createdAt: Date } & Record<string, any>) => msgForLang<TemplateMail, Mail>(req, {
+            to: user.email,
+            subject: {
+                fr: `Nouvelle notification : ${notification.title}`,
+                en: `New notification : ${notification.title}`
+            },
+            html: {
+                fr: `${mailHtmlHeader}
+                <p>Bonjour ${user.firstName ?? ''} ${user.lastName ?? ''},</p>
+                <p>Vous avez reçu une nouvelle notification :</p>
+                <div style="border: 1px solid #ccc; border-radius: 0.5em; padding: 1em; margin: 1em 0;">
+                    <div style="font-weight: bold;">
+                        <p style="font-size: 0.8em; opacity: 0.5;">${new Date(notification.createdAt).toLocaleString('fr-FR')}</p>
+                        <p>${notification.title}</p>
+                    </div>
+                    <p style="margin-top: 0.5em;">${notification.message}</p>
+                </div>
+                ${notification.type === 'request'
+                    ? `<p>Pour accepter ou refuser cette demande, <a href="${String(properties.url.notifs)}">rendez-vous sur votre espace personnel</a>.</p>`
+                    : ''}
+                <p>Cordialement,</p>
+                <p>L'équipe de ${process.env.FRONTEND_NAME ?? ''}</p>`,
+                en: `${mailHtmlHeader}
+                <p>Hello ${user.firstName ?? ''} ${user.lastName ?? ''},</p>
+                <p>You received a new notification:</p>
+                <div style="border: 1px solid #ccc; border-radius: 0.5em; padding: 1em; margin: 1em 0;">
+                    <div style="font-weight: bold;">
+                        <p style="font-size: 0.8em; opacity: 0.5;">${new Date(notification.createdAt).toLocaleString('en-US')}</p>
+                        <p>${notification.title}</p>
+                    </div>
+                    <p style="margin-top: 0.5em;">${notification.message}</p>
+                </div>
+                ${notification.type === 'request'
+                    ? `<p>To accept or refuse this request, <a href="${String(properties.url.notifs)}">go to your personal space</a>.</p>`
+                    : ''}
+                <p>Best regards,</p>
+                <p>The ${process.env.FRONTEND_NAME ?? ''} team</p>`
+            },
+            text: {
+                fr: `Bonjour ${user.firstName ?? ''} ${user.lastName ?? ''},
+                Vous avez reçu une nouvelle notification :
+                ${notification.title}
+                ${new Date(notification.createdAt).toLocaleString('fr-FR')}
+                ${notification.message}
+                
+                ${notification.type === 'request'
+                    ? `\nPour accepter ou refuser cette demande, rendez-vous sur votre espace personnel : ${String(properties.url.notifs)}\n`
+                    : ''}
+                
+                Cordialement,
+                L'équipe de ${process.env.FRONTEND_NAME ?? ''}`,
+                en: `Hello ${user.firstName ?? ''} ${user.lastName ?? ''},
+                You received a new notification :
+                ${notification.title}
+                ${new Date(notification.createdAt).toLocaleString('en-US')}
+                ${notification.message}
+                
+                ${notification.type === 'request'
+                    ? `\nTo accept or refuse this request, go to your personal space : ${String(properties.url.notifs)}\n`
+                    : ''}
+                    
                 Best regards,
                 The ${process.env.FRONTEND_NAME ?? ''} team`
             }
@@ -846,19 +965,54 @@ const mail = {
     }
 } satisfies TranslationsMail;
 
+const notifs = {
+    request: {
+        new: (lang: string, travel: Travel & { etapes: Etape[] }, sender: User, etapeDep: Etape, etapeDest: Etape, passenger: Passenger) => msgForLang<TemplateNotif, Notif>(lang, { // TODO: revoir les parametres
+            title: {
+                fr: 'Nouvelle demande',
+                en: 'New request'
+            },
+            message: {
+                fr: `${sender.firstName ?? ''} ${sender.lastName ?? ''} souhaite vous accompagner sur le trajet ${travel.etapes[0].city} - ${travel.etapes[travel.etapes.length - 1].city}` +
+                 `(du ${new Date(travel.etapes[0].date).toLocaleString('fr-FR')}) de l'étape ${etapeDep.city} à ${etapeDest.city}.` +
+                    (passenger.comment === null || passenger.comment === ''
+                        ? ''
+                        : `\n\n${sender.firstName ?? ''} ${sender.lastName ?? ''} vous a laissé le message suivant :\n${passenger.comment ?? ''}`),
+                en: `${sender.firstName ?? ''} ${sender.lastName ?? ''} wants to accompany you on the trip ${travel.etapes[0].city} - ${travel.etapes[travel.etapes.length - 1].city}` +
+                    `(from ${new Date(travel.etapes[0].date).toLocaleString('en-US')}) from the step ${etapeDep.city} to ${etapeDest.city}.` +
+                    (passenger.comment === null || passenger.comment === ''
+                        ? ''
+                        : `\n\n${sender.firstName ?? ''} ${sender.lastName ?? ''} left you the following message:\n${passenger.comment ?? ''}`)
+            }
+        })
+    },
+    standard: {
+        travelCancelled: (lang: string, passenger: (Passenger & { departure: Etape, arrival: Etape, passenger: User })) => msgForLang<TemplateNotif, Notif>(lang, {
+            title: {
+                fr: 'Annulation de trajet',
+                en: 'Travel cancelled'
+            },
+            message: {
+                fr: `Votre trajet de ${passenger.departure.city} à ${passenger.arrival.city} du ${new Date(passenger.departure.date).toLocaleString('fr-FR')} a été annulé par le conducteur.`,
+                en: `Your trip from ${passenger.departure.city} to ${passenger.arrival.city} on ${new Date(passenger.departure.date).toLocaleString('en-US')} has been cancelled by the driver.`
+            }
+        })
+    }
+} satisfies TranslationsNotif;
+
 /**
  * Returns the message for the language of the request
- * @param req Express request
+ * @param langOrRequest Language or request
  * @param message Message to translate
  * @returns Translated message
  */
-function msgForLang<T extends TemplateMessage, U extends Message> (req: Request, message: T): U {
+function msgForLang<T extends TemplateMessage, U extends Message> (langOrRequest: string | Request, message: T): U {
     const newMessage: Record<any, any> = {};
 
     for (const key in message) {
         const value = message[key];
         if (areVariants(value)) {
-            newMessage[key] = translate(req, value);
+            newMessage[key] = translate(langOrRequest, value);
         } else {
             newMessage[key] = message[key];
         }
@@ -867,18 +1021,25 @@ function msgForLang<T extends TemplateMessage, U extends Message> (req: Request,
     return newMessage as U;
 }
 
+/**
+ * Checks if the given object is a Variants object
+ * @param obj Object to check
+ */
 function areVariants (obj: any): obj is Variants {
     return typeof obj === 'object' && 'en' in obj;
 }
 
 /**
  * Translates a message by choosing the right variant
- * @param req Express request
+ * @param langOrRequest Language or request
  * @param variants Variants of the message
  * @returns Translated message
  */
-function translate (req: Request, variants: Variants): string {
-    return variants[req.acceptsLanguages().find((lang) => lang in variants) ?? 'en'];
+function translate (langOrRequest: string | Request, variants: Variants): string {
+    if (typeof langOrRequest === 'string') {
+        return variants[langOrRequest] ?? variants.en;
+    }
+    return variants[langOrRequest.acceptsLanguages().find((lang) => lang in variants) ?? 'en'];
 }
 
 /**
@@ -897,18 +1058,6 @@ function sendMsg (req: Request, res: Response, message: (req: Request, ...args: 
 }
 
 /**
- * Sends a raw text with the given message
- * @param req Express request
- * @param res Express response
- * @param page Message to send
- * @param args Arguments to pass to the message function (if any)
- */
-function sendRaw (req: Request, res: Response, page: (req: Request, ...args: any) => MessageHTTP, ...args: any) {
-    const p = page(req, ...args);
-    res.status(p.code).send(p.msg);
-}
-
-/**
  * Sends an email
  * @param req Express request
  * @param message Message to send
@@ -920,12 +1069,27 @@ async function sendMail (req: Request, message: (req: Request, ...args: any) => 
 }
 
 /**
+ * Will send a notification to the user
+ * @param user User to notify
+ * @param notification Notification to send
+ */
+function notify (user: User, notification: { type: string | null, title: string, message: string, createdAt: Date } & Record<string, any>) {
+    if (!user.mailNotif) return;
+    mailerSend(mail.notification.new('en', user, notification)) // TODO: get user's language
+        .then(() => {
+            console.log(`Notification sent to ${user.email}.`);
+        }).catch((err) => {
+            console.error(`Failed to send notification to ${user.email}.`);
+            console.error(err);
+        });
+}
+
+/**
  * Returns a user without some properties for display to the user itself or to admins
  * @param user User to display
- * @returns User without some properties
  * @see displayableUserPublic
  */
-function displayableUserPrivate (user: User) {
+function displayableUserPrivate (user: User): Partial<User> {
     const u = user as any;
     delete u.password;
     delete u.lastPasswordResetEmailedOn;
@@ -936,20 +1100,50 @@ function displayableUserPrivate (user: User) {
 /**
  * Returns a user without some properties for display to other users
  * @param user User to display
- * @returns User without some properties
  * @see displayableUserPrivate
  */
-function displayableUserPublic (user: User) {
+function displayableUserPublic (user: User): Partial<User> {
     const u = displayableUserPrivate(user);
     delete u.mailNotif;
     delete u.createdAt;
     return u;
 }
 
-function displayableGroup (group: Group & { users: User[] }) {
+/**
+ * Returns a group without some properties for display to all users
+ * @param group Group to display
+ */
+function displayableGroup (group: Group & { users: User[], creator: User }): Partial<Group> {
     const g = group as any;
     g.users = g.users.map(displayableUserPublic);
+    g.creator = displayableUserPublic(g.creator);
     return g;
 }
 
-export { error, info, mail, sendMsg, sendMail, sendRaw, displayableUserPrivate, displayableGroup };
+/**
+ * Returns a value with avg and count rename
+ * @param value value to rename avg and count
+ * @returns value with rename
+ */
+function displayableAverage (value: any) {
+    const p = value;
+    p.average = value._avg;
+    delete p._avg;
+    p.count = value._count;
+    delete p._count;
+    return p;
+}
+
+export {
+    error,
+    info,
+    mail,
+    notifs,
+    sendMsg,
+    sendMail,
+    notify,
+    displayableUserPrivate,
+    displayableUserPublic,
+    displayableGroup,
+    displayableAverage
+};

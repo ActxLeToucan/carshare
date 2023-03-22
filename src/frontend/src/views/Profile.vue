@@ -1,46 +1,94 @@
 <template>
-    <div class="flex grow flex-col min-h-0 max-h-screen">
-        <topbar></topbar>
+    <div class="flex grow flex-col min-h-0 max-h-screen max-w-full">
+        <topbar />
         <div class="flex md:flex-row flex-col grow max-h-min min-h-0">
-            <div ref="tabs-zone" class="show-right flex flex-col items-center h-full md:w-min w-full min-h-0 px-8 py-4 space-y-4 md:border-r-8 border-teal-500 mx-auto overflow-hidden">
-                <p class="text-2xl text-teal-500 py-2 font-bold mx-auto"> {{ lang.PROFILE }} </p>
-                <button-tab href="#infos" :default="!isMobile"> {{ lang.MY_INFOS }} </button-tab>
-                <button-tab href="#trips"> {{ lang.MY_TRIPS }} </button-tab>
-                <button-tab href="#groups"> {{ lang.MY_GROUPS }} </button-tab>
-                <button-tab href="#evals"> {{ lang.MY_EVALS }} </button-tab>
-                <button-tab href="#params"> {{ lang.PARAMS }} </button-tab>
+            <div
+                ref="tabs-zone"
+                class="show-right flex flex-col items-center h-full md:w-min w-full min-h-0 px-8 py-4 space-y-4 md:border-r-8 border-teal-500 mx-auto overflow-hidden"
+            >
+                <p class="text-2xl text-teal-500 py-2 font-bold mx-auto">
+                    {{ lang.PROFILE }}
+                </p>
+                <button-tab
+                    href="#infos"
+                    :default="!isMobile"
+                >
+                    {{ lang.MY_INFOS }}
+                </button-tab>
+                <button-tab href="#notifs">
+                    {{ lang.MY_NOTIFS }}
+                </button-tab>
+                <button-tab href="#trips">
+                    {{ lang.MY_TRIPS }}
+                </button-tab>
+                <button-tab href="#groups">
+                    {{ lang.MY_GROUPS }}
+                </button-tab>
+                <button-tab href="#evals">
+                    {{ lang.MY_EVALS }}
+                </button-tab>
+                <button-tab href="#params">
+                    {{ lang.PARAMS }}
+                </button-tab>
                 <div class="flex grow justify-end items-end mx-auto">
-                    <button-block :action="disconnect"> {{ lang.DISCONNECT }} </button-block>
+                    <button-block :action="disconnect">
+                        {{ lang.DISCONNECT }}
+                    </button-block>
                 </div>
             </div>
-            <div ref="content-zone" class="flex flex-col md:grow min-h-0 max-h-full">
-
-                <button ref="backtabs-btn" class="absolute md:hidden flex rounded-md border-2 border-slate-200 bg-white h-fit w-fit p-2 m-4">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            <div
+                ref="content-zone"
+                class="flex flex-col md:grow min-h-0 max-h-full"
+            >
+                <button
+                    ref="backtabs-btn"
+                    class="absolute md:hidden text-slate-700 dark:text-slate-200 flex rounded-md border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-600 h-fit w-fit p-1 m-2"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="w-7 h-7"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M15.75 19.5L8.25 12l7.5-7.5"
+                        />
                     </svg>
                 </button>
 
-                <tab-window defaultHash="#infos" class="md:pt-0 pt-5 max-h-full">
+                <tab-window
+                    default-hash="#infos"
+                    class="md:pt-0 pt-5 max-h-full max-w-full"
+                >
+                    <tab-div
+                        hash="#infos"
+                        class="flex flex-col items-center"
+                    >
+                        <user-infos />
+                    </tab-div>
 
-                    <tab-div hash="#infos" class="flex flex-col items-center">
-                        <user-infos></user-infos>
+                    <tab-div hash="#notifs">
+                        <user-notifs />
                     </tab-div>
 
                     <tab-div hash="#trips">
-                        <user-trips></user-trips>
+                        <user-trips />
                     </tab-div>
 
                     <tab-div hash="#groups">
-                        <user-groups></user-groups>
+                        <user-groups />
                     </tab-div>
 
                     <tab-div hash="#evals">
-                        <user-evals></user-evals>
+                        <user-evals />
                     </tab-div>
 
                     <tab-div hash="#params">
-                        <user-params></user-params>
+                        <user-params />
                     </tab-div>
                 </tab-window>
             </div>
@@ -55,6 +103,7 @@ import ButtonTab from '../components/inputs/ButtonTab.vue';
 import TabWindow from '../components/cards/TabWindow.vue';
 import TabDiv from '../components/cards/TabDiv.vue';
 import UserInfos from '../components/profile/UserInfos.vue';
+import UserNotifs from '../components/profile/UserNotifs.vue';
 import UserTrips from '../components/profile/UserTrips.vue';
 import UserEvals from '../components/profile/UserEvals.vue';
 import UserParams from '../components/profile/UserParams.vue';
@@ -63,7 +112,7 @@ import User from '../scripts/User';
 import Lang from '../scripts/Lang';
 
 export default {
-    name: 'Home',
+    name: 'ProfileView',
     components: {
         Topbar,
         ButtonBlock,
@@ -71,6 +120,7 @@ export default {
         TabWindow,
         TabDiv,
         UserInfos,
+        UserNotifs,
         UserTrips,
         UserEvals,
         UserParams,
@@ -78,6 +128,21 @@ export default {
     },
     data() {
         return { isMobile: window.innerWidth < 768, lang: Lang.CurrentLang }
+    },
+    watch: {
+        '$route.hash': function (newVal, oldVal) {
+            const isMobile = window.innerWidth < 768;
+            if (isMobile && newVal != '') this.hideTabs();
+        }
+    },
+    mounted() {
+        Lang.AddCallback(lang => this.lang = lang);
+
+        this.setupView();
+        window.addEventListener("resize", () => {
+            this.isMobile = window.innerWidth < 768;
+            this.setupView();
+        });
     },
     methods: {
         disconnect() {
@@ -119,21 +184,6 @@ export default {
                 tabs.classList.remove("hidden");
                 content.classList.remove("hidden");
             }
-        }
-    },
-    mounted() {
-        Lang.AddCallback(lang => this.lang = lang);
-
-        this.setupView();
-        window.addEventListener("resize", () => {
-            this.isMobile = window.innerWidth < 768;
-            this.setupView();
-        });
-    },
-    watch: {
-        '$route.hash': function (newVal, oldVal) {
-            const isMobile = window.innerWidth < 768;
-            if (isMobile && newVal != '') this.hideTabs();
         }
     }
 }

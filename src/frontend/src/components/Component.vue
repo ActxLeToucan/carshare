@@ -1,5 +1,5 @@
 <template>
-    <div></div>
+    <div />
     <!-- Nothing to see here, it's just to create the "components" folder in the project -->
 </template>
 
