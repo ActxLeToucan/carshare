@@ -269,7 +269,8 @@ exports.getTravel = (req: express.Request, res: express.Response, _: express.Nex
         where: { id: travelId },
         include: {
             etapes: true,
-            driver: true
+            driver: true,
+            // TODO : include passengers
         }
     }).then((travel) => {
         if (travel === null) {
