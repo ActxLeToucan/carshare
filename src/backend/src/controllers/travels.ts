@@ -1,7 +1,7 @@
 import type express from 'express';
 import { prisma } from '../app';
 import * as validator from '../tools/validator';
-import { Passenger, Travel, User } from '@prisma/client';
+import { type Passenger } from '@prisma/client';
 import { error, info, type Notif, notifs, notify, sendMsg } from '../tools/translator';
 import properties from '../properties';
 import { checkTravelHoursLimit } from '../tools/validator';
@@ -123,37 +123,56 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
 exports.cancelBooking = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     const travel = req.body.travel;
 
-    const dateCheck = new Date(new Date(travel.date).getTime() - 1000 * 60 * 60 * 24);
-    console.log(res.locals.user.travelsAsPassenger.id)
-
-    const passengerTravel = res.locals.user.travelsAsPassenger.filter((elem: Passenger) => travel.steps.id.include(elem.departureId));
-
-    if (!(passengerTravel)) {
-        sendMsg(req, res, error.travel.notAPassenger);
+    if (travel === null) {
+        sendMsg(req, res, error.travel.required);
         return;
     }
 
-    if (dateCheck <= new Date() ) {
-        sendMsg(req, res, error.travel.tooLate);
-        return;
-    }
+    prisma.travel.findUnique({
+        where: { id: travel.travelId },
+        include: {
+            etapes: true
+        }
+    }).then((travelRes) => {
+        if (travelRes === null) {
+            sendMsg(req, res, error.travel.notFound);
+            return;
+        }
+        const dateCheck = new Date(new Date(travel.date).getTime() - 1000 * 60 * 60 * 24);
+        console.log(res.locals.user.travelsAsPassenger.id)
 
-    prisma.passenger.delete(passengerTravel).then(() => {
-        sendMsg(req, res, info.travel.unbooked);
-        const notif: Notif = notifs.standard.passengerUnbooked('en', passengerTravel); // TODO: get user language
-        const data = {
-            userId: travel.driver,
-            title: notif.title,
-            message: notif.message,
-            type: 'standard',
-            senderId: Number(res.locals.user.id),
-            travelId: travel.id,
-            createdAt: new Date()
-        };
+        const passengerTravel = res.locals.user.travelsAsPassenger.filter((elem: Passenger) => travel.steps.id.include(elem.departureId));
 
-        prisma.notification.create({ data }).then(() => {
-            notify(travel.driver, notif);
-            sendMsg(req, res, info.travel.cancelled);
+        if (passengerTravel === null) {
+            sendMsg(req, res, error.travel.notAPassenger);
+            return;
+        }
+
+        if (dateCheck <= new Date()) {
+            sendMsg(req, res, error.travel.notModifiable);
+            return;
+        }
+
+        prisma.passenger.delete(passengerTravel).then(() => {
+            sendMsg(req, res, info.travel.unbooked);
+            const notif: Notif = notifs.standard.passengerUnbooked('en', passengerTravel); // TODO: get user language
+            const data = {
+                userId: travel.driver,
+                title: notif.title,
+                message: notif.message,
+                type: 'standard',
+                senderId: Number(res.locals.user.id),
+                travelId: travel.id,
+                createdAt: new Date()
+            };
+
+            prisma.notification.create({ data }).then(() => {
+                notify(travel.driver, data);
+                sendMsg(req, res, info.travel.cancelled);
+            }).catch((err) => {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
+            });
         }).catch((err) => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);

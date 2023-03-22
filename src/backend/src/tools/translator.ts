@@ -629,6 +629,13 @@ const error = {
         })
     },
     travel: {
+        required: (req: Request, field: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Le champ "${field}" est requis.`,
+                en: `Field "${field}" is required.`
+            },
+            code: 400
+        }),
         notModifiable: (req: Request, hours: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: `Vous ne pouvez pas modifier un trajet qui commence dans moins de ${hours} heure${hours > 1 ? 's' : ''}.`,
@@ -655,21 +662,14 @@ const error = {
                 fr: 'Ce trajet n\'est plus ouvert.',
                 en: 'This travel is no longer open.'
             },
-            code: 400
-        }),
-        tooLate: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Vous ne pouvez pas réaliser cette action moins de 24h avant le départ.',
-                en: 'This action is forbidden under a 24h margin.'
-            },
-            code: 400
+            code: 403
         }),
         notAPassenger: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Vous n\'ête pas un passager de ce voyage.',
                 en: 'You are not a passenger of this trip.'
             },
-            code: 400
+            code: 403
         })
     }
 } satisfies TranslationsMessageHTTP;
@@ -779,7 +779,7 @@ const info = {
                 en: 'Unbooked from trip.'
             },
             code: 200
-        }),
+        })
     },
     group: {
         created: (req: Request, group: Group & { users: User[], creator: User }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
@@ -1009,7 +1009,7 @@ const notifs = {
                 fr: `Le passager ${passenger.passenger.email} de votre trajet de ${passenger.departure.city} à ${passenger.arrival.city} du ${new Date(passenger.departure.date).toLocaleString('fr-FR')} a annulé sa réservation`,
                 en: `The passenger ${passenger.passenger.email} of your trip from ${passenger.departure.city} to ${passenger.arrival.city} on ${new Date(passenger.departure.date).toLocaleString('en-US')} has cancelled his booking`
             }
-        }),
+        })
     }
 } satisfies TranslationsNotif;
 
