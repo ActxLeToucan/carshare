@@ -2,6 +2,7 @@
     <button
         class="flex flex-col w-fit h-fit py-1 px-2 m-4 border-2 border-slate-200 rounded-md bg-slate-50
                    hover:shadow-md hover:border-slate-300 hover:-translate-y-1 transition-all space-y-2"
+        @click="openTrip"
     >
         <div class="flex w-full justify-center">
             <p class="text-slate-500 text-lg font-bold">
@@ -76,7 +77,15 @@ export default {
         
     },
     methods: {
-        
+        openTrip: function () {
+            this.$router.push({
+                name: 'Trip',
+                params: {
+                  trip: this.trip, // FIXME: antipattern?
+                  id: 1
+                }
+            });
+        }
     }
 }
 </script>

@@ -423,6 +423,7 @@ export default {
 
             for (const el of list) {
                 this.trips.push({
+                    id: el.id,
                     date: new Date(el.departure.date).toLocaleDateString(),
                     author: el.driver.firstname + " " + el.driver.lastname?.substring(0, 1) + ".",
                     startCity: el.departure.city,

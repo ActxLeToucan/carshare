@@ -121,6 +121,9 @@ export default {
     NO_TRIPS: "Aucun trajet trouvé",
     NO_TRIPS_DESC: "Il n'y a aucun trajet trouvé pour les informations renseignées",
 
+    // trips
+    TRIP_TITLE: "Consultation du trajet",
+
     // profile
     MY_PROFILE: "Mon profil",
     MY_INFOS: "Mes informations",
