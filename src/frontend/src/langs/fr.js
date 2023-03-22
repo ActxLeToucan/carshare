@@ -19,6 +19,8 @@ export default {
     INFORMATIONS: "Informations",
     STEPS: "Étapes",
     DEFAULT: "Par défaut",
+    SENDING_RESPONSE: "Envoi de la réponse",
+    DELETING: "Suppression en cours",
 
     // languages
     ENGLISH: "Anglais",

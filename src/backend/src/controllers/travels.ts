@@ -22,8 +22,8 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
 
     prisma.$queryRaw`select t.*,
                             u.id        as 'driver.id',
-                            u.firstname as 'driver.firstname',
-                            u.lastname  as 'driver.lastname',
+                            u.firstName as 'driver.firstName',
+                            u.lastName  as 'driver.lastName',
                             u.email     as 'driver.email',
                             u.phone     as 'driver.phone',
                             u.avatar    as 'driver.avatar',
