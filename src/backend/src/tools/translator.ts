@@ -807,6 +807,13 @@ const info = {
             data: {
                 group: displayableGroup(group)
             }
+        }),
+        deleted: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Groupe supprimé',
+                en: 'Group removed'
+            },
+            code: 200
         })
     },
     notification: {
