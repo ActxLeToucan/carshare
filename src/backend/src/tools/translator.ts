@@ -1110,6 +1110,28 @@ function displayableUserPublic (user: User): Partial<User> {
 }
 
 /**
+ * Returns a travel without some properties for display to other users
+ * @param travel Travel to display
+ */
+function displayableTravelPublic (travel: Travel): Partial<Travel> {
+    const t = Object.assign({}, travel) as any;
+    delete t.groupId;
+    t.driver = displayableUserPublic(t.driver);
+    t.etapes = t.etapes.map(displayableEtapePublic);
+    return t;
+}
+
+/**
+ * Returns an etape without some properties for display to other users
+ * @param etape Etape to display
+ */
+function displayableEtapePublic (etape: Etape): Partial<Etape> {
+    const e = Object.assign({}, etape) as any;
+    delete e.travelId;
+    return e;
+}
+
+/**
  * Returns a group without some properties for display to all users
  * @param group Group to display
  */
@@ -1144,6 +1166,8 @@ export {
     notify,
     displayableUserPrivate,
     displayableUserPublic,
+    displayableTravelPublic,
+    displayableEtapePublic,
     displayableGroup,
     displayableAverage
 };

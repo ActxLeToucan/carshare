@@ -8,7 +8,8 @@ import {
     type Notif,
     notifs,
     notify,
-    sendMsg
+    sendMsg,
+    displayableTravelPublic
 } from '../tools/translator';
 import properties from '../properties';
 import { checkTravelHoursLimit } from '../tools/validator';
@@ -254,6 +255,28 @@ exports.getTravels = (req: express.Request, res: express.Response, _: express.Ne
             console.error(err);
             sendMsg(req, res, error.generic.internalError);
         });
+    }).catch(err => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
+}
+
+exports.getTravel = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    const travelId = validator.sanitizeId(req.params.id, req, res);
+    if (travelId === null) return;
+
+    prisma.travel.findUnique({
+        where: { id: travelId },
+        include: {
+            etapes: true,
+            driver: true
+        }
+    }).then((travel) => {
+        if (travel === null) {
+            sendMsg(req, res, error.travel.notFound);
+            return;
+        }
+        res.status(200).json(displayableTravelPublic(travel));
     }).catch(err => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
