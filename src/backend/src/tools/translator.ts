@@ -767,6 +767,16 @@ const info = {
                 en: 'Travel cancelled'
             },
             code: 200
+        }),
+        updated: (req: Request, travel: Travel) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Trajet mis à jour',
+                en: 'Travel updated'
+            },
+            code: 200,
+            data: {
+                travel
+            }
         })
     },
     group: {
