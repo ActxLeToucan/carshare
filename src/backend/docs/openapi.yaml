@@ -1504,7 +1504,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: Evaluation put in
+                    example: Recorded evaluation
                   group:
                     $ref: '#/components/schemas/EvaluationCreate'
         '400':

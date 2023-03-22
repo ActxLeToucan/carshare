@@ -652,8 +652,8 @@ const error = {
         }),
         alreadyNoted: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'La personne que l\'on veut évaluer a déjà été noté par l\'utilisateur courant.',
-                en: 'The person to be evaluated has already been rated by the current user.'
+                fr: 'Vous avez déjà noté cet utilisateur.',
+                en: 'You have already noted this user.'
             },
             code: 404
         })
@@ -821,8 +821,8 @@ const info = {
     evaluation: {
         created: (req: Request, evaluation: Evaluation & { travel: Travel, evaluated: User, evaluator: User }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Evaluation mise',
-                en: 'Evaluation put in'
+                fr: 'Évaluation enregistrée',
+                en: 'Recorded evaluation'
             },
             code: 201,
             data: {
