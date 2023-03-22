@@ -1015,6 +1015,49 @@ paths:
         '500':
           $ref: '#/components/responses/internalError'
 
+  /travels/:id:
+    get:
+      summary: Get one travel
+      description: Get one trips with the given id
+      operationId: getTravel
+      tags:
+        - Travels
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - name: id
+          in: query
+          description: Target travel id
+          schema:
+            type: number
+            example: 1
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: The travels with the given id
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/PublicTravel'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Id is invalid.
+        '401':
+          $ref: '#/components/responses/noToken'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+
   /travels:
     get:
       summary: All travels (admin)
@@ -1768,6 +1811,37 @@ components:
           type: integer
           nullable: true
           example: 1
+        createdAt:
+          type: string
+          format: date-time
+          example: 2020-01-01T00:00:00.000Z
+    PublicTravel:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        maxPassengers:
+          type: integer
+          example: 4
+        price:
+          type: number
+          example: 100
+        description:
+          type: string
+          example: No pets allowed
+        status:
+          type: integer
+          example: 1
+        driverId:
+          type: integer
+          example: 1
+        driver:
+          $ref: '#/components/schemas/PublicUser'
+        etapes:
+          type: array
+          items:
+            $ref: '#/components/schemas/Etape'
         createdAt:
           type: string
           format: date-time
