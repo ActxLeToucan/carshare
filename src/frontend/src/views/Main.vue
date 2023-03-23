@@ -169,9 +169,17 @@
                     :key="trip.id"
                     :trip="trip"
                     class="mx-auto"
+                    @click="selectTrip(trip.id)"
                 />
             </div>
         </div>
+        <card-popup
+            ref="trip-details"
+            :show-validate="false"
+            :oncancel="onpopupcancel"
+        >
+            <trip-detail :trip-id="selectedTripId" />
+        </card-popup>
     </div>
 </template>
 
@@ -181,7 +189,9 @@ import InputText from '../components/inputs/InputText.vue';
 import Topbar from "../components/topbar/Topbar.vue";
 import Selector from '../components/inputs/Selector.vue';
 import TripCard from '../components/cards/TripCard.vue';
+import TripDetail from '../components/cards/TripDetail.vue';
 import CardBorder from '../components/cards/CardBorder.vue';
+import CardPopup from '../components/cards/CardPopup.vue';
 import { Log, LogZone } from '../scripts/Logs';
 import Car from '../components/Car.vue';
 import BAN from '../scripts/BAN.js';
@@ -294,10 +304,12 @@ export default {
         Selector,
         Car,
         CardBorder,
-        TripCard
+        TripCard,
+        TripDetail,
+        CardPopup
     },
     data() {
-        return { lang: Lang.CurrentLang, trips: [], startCity: {}, endCity: {} }
+        return { lang: Lang.CurrentLang, trips: [], startCity: {}, endCity: {}, selectedTripId: null }
     },
     mounted() {
         Lang.AddCallback(lang => this.lang = lang);
@@ -321,6 +333,8 @@ export default {
         this.endSelector.attachInput(this.endInput);
 
         this.logZone = new LogZone(this.$refs["log-zone"]);
+
+        window.action = () => { this.selectTrip(8); }
     },
     methods: {
         onstartselected(city) {
@@ -434,6 +448,17 @@ export default {
                     price: el.price,
                 });
             }
+        },
+        selectTrip(id) {
+            this.selectedTripId = null;
+            this.selectedTripId = id;
+            const popup = this.$refs["trip-details"];
+            popup.setTitle(Lang.CurrentLang.TRIP_DETAILS);
+            popup.show();
+        },
+        onpopupcancel(popup) {
+            popup.hide();
+            this.selectedTripId = null;
         }
     }
 }

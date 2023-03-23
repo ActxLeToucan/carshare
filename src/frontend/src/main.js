@@ -19,7 +19,6 @@ const routes = [
     { path: "/validate", name: 'Validate', component: () => import("./views/Validate.vue") },
     { path: "/profile", name: 'Profile', component: () => import("./views/Profile.vue") },
     { path: "/admin", name: 'Admin', component: () => import("./views/Admin.vue") },
-    { path: "/trips/:id", name: 'Trip', component: () => import("./views/Trip.vue") },
     { path: "/trips/new", name: 'TripsNew', component: () => import("./views/TripsNew.vue") },
     // 404 redirection
     { path: "/:catchAll(.*)", name: 'NotFound', component: () => import("./views/NotFound.vue") }

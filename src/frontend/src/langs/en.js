@@ -120,6 +120,8 @@ export default {
     DATE_SPECIFY: "Please specify the trip date",
     NO_TRIPS: "No trips found",
     NO_TRIPS_DESC: "No trips found for the selected informations",
+    TRIP_DETAILS: "Trip details",
+    PASSENGERS: "Passengers",
 
     // trips
     TRIP_TITLE: "Consultation du trajet",
