@@ -178,7 +178,12 @@
             :show-validate="false"
             :oncancel="onpopupcancel"
         >
-            <trip-detail :trip-id="selectedTripId" />
+            <trip-detail
+                ref="trip-comp"
+                :trip-id="selectedTripId"
+                :trip-start="startCity"
+                :trip-end="endCity"
+            />
         </card-popup>
     </div>
 </template>
@@ -334,7 +339,7 @@ export default {
 
         this.logZone = new LogZone(this.$refs["log-zone"]);
 
-        window.action = () => { this.selectTrip(8); }
+        window.action = () => { this.selectTrip(9); }
     },
     methods: {
         onstartselected(city) {
@@ -452,6 +457,7 @@ export default {
             }
         },
         selectTrip(id) {
+            this.$refs["trip-comp"].setPopup(this.$refs["trip-details"]);
             this.selectedTripId = null;
             this.selectedTripId = id;
             const popup = this.$refs["trip-details"];

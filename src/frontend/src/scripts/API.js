@@ -178,6 +178,7 @@ class API {
             GET: "/travels/",
         },
         BOOKINGS: {
+            CREATE: "/bookings/create",
             ACCEPT: (id) => `/bookings/${id}/accept`,
             REJECT: (id) => `/bookings/${id}/reject`,
         }

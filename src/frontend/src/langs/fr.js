@@ -124,6 +124,10 @@ export default {
     NO_TRIPS_DESC: "Il n'y a aucun trajet trouvé pour les informations renseignées",
     TRIP_DETAILS: "Détails du trajet",
     PASSENGERS: "Passagers",
+    NO_PASSENGERS: "Il n'y a encore aucun passager sur ce trajet",
+    TRIP_DESTINATIONS: "Destinations du trajet",
+    BOOK_TRIP: "Réserver le trajet",
+    DRIVER: "Conducteur",
 
     // trips
     TRIP_TITLE: "Consultation du trajet",
