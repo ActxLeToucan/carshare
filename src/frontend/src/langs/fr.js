@@ -19,6 +19,8 @@ export default {
     INFORMATIONS: "Informations",
     STEPS: "Étapes",
     DEFAULT: "Par défaut",
+    SENDING_RESPONSE: "Envoi de la réponse",
+    DELETING: "Suppression en cours",
 
     // languages
     ENGLISH: "Anglais",
@@ -120,6 +122,15 @@ export default {
     DATE_SPECIFY: "Veuillez renseignez la date",
     NO_TRIPS: "Aucun trajet trouvé",
     NO_TRIPS_DESC: "Il n'y a aucun trajet trouvé pour les informations renseignées",
+    TRIP_DETAILS: "Détails du trajet",
+    PASSENGERS: "Passagers",
+    NO_PASSENGERS: "Il n'y a encore aucun passager sur ce trajet",
+    TRIP_DESTINATIONS: "Destinations du trajet",
+    BOOK_TRIP: "Réserver le trajet",
+    DRIVER: "Conducteur",
+
+    // trips
+    TRIP_TITLE: "Consultation du trajet",
 
     // profile
     MY_PROFILE: "Mon profil",
@@ -148,7 +159,7 @@ export default {
     NOTIFS_DELETED: "Notifications supprimées avec succès",
 
     // groups
-    NO_GROUPS: "Vous n'avez encore aucun groupe",
+    NO_GROUPS: "Vous n'avez pas encore créé de groupe",
     NO_GROUPS_DESC: "Créez un groupe pour pouvoir partager vos trajets avec vos amis",
     NO_USERS: "Il n'y encore aucun utilisateur",
     NO_USERS_DESC: "Ajoutez des utilisateurs à votre groupe pour pouvoir partager vos trajets avec eux",

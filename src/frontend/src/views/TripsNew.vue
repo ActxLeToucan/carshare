@@ -169,7 +169,7 @@
                                 :label="lang.DATE"
                                 :value="startStep.datetime"
                                 :onchange="e => setStartDate(e.target.value)"
-                                type="datetime"
+                                type="datetime-local"
                             />
                         </card-border>
 
@@ -223,7 +223,7 @@
                                             :label="lang.DATE"
                                             :value="step.datetime"
                                             :onchange="e => setStepDate(index, e.target.value)"
-                                            type="datetime"
+                                            type="datetime-local"
                                         />
                                     </card-border>
                                 </div>
@@ -262,7 +262,7 @@
                                 :label="lang.DATE"
                                 :value="endStep.datetime"
                                 :onchange="e => setEndDate(e.target.value)"
-                                type="datetime"
+                                type="datetime-local"
                             />
                         </card-border>
                     </div>

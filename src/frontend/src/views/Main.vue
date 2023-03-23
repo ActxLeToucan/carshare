@@ -169,9 +169,22 @@
                     :key="trip.id"
                     :trip="trip"
                     class="mx-auto"
+                    @click="selectTrip(trip.id)"
                 />
             </div>
         </div>
+        <card-popup
+            ref="trip-details"
+            :show-validate="false"
+            :oncancel="onpopupcancel"
+        >
+            <trip-detail
+                ref="trip-comp"
+                :trip-id="selectedTripId"
+                :trip-start="startCity"
+                :trip-end="endCity"
+            />
+        </card-popup>
     </div>
 </template>
 
@@ -181,7 +194,9 @@ import InputText from '../components/inputs/InputText.vue';
 import Topbar from "../components/topbar/Topbar.vue";
 import Selector from '../components/inputs/Selector.vue';
 import TripCard from '../components/cards/TripCard.vue';
+import TripDetail from '../components/cards/TripDetail.vue';
 import CardBorder from '../components/cards/CardBorder.vue';
+import CardPopup from '../components/cards/CardPopup.vue';
 import { Log, LogZone } from '../scripts/Logs';
 import Car from '../components/Car.vue';
 import BAN from '../scripts/BAN.js';
@@ -294,10 +309,12 @@ export default {
         Selector,
         Car,
         CardBorder,
-        TripCard
+        TripCard,
+        TripDetail,
+        CardPopup
     },
     data() {
-        return { lang: Lang.CurrentLang, trips: [], startCity: {}, endCity: {} }
+        return { lang: Lang.CurrentLang, trips: [], startCity: {}, endCity: {}, selectedTripId: null }
     },
     mounted() {
         Lang.AddCallback(lang => this.lang = lang);
@@ -321,6 +338,8 @@ export default {
         this.endSelector.attachInput(this.endInput);
 
         this.logZone = new LogZone(this.$refs["log-zone"]);
+
+        window.action = () => { this.selectTrip(9); }
     },
     methods: {
         onstartselected(city) {
@@ -421,18 +440,33 @@ export default {
                 this.$refs["err-notfound"].classList.add("hidden");
             }
 
+            console.log(list);
+
             for (const el of list) {
                 this.trips.push({
+                    id: el.id,
                     date: new Date(el.departure.date).toLocaleDateString(),
-                    author: el.driver.firstname + " " + el.driver.lastname?.substring(0, 1) + ".",
+                    author: el.driver.firstName + " " + el.driver.lastName?.substring(0, 1) + ".",
                     startCity: el.departure.city,
                     startTime: new Date(el.departure.date).toLocaleTimeString().substring(0, 5),
                     endCity: el.arrival.city,
                     endTime: new Date(el.arrival.date).toLocaleTimeString().substring(0, 5),
-                    slots: el.maxPassengers - (el.passengers == undefined ? 0 : el.passengers?.length),
+                    slots: el.maxPassengers - (el.passengers === undefined ? 0 : el.passengers) + " / " + el.maxPassengers,
                     price: el.price,
                 });
             }
+        },
+        selectTrip(id) {
+            this.$refs["trip-comp"].setPopup(this.$refs["trip-details"]);
+            this.selectedTripId = null;
+            this.selectedTripId = id;
+            const popup = this.$refs["trip-details"];
+            popup.setTitle(Lang.CurrentLang.TRIP_DETAILS);
+            popup.show();
+        },
+        onpopupcancel(popup) {
+            popup.hide();
+            this.selectedTripId = null;
         }
     }
 }
