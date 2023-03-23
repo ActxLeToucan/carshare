@@ -6,21 +6,18 @@
         <card class="flex flex-col md:m-4 my-4">
            <P>PAS DE TRAJETS DISPO</P>
           <div
-                        v-if="groups.length > 0 && !loading"
+                        v-if="trips.length > 0 && !loading"
                         class="flex space-x-4 overflow-x-scroll w-full"
                     >
                         <button
-                            v-for="group in groups"
-                            :key="group.id"
+                            v-for="trip in trips"
+                            :key="trip.id"
                             class="flex flex-col justify-center py-4 my-4 rounded-lg bg-slate-100 dark:bg-slate-700 px-4 w-fit max-w-[14em]
                                     border-2 border-transparent hover:border-slate-200 hover:border-slate-600 cursor-pointer transition-all"
-                            @click="showGroup(group)"
+                            @click="showTrip(trip)"
                         >
                             <p class="text-xl md:text-2xl text-slate-500 dark:text-slate-300 font-bold mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full">
-                                {{ group.name }}
-                            </p>
-                            <p class="text-lg md:text-xl text-slate-500 dark:text-slate-400 mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full">
-                                {{ group.users.length }} {{ lang.MEMBERS }}
+                                {{ trip.name}}
                             </p>
                         </button>
                     </div>
@@ -34,7 +31,7 @@
         <div class="flex flex-col justify-center py-4 my-4 rounded-lg bg-slate-100 px-4" >
             <p class="text-2xl text-slate-500 py-2 font-semibold">{{ lang.TRIP_OFF }}</p>
         <div class="flex justify-between">
-            <p class="text-xl text-slate-500 py-2 font-semibold">villeDdddddddddd</p>
+            <p class="text-xl text-slate-500 py-2 font-semibold">villeD</p>
             <p class="text-xl text-slate-500 py-2 font-semibold">heureD</p>
         </div>
         <div class="flex justify-between">
@@ -92,36 +89,36 @@ export default {
         CardPopup
     },
     data() {
-        return { groups: [], loading: false, lang: Lang.CurrentLang, selectedGroup: null, deletePopup: null, createPopup: null }
+        return { trips: [], loading: false, lang: Lang.CurrentLang, selectedGroup: null, deletePopup: null, createPopup: null }
 
     },
     mounted() {
         Lang.AddCallback(lang => this.lang = lang);
-        this.updateGroups();  },
+        this.updateTrips();  },
     methods: {
-        showGroupZone() {
+        showTripZone() {
             const zone = this.$refs["group-zone"];
             const child = zone.firstElementChild;
             zone.style.maxHeight = child.getBoundingClientRect().height + "px";
             setTimeout(() => { zone.style.maxHeight = "2000px"; }, 250);
     },
-    hideGroupZone() {
+    hideTripZone() {
             const zone = this.$refs["group-zone"];
             zone.style.maxHeight = "0px";
         },
-    showGroup(group) {
-            this.selectedGroup = group;
-            this.showGroupZone();
+    showTrip(trip) {
+            this.selectedGroup = trip;
+            this.showTripZone();
     },
     removeTrip() {
             this.selectedGroup
         },
-        updateGroups() {
+        updateTrips() {
             this.loading = true;
-            this.groups.splice(0, this.groups.length);
-            API.execute_logged(API.ROUTE.TRAVELS.MY.PASSENGER, API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
-                const data = res.data ?? res.groups;
-                data.forEach(group => this.groups.push(group));
+            this.trips.splice(0, this.trips.length);
+            API.execute_logged(API.ROUTE.GROUPS , API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
+                const data = res.data ?? res.trips;
+                data.forEach(trip => this.trips.push(trip));
                 this.loading = false;
             }).catch(err => {
                 console.error(err);

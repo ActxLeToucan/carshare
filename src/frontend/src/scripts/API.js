@@ -171,14 +171,10 @@ class API {
         NOTIFS: "/notifications",
         MY_NOTIFS: "/notifications/my",
         ALL_NOITFS: "/notifications/all",
-        TRAVELS: {
-            CREATE: "/travels/create",
-            MY: {
-                PASSENGER: "/travels/my/passenger",
-                DRIVER: "/travels/my/driver",
-            },
-            SEARCH: "/travels/search",
-        }
+        TRAVELSC : "/travels/create",
+        TRAVELSP : "/travels/my/passenger",
+        TRAVELSD : "/travels/my/driver",
+        TRAVELSS : "/travels/search",
     };
 
     /**
