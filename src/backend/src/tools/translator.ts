@@ -727,6 +727,13 @@ const error = {
                 en: 'You have already replied to this request.'
             },
             code: 400
+        }),
+        alreadyBooked: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Vous avez déjà réservé ce trajet.',
+                en: 'You have already booked this travel.'
+            },
+            code: 400
         })
     }
 } satisfies TranslationsMessageHTTP;

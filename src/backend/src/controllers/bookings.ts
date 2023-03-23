@@ -173,8 +173,10 @@ exports.createBooking = (req: express.Request, res: express.Response, _: express
 
         if (!checkTravelHoursLimit(travel.etapes[0].date, req, res)) return;
 
-        const startEtape = travel.etapes.find((e) => e.id === departureIdSanitized);
-        const endEtape = travel.etapes.find((e) => e.id === arrivalIdSanitized);
+        const startEtapeIndex = travel.etapes.findIndex((e) => e.id === departureIdSanitized);
+        const endEtapeIndex = travel.etapes.findIndex((e) => e.id === arrivalIdSanitized);
+        const startEtape = travel.etapes[startEtapeIndex];
+        const endEtape = travel.etapes[endEtapeIndex];
         if (startEtape === undefined || endEtape === undefined) {
             sendMsg(req, res, error.travel.invalidEtapes);
             return;
@@ -199,47 +201,75 @@ exports.createBooking = (req: express.Request, res: express.Response, _: express
             return;
         }
 
-        // create booking
-        prisma.passenger.create({
-            data: {
-                status: properties.booking.status.pending,
-                passengerId: Number(res.locals.user.id),
-                departureId: startEtape.id,
-                arrivalId: endEtape.id
-            },
-            include: {
-                departure: true,
-                arrival: true,
-                passenger: true
-            }
-        }).then((booking) => {
-            const notifDriver = notifs.request.new('en', travel, res.locals.user, startEtape, endEtape, {
-                id: booking.id,
-                status: booking.status,
-                departureId: startEtape.id,
-                arrivalId: endEtape.id,
-                comment: null,
-                passengerId: booking.passengerId
-            });
-
-            // create driver's notification
-            prisma.notification.create({
+        const addBooking = () => {
+            prisma.passenger.create({
                 data: {
-                    ...notifDriver,
-                    userId: travel.driverId,
-                    senderId: Number(res.locals.user.id),
-                    bookingId: booking.id
+                    status: properties.booking.status.pending,
+                    passengerId: Number(res.locals.user.id),
+                    departureId: startEtape.id,
+                    arrivalId: endEtape.id
+                },
+                include: {
+                    departure: true,
+                    arrival: true,
+                    passenger: true
                 }
-            }).then(() => {
-                // send email notification to passenger
-                notify(travel.driver, notifDriver);
+            }).then((booking) => {
+                const notifDriver = notifs.request.new('en', travel, res.locals.user, startEtape, endEtape, {
+                    id: booking.id,
+                    status: booking.status,
+                    departureId: startEtape.id,
+                    arrivalId: endEtape.id,
+                    comment: null,
+                    passengerId: booking.passengerId
+                });
 
-                sendMsg(req, res, info.booking.created, travel.driver);
+                // create driver's notification
+                prisma.notification.create({
+                    data: {
+                        ...notifDriver,
+                        userId: travel.driverId,
+                        senderId: Number(res.locals.user.id),
+                        bookingId: booking.id
+                    }
+                }).then(() => {
+                    // send email notification to passenger
+                    notify(travel.driver, notifDriver);
+
+                    sendMsg(req, res, info.booking.created, travel.driver);
+                }).catch((err: any) => {
+                    console.error(err);
+                    sendMsg(req, res, error.generic.internalError);
+                });
             }).catch((err: any) => {
                 console.error(err);
                 sendMsg(req, res, error.generic.internalError);
             });
-        }).catch((err: any) => {
+        };
+
+        const userEtapesIds = Array.from(travel.etapes).splice(startEtapeIndex, endEtapeIndex - startEtapeIndex + 1).map((e) => e.id);
+        const arrivalAndDepartures: object[] = [];
+        userEtapesIds.forEach((id) => {
+            arrivalAndDepartures.push({ arrivalId: id });
+            arrivalAndDepartures.push({ departureId: id });
+        });
+
+        prisma.passenger.findFirst({
+            where: {
+                AND: [
+                    { passengerId: res.locals.user.id },
+                    {
+                        OR: arrivalAndDepartures
+                    }
+                ]
+            }
+        }).then((booking) => {
+            if (booking !== null) {
+                sendMsg(req, res, error.booking.alreadyBooked);
+                return;
+            }
+            addBooking();
+        }).catch(err => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);
         });
