@@ -251,7 +251,7 @@ exports.createBooking = (req: express.Request, res: express.Response, _: express
 };
 
 exports.cancelBooking = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const travelId = validator.sanitizeId(req.body.id, req, res);
+    const travelId = validator.sanitizeId(req.params.id, req, res);
     if (travelId === null) return;
 
     prisma.passenger.findMany({
