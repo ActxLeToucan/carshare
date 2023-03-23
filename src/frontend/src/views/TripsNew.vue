@@ -59,7 +59,7 @@
                             value=""
                         />
                     </card-border>
-                    <div class="flex flex-col grow justify-evenly items-center my-4 space-y-4">
+                    <div class="flex flex-col justify-evenly items-center my-4 space-y-4">
                         <!-- GROUP SELECTION -->
                         <card-border v-show="selectedTripType == 1">
                             <div
@@ -97,7 +97,7 @@
                                     {{ lang.GROUP_SELECTED }}
                                 </p>
                                 <button
-                                    class="p-2 mt-2 mx-auto text-slate-400 rounded-lg border-2 border-transparent hover:bg-slate-100 hover:border-slate-200 transition-all"
+                                    class="p-2 mt-2 mx-auto text-slate-400 rounded-lg border-2 border-transparent hover:bg-slate-100 hover:border-slate-200 hover:dark:bg-slate-600 hover:dark:border-slate-700 transition-all"
                                     @click="() => { $refs['group-popup'].show(); }"
                                 >
                                     <svg
@@ -124,18 +124,20 @@
                             </div>
                         </card-border>
                     </div>
-                    <div
-                        ref="log-zone"
-                        class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
-                        style="max-height: 0px;"
-                    />
-                    <div class="flex w-full md:justify-evenly justify-between items-end my-4 md:px-0 px-4">
-                        <button-text :action="goBack">
-                            {{ lang.CANCEL }}
-                        </button-text>
-                        <button-block :action="showValidatePopup">
-                            {{ lang.CREATE }}
-                        </button-block>
+                    <div class="flex h-fit w-full flex-col sticky bottom-0 my-4 space-y-4 bg-slate-50 dark:bg-slate-800">
+                        <div
+                            ref="log-zone"
+                            class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
+                            style="max-height: 0px;"
+                        />
+                        <div class="flex pb-4 w-full md:justify-evenly justify-between items-end md:px-0 px-4">
+                            <button-text :action="goBack">
+                                {{ lang.CANCEL }}
+                            </button-text>
+                            <button-block :action="showValidatePopup">
+                                {{ lang.CREATE }}
+                            </button-block>
+                        </div>
                     </div>
                 </div>
 
@@ -280,8 +282,8 @@
                 <button
                     v-for="group in groups"
                     :key="group.name"
-                    class="flex flex-col justify-center py-1 md:m-2 m-1 rounded-md bg-slate-100 px-2 w-fit max-w-[14em] border-2 border-transparent
-                            hover:border-slate-200 cursor-pointer transition-all"
+                    class="flex flex-col justify-center py-1 md:m-2 m-1 rounded-md bg-slate-100 bg-slate-700 px-2 w-fit max-w-[14em] border-2 border-transparent
+                            hover:border-slate-200 hover:dark:bg-slate-600 hover:dark:border-slate-700 cursor-pointer transition-all"
                     @click="() => { selectedGroup = group; $refs['group-popup'].hide(); }"
                 >
                     <p class="md:text-xl text-lg text-slate-500 font-bold mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full">
@@ -341,7 +343,6 @@ import {
     XMarkIcon
 } from '@heroicons/vue/24/outline';
 import API from '../scripts/API';
-import { getTypedValue } from '../scripts/data';
 
 const tripTypes = [
     { value: 0, id: 'TRIP_PUBLIC' },
@@ -435,7 +436,7 @@ export default {
         },
         createTrip(showlogs = true) {
             const toDestination = (obj) => !obj? null: ({label: obj.label, city: obj.city, context: obj.context, lat: obj.lat, lng: obj.lng});
-            const toStep = (obj) => !obj? null: ({date: new Date(obj.datetime).toISOString(), ...toDestination(obj.destination)});
+            const toStep = (obj) => !obj? null: ({date: obj.datetime != null ? new Date(obj.datetime).toISOString() : null, ...toDestination(obj.destination)});
 
             const groupID = this.selectedTripType == 1? this.selectedGroup?.id: null;
             const infos = this.$el.querySelector("textarea[name=trip-infos]").value;
@@ -468,7 +469,7 @@ export default {
                             if (!acc) return false;
                             if (!step) return false;
                             if (!step.label) return false;
-                            return true;
+                            return acc && true;
                         }, true)
                     ,
                     error: Lang.CurrentLang.DESTINATION_SPECIFY
@@ -479,7 +480,7 @@ export default {
                             if (!acc) return false;
                             if (!step) return false;
                             if (!step.date) return false;
-                            return true;
+                            return acc && true;
                         }, true)
                     ,
                     error: Lang.CurrentLang.DATETIME_SPECIFY
@@ -505,12 +506,12 @@ export default {
 
             return data;
         },
-        updateTripDesc() {
-            const data = this.createTrip();
+        updateTripDesc(showLogs = true) {
+            const data = this.createTrip(showLogs);
             if (!data) return false;
             let startDate = "";
 
-            const stylize = str => `<span class="text-slate-600 font-bold">${str}</span>`;
+            const stylize = str => `<span class="text-slate-600 dark:text-slate-200 font-bold">${str}</span>`;
             const getDate = date => {
                 if (!date) return undefined;
                 const strDate = new Date(date).toLocaleDateString();
@@ -578,7 +579,7 @@ export default {
             tripDesc.innerHTML = "";
             lines.forEach(line => {
                 const p = document.createElement("p");
-                p.classList.add("text-md", "text-gray-500", "font-semibold");
+                p.classList.add("text-md", "text-gray-500", "dark:text-gray-400", "font-semibold");
                 let text = line;
                 if (line.startsWith("\r")) {
                     p.classList.add("mt-4");
