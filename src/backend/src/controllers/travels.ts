@@ -2,7 +2,7 @@ import type express from 'express';
 import { prisma } from '../app';
 import * as validator from '../tools/validator';
 import { checkTravelHoursLimit } from '../tools/validator';
-import { displayableUserPublic, error, info, notifs, notify, sendMsg } from '../tools/translator';
+import { displayableTravelPublic, displayableUserPublic, error, info, notifs, notify, sendMsg } from '../tools/translator';
 import properties from '../properties';
 import { getMaxPassengers, preparePagination } from './_common';
 
@@ -277,8 +277,7 @@ exports.getTravel = (req: express.Request, res: express.Response, _: express.Nex
         where: { id: travelId },
         include: {
             etapes: true,
-            driver: true,
-            // TODO : include passengers
+            driver: true // TODO : include passenger
         }
     }).then((travel) => {
         if (travel === null) {

@@ -435,16 +435,18 @@ export default {
                 this.$refs["err-notfound"].classList.add("hidden");
             }
 
+            console.log(list);
+
             for (const el of list) {
                 this.trips.push({
                     id: el.id,
                     date: new Date(el.departure.date).toLocaleDateString(),
-                    author: el.driver.firstname + " " + el.driver.lastname?.substring(0, 1) + ".",
+                    author: el.driver.firstName + " " + el.driver.lastName?.substring(0, 1) + ".",
                     startCity: el.departure.city,
                     startTime: new Date(el.departure.date).toLocaleTimeString().substring(0, 5),
                     endCity: el.arrival.city,
                     endTime: new Date(el.arrival.date).toLocaleTimeString().substring(0, 5),
-                    slots: el.maxPassengers - (el.passengers == undefined ? 0 : el.passengers?.length),
+                    slots: el.maxPassengers - (el.passengers === undefined ? 0 : el.passengers) + " / " + el.maxPassengers,
                     price: el.price,
                 });
             }

@@ -39,7 +39,7 @@
                 <div class="flex grow justify-end">
                     <div class="flex w-full justify-between">
                         <p class="text-slate-500 text-lg font-bold">
-                            {{ trip.slots }} {{ trip.slots > 1 ? lang.SLOTS: lang.SLOT }}
+                            {{ trip.slots }} {{ Number(trip.slots.substr(trip.slots.length - 1, 1)) > 1 ? lang.SLOTS: lang.SLOT }}
                         </p>
                         <p class="text-slate-500 text-lg font-bold">
                             {{ trip.price }} €
