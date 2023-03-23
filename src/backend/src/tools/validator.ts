@@ -605,6 +605,14 @@ function checkNumberField (value: any, req: express.Request, res: express.Respon
     return true;
 }
 
+/**
+ * Check if a date is in the future ({@link properties.travel.hoursLimit} hours)
+ * If the date is not valid, send an error message to the client
+ * @param date Date to check
+ * @param req Express request
+ * @param res Express response
+ * @returns whether the date is in the future
+ */
 function checkTravelHoursLimit (date: Date, req: express.Request, res: express.Response): boolean {
     const now = new Date();
     if (dateAddHours(now, properties.travel.hoursLimit) > date) {
@@ -614,6 +622,12 @@ function checkTravelHoursLimit (date: Date, req: express.Request, res: express.R
     return true;
 }
 
+/**
+ * Add hours to a date
+ * @param date Date to add hours
+ * @param hours Hours to add
+ * @returns the new date
+ */
 function dateAddHours (date: Date, hours: number): Date {
     return new Date(date.getTime() + hours * 60 * 60 * 1000);
 }
@@ -641,5 +655,4 @@ export {
     checkNoteField,
     checkNumberField,
     checkTravelHoursLimit
-
 };
