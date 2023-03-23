@@ -79,14 +79,16 @@
                             >
                                 <button-block
                                     class="inline-block mr-4"
-                                    :action="() => acceptRequest(notif)"
+                                    :disabled="notif.locked"
+                                    :action="() => acceptOrReject(notif, true)"
                                 >
                                     Accepter
                                 </button-block>
                                 <button-block
                                     class="inline-block"
                                     color="red"
-                                    :action="() => refuseRequest(notif)"
+                                    :disabled="notif.locked"
+                                    :action="() => acceptOrReject(notif, false)"
                                 >
                                     Refuser
                                 </button-block>
@@ -97,18 +99,18 @@
                                 style="max-height: 0"
                             />
                         </div>
-                        <button-block
-                            v-show="isThereMore"
-                            :disabled="loading"
-                            class="w-fit mt-8 mx-auto"
-                            :action="getNotifs"
-                        >
-                            <PlusIcon class="w-7 h-7 mr-1.5 inline" />
-                            <p class="inline">
-                                {{ lang.LOAD_MORE }}
-                            </p>
-                        </button-block>
                     </card-border>
+                    <button-block
+                        v-show="isThereMore"
+                        :disabled="loading"
+                        class="w-fit mt-8 mx-auto"
+                        :action="getNotifs"
+                    >
+                        <PlusIcon class="w-7 h-7 mr-1.5 inline" />
+                        <p class="inline">
+                            {{ lang.LOAD_MORE }}
+                        </p>
+                    </button-block>
                 </div>
             </div>
         </div>
@@ -176,19 +178,16 @@ export default {
                 API.ROUTE.MY_NOTIFS + API.createPagination(this.next),
                 API.METHOD.GET,
                 User.CurrentUser?.getCredentials()
-            )
-                .then((data) => {
-                    this.upsertNotifs(...data.data);
-                    this.next = data.next;
-                    this.minorLoading = true;
-                })
-                .catch((err) => {
-                    this.error = err.message;
-                    this.notifs = [];
-                })
-                .finally(() => {
-                    this.loading = false;
-                });
+            ).then((data) => {
+                this.upsertNotifs(...data.data);
+                this.next = data.next;
+                this.minorLoading = true;
+            }).catch((err) => {
+                this.error = err.message;
+                this.notifs = [];
+            }).finally(() => {
+                this.loading = false;
+            });
         },
         upsertNotifs(...n) {
             const notifs = this.notifs;
@@ -211,17 +210,15 @@ export default {
                 `${API.ROUTE.NOTIFS}/${notif.id}`,
                 API.METHOD.DELETE,
                 User.CurrentUser?.getCredentials()
-            )
-                .then((_) => {
-                    this.notifs = this.notifs.filter((n) => n.id !== notif.id);
-                })
-                .catch((err) => {
-                    log.update(this.lang.ERROR + " : " + err.message, Log.ERROR);
-                    notif.locked = false;
-                    setTimeout(() => {
-                        log.delete();
-                    }, 6000);
-                });
+            ).then((_) => {
+                this.notifs = this.notifs.filter((n) => n.id !== notif.id);
+            }).catch((err) => {
+                log.update(this.lang.ERROR + " : " + err.message, Log.ERROR);
+                notif.locked = false;
+                setTimeout(() => {
+                    log.delete();
+                }, 6000);
+            });
         },
         setDeleteAllPopup(popup) {
             this.deleteAllPopup = popup;
@@ -236,29 +233,44 @@ export default {
                 API.ROUTE.ALL_NOITFS,
                 API.METHOD.DELETE,
                 User.CurrentUser?.getCredentials()
-            )
-                .then((_) => {
-                    this.notifs = [];
-                    log.update(this.lang.NOTIFS_DELETED, Log.SUCCESS);
-                    setTimeout(() => {
-                        log.delete();
-                        popup.hide();
-                    }, 2000);
-                })
-                .catch((err) => {
-                    log.update(this.lang.ERROR + " : " + err.message, Log.ERROR);
-                    setTimeout(() => {
-                        log.delete();
-                    }, 6000);
-                });
+            ).then((_) => {
+                this.notifs = [];
+                log.update(this.lang.NOTIFS_DELETED, Log.SUCCESS);
+                setTimeout(() => {
+                    log.delete();
+                    popup.hide();
+                }, 2000);
+            }).catch((err) => {
+                log.update(this.lang.ERROR + " : " + err.message, Log.ERROR);
+                setTimeout(() => {
+                    log.delete();
+                }, 6000);
+            });
         },
-        acceptRequest(notif) {
-            // TODO: send accept request with SENDER: ${notif.userId} and TRAVEL: ${notif.travelId} TO: ${notif.senderId}
-            notif.type = "request.old";
-        },
-        refuseRequest(notif) {
-            // TODO: send refuse request with SENDER: ${notif.userId} and TRAVEL: ${notif.travelId} TO: ${notif.senderId}
-            notif.type = "request.old";
+        acceptOrReject(notif, accept) {
+            notif.type = `request.${accept ? "accepted" : "rejected"}`;
+            notif.locked = true;
+            const log = this.notifLog(notif, this.lang.SENDING_RESPONSE + "...", Log.INFO);
+            API.execute_logged(
+                accept
+                    ? API.ROUTE.BOOKINGS.ACCEPT(notif.bookingId)
+                    : API.ROUTE.BOOKINGS.REJECT(notif.bookingId),
+                API.METHOD.PATCH,
+                User.CurrentUser?.getCredentials()
+            ).then((data) => {
+                log.update(data.message, Log.SUCCESS);
+                setTimeout(() => {
+                    log.delete();
+                    notif.locked = false;
+                }, 6000);
+            }).catch((err) => {
+                log.update(this.lang.ERROR + " : " + err.message, Log.ERROR);
+                setTimeout(() => {
+                    log.delete();
+                    notif.locked = false;
+                    notif.type = 'request';
+                }, 6000);
+            });
         },
         notifLog(notif, msg, type = Log.INFO) {
             if (!this.logZones[notif.id]) {

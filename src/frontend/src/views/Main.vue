@@ -126,52 +126,65 @@
                         </div>
                     </div>
                 </div>
-            
+            </div>
+
+            <div class="flex flex-col grow min-h-[50vh] w-full justify-center items-center">
                 <div
                     ref="log-zone"
                     class="flex flex-col w-full justify-center items-center min-h-max h-max transition-all"
                     style="max-height: 0px;"
                 />
 
-                <div class="flex grow min-h-[50vh]">
-                    <div
-                        ref="err-notfound"
-                        class="flex hidden grow h-fit py-8 justify-center items-center"
-                    >
-                        <card-border class="flex flex-col justify-center items-center">
-                            <p class="text-2xl text-slate-500 dark:text-slate-400 font-bold">
-                                {{ lang.NO_TRIPS }}
-                            </p>
-                            <p class="text-xl text-slate-400 dark:text-slate-500 font-semibold">
-                                {{ lang.NO_TRIPS_DESC }}
-                            </p>
-                        </card-border>
-                    </div>
-
-                    <div
-                        ref="err-fetch"
-                        class="flex hidden grow h-fit py-8 justify-center items-center"
-                    >
-                        <card-border class="flex flex-col justify-center items-center">
-                            <p class="text-2xl text-slate-500 dark:text-slate-400 font-bold">
-                                {{ lang.ERROR }}
-                            </p>
-                            <p
-                                ref="err-fetch-msg"
-                                class="text-xl text-slate-400 dark:text-slate-500 font-semibold"
-                            />
-                        </card-border>
-                    </div>
-
-                    <trip-card
-                        v-for="trip in trips"
-                        :key="trip.id"
-                        :trip="trip"
-                        class="mx-auto"
-                    />
+                <div
+                    ref="err-notfound"
+                    class="flex hidden grow h-fit w-full py-8 justify-center items-center"
+                >
+                    <card-border class="flex flex-col justify-center items-center">
+                        <p class="text-2xl text-slate-500 dark:text-slate-400 font-bold">
+                            {{ lang.NO_TRIPS }}
+                        </p>
+                        <p class="text-xl text-slate-400 dark:text-slate-500 font-semibold">
+                            {{ lang.NO_TRIPS_DESC }}
+                        </p>
+                    </card-border>
                 </div>
+
+                <div
+                    ref="err-fetch"
+                    class="flex hidden grow h-fit w-full fit py-8 justify-center items-center"
+                >
+                    <card-border class="flex flex-col justify-center items-center">
+                        <p class="text-2xl text-slate-500 dark:text-slate-400 font-bold">
+                            {{ lang.ERROR }}
+                        </p>
+                        <p
+                            ref="err-fetch-msg"
+                            class="text-xl text-slate-400 dark:text-slate-500 font-semibold"
+                        />
+                    </card-border>
+                </div>
+
+                <trip-card
+                    v-for="trip in trips"
+                    :key="trip.id"
+                    :trip="trip"
+                    class="mx-auto"
+                    @click="selectTrip(trip.id)"
+                />
             </div>
         </div>
+        <card-popup
+            ref="trip-details"
+            :show-validate="false"
+            :oncancel="onpopupcancel"
+        >
+            <trip-detail
+                ref="trip-comp"
+                :trip-id="selectedTripId"
+                :trip-start="startCity"
+                :trip-end="endCity"
+            />
+        </card-popup>
     </div>
 </template>
 
@@ -181,7 +194,9 @@ import InputText from '../components/inputs/InputText.vue';
 import Topbar from "../components/topbar/Topbar.vue";
 import Selector from '../components/inputs/Selector.vue';
 import TripCard from '../components/cards/TripCard.vue';
+import TripDetail from '../components/cards/TripDetail.vue';
 import CardBorder from '../components/cards/CardBorder.vue';
+import CardPopup from '../components/cards/CardPopup.vue';
 import { Log, LogZone } from '../scripts/Logs';
 import Car from '../components/Car.vue';
 import BAN from '../scripts/BAN.js';
@@ -294,10 +309,12 @@ export default {
         Selector,
         Car,
         CardBorder,
-        TripCard
+        TripCard,
+        TripDetail,
+        CardPopup
     },
     data() {
-        return { lang: Lang.CurrentLang, trips: [], startCity: {}, endCity: {} }
+        return { lang: Lang.CurrentLang, trips: [], startCity: {}, endCity: {}, selectedTripId: null }
     },
     mounted() {
         Lang.AddCallback(lang => this.lang = lang);
@@ -321,6 +338,8 @@ export default {
         this.endSelector.attachInput(this.endInput);
 
         this.logZone = new LogZone(this.$refs["log-zone"]);
+
+        window.action = () => { this.selectTrip(9); }
     },
     methods: {
         onstartselected(city) {
@@ -385,7 +404,7 @@ export default {
 
             msg_log.update(Lang.CurrentLang.SEARCHING + " ...", Log.INFO);
             API.execute_logged(API.ROUTE.TRAVELS.SEARCH + API.createParameters({
-                date: input_date.value,
+                date: new Date(input_date.value).toISOString(),
                 startCity: this.startCity.value,
                 endCity: this.endCity.value,
                 startContext: this.startCity.desc,
@@ -401,10 +420,14 @@ export default {
             });
         },
         setTrips(list) {
+            this.trips = [];
             if (typeof list == "string")
             {
                 this.$refs["err-fetch"].classList.remove("hidden");
                 this.$refs["err-fetch-msg"].innerText = list;
+                return;
+            } else if (typeof list == "object" && list.message) {
+                this.$refs["err-fetch"].classList.add("hidden");
                 return;
             } else {
                 this.$refs["err-fetch"].classList.add("hidden");
@@ -417,20 +440,33 @@ export default {
                 this.$refs["err-notfound"].classList.add("hidden");
             }
 
-            this.trips = [];
+            console.log(list);
+
             for (const el of list) {
-                console.log(el)
                 this.trips.push({
-                    date: el.steps == null ? "--noinfo--" : el.steps[0]?.date.toLocalDateString(),
-                    author: el.driver == null ? (el.driverId == undefined ? "--noinfo--" : "ID : " + el.driverId) : el.driver.firstName + el.driver.lastName.substring(0, 1) + ".",
-                    startCity: el.steps == null ? "--noinfo--" : el.steps[0]?.label,
-                    startTime: el.steps == null ? "--noinfo--" : el.steps[0]?.date.toLocalTimeString().substring(0, 5),
-                    endCity: el.steps == null ? "--noinfo--" : el.steps[el.steps.length - 1]?.label,
-                    endTime: el.steps == null ? "--noinfo--" : el.steps[el.steps.length - 1]?.date.toLocalTimeString().substring(0, 5),
-                    slots: el.maxPassengers - (el.passengers == undefined ? 0 : el.passengers?.length),
+                    id: el.id,
+                    date: new Date(el.departure.date).toLocaleDateString(),
+                    author: el.driver.firstName + " " + el.driver.lastName?.substring(0, 1) + ".",
+                    startCity: el.departure.city,
+                    startTime: new Date(el.departure.date).toLocaleTimeString().substring(0, 5),
+                    endCity: el.arrival.city,
+                    endTime: new Date(el.arrival.date).toLocaleTimeString().substring(0, 5),
+                    slots: el.maxPassengers - (el.passengers === undefined ? 0 : el.passengers) + " / " + el.maxPassengers,
                     price: el.price,
                 });
             }
+        },
+        selectTrip(id) {
+            this.$refs["trip-comp"].setPopup(this.$refs["trip-details"]);
+            this.selectedTripId = null;
+            this.selectedTripId = id;
+            const popup = this.$refs["trip-details"];
+            popup.setTitle(Lang.CurrentLang.TRIP_DETAILS);
+            popup.show();
+        },
+        onpopupcancel(popup) {
+            popup.hide();
+            this.selectedTripId = null;
         }
     }
 }

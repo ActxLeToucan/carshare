@@ -1,11 +1,11 @@
 import type express from 'express';
-import { displayableGroup, error, info, sendMsg, type Notif, notifs, notify } from '../tools/translator';
+import {displayableGroup, error, info, sendMsg, type Notif, notifs, notify} from '../tools/translator';
 import * as validator from '../tools/validator';
-import { prisma } from '../app';
-import { type Pagination, preparePagination } from './_common';
+import {prisma} from '../app';
+import {type Pagination, preparePagination} from './_common';
 
 exports.createGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const { name } = req.body;
+    const {name} = req.body;
     if (!validator.checkGroupNameField(name, req, res)) return;
     prisma.group.create({
         data: {
@@ -42,7 +42,7 @@ exports.searchGroups = (req: express.Request, res: express.Response, next: expre
     }));
 }
 
-function getGroups (req: express.Request, res: express.Response, next: express.NextFunction, searchMode: boolean, where: (pagination: Pagination) => any) {
+function getGroups(req: express.Request, res: express.Response, next: express.NextFunction, searchMode: boolean, where: (pagination: Pagination) => any) {
     const pagination = preparePagination(req, searchMode);
 
     prisma.group.count().then((count) => {
@@ -66,7 +66,7 @@ function getGroups (req: express.Request, res: express.Response, next: express.N
 }
 
 exports.addUserGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const { userMail } = req.body;
+    const {userMail} = req.body;
     if (!validator.checkEmailField(userMail, req, res)) return;
 
     const groupId = validator.sanitizeId(req.params.id, req, res);
@@ -142,7 +142,7 @@ exports.addUserGroup = (req: express.Request, res: express.Response, _: express.
                             createdAt: new Date()
                         };
 
-                    prisma.notification.createMany({ data }).then(() => {
+                    prisma.notification.createMany({data}).then(() => {
                         notify(user, data);
 
                         sendMsg(req, res, info.group.userAdd, group);
@@ -158,6 +158,38 @@ exports.addUserGroup = (req: express.Request, res: express.Response, _: express.
                 console.error(err);
                 sendMsg(req, res, error.generic.internalError);
             });
+        }).catch((err) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
+    }).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
+}
+
+
+exports.deleteGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    const groupId = validator.sanitizeId(req.params.id, req, res);
+    if (groupId === null) return;
+
+    prisma.group.count({
+        where: {
+            id: groupId
+        }
+
+    }).then((count) => {
+        if (count <= 0) {
+            sendMsg(req, res, error.group.notFound);
+            return;
+        }
+        prisma.group.delete({
+            where: {
+                id: groupId
+
+            }
+        }).then(() => {
+            sendMsg(req, res, info.group.deleted);
         }).catch((err) => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);

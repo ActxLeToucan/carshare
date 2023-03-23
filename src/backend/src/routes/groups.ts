@@ -12,5 +12,5 @@ router.post('/:id/member', auth.access, emailVerified, controller.addUserGroup);
 
 // admin routes
 router.get('/', auth.access, emailVerified, admin, controller.searchGroups);
-
+router.delete('/:id', auth.access, emailVerified, admin, controller.deleteGroup);
 module.exports = router;

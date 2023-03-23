@@ -1,5 +1,5 @@
 import { type Request, type Response } from 'express';
-import { type User, type Travel, type Group, type Etape, type Passenger } from '@prisma/client';
+import { type User, type Travel, type Group, type Etape, type Passenger, type Notification, type Evaluation } from '@prisma/client';
 
 import properties from '../properties';
 import { sendMail as mailerSend } from './mailer';
@@ -42,12 +42,16 @@ export interface MessageHTTP {
 interface TemplateNotif {
     title: Variants
     message: Variants
+    type: string
+    createdAt: Date
     data?: any
 }
 
 export interface Notif {
     title: string
     message: string
+    type: string
+    createdAt: Date
     data?: any
 }
 
@@ -535,6 +539,13 @@ const error = {
                 en: `Field "${fieldName}" must be greater than or equal to ${min}.`
             },
             code: 400
+        }),
+        max: (req: Request, fieldName: string, max: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Le champ "${fieldName}" doit être inférieur ou égal à ${max}.`,
+                en: `Field "${fieldName}" must be less than or equal to ${max}.`
+            },
+            code: 400
         })
     },
     string: {
@@ -642,6 +653,29 @@ const error = {
             code: 400
         })
     },
+    evaluation: {
+        notpossible: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Vous n\'avez jamais fait de trajet avec la personne que vous voulez évaluer.',
+                en: 'You have never made a trip with the person you want to evaluate.'
+            },
+            code: 404
+        }),
+        alreadyNoted: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Vous avez déjà noté cet utilisateur.',
+                en: 'You have already noted this user.'
+            },
+            code: 404
+        }),
+        notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Evaluation introuvable.',
+                en: 'Evaluation not found.'
+            },
+            code: 404
+        })
+    },
     travel: {
         notModifiable: (req: Request, hours: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
@@ -664,10 +698,47 @@ const error = {
             },
             code: 403
         }),
+        isDriver: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Vous êtes le conducteur de ce trajet.',
+                en: 'You are the driver of this travel.'
+            },
+            code: 403
+        }),
         notOpen: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Ce trajet n\'est plus ouvert.',
                 en: 'This travel is no longer open.'
+            },
+            code: 400
+        }),
+        noSeats: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Ce trajet n\'a plus de place.',
+                en: 'This travel has no more seats.'
+            },
+            code: 400
+        }),
+        invalidEtapes: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Les étapes ne sont pas valides.',
+                en: 'The steps are not valid.'
+            },
+            code: 400
+        })
+    },
+    booking: {
+        notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Réservation introuvable.',
+                en: 'Booking not found.'
+            },
+            code: 404
+        }),
+        alreadyReplied: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Vous avez déjà répondu à cette demande.',
+                en: 'You have already replied to this request.'
             },
             code: 400
         })
@@ -794,6 +865,13 @@ const info = {
             data: {
                 group: displayableGroup(group)
             }
+        }),
+        deleted: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Groupe supprimé',
+                en: 'Group removed'
+            },
+            code: 200
         })
     },
     notification: {
@@ -811,8 +889,49 @@ const info = {
             },
             code: 200
         })
+    },
+    evaluation: {
+        created: (req: Request, evaluation: Evaluation & { travel: Travel, evaluated: User, evaluator: User }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Évaluation enregistrée',
+                en: 'Recorded evaluation'
+            },
+            code: 201,
+            data: {
+                evaluation: displayableEvaluation(evaluation)
+            }
+        }),
+        deleted: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Evaluation retirée',
+                en: 'Evaluation removed'
+            },
+            code: 200
+        })
+    },
+    booking: {
+        accepted: (req: Request, user: User) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Vous venez d'accepter la demande de ${user.firstName ?? ''} ${user.lastName ?? ''}.`,
+                en: `You have just accepted the request of ${user.firstName ?? ''} ${user.lastName ?? ''}.`
+            },
+            code: 200
+        }),
+        rejected: (req: Request, user: User) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Vous venez de refuser la demande de ${user.firstName ?? ''} ${user.lastName ?? ''}.`,
+                en: `You have just rejected the request of ${user.firstName ?? ''} ${user.lastName ?? ''}.`
+            },
+            code: 200
+        }),
+        created: (req: Request, user: User) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Vous venez de demander à rejoindre le trajet de ${user.firstName ?? ''} ${user.lastName ?? ''}.`,
+                en: `You have asked to join ${user.firstName ?? ''} ${user.lastName ?? ''}'s trip.`
+            },
+            code: 200
+        })
     }
-
 } satisfies TranslationsMessageHTTP;
 
 const mail = {
@@ -947,11 +1066,11 @@ const mail = {
                 ${notification.title}
                 ${new Date(notification.createdAt).toLocaleString('fr-FR')}
                 ${notification.message}
-                
+
                 ${notification.type === 'request'
                     ? `\nPour accepter ou refuser cette demande, rendez-vous sur votre espace personnel : ${String(properties.url.notifs)}\n`
                     : ''}
-                
+
                 Cordialement,
                 L'équipe de ${process.env.FRONTEND_NAME ?? ''}`,
                 en: `Hello ${user.firstName ?? ''} ${user.lastName ?? ''},
@@ -959,11 +1078,11 @@ const mail = {
                 ${notification.title}
                 ${new Date(notification.createdAt).toLocaleString('en-US')}
                 ${notification.message}
-                
+
                 ${notification.type === 'request'
                     ? `\nTo accept or refuse this request, go to your personal space : ${String(properties.url.notifs)}\n`
                     : ''}
-                    
+
                 Best regards,
                 The ${process.env.FRONTEND_NAME ?? ''} team`
             }
@@ -989,21 +1108,59 @@ const notifs = {
                     (passenger.comment === null || passenger.comment === ''
                         ? ''
                         : `\n\n${sender.firstName ?? ''} ${sender.lastName ?? ''} left you the following message:\n${passenger.comment ?? ''}`)
-            }
+            },
+            type: 'request',
+            createdAt: new Date()
+        }),
+        accepted: (lang: string, oldNotif: Notification, passenger: User, date: Date) => msgForLang<TemplateNotif, Notif>(lang, {
+            title: {
+                fr: `Demande de ${passenger.firstName ?? ''} ${passenger.lastName ?? ''} acceptée`,
+                en: `Request from ${passenger.firstName ?? ''} ${passenger.lastName ?? ''} accepted`
+            },
+            message: {
+                fr: `${oldNotif.message}
+                \n\n =====================
+                \n\nVous avez accepté la demande de ${passenger.firstName ?? ''} ${passenger.lastName ?? ''} le ${date.toLocaleString('fr-FR')}.`,
+                en: `${oldNotif.message}
+                \n\n =====================
+                \n\nYou accepted the request from ${passenger.firstName ?? ''} ${passenger.lastName ?? ''} on ${date.toLocaleString('en-US')}.`
+            },
+            type: 'request.accepted',
+            createdAt: date
+        }),
+        rejected: (lang: string, oldNotif: Notification, passenger: User, date: Date) => msgForLang<TemplateNotif, Notif>(lang, {
+            title: {
+                fr: `Demande de ${passenger.firstName ?? ''} ${passenger.lastName ?? ''} refusée`,
+                en: `Request from ${passenger.firstName ?? ''} ${passenger.lastName ?? ''} rejected`
+            },
+            message: {
+                fr: `${oldNotif.message}
+                \n\n =====================
+                \n\nVous avez refusé la demande de ${passenger.firstName ?? ''} ${passenger.lastName ?? ''} le ${date.toLocaleString('fr-FR')}.`,
+                en: `${oldNotif.message}
+                \n\n =====================
+                \n\nYou rejected the request from ${passenger.firstName ?? ''} ${passenger.lastName ?? ''} on ${date.toLocaleString('en-US')}.`
+            },
+            type: 'request.rejected',
+            createdAt: date
         })
     },
-    standard: {
-        travelCancelled: (lang: string, passenger: (Passenger & { departure: Etape, arrival: Etape, passenger: User })) => msgForLang<TemplateNotif, Notif>(lang, {
+    travel: {
+        cancelled: (lang: string, booking: Passenger & { departure: Etape, arrival: Etape } & Record<string, any>) => msgForLang<TemplateNotif, Notif>(lang, {
             title: {
                 fr: 'Annulation de trajet',
                 en: 'Travel cancelled'
             },
             message: {
-                fr: `Votre trajet de ${passenger.departure.city} à ${passenger.arrival.city} du ${new Date(passenger.departure.date).toLocaleString('fr-FR')} a été annulé par le conducteur.`,
-                en: `Your trip from ${passenger.departure.city} to ${passenger.arrival.city} on ${new Date(passenger.departure.date).toLocaleString('en-US')} has been cancelled by the driver.`
-            }
-        }),
-        userAdd: (lang: string, group: Group) => msgForLang<TemplateNotif, Notif>(lang, {
+                fr: `Votre trajet de ${booking.departure.city} à ${booking.arrival.city} du ${new Date(booking.departure.date).toLocaleString('fr-FR')} a été annulé par le conducteur.`,
+                en: `Your trip from ${booking.departure.city} to ${booking.arrival.city} on ${new Date(booking.departure.date).toLocaleString('en-US')} has been cancelled by the driver.`
+            },
+            type: 'standard',
+            createdAt: new Date()
+        })
+    },
+    group: {
+        userAdded: (lang: string, group: Group) => msgForLang<TemplateNotif, Notif>(lang, {
             title: {
                 fr: 'Ajout dans un groupe',
                 en: 'Adding to a group'
@@ -1011,7 +1168,55 @@ const notifs = {
             message: {
                 fr: `Vous avez été ajouté dans le groupe ${group.name}, vous recevrez toutes les notifications de ce groupe.`,
                 en: `You have been added to the group ${group.name}, you will receive all notifications from this group.`
-            }
+            },
+            type: 'standard',
+            createdAt: new Date()
+        })
+    },
+    booking: {
+        accepted: (lang: string, booking: Passenger & { departure: Etape, arrival: Etape } & Record<string, any>) => msgForLang<TemplateNotif, Notif>(lang, {
+            title: {
+                fr: 'Réservation acceptée',
+                en: 'Booking accepted'
+            },
+            message: {
+                fr: `Votre réservation pour le trajet ${booking.departure.city} - ${booking.arrival.city} du ${new Date(booking.departure.date).toLocaleString('fr-FR')} a été acceptée par le conducteur.`,
+                en: `Your booking for the trip ${booking.departure.city} - ${booking.arrival.city} on ${new Date(booking.departure.date).toLocaleString('en-US')} has been accepted by the driver.`
+            },
+            type: 'standard',
+            createdAt: new Date()
+        }),
+        rejected: (lang: string, booking: Passenger & { departure: Etape, arrival: Etape } & Record<string, any>) => msgForLang<TemplateNotif, Notif>(lang, {
+            title: {
+                fr: 'Réservation refusée',
+                en: 'Booking rejected'
+            },
+            message: {
+                fr: `Votre réservation pour le trajet ${booking.departure.city} - ${booking.arrival.city} du ${new Date(booking.departure.date).toLocaleString('fr-FR')} a été refusée par le conducteur.`,
+                en: `Your booking for the trip ${booking.departure.city} - ${booking.arrival.city} on ${new Date(booking.departure.date).toLocaleString('en-US')} has been rejected by the driver.`
+            },
+            type: 'standard',
+            createdAt: new Date()
+        })
+    },
+    general: {
+        welcome: (lang: string, user: User) => msgForLang<TemplateNotif, Notif>(lang, {
+            title: {
+                fr: `Bienvenue sur ${process.env.FRONTEND_NAME ?? ''} !`,
+                en: `Welcome to ${process.env.FRONTEND_NAME ?? ''} !`
+            },
+            message: {
+                fr: `Bonjour ${user.firstName ?? ''} ${user.lastName ?? ''} !\n\n` +
+                    'Nous sommes ravis de vous compter parmi nous !\n' +
+                    `Si ce n'est pas déjà fait, pensez à vérifier votre adresse mail pour accéder à l'ensemble des fonctionnalités de ${process.env.FRONTEND_NAME ?? ''} !\n\n` +
+                    'À bientôt !',
+                en: `Hello ${user.firstName ?? ''} ${user.lastName ?? ''} !\n\n` +
+                    'We are delighted to welcome you among us !\n' +
+                    `If it is not already done, don't forget to verify your email address to access all the features of ${process.env.FRONTEND_NAME ?? ''} !\n\n` +
+                    'See you soon !'
+            },
+            type: 'standard',
+            createdAt: new Date()
         })
     }
 } satisfies TranslationsNotif;
@@ -1090,7 +1295,7 @@ async function sendMail (req: Request, message: (req: Request, ...args: any) => 
  * @param notification Notification to send
  */
 function notify (user: User, notification: { type: string | null, title: string, message: string, createdAt: Date } & Record<string, any>) {
-    if (!user.mailNotif) return;
+    if (!user.mailNotif || user.emailVerifiedOn === null) return;
     mailerSend(mail.notification.new('en', user, notification)) // TODO: get user's language
         .then(() => {
             console.log(`Notification sent to ${user.email}.`);
@@ -1126,6 +1331,17 @@ function displayableUserPublic (user: User): Partial<User> {
 }
 
 /**
+ * Returns a travel without some properties for display to other users
+ * @param travel Travel to display
+ */
+function displayableTravelPublic (travel: Travel): Partial<Travel> {
+    const t = Object.assign({}, travel) as any;
+    delete t.groupId;
+    t.driver = displayableUserPublic(t.driver);
+    return t;
+}
+
+/**
  * Returns a group without some properties for display to all users
  * @param group Group to display
  */
@@ -1150,6 +1366,23 @@ function displayableAverage (value: any) {
     return p;
 }
 
+/**
+ * Returns a user without some properties for display to other users
+ * @param user User to display
+ * @returns User without some properties
+ * @see displayableUserPrivate
+ */
+function displayableEvaluation (evaluation: Evaluation & { travel: Travel, evaluated: User, evaluator: User }) {
+    const g = evaluation as any;
+    g.evaluated = displayableUserPublic(g.evaluated);
+    g.evaluator = displayableUserPublic(g.evaluator);
+    delete g.createdAt;
+    delete g.travelId;
+    delete g.evaluatedId;
+    delete g.evaluatorId;
+    return g;
+}
+
 export {
     error,
     info,
@@ -1160,6 +1393,8 @@ export {
     notify,
     displayableUserPrivate,
     displayableUserPublic,
+    displayableTravelPublic,
     displayableGroup,
-    displayableAverage
+    displayableAverage,
+    displayableEvaluation
 };
