@@ -131,15 +131,15 @@ exports.addUserGroup = (req: express.Request, res: express.Response, _: express.
                         creator: true
                     }
                 }).then((group) => {
-                    const notif: Notif = notifs.standard.userAdd('en', group);
+                    const notif: Notif = notifs.group.userAdded('en', group);
                     const data =
                         {
                             userId,
                             title: notif.title,
                             message: notif.message,
-                            type: 'standard',
+                            type: notif.type,
                             senderId: Number(res.locals.user.id),
-                            createdAt: new Date()
+                            createdAt: notif.createdAt
                         };
 
                     prisma.notification.createMany({data}).then(() => {

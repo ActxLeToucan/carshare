@@ -1454,7 +1454,6 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
-
   /groups/:id/member:
     post:
       summary: Add a new member
