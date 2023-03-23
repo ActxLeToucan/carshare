@@ -2,7 +2,7 @@ import type express from 'express';
 import { prisma } from '../app';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { displayableUserPrivate, error, info, mail, sendMail, sendMsg } from '../tools/translator';
+import { displayableUserPrivate, error, info, mail, notifs, sendMail, sendMsg } from '../tools/translator';
 import * as validator from '../tools/validator';
 import * as _user from './users/_common';
 import { preparePagination } from './_common';
@@ -31,6 +31,7 @@ exports.signup = (req: express.Request, res: express.Response, _: express.NextFu
 
             bcrypt.hash(password, properties.password.salt)
                 .then((hash) => {
+                    // TODO: save user's language
                     prisma.user.create({
                         data: {
                             email,
@@ -43,15 +44,28 @@ exports.signup = (req: express.Request, res: express.Response, _: express.NextFu
                             gender: genderSanitized
                         }
                     }).then((user) => {
-                        const token = jwt.sign(
-                            {
-                                userId: user.id,
-                                type: 'access'
-                            },
-                            process.env.JWT_SECRET ?? 'secret',
-                            { expiresIn: properties.token.access.expiration }
-                        );
-                        sendMsg(req, res, info.user.created, user, token);
+                        const notif = notifs.general.welcome('en', user); // TODO: use user's language
+                        prisma.notification.create({
+                            data: {
+                                user: { connect: { id: user.id } },
+                                title: notif.title,
+                                message: notif.message,
+                                type: 'standard'
+                            }
+                        }).then(() => {
+                            const token = jwt.sign(
+                                {
+                                    userId: user.id,
+                                    type: 'access'
+                                },
+                                process.env.JWT_SECRET ?? 'secret',
+                                { expiresIn: properties.token.access.expiration }
+                            );
+                            sendMsg(req, res, info.user.created, user, token);
+                        }).catch((err) => {
+                            console.error(err);
+                            sendMsg(req, res, error.generic.internalError);
+                        });
                     }).catch((err) => {
                         console.error(err);
                         sendMsg(req, res, error.generic.internalError);
