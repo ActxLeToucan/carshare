@@ -66,10 +66,11 @@ function getGroups (req: express.Request, res: express.Response, next: express.N
 }
 
 exports.addUserGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const { groupId, userMail } = req.body;
-
+    const { userMail } = req.body;
     if (!validator.checkEmailField(userMail, req, res)) return;
-    if (!validator.checkNumberField(groupId, req, res, 'groupId')) return;
+
+    const groupId = validator.sanitizeId(req.params.id, req, res);
+    if (groupId === null) return;
 
     prisma.group.count({
         where: {
