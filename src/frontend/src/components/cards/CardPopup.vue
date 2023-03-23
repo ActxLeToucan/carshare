@@ -10,7 +10,10 @@
             >
                 {{ m_title }}
             </h1>
-            <div class="flex flex-col">
+            <div
+                v-show="content != '' && content != null && content != undefined"
+                class="flex flex-col"
+            >
                 <p
                     v-for="line in content.split(/\n|\\n/g)"
                     :key="line"
@@ -20,6 +23,7 @@
                 </p>
             </div>
             <div
+                v-show="content != '' && content != null && content != undefined"
                 ref="log-zone"
                 class="flex flex-col w-full justify-center items-center min-h-max h-max transition-all"
                 style="max-height: 0px;"

@@ -19,6 +19,8 @@ export default {
     INFORMATIONS: "Informations",
     STEPS: "Steps",
     DEFAULT: "Default",
+    SENDING_RESPONSE: "Sending response",
+    DELETING: "Deleting",
 
     // languages
     ENGLISH: "English",
@@ -120,6 +122,15 @@ export default {
     DATE_SPECIFY: "Please specify the trip date",
     NO_TRIPS: "No trips found",
     NO_TRIPS_DESC: "No trips found for the selected informations",
+    TRIP_DETAILS: "Trip details",
+    PASSENGERS: "Passengers",
+    NO_PASSENGERS: "There is no passenger for this trip yet",
+    TRIP_DESTINATIONS: "Trip destinations",
+    BOOK_TRIP: "Book the trip",
+    DRIVER: "Driver",
+
+    // trips
+    TRIP_TITLE: "Consultation du trajet",
 
     // profile
     MY_PROFILE: "My profile",

@@ -30,12 +30,13 @@ app.get('/', (req, res) => {
 });
 
 app.use('/docs', require('./routes/docs'));
-app.use('/users', dbNeeded, require('./routes/users'));
-app.use('/travels', dbNeeded, require('./routes/travels'));
-app.use('/notifications', dbNeeded, require('./routes/notifications'));
-app.use('/settings', dbNeeded, require('./routes/settings'));
+app.use('/bookings', dbNeeded, require('./routes/bookings'));
 app.use('/groups', dbNeeded, require('./routes/groups'));
 app.use('/notations', dbNeeded, require('./routes/notations'));
+app.use('/notifications', dbNeeded, require('./routes/notifications'));
+app.use('/settings', dbNeeded, require('./routes/settings'));
+app.use('/travels', dbNeeded, require('./routes/travels'));
+app.use('/users', dbNeeded, require('./routes/users'));
 
 app.use((req, res) => {
     sendMsg(req, res, error.generic.routeNotFound);

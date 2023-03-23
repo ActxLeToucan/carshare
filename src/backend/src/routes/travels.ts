@@ -7,6 +7,7 @@ const emailVerified = require('../middlewares/emailVerified');
 
 router.use('/my', auth.access, require('./travels/my'));
 router.get('/search', auth.access, controller.searchTravels);
+router.get('/:id', auth.access, emailVerified, controller.getTravel);
 router.post('/create', auth.access, emailVerified, controller.createTravel);
 router.delete('/my/:id', auth.access, emailVerified, controller.cancelMyTravel); // TODO: à déplacer dans my.ts quand on aura aussi la route de suppression par l'admin
 

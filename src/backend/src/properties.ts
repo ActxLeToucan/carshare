@@ -95,6 +95,14 @@ const properties = {
             ended: 1
         },
         hoursLimit: 24
+    },
+    booking: {
+        status: {
+            cancelled: -1,
+            pending: 0,
+            accepted: 1, // this value can not be changed, it is used in the database
+            rejected: 2
+        }
     }
 } satisfies Record<string, Record<string, any>>;
 
