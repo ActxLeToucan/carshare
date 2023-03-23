@@ -182,10 +182,7 @@ class API {
             ACCEPT: (id) => `/bookings/${id}/accept`,
             REJECT: (id) => `/bookings/${id}/reject`,
         }
-        TRAVELSC : "/travels/create",
-        TRAVELSP : "/travels/my/passenger",
-        TRAVELSD : "/travels/my/driver",
-        TRAVELSS : "/travels/search",
+     
     };
 
     /**
