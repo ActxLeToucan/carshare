@@ -2,7 +2,7 @@ import type express from 'express';
 import { prisma } from '../app';
 import * as validator from '../tools/validator';
 import { checkTravelHoursLimit } from '../tools/validator';
-import { displayableUserPublic, error, info, notifs, notify, sendMsg } from '../tools/translator';
+import { displayableTravelPublic, displayableUserPublic, error, info, notifs, notify, sendMsg } from '../tools/translator';
 import properties from '../properties';
 import { getMaxPassengers, preparePagination } from './_common';
 
@@ -263,6 +263,28 @@ exports.getTravels = (req: express.Request, res: express.Response, _: express.Ne
             console.error(err);
             sendMsg(req, res, error.generic.internalError);
         });
+    }).catch(err => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
+}
+
+exports.getTravel = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    const travelId = validator.sanitizeId(req.params.id, req, res);
+    if (travelId === null) return;
+
+    prisma.travel.findUnique({
+        where: { id: travelId },
+        include: {
+            etapes: true,
+            driver: true // TODO : include passenger
+        }
+    }).then((travel) => {
+        if (travel === null) {
+            sendMsg(req, res, error.travel.notFound);
+            return;
+        }
+        res.status(200).json(displayableTravelPublic(travel));
     }).catch(err => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
