@@ -903,7 +903,7 @@ const info = {
         created: (req: Request, user: User) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: `Vous venez de demander à rejoindre le trajet de ${user.firstName ?? ''} ${user.lastName ?? ''}.`,
-                en: `You have asked to join ${user.firstName ?? ''} ${user.lastName ?? ''} trip.`
+                en: `You have asked to join ${user.firstName ?? ''} ${user.lastName ?? ''}'s trip.`
             },
             code: 200
         })
@@ -1300,18 +1300,7 @@ function displayableTravelPublic (travel: Travel): Partial<Travel> {
     const t = Object.assign({}, travel) as any;
     delete t.groupId;
     t.driver = displayableUserPublic(t.driver);
-    t.etapes = t.etapes.map(displayableEtapePublic);
     return t;
-}
-
-/**
- * Returns an etape without some properties for display to other users
- * @param etape Etape to display
- */
-function displayableEtapePublic (etape: Etape): Partial<Etape> {
-    const e = Object.assign({}, etape) as any;
-    delete e.travelId;
-    return e;
 }
 
 /**
@@ -1367,7 +1356,6 @@ export {
     displayableUserPrivate,
     displayableUserPublic,
     displayableTravelPublic,
-    displayableEtapePublic,
     displayableGroup,
     displayableAverage,
     displayableEvaluation

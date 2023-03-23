@@ -146,9 +146,13 @@ exports.createBooking = (req: express.Request, res: express.Response, _: express
     const { travelId, departureId, arrivalId } = req.body;
 
     const travelIdSanitized = validator.sanitizeId(travelId, req, res);
-    const departureIdSanitized = validator.sanitizeId(departureId, req, res);
-    const arrivalIdSanitized = validator.sanitizeId(arrivalId, req, res);
     if (travelIdSanitized === null) return;
+
+    const departureIdSanitized = validator.sanitizeId(departureId, req, res);
+    if (departureIdSanitized === null) return;
+
+    const arrivalIdSanitized = validator.sanitizeId(arrivalId, req, res);
+    if (arrivalIdSanitized === null) return;
 
     prisma.travel.findUnique({
         where: { id: travelIdSanitized },
@@ -200,8 +204,8 @@ exports.createBooking = (req: express.Request, res: express.Response, _: express
             data: {
                 status: properties.booking.status.pending,
                 passengerId: Number(res.locals.user.id),
-                departureId: travel.etapes[0].id,
-                arrivalId: travel.etapes[travel.etapes.length - 1].id
+                departureId: startEtape.id,
+                arrivalId: endEtape.id
             },
             include: {
                 departure: true,
@@ -214,7 +218,7 @@ exports.createBooking = (req: express.Request, res: express.Response, _: express
                 status: booking.status,
                 departureId: startEtape.id,
                 arrivalId: endEtape.id,
-                comment: '',
+                comment: null,
                 passengerId: booking.passengerId
             });
 
