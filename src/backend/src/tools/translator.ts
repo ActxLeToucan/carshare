@@ -498,6 +498,20 @@ const error = {
                 en: 'Group id must be a number.'
             },
             code: 400
+        }),
+        creatorMember: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Le créateur du groupe ne peut pas être un membre.',
+                en: 'The creator of the group cannot be a member.'
+            },
+            code: 400
+        }),
+        alreadyMember: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'L\'utilisateur est déjà dans le groupe.',
+                en: 'The user is already in the group.'
+            },
+            code: 400
         })
     },
     number: {
@@ -770,6 +784,16 @@ const info = {
             data: {
                 group: displayableGroup(group)
             }
+        }),
+        userAdd: (req: Request, group: Group & { users: User[], creator: User }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Utilisateur ajouter',
+                en: 'User add'
+            },
+            code: 201,
+            data: {
+                group: displayableGroup(group)
+            }
         })
     },
     notification: {
@@ -977,6 +1001,16 @@ const notifs = {
             message: {
                 fr: `Votre trajet de ${passenger.departure.city} à ${passenger.arrival.city} du ${new Date(passenger.departure.date).toLocaleString('fr-FR')} a été annulé par le conducteur.`,
                 en: `Your trip from ${passenger.departure.city} to ${passenger.arrival.city} on ${new Date(passenger.departure.date).toLocaleString('en-US')} has been cancelled by the driver.`
+            }
+        }),
+        userAdd: (lang: string, group: Group) => msgForLang<TemplateNotif, Notif>(lang, {
+            title: {
+                fr: 'Ajout dans un groupe',
+                en: 'Adding to a group'
+            },
+            message: {
+                fr: `Vous avez été ajouté dans le groupe ${group.name}, vous recevrez toutes les notifications de ce groupe.`,
+                en: `You have been added to the group ${group.name}, you will receive all notifications from this group.`
             }
         })
     }

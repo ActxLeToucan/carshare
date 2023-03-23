@@ -8,6 +8,7 @@ const admin = require('../middlewares/admin');
 
 router.post('/my', auth.access, emailVerified, controller.createGroup);
 router.get('/my', auth.access, emailVerified, controller.getMyGroups);
+router.post('/addmember', auth.access, emailVerified, controller.addUserGroup);
 
 // admin routes
 router.get('/', auth.access, emailVerified, admin, controller.searchGroups);
