@@ -159,7 +159,7 @@ export default {
     NOTIFS_DELETED: "Notifications supprimées avec succès",
 
     // groups
-    NO_GROUPS: "Vous n'avez encore aucun groupe",
+    NO_GROUPS: "Vous n'avez pas encore créé de groupe",
     NO_GROUPS_DESC: "Créez un groupe pour pouvoir partager vos trajets avec vos amis",
     NO_USERS: "Il n'y encore aucun utilisateur",
     NO_USERS_DESC: "Ajoutez des utilisateurs à votre groupe pour pouvoir partager vos trajets avec eux",
