@@ -146,6 +146,8 @@ exports.createBooking = (req: express.Request, res: express.Response, _: express
     const { travelId, departureId, arrivalId } = req.body;
 
     const travelIdSanitized = validator.sanitizeId(travelId, req, res);
+    const departureIdSanitized = validator.sanitizeId(departureId, req, res);
+    const arrivalIdSanitized = validator.sanitizeId(arrivalId, req, res);
     if (travelIdSanitized === null) return;
 
     prisma.travel.findUnique({
@@ -167,8 +169,8 @@ exports.createBooking = (req: express.Request, res: express.Response, _: express
 
         if (!checkTravelHoursLimit(travel.etapes[0].date, req, res)) return;
 
-        const startEtape = travel.etapes.find((e) => e.id === departureId);
-        const endEtape = travel.etapes.find((e) => e.id === arrivalId);
+        const startEtape = travel.etapes.find((e) => e.id === departureIdSanitized);
+        const endEtape = travel.etapes.find((e) => e.id === arrivalIdSanitized);
         if (startEtape === undefined || endEtape === undefined) {
             sendMsg(req, res, error.travel.invalidEtapes);
             return;
