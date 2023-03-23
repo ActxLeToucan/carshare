@@ -331,7 +331,7 @@ import InputBlock from '../components/inputs/InputBlock.vue';
 import Topbar from "../components/topbar/Topbar.vue";
 import CardPopup from "../components/cards/CardPopup.vue";
 import CardBorder from '../components/cards/CardBorder.vue';
-import { goBack } from "../scripts/redirects.js";
+import { goBack, goHome } from "../scripts/redirects.js";
 import User from "../scripts/User.js";
 import Lang from "../scripts/Lang.js";
 import Selector from '../components/inputs/Selector.vue';
@@ -500,8 +500,7 @@ export default {
             }
 
             if (showlogs) {
-                msg_log.update(Lang.CurrentLang.INPUT_VERIFICATION_SUCCESS, Log.SUCCESS);
-                setTimeout(() => { msg_log.delete(); }, 2000);
+                msg_log.delete();
             }
 
             return data;
@@ -579,7 +578,7 @@ export default {
             tripDesc.innerHTML = "";
             lines.forEach(line => {
                 const p = document.createElement("p");
-                p.classList.add("text-md", "text-gray-500", "dark:text-gray-400", "font-semibold");
+                p.classList.add("text-md", "text-gray-500", "dark:text-gray-300", "font-semibold");
                 let text = line;
                 if (line.startsWith("\r")) {
                     p.classList.add("mt-4");
@@ -601,6 +600,11 @@ export default {
                 setTimeout(() => {
                     msg_log.delete();
                     popup.hide();
+
+                    setTimeout(() => {
+                        goHome(this);
+                    }, 1000);
+
                 }, 2000);
             }).catch(err => {
                 msg_log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
