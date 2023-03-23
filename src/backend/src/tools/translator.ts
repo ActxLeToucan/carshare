@@ -684,6 +684,13 @@ const error = {
             },
             code: 403
         }),
+        isDriver: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Vous êtes le conducteur de ce trajet.',
+                en: 'You are the driver of this travel.'
+            },
+            code: 403
+        }),
         notOpen: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Ce trajet n\'est plus ouvert.',
@@ -695,6 +702,13 @@ const error = {
             msg: {
                 fr: 'Ce trajet n\'a plus de place.',
                 en: 'This travel has no more seats.'
+            },
+            code: 400
+        }),
+        invalidEtapes: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Les étapes ne sont pas valides.',
+                en: 'The steps are not valid.'
             },
             code: 400
         })
@@ -883,6 +897,13 @@ const info = {
             msg: {
                 fr: `Vous venez de refuser la demande de ${user.firstName ?? ''} ${user.lastName ?? ''}.`,
                 en: `You have just rejected the request of ${user.firstName ?? ''} ${user.lastName ?? ''}.`
+            },
+            code: 200
+        }),
+        created: (req: Request, user: User) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Vous venez de demander à rejoindre le trajet de ${user.firstName ?? ''} ${user.lastName ?? ''}.`,
+                en: `You have asked to join ${user.firstName ?? ''} ${user.lastName ?? ''} trip.`
             },
             code: 200
         })

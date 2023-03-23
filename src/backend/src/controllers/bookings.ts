@@ -55,7 +55,11 @@ function acceptOrRejectBooking (req: express.Request, res: express.Response, sta
             try {
                 const count: any = await getMaxPassengers(booking.departure.travelId, booking.departure, booking.arrival);
                 const passengers = Number(count[0].nbPassengers);
-                if (Number.isNaN(passengers)) throw new Error('Could not get max passengers');
+                if (Number.isNaN(passengers)) {
+                    console.error("Error while getting the number of passengers in the trip");
+                    sendMsg(req, res, error.generic.internalError);
+                    return;
+                }
 
                 if (passengers >= booking.departure.travel.maxPassengers) {
                     sendMsg(req, res, error.travel.noSeats);
@@ -137,3 +141,104 @@ function acceptOrRejectBooking (req: express.Request, res: express.Response, sta
         sendMsg(req, res, error.generic.internalError);
     });
 }
+
+exports.createBooking = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    const { travelId, departureId, arrivalId } = req.body;
+
+    const travelIdSanitized = validator.sanitizeId(travelId, req, res);
+    if (travelIdSanitized === null) return;
+
+    prisma.travel.findUnique({
+        where: { id: travelIdSanitized },
+        include: {
+            etapes: true,
+            driver: true
+        }
+    }).then(async (travel) => {
+        if (travel === null) {
+            sendMsg(req, res, error.travel.notFound);
+            return;
+        }
+
+        if (travel.driverId === res.locals.user.id) {
+            sendMsg(req, res, error.travel.isDriver);
+            return;
+        }
+
+        if (!checkTravelHoursLimit(travel.etapes[0].date, req, res)) return;
+
+        const startEtape = travel.etapes.find((e) => e.id === departureId);
+        const endEtape = travel.etapes.find((e) => e.id === arrivalId);
+        if (startEtape === undefined || endEtape === undefined) {
+            sendMsg(req, res, error.travel.invalidEtapes);
+            return;
+        }
+
+        // check if there is a place left in the car
+        try {
+            const count: any = await getMaxPassengers(travelIdSanitized, startEtape, endEtape);
+            const passengers = Number(count[0].nbPassengers);
+            if (Number.isNaN(passengers)) {
+                console.error('Error while getting the number of passengers in the trip');
+                sendMsg(req, res, error.generic.internalError);
+                return;
+            }
+
+            if (passengers >= travel.maxPassengers) {
+                sendMsg(req, res, error.travel.noSeats);
+                return;
+            }
+        } catch (e) {
+            sendMsg(req, res, error.generic.internalError);
+            return;
+        }
+
+        // create booking
+        prisma.passenger.create({
+            data: {
+                status: properties.booking.status.pending,
+                passengerId: Number(res.locals.user.id),
+                departureId: travel.etapes[0].id,
+                arrivalId: travel.etapes[travel.etapes.length - 1].id
+            },
+            include: {
+                departure: true,
+                arrival: true,
+                passenger: true
+            }
+        }).then((booking) => {
+            const notifDriver = notifs.request.new('en', travel, res.locals.user, startEtape, endEtape, {
+                id: booking.id,
+                status: booking.status,
+                departureId: startEtape.id,
+                arrivalId: endEtape.id,
+                comment: '',
+                passengerId: booking.passengerId
+            });
+
+            // create driver's notification
+            prisma.notification.create({
+                data: {
+                    ...notifDriver,
+                    userId: travel.driverId,
+                    senderId: Number(res.locals.user.id),
+                    bookingId: booking.id
+                }
+            }).then(() => {
+                // send email notification to passenger
+                notify(travel.driver, notifDriver);
+
+                sendMsg(req, res, info.booking.created, travel.driver);
+            }).catch((err: any) => {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
+            });
+        }).catch((err: any) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
+    }).catch((err: any) => {
+        console.error(err);
+        sendMsg(req, res, error.travel.notFound);
+    });
+};
