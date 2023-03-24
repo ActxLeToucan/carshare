@@ -159,7 +159,7 @@ export default {
     NOTIFS_DELETED: "Notifications deleted successfully",
 
     // groups
-    NO_GROUPS: "You don't have any group yet",
+    NO_GROUPS: "You haven't created any group yet",
     NO_GROUPS_DESC: "Create a group to start sharing your trips with your friends",
     NO_USERS: "No users in this group yet",
     NO_USERS_DESC: "Add users to this group to start sharing your trips with them",

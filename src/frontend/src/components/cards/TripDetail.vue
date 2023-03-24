@@ -136,6 +136,12 @@ export default {
         tripId: function (newVal, oldVal) {
             this.loadTrip(newVal);
         },
+        tripStart: function(newVal, oldVal) {
+            this.loadTrip(this.tripId);
+        },
+        tripEnd: function(newVal, oldVal) {
+            this.loadTrip(this.tripId);
+        },
     },
     mounted() {
         Lang.AddCallback((lang) => (this.lang = lang));
@@ -152,7 +158,6 @@ export default {
 
                 this.startIndex = this.trip?.etapes.findIndex(step => step.city == this.tripStart.value);
                 this.endIndex = this.trip?.etapes.findIndex(step => step.city == this.tripEnd.value);
-                console.log(this.startIndex, this.endIndex)
             }).catch(err => {
                 console.error(err);
                 this.popup?.hide();

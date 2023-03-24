@@ -696,7 +696,14 @@ const error = {
                 fr: 'Ce trajet n\'est plus ouvert.',
                 en: 'This travel is no longer open.'
             },
-            code: 400
+            code: 403
+        }),
+        notAPassenger: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Vous n\'ête pas un passager de ce voyage.',
+                en: 'You are not a passenger of this trip.'
+            },
+            code: 403
         }),
         noSeats: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
@@ -725,6 +732,13 @@ const error = {
             msg: {
                 fr: 'Vous avez déjà répondu à cette demande.',
                 en: 'You have already replied to this request.'
+            },
+            code: 400
+        }),
+        alreadyBooked: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Vous avez déjà réservé ce trajet.',
+                en: 'You have already booked this travel.'
             },
             code: 400
         })
@@ -827,6 +841,13 @@ const info = {
             msg: {
                 fr: 'Trajet annulé',
                 en: 'Travel cancelled'
+            },
+            code: 200
+        }),
+        unbooked: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Réservation annulée.',
+                en: 'Unbooked from trip.'
             },
             code: 200
         })
@@ -1156,6 +1177,18 @@ const notifs = {
             message: {
                 fr: `Votre réservation pour le trajet ${booking.departure.city} - ${booking.arrival.city} du ${new Date(booking.departure.date).toLocaleString('fr-FR')} a été refusée par le conducteur.`,
                 en: `Your booking for the trip ${booking.departure.city} - ${booking.arrival.city} on ${new Date(booking.departure.date).toLocaleString('en-US')} has been rejected by the driver.`
+            },
+            type: 'standard',
+            createdAt: new Date()
+        }),
+        unbooked: (lang: string, passenger: (Passenger & { departure: Etape, arrival: Etape, passenger: User })) => msgForLang<TemplateNotif, Notif>(lang, {
+            title: {
+                fr: 'Annulation de réservation',
+                en: 'Booking cancelation'
+            },
+            message: {
+                fr: `Le passager ${passenger.passenger.firstName} ${passenger.passenger.lastName} de votre trajet de ${passenger.departure.city} à ${passenger.arrival.city} du ${new Date(passenger.departure.date).toLocaleString('fr-FR')} a annulé sa réservation`,
+                en: `The passenger ${passenger.passenger.firstName} ${passenger.passenger.lastName} of your trip from ${passenger.departure.city} to ${passenger.arrival.city} on ${new Date(passenger.departure.date).toLocaleString('en-US')} has cancelled his booking`
             },
             type: 'standard',
             createdAt: new Date()

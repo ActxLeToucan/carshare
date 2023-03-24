@@ -44,7 +44,7 @@
                                 {{ group.name }}
                             </p>
                             <p class="text-lg md:text-xl text-slate-500 dark:text-slate-400 mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full">
-                                {{ group.users.length }} {{ lang.MEMBERS }}
+                                {{ group.users.length }} {{ group.users.length >= 2 ? lang.MEMBERS : lang.MEMBER }}
                             </p>
                         </button>
                     </div>
