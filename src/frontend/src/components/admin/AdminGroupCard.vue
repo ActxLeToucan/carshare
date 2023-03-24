@@ -7,10 +7,14 @@
         <p class="text-xl font-semibold text-slate-700 text-left whitespace-nowrap text-ellipsis overflow-hidden">
             {{ data.name }}
         </p>
+         <p class="text-xl font-semibold text-slate-500 dark:text-slate-400 text-left whitespace-nowrap text-ellipsis overflow-hidden">
+                {{ data.users.length}}  {{ data.users.length >= 2 ?  lang.MEMBERS : lang.MEMBER }}
+        </p>
     </div>
 </template>
 
 <script>
+import Lang from '../../scripts/Lang';
 export default {
     name: 'AdminGroupCard',
     props: {
@@ -26,10 +30,15 @@ export default {
         }
     },
     data() {
-        return {}
+        return {
+            lang: Lang.CurrentLang,
+        }
     },
     methods: {
 
+    },
+    mounted() {
+         Lang.AddCallback(lang => this.lang = lang);
     }
 }
 </script>

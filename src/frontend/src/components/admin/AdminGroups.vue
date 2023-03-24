@@ -80,7 +80,7 @@
                             name="creatorId"
                             :label="lang.GROUP_CREATOR"
                             :placeholder="lang.GROUP_CREATOR"
-                            :value="selectedGroup.creatorId"
+                            :value="groupName"
                             class="mb-0"
                         />
                         <input-text
@@ -186,7 +186,7 @@ function search(obj) {
 
     const value = obj.$refs['query-zone'].querySelector('input').value;
 
-    API.execute_logged(API.ROUTE.GROUPS, API.METHOD.GET, User.CurrentUser?.getCredentials() ,{ search : value}).then((data) => {
+    API.execute_logged(API.ROUTE.GROUPS, API.METHOD.GET, User.CurrentUser?.getCredentials(), { search: value }).then((data) => {
         obj.groups = data.data ?? data.group;
         log.delete();
         console.log(groups)
@@ -196,7 +196,7 @@ function search(obj) {
     }).finally(() => {
         obj.searchBar.buttonEnabled = true;
     });
-    console.log("search")
+  
 }
 export default {
     name: 'AdminGroups',
@@ -229,6 +229,7 @@ export default {
             searchBar: {
                 buttonEnabled: true,
             },
+            groupName:'',
         }
     },
     mounted() {
@@ -260,6 +261,16 @@ export default {
         },
         onCardClicked(group) {
             this.selectedGroup = group;
+            console.log('name', groupName);
+            API.execute_logged(API.ROUTE.USERS + '/' + selectedGroup.creatorId, API.METHOD.GET, User.CurrentUser?.getCredentials()).then((data) => {
+                groupName = data.firstName;
+                console.log('name', groupName);
+            }).catch((err) => {
+                log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
+                setTimeout(() => { log.delete(); }, 4000);
+            }).finally(() => {
+                obj.searchBar.buttonEnabled = true;
+            });
         },
         searchLog(msg, type = Log.INFO) {
             if (!this.searchLogZone) return;
