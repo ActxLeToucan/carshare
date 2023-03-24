@@ -80,7 +80,7 @@
                             name="creatorId"
                             :label="lang.GROUP_CREATOR"
                             :placeholder="lang.GROUP_CREATOR"
-                            :value="groupName"
+                            :value="selectedGroup.creator.firstName +' ' + selectedGroup.creator.lastName"
                             class="mb-0"
                         />
                         <input-text
@@ -88,7 +88,7 @@
                                 :type="Date"
                                 :label="lang.GROUP_CREATEDAT"
                                 :placeholder="lang.GROUP_CREATOR"
-                                :value="selectedGroup.createdAt"
+                                :value="selectedGroup.createdAt.substring(0,10)"
                                 class="mb-0"
                         />
                         <div class="flex grow h-fit justify-center p-4">
@@ -189,7 +189,6 @@ function search(obj) {
     API.execute_logged(API.ROUTE.GROUPS, API.METHOD.GET, User.CurrentUser?.getCredentials(), { search: value }).then((data) => {
         obj.groups = data.data ?? data.group;
         log.delete();
-        console.log(groups)
     }).catch((err) => {
         log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
         setTimeout(() => { log.delete(); }, 4000);
