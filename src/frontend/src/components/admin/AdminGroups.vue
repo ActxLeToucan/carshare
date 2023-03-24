@@ -77,7 +77,7 @@
                             :value="selectedGroup.name"
                         />
                         <input-text
-                            name="creator"
+                            name="creatorId"
                             :label="lang.GROUP_CREATOR"
                             :placeholder="lang.GROUP_CREATOR"
                             :value="selectedGroup.creatorId"
@@ -92,7 +92,13 @@
                                 class="mb-0"
                         />
                         <div class="flex grow h-fit justify-center p-4">
-                            <p>Liste of users </p><br>
+                            <label
+                                v-if="label != ''"
+                                class="flex text-xl dark:text-slate-400 font-bold whitespace-nowrap text-ellipsis w-fit"
+                                :class="dark ? ' text-white' : ' text-slate-500'"
+                            >
+                            {{ lang.USERS }}
+                            </label>
                             <div
                                 v-if="selectedGroup?.users.length == 0"
                                 class="flex flex-col justify-center mx-auto max-w-full"
@@ -147,14 +153,8 @@
                 :cancel-label="lang.CANCEL"
                 :validate-label="lang.DELETE"
                 :onload="setDeletePopup"
-                :onvalidate="deleteAccount"
+                :onvalidate="deleteGroup"
             >
-                <input-text
-                    :label="lang.ACCOUNT_EMAIL"
-                    :placeholder="lang.EMAIL"
-                    name="email"
-                    type="email"
-                />
             </card-popup>
     </div>
 </template>
@@ -260,17 +260,6 @@ export default {
         },
         onCardClicked(group) {
             this.selectedGroup = group;
-
-            API.execute_logged(API.ROUTE.ME , API.METHOD.GET, User.CurrentUser?.getCredentials()).then((data) => {
-                console.log("id" , data.data)
-                log.delete();
-            }).catch((err) => {
-                log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
-                setTimeout(() => { log.delete(); }, 4000);
-            }).finally(() => {
-                
-            });
-            this.displayPage(PAGE.RESULTS);
         },
         searchLog(msg, type = Log.INFO) {
             if (!this.searchLogZone) return;
@@ -288,8 +277,11 @@ export default {
             const field_checks = [
                 { field: "name", check: (value) => value.length > 0, error: Lang.CurrentLang.GROUPNAME_SPECIFY },
                 { field: "creatorId", check: (value) => value.length > 0, error: Lang.CurrentLang.CREATOR_SPECIFY },
-               
+                { field: "createdAt", check: (value) => value.length > 0, error: Lang.CurrentLang.CREATOR_SPECIFY },
 
+                { field: "name", check: (value) => value.length <= 50, error: Lang.CurrentLang.GROUPNAME_SPECIFY },
+                { field: "creatorId", check: (value) => value.length <= 50, error: Lang.CurrentLang.CREATOR_SPECIFY },
+                { field: "createdAt", check: (value) => value.length <= 50, error: Lang.CurrentLang.CREATOR_SPECIFY },
             ];
 
             for (let i = 0; i < field_checks.length; i++) {
@@ -302,8 +294,39 @@ export default {
                     return;
                 }
             }
+            const props = ["name", "creatorId", "createdAt"];
+            const newData = {};
+            for (const prop of props) {
+                const input = this.$el.querySelector(`input[name="${prop}"]`);
+                newData[prop] = getTypedValue(input);
+                console.log("e")
+            }
+            //todo
+            log.update(Lang.CurrentLang.CHANGING_INFORMATIONS, Log.WARNING);
+            API.execute_logged(API.ROUTE.GROUPS + "/" + this.selectedGroup.id, API.METHOD.PATCH, User.CurrentUser?.getCredentials(), newData).then((data) => {
+                for (const prop of props) {
+                    this.selectedGroup[prop] = newData[prop];
+                }
+                this.displayPage(PAGE.RESULTS);
+                log.update(Lang.CurrentLang.INFORMATIONS_CHANGED, Log.SUCCESS);
+                setTimeout(() => { log.delete(); }, 2000);
+            }).catch(err => {
+                log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
+                setTimeout(() => { log.delete(); }, 4000);
+            }).finally(() => {
+                this.formUser.buttonEnabled = true;
+            });
 
            
+        },
+          userLog(msg, type = Log.INFO) {
+            if (!this.userLogZone) {
+                this.userLogZone = new LogZone(this.$refs["user-log-zone"]);
+                if (!this.userLogZone) return;
+            }
+            const log = new Log(msg, type);
+            log.attachTo(this.userLogZone);
+            return log;
         },
         setDeletePopup(popup) {
             this.deletePopup = popup;
@@ -312,23 +335,17 @@ export default {
             this.deletePopup.setTitle(this.lang.DELETE + ' ' + this.selectedUser?.firstName + ' ' + this.selectedUser?.lastName);
             this.deletePopup.show();
         }, 
-        deleteAccount(popup) {
-            
-
-            // Setting popup title to static string to avoid seing (Delete undefined undefined)
+        deleteGroup(popup) {
+        //todo
             popup.setTitle(this.lang.DELETE + ' ' + this.selectedGroup?.name);
-
             API.execute_logged(API.ROUTE.GROUPS + "/" + this.selectedGroup.id + this.pagination, API.METHOD.DELETE, User.CurrentUser?.getCredentials()).then((data) => {
                 this.displayPage(PAGE.QUERY);
                 this.groups.splice(this.groups.indexOf(this.selectedGroup), 1);
                 this.selectedGroup = null;
-                // pop_log.update(this.lang.ACCOUNT_DELETED, Log.SUCCESS);
                 setTimeout(() => {
-                   
                     popup.hide();
                 }, 2000);
             }).catch(err => {
-                //pop_log.update(this.lang.ERROR + " : " + err.message, Log.ERROR);
                 setTimeout(() => {
                    
                 }, 4000);
