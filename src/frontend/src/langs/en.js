@@ -179,7 +179,8 @@ export default {
     GROUP_SELECTED: "Group selected",
     SEARCH_GROUP: "Search group",
     GROUP_NAME: "Group name",
-    GROUP_CREATOR :"Creator" , 
+    GROUP_CREATOR: "Creator", 
+    GROUP_CREATEDAT :"Creation date",
 
     // parametres
     NOTIF_PARAMS: "Notification settings",
