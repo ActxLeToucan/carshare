@@ -260,16 +260,7 @@ export default {
         },
         onCardClicked(group) {
             this.selectedGroup = group;
-            console.log('name', groupName);
-            API.execute_logged(API.ROUTE.USERS + '/' + selectedGroup.creatorId, API.METHOD.GET, User.CurrentUser?.getCredentials()).then((data) => {
-                groupName = data.firstName;
-                console.log('name', groupName);
-            }).catch((err) => {
-                log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
-                setTimeout(() => { log.delete(); }, 4000);
-            }).finally(() => {
-                obj.searchBar.buttonEnabled = true;
-            });
+    
         },
         searchLog(msg, type = Log.INFO) {
             if (!this.searchLogZone) return;
