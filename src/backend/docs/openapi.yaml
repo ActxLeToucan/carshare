@@ -1015,39 +1015,6 @@ paths:
         '500':
           $ref: '#/components/responses/internalError'
 
-  /travels/update:
-    get:
-      summary: Update data
-      description: Update the current travel's data
-      operationId: updateTravel
-      in: local
-          description: user id
-          required: true
-          schema:
-            type: integer
-            example: 1
-        - name: id
-          in: path
-          description: Travel id
-          required: true
-          schema:
-            type: integer
-          example: 1
-      security:
-        - bearerAuth: [ ]
-      responses:
-        '200':
-          description: Travel updated
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    message:
-                      type: string
-                      example: "Travel updated"
-        '500'
-          $ref: '#/components/responses/internalError'
   /travels/:id:
     get:
       summary: Get one travel
@@ -1067,7 +1034,6 @@ paths:
         - bearerAuth: [ ]
       responses:
         '200':
-
           description: The travels with the given id
           content:
             application/json:
