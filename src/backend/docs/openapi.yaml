@@ -2280,7 +2280,7 @@ components:
       properties:
         id:
           type: integer
-        action:
+        type:
           type: string
         title:
           type: string
@@ -2289,6 +2289,10 @@ components:
         userId:
           type: integer
         travelId:
+          type: integer
+        senderId:
+          type: integer
+        bookingId:
           type: integer
         createdAt:
           type: string
@@ -2305,9 +2309,9 @@ components:
         context:
           type: string
         lat:
-          type: integer
+          type: number
         lng:
-          type: integer
+          type: number
         travelId:
           type: integer
         date:
@@ -2324,9 +2328,9 @@ components:
         context:
           type: string
         lat:
-          type: integer
+          type: number
         lng:
-          type: integer
+          type: number
         date:
           type: string
           format: date-time
@@ -2341,13 +2345,13 @@ components:
               type: object
               properties:
                 note:
-                  type: integer
+                  type: number
                   example: 1.5
             count:
               type: object
               properties:
                 note:
-                  type: integer
+                  type: number
                   example: 2
         passenger:
           type: object
@@ -2356,13 +2360,13 @@ components:
               type: object
               properties:
                 note:
-                  type: integer
+                  type: number
                   example: null
             count:
               type: object
               properties:
                 note:
-                  type: integer
+                  type: number
                   example: 0
     EvalutationTravel:
       type: array
