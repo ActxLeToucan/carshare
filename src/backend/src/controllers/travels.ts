@@ -292,7 +292,7 @@ exports.getTravel = (req: express.Request, res: express.Response, _: express.Nex
     });
 }
 
-exports.updateTravel = async (req: express.Request, res: express.Response, next: express.NextFunction) => { 
+exports.updateTravel = (req: express.Request, res: express.Response, next: express.NextFunction) => { 
     const userId = res.locals.user.id;
     
     const travelId = validator.sanitizeId(req.query.id, req, res);
