@@ -169,35 +169,37 @@ exports.askForPasswordReset = (req: express.Request, res: express.Response, _: e
 }
 
 exports.resetPassword = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    exports.updatePassword(req, res, next);
+    exports.updatePassword(req, res, next, false);
 }
 
-exports.updatePassword = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+exports.updatePassword = async (req: express.Request, res: express.Response, _: express.NextFunction, checkOld = true) => {
     if (!validator.checkPasswordField(req.body.password, req, res)) return;
-    if (!validator.checkOldPasswordField(req.body.oldPassword, req, res)) return;
+    if (checkOld && !validator.checkOldPasswordField(req.body.oldPassword, req, res)) return;
 
-    bcrypt.compare(req.body.oldPassword, res.locals.user.password)
-        .then((valid) => {
+    if (checkOld) {
+        try {
+            const valid = await bcrypt.compare(req.body.oldPassword, res.locals.user.password);
             if (!valid) {
                 sendMsg(req, res, error.auth.wrongPassword);
                 return;
             }
+        } catch (err) {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        }
+    }
 
-            bcrypt.hash(req.body.password, properties.password.salt)
-                .then((hash) => {
-                    prisma.user.update({
-                        where: { id: res.locals.user.id },
-                        data: { password: hash }
-                    }).then(() => {
-                        sendMsg(req, res, info.user.passwordChanged);
-                    }).catch((err) => {
-                        console.error(err);
-                        sendMsg(req, res, error.generic.internalError);
-                    });
-                }).catch((err) => {
-                    console.error(err);
-                    sendMsg(req, res, error.generic.internalError);
-                });
+    bcrypt.hash(req.body.password, properties.password.salt)
+        .then((hash) => {
+            prisma.user.update({
+                where: { id: res.locals.user.id },
+                data: { password: hash }
+            }).then(() => {
+                sendMsg(req, res, info.user.passwordChanged);
+            }).catch((err) => {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
+            });
         }).catch((err) => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);
