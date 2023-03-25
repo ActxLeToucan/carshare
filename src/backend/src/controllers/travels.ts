@@ -55,7 +55,8 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
                        and dep.date < arr.date
                        and IF(${startCtx} = '', true, dep.context = ${startCtx})
                        and IF(${endCtx} = '', true, arr.context = ${endCtx})
-                       and dep.date BETWEEN ${date1} and ${date2}`
+                       and dep.date BETWEEN ${date1} and ${date2}
+                       and t.groupId is null`
         .then(async (data: any) => {
             for (const travel of data) {
                 for (const key of Object.keys(travel)) {

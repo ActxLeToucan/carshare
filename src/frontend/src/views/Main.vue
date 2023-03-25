@@ -440,8 +440,6 @@ export default {
                 this.$refs["err-notfound"].classList.add("hidden");
             }
 
-            console.log(list);
-
             for (const el of list) {
                 this.trips.push({
                     id: el.id,
