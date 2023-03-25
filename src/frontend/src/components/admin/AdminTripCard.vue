@@ -3,7 +3,7 @@
                         hover:bg-white hover:border-teal-500 transition-all cursor-pointer"
         @click="() => { onclick(data); }">
         <p class="text-xl font-semibold text-slate-700 text-left whitespace-nowrap text-ellipsis overflow-hidden">
-            {{ data }}
+            {{ data.price }}
         </p>
        
     </div>

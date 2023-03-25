@@ -104,6 +104,8 @@ function search(obj) {
     }).finally(() => {
         obj.searchBar.buttonEnabled = true;
     });
+
+    
 }
 
 export default {
