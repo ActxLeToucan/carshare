@@ -102,7 +102,6 @@ import TravelCard from '../cards/TravelCard.vue';
 import { Log, LogZone } from '../../scripts/Logs';
 
 
-
 import {
     XMarkIcon
 } from '@heroicons/vue/24/outline';
@@ -123,12 +122,13 @@ export default {
         TravelCard
     },
     data() {
-        return { trips: [], loading: false, lang: Lang.CurrentLang, startCity: {}, endCity: {}, selectedTripId: null}
+        return { trips: [], loading: false, lang: Lang.CurrentLang, startCity: {}, endCity: {}}
     },
     mounted() {
         Lang.AddCallback(lang => this.lang = lang);
         this.updateTrips(); 
         this.logZone = new LogZone(this.$refs["log-zone"]);
+      
         window.action = () => { this.selectTrip(9); }
     },
     methods: {
@@ -148,90 +148,13 @@ export default {
             }).catch(err => {
                 console.error(err);
             });
-    },
+    },    
     log(msg, type = Log.INFO) {
             if (!this.logZone) return null;
             const log = new Log(msg, type);
             log.attachTo(this.logZone);
             return log;
         },
-    searchTrips() {
-            const msg_log = this.log(Lang.CurrentLang.INPUT_VERIFICATION, Log.INFO);
-            const input_date = document.querySelector("input[name=datetime]");
-            const input_start = document.querySelector("input[name=startingpoint]");
-            const input_end = document.querySelector("input[name=endingpoint]");
-
-            const field_checks = [
-                { field: input_start, msg: Lang.CurrentLang.STARTING_POINT_SPECIFY },
-                { field: input_end, msg: Lang.CurrentLang.ENDING_POINT_SPECIFY },
-                { field: input_date, msg: Lang.CurrentLang.DATE_SPECIFY }
-            ];
-
-            for (let i = 0; i < field_checks.length; i++) {
-                const check = field_checks[i];
-                if (check.field.value == "") {
-                    msg_log.update(check.msg, Log.WARNING);
-                    check.field.focus();
-                    setTimeout(() => { msg_log.delete(); }, 6000);
-                    return;
-                }
-            }
-
-            msg_log.update(Lang.CurrentLang.SEARCHING + " ...", Log.INFO);
-            API.execute_logged(API.ROUTE.TRAVELS.MY.PASSENGER + API.createParameters({
-                date: new Date(input_date.value).toISOString(),
-                startCity: this.startCity.value,
-                endCity: this.endCity.value,
-                startContext: this.startCity.desc,
-                endContext: this.endCity.desc,
-            }), API.METHOD.GET, User.CurrentUser.getCredentials()).then(res => {
-                this.setTrips(res);
-                msg_log.delete();
-            }).catch(err => {
-                console.error(err);
-                this.setTrips(err);
-                msg_log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
-                setTimeout(() => { msg_log.delete(); }, 5000);
-            });
-        },
-    setTrips(list) {
-            this.trips = [];
-            if (typeof list == "string")
-            {
-                this.$refs["err-fetch"].classList.remove("hidden");
-                this.$refs["err-fetch-msg"].innerText = list;
-                return;
-            } else if (typeof list == "object" && list.message) {
-                this.$refs["err-fetch"].classList.add("hidden");
-                return;
-            } else {
-                this.$refs["err-fetch"].classList.add("hidden");
-            }
-
-            if (list.length == 0) {
-                this.$refs["err-notfound"].classList.remove("hidden");
-                return;
-            } else {
-                this.$refs["err-notfound"].classList.add("hidden");
-            }
-
-            console.log(list);
-
-            for (const el of list) {
-                this.trips.push({
-                    id: el.id,
-                    date: new Date(el.departure.date).toLocaleDateString(),
-                    author: el.driver.firstName + " " + el.driver.lastName?.substring(0, 1) + ".",
-                    startCity: el.departure.city,
-                    startTime: new Date(el.departure.date).toLocaleTimeString().substring(0, 5),
-                    endCity: el.arrival.city,
-                    endTime: new Date(el.arrival.date).toLocaleTimeString().substring(0, 5),
-                    slots: el.maxPassengers - (el.passengers === undefined ? 0 : el.passengers) + " / " + el.maxPassengers,
-                    price: el.price,
-                });
-            }
-        },
- 
 }
 }
 </script>

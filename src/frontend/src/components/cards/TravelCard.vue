@@ -22,8 +22,13 @@
                     <p class="text-slate-500 dark:text-slate-300 text-lg font-semibold">
                         {{ lang.ENDING_POINT.replace(trip.endCity) }}
                     </p>
-                    <p class="text-slate-400 dark:text-slate-400 text-lg font-semibold">
+                    <p class="text-slate-500 dark:text-slate-300 text-lg font-semibold">
                         {{ lang.HOUR.replace(trip.endTime) }}
+                    </p>
+                </div>
+                <div class="flex w-full justify-between space-x-8">
+                    <p class="text-slate-500 dark:text-slate-300 text-lg font-semibold">
+                        {{ lang.PASSENGER }}
                     </p>
                 </div>
 
