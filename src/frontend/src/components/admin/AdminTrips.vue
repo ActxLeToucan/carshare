@@ -7,6 +7,35 @@
             <p class="text-2xl text-teal-500 py-2 font-bold mx-auto">
                 {{ lang.TRIPS }}
             </p>
+             <p class="text-lg text-slate-500 pt-2 font-semibold mx-auto">
+                    {{ lang.SEARCH_GROUP }}
+            </p>
+               <div class="flex max-w-full min-w-0 items-center space-x-2">
+                <input-text
+                    class="w-full flex grow"
+                    placeholder="Rechercher"
+                />
+                <button-block
+                    :action="search"
+                    :disabled="!searchBar.buttonEnabled"
+                >
+                    <magnifying-glass-icon class="w-7 h-7" />
+                </button-block>
+            </div>
+            <div
+                    ref="search-log-zone"
+                    class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
+                    style="max-height: 0;"
+            />
+            <div class="flex w-full flex-col px-8 space-y-4 pt-4 max-w-full min-w-0">
+                    <admin-trip-card
+                        v-for="group in groups"
+                        :key="group?.id"
+                        class="min-w-0 w-full show-up"
+                        :data="group"
+                        :onclick="onCardClicked"
+                    />
+            </div>
         </div>
         <div
             ref="result-zone"
@@ -40,25 +69,78 @@
 <script>
 import User from '../../scripts/User.js';
 import API from '../../scripts/API.js';
-import ButtonTab from '../inputs/ButtonTab.vue';
-import TabWindow from '../cards/TabWindow.vue';
-import TabDiv from '../cards/TabDiv.vue';
-import Lang from '../../scripts/Lang.js';
+import InputText from '../inputs/InputText.vue';
+import ButtonBlock from '../inputs/ButtonBlock.vue';
+import AdminTripCard from './AdminTripCard.vue';
+import CardPopup from '../cards/CardPopup.vue';
+import CardBadge from '../cards/CardBadge.vue';
+import Card from '../cards/CardBorder.vue';
+import { Log, LogZone } from '../../scripts/Logs.js';
+import { genres, isPhoneNumber, levels } from '../../scripts/data';
+
+import {
+    MagnifyingGlassIcon
+} from '@heroicons/vue/24/outline';
+import { getTypedValue } from '../../scripts/data.js';
+import Lang from "../../scripts/Lang";
+import re from "../../scripts/Regex";
+
+
+const PAGE = { QUERY: 1, RESULTS: 2 };
+
+function search(obj) {
+    obj.searchBar.buttonEnabled = false;
+    const log = obj.searchLog(Lang.CurrentLang.SEARCHING + "...", Log.INFO);
+
+    const value = obj.$refs['query-zone'].querySelector('input').value;
+
+    API.execute_logged(API.ROUTE.TRAVELS.GET, API.METHOD.GET, User.CurrentUser?.getCredentials(), { search: value }).then((data) => {
+        obj.groups = data.data ?? data.group;
+        log.delete();
+        console.log("travels")
+    }).catch((err) => {
+        log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
+        setTimeout(() => { log.delete(); }, 4000);
+    }).finally(() => {
+        obj.searchBar.buttonEnabled = true;
+    });
+}
 
 export default {
     name: 'AdminTrips',
     components: {
-        ButtonTab,
-        TabWindow,
-        TabDiv
+       InputText,
+        ButtonBlock,
+        AdminTripCard,
+        CardPopup,
+        Card,
+        CardBadge,
+        MagnifyingGlassIcon,
     },
     data() {
-        return { User, lang: Lang.CurrentLang }
+        return {
+            User, lang: Lang.CurrentLang,
+            searchBar: {
+                buttonEnabled: true,
+            },
+        }
     },
     mounted() {
         Lang.AddCallback(lang => this.lang = lang);
     },
     methods: {
+         onCardClicked(group) {
+            this.selectedGroup = group;    
+        },
+        search() {
+            return search(this);
+        },
+          searchLog(msg, type = Log.INFO) {
+            if (!this.searchLogZone) return;
+            const log = new Log(msg, type);
+            log.attachTo(this.searchLogZone);
+            return log;
+        },
         
     }
 }
