@@ -154,7 +154,7 @@ function onValidate(modal) {
                 setTimeout(() => {
                     log.delete();
                     email_log.delete();
-                    resolve(false);
+                    resolve(true); // Even if the email verification failed, the user is still registered
                 }, 4000);
             });
 
