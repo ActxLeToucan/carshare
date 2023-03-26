@@ -1724,6 +1724,54 @@ paths:
         '500':
           $ref: '#/components/responses/internalError'
 
+  /bookings/:id/cancel:
+    delete:
+      summary: Delete a passenger
+      description: Delete a passenger relation, unbooking the user from a trip.
+      operationId: cancelBooking
+      tags:
+        - Bookings
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - name: id
+          in: path
+          description: The id of the booking to cancel
+          required: true
+          schema:
+            type: integer
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Trip unbooked
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Unbooked from trip
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: TravelId is required.
+        '401':
+          $ref: '#/components/responses/noToken'
+        '403':
+          $ref: '#/components/responses/insufficientPrivileges'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+
+
   /bookings/:id/accept:
     patch:
       summary: Accept a booking
@@ -2232,7 +2280,7 @@ components:
       properties:
         id:
           type: integer
-        action:
+        type:
           type: string
         title:
           type: string
@@ -2241,6 +2289,10 @@ components:
         userId:
           type: integer
         travelId:
+          type: integer
+        senderId:
+          type: integer
+        bookingId:
           type: integer
         createdAt:
           type: string
@@ -2257,9 +2309,9 @@ components:
         context:
           type: string
         lat:
-          type: integer
+          type: number
         lng:
-          type: integer
+          type: number
         travelId:
           type: integer
         date:
@@ -2276,9 +2328,9 @@ components:
         context:
           type: string
         lat:
-          type: integer
+          type: number
         lng:
-          type: integer
+          type: number
         date:
           type: string
           format: date-time
@@ -2293,13 +2345,13 @@ components:
               type: object
               properties:
                 note:
-                  type: integer
+                  type: number
                   example: 1.5
             count:
               type: object
               properties:
                 note:
-                  type: integer
+                  type: number
                   example: 2
         passenger:
           type: object
@@ -2308,13 +2360,13 @@ components:
               type: object
               properties:
                 note:
-                  type: integer
+                  type: number
                   example: null
             count:
               type: object
               properties:
                 note:
-                  type: integer
+                  type: number
                   example: 0
     EvalutationTravel:
       type: array
