@@ -993,7 +993,7 @@ const mail = {
                 <p>Vous avez reçu une nouvelle notification :</p>
                 <div style="border: 1px solid #ccc; border-radius: 0.5em; padding: 1em; margin: 1em 0;">
                     <div style="font-weight: bold;">
-                        <p style="font-size: 0.8em; opacity: 0.5;">${dateToString(notification.createdAt, user.preferedTimezone, 'fr')}</p>
+                        <p style="font-size: 0.8em; opacity: 0.5;">${dateToString(notification.createdAt, user.timezone, 'fr')}</p>
                         <p>${notification.title}</p>
                     </div>
                     <p style="margin-top: 0.5em;">${notification.message}</p>
@@ -1008,7 +1008,7 @@ const mail = {
                 <p>You received a new notification:</p>
                 <div style="border: 1px solid #ccc; border-radius: 0.5em; padding: 1em; margin: 1em 0;">
                     <div style="font-weight: bold;">
-                        <p style="font-size: 0.8em; opacity: 0.5;">${dateToString(notification.createdAt, user.preferedTimezone, 'en')}</p>
+                        <p style="font-size: 0.8em; opacity: 0.5;">${dateToString(notification.createdAt, user.timezone, 'en')}</p>
                         <p>${notification.title}</p>
                     </div>
                     <p style="margin-top: 0.5em;">${notification.message}</p>
@@ -1023,7 +1023,7 @@ const mail = {
                 fr: `Bonjour ${user.firstName ?? ''} ${user.lastName ?? ''},
                 Vous avez reçu une nouvelle notification :
                 ${notification.title}
-                ${dateToString(notification.createdAt, user.preferedTimezone, 'fr')}
+                ${dateToString(notification.createdAt, user.timezone, 'fr')}
                 ${notification.message}
 
                 ${notification.type === 'request'
@@ -1035,7 +1035,7 @@ const mail = {
                 en: `Hello ${user.firstName ?? ''} ${user.lastName ?? ''},
                 You received a new notification :
                 ${notification.title}
-                ${dateToString(notification.createdAt, user.preferedTimezone, 'en')}
+                ${dateToString(notification.createdAt, user.timezone, 'en')}
                 ${notification.message}
 
                 ${notification.type === 'request'
@@ -1051,19 +1051,19 @@ const mail = {
 
 const notifs = {
     request: {
-        new: (user: User, travel: Travel & { etapes: Etape[] }, booking: Passenger & { arrival: Etape, departure: Etape, passenger: User }, sender: User) => msgForLang<TemplateNotif, Notif>(user.preferedLanguage, {
+        new: (user: User, travel: Travel & { etapes: Etape[] }, booking: Passenger & { arrival: Etape, departure: Etape, passenger: User }, sender: User) => msgForLang<TemplateNotif, Notif>(user.locale, {
             title: {
                 fr: 'Nouvelle demande',
                 en: 'New request'
             },
             message: {
                 fr: `${sender.firstName ?? ''} ${sender.lastName ?? ''} souhaite vous accompagner sur le trajet ${travel.etapes[0].city} - ${travel.etapes[travel.etapes.length - 1].city}` +
-                 ` (du ${dateToString(new Date(travel.etapes[0].date), user.preferedTimezone, 'fr')}) de l'étape ${booking.departure.city} à ${booking.arrival.city}.` +
+                 ` (du ${dateToString(new Date(travel.etapes[0].date), user.timezone, 'fr')}) de l'étape ${booking.departure.city} à ${booking.arrival.city}.` +
                     (booking.comment === null || booking.comment === ''
                         ? ''
                         : `\n\n${sender.firstName ?? ''} ${sender.lastName ?? ''} vous a laissé le message suivant :\n${booking.comment ?? ''}`),
                 en: `${sender.firstName ?? ''} ${sender.lastName ?? ''} wants to accompany you on the trip ${travel.etapes[0].city} - ${travel.etapes[travel.etapes.length - 1].city}` +
-                    ` (from ${dateToString(new Date(travel.etapes[0].date), user.preferedTimezone, 'en')}) from the step ${booking.departure.city} to ${booking.arrival.city}.` +
+                    ` (from ${dateToString(new Date(travel.etapes[0].date), user.timezone, 'en')}) from the step ${booking.departure.city} to ${booking.arrival.city}.` +
                     (booking.comment === null || booking.comment === ''
                         ? ''
                         : `\n\n${sender.firstName ?? ''} ${sender.lastName ?? ''} left you the following message:\n${booking.comment ?? ''}`)
@@ -1071,7 +1071,7 @@ const notifs = {
             type: 'request',
             createdAt: new Date()
         }),
-        accepted: (user: User, oldNotif: Notification, passenger: User, date: Date) => msgForLang<TemplateNotif, Notif>(user.preferedLanguage, {
+        accepted: (user: User, oldNotif: Notification, passenger: User, date: Date) => msgForLang<TemplateNotif, Notif>(user.locale, {
             title: {
                 fr: `Demande de ${passenger.firstName ?? ''} ${passenger.lastName ?? ''} acceptée`,
                 en: `Request from ${passenger.firstName ?? ''} ${passenger.lastName ?? ''} accepted`
@@ -1079,15 +1079,15 @@ const notifs = {
             message: {
                 fr: `${oldNotif.message}
                 \n =====================
-                \nVous avez accepté la demande de ${passenger.firstName ?? ''} ${passenger.lastName ?? ''} le ${dateToString(date, user.preferedTimezone, 'fr')}.`,
+                \nVous avez accepté la demande de ${passenger.firstName ?? ''} ${passenger.lastName ?? ''} le ${dateToString(date, user.timezone, 'fr')}.`,
                 en: `${oldNotif.message}
                 \n =====================
-                \nYou accepted the request from ${passenger.firstName ?? ''} ${passenger.lastName ?? ''} on ${dateToString(date, user.preferedTimezone, 'en')}.`
+                \nYou accepted the request from ${passenger.firstName ?? ''} ${passenger.lastName ?? ''} on ${dateToString(date, user.timezone, 'en')}.`
             },
             type: 'request.accepted',
             createdAt: date
         }),
-        rejected: (user: User, oldNotif: Notification, passenger: User, date: Date) => msgForLang<TemplateNotif, Notif>(user.preferedLanguage, {
+        rejected: (user: User, oldNotif: Notification, passenger: User, date: Date) => msgForLang<TemplateNotif, Notif>(user.locale, {
             title: {
                 fr: `Demande de ${passenger.firstName ?? ''} ${passenger.lastName ?? ''} refusée`,
                 en: `Request from ${passenger.firstName ?? ''} ${passenger.lastName ?? ''} rejected`
@@ -1095,7 +1095,7 @@ const notifs = {
             message: {
                 fr: `${oldNotif.message}
                 \n =====================
-                \nVous avez refusé la demande de ${passenger.firstName ?? ''} ${passenger.lastName ?? ''} le ${dateToString(date, user.preferedTimezone, 'fr')}.`,
+                \nVous avez refusé la demande de ${passenger.firstName ?? ''} ${passenger.lastName ?? ''} le ${dateToString(date, user.timezone, 'fr')}.`,
                 en: `${oldNotif.message}
                 \n =====================
                 \nYou rejected the request from ${passenger.firstName ?? ''} ${passenger.lastName ?? ''} on ${date.toLocaleString('en-US')}.`
@@ -1105,59 +1105,59 @@ const notifs = {
         })
     },
     travel: {
-        cancelled: (user: User, booking: Passenger & { departure: Etape, arrival: Etape } & Record<string, any>) => msgForLang<TemplateNotif, Notif>(user.preferedLanguage, {
+        cancelled: (user: User, booking: Passenger & { departure: Etape, arrival: Etape } & Record<string, any>) => msgForLang<TemplateNotif, Notif>(user.locale, {
             title: {
                 fr: 'Annulation de trajet',
                 en: 'Travel cancelled'
             },
             message: {
-                fr: `Votre trajet de ${booking.departure.city} à ${booking.arrival.city} du ${dateToString(booking.departure.date, user.preferedTimezone, 'fr')} a été annulé par le conducteur.`,
-                en: `Your trip from ${booking.departure.city} to ${booking.arrival.city} on ${dateToString(booking.departure.date, user.preferedTimezone, 'en')} has been cancelled by the driver.`
+                fr: `Votre trajet de ${booking.departure.city} à ${booking.arrival.city} du ${dateToString(booking.departure.date, user.timezone, 'fr')} a été annulé par le conducteur.`,
+                en: `Your trip from ${booking.departure.city} to ${booking.arrival.city} on ${dateToString(booking.departure.date, user.timezone, 'en')} has been cancelled by the driver.`
             },
             type: 'standard',
             createdAt: new Date()
         })
     },
     booking: {
-        accepted: (user: User, booking: Passenger & { departure: Etape, arrival: Etape } & Record<string, any>) => msgForLang<TemplateNotif, Notif>(user.preferedLanguage, {
+        accepted: (user: User, booking: Passenger & { departure: Etape, arrival: Etape } & Record<string, any>) => msgForLang<TemplateNotif, Notif>(user.locale, {
             title: {
                 fr: 'Réservation acceptée',
                 en: 'Booking accepted'
             },
             message: {
-                fr: `Votre réservation pour le trajet ${booking.departure.city} - ${booking.arrival.city} du ${dateToString(booking.departure.date, user.preferedTimezone, 'fr')} a été acceptée par le conducteur.`,
-                en: `Your booking for the trip ${booking.departure.city} - ${booking.arrival.city} on ${dateToString(booking.departure.date, user.preferedTimezone, 'en')} has been accepted by the driver.`
+                fr: `Votre réservation pour le trajet ${booking.departure.city} - ${booking.arrival.city} du ${dateToString(booking.departure.date, user.timezone, 'fr')} a été acceptée par le conducteur.`,
+                en: `Your booking for the trip ${booking.departure.city} - ${booking.arrival.city} on ${dateToString(booking.departure.date, user.timezone, 'en')} has been accepted by the driver.`
             },
             type: 'standard',
             createdAt: new Date()
         }),
-        rejected: (user: User, booking: Passenger & { departure: Etape, arrival: Etape } & Record<string, any>) => msgForLang<TemplateNotif, Notif>(user.preferedLanguage, {
+        rejected: (user: User, booking: Passenger & { departure: Etape, arrival: Etape } & Record<string, any>) => msgForLang<TemplateNotif, Notif>(user.locale, {
             title: {
                 fr: 'Réservation refusée',
                 en: 'Booking rejected'
             },
             message: {
-                fr: `Votre réservation pour le trajet ${booking.departure.city} - ${booking.arrival.city} du ${dateToString(booking.departure.date, user.preferedTimezone, 'fr')} a été refusée par le conducteur.`,
-                en: `Your booking for the trip ${booking.departure.city} - ${booking.arrival.city} on ${dateToString(booking.departure.date, user.preferedTimezone, 'en')} has been rejected by the driver.`
+                fr: `Votre réservation pour le trajet ${booking.departure.city} - ${booking.arrival.city} du ${dateToString(booking.departure.date, user.timezone, 'fr')} a été refusée par le conducteur.`,
+                en: `Your booking for the trip ${booking.departure.city} - ${booking.arrival.city} on ${dateToString(booking.departure.date, user.timezone, 'en')} has been rejected by the driver.`
             },
             type: 'standard',
             createdAt: new Date()
         }),
-        unbooked: (user: User, passenger: (Passenger & { departure: Etape, arrival: Etape, passenger: User })) => msgForLang<TemplateNotif, Notif>(user.preferedLanguage, {
+        unbooked: (user: User, passenger: (Passenger & { departure: Etape, arrival: Etape, passenger: User })) => msgForLang<TemplateNotif, Notif>(user.locale, {
             title: {
                 fr: 'Annulation de réservation',
                 en: 'Booking cancelation'
             },
             message: {
-                fr: `Le passager ${passenger.passenger.firstName ?? ''} ${passenger.passenger.lastName ?? ''} de votre trajet de ${passenger.departure.city} à ${passenger.arrival.city} du ${dateToString(passenger.departure.date, user.preferedTimezone, 'fr')} a annulé sa réservation.`,
-                en: `The passenger ${passenger.passenger.firstName ?? ''} ${passenger.passenger.lastName ?? ''} of your trip from ${passenger.departure.city} to ${passenger.arrival.city} on ${dateToString(passenger.departure.date, user.preferedTimezone, 'en')} has cancelled his booking.`
+                fr: `Le passager ${passenger.passenger.firstName ?? ''} ${passenger.passenger.lastName ?? ''} de votre trajet de ${passenger.departure.city} à ${passenger.arrival.city} du ${dateToString(passenger.departure.date, user.timezone, 'fr')} a annulé sa réservation.`,
+                en: `The passenger ${passenger.passenger.firstName ?? ''} ${passenger.passenger.lastName ?? ''} of your trip from ${passenger.departure.city} to ${passenger.arrival.city} on ${dateToString(passenger.departure.date, user.timezone, 'en')} has cancelled his booking.`
             },
             type: 'standard',
             createdAt: new Date()
         })
     },
     general: {
-        welcome: (user: User) => msgForLang<TemplateNotif, Notif>(user.preferedLanguage, {
+        welcome: (user: User) => msgForLang<TemplateNotif, Notif>(user.locale, {
             title: {
                 fr: `Bienvenue sur ${process.env.FRONTEND_NAME ?? ''} !`,
                 en: `Welcome to ${process.env.FRONTEND_NAME ?? ''} !`
@@ -1256,7 +1256,7 @@ async function sendMail (req: Request, message: (req: Request, ...args: any) => 
  */
 function notify (user: User, notification: { type: string | null, title: string, message: string, createdAt: Date } & Record<string, any>) {
     if (!user.mailNotif || user.emailVerifiedOn === null) return;
-    mailerSend(mail.notification.new(user.preferedLanguage, user, notification))
+    mailerSend(mail.notification.new(user.locale, user, notification))
         .then(() => {
             console.log(`Notification sent to ${user.email}.`);
         }).catch((err) => {

@@ -42,8 +42,8 @@ exports.signup = (req: express.Request, res: express.Response, _: express.NextFu
                             avatar: null,
                             hasCar,
                             gender: genderSanitized,
-                            preferedLanguage: req.acceptsLanguages().find((lang) => lang in properties.languages), // detect language from browser
-                            preferedTimezone: timezoneSanitized
+                            locale: req.acceptsLanguages().find((lang) => lang in properties.languages), // detect language from browser
+                            timezone: timezoneSanitized
                         }
                     }).then((user) => {
                         const notif = notifs.general.welcome(user);

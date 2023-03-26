@@ -244,7 +244,7 @@ function checkDateField (date: any, dateDays: boolean, req: express.Request, res
 
     if (dateDays) {
         if (dateAddHours(new Date(), properties.travel.hoursLimit) > new Date(date)) {
-            sendMsg(req, res, error.date.tooSoon, dateAddHours(new Date(), properties.travel.hoursLimit), res.locals.user.preferedTimezone);
+            sendMsg(req, res, error.date.tooSoon, dateAddHours(new Date(), properties.travel.hoursLimit), res.locals.user.timezone);
             return false;
         }
     }
@@ -495,16 +495,16 @@ function checkDatesOrder (date1: any, date2: any, req: express.Request, res: exp
 function checkTravelAlready (dateMin: any, dateMax: any, etapes: any, req: express.Request, res: express.Response): boolean {
     if (etapes.length === 0) return true;
     if (new Date(dateMin) >= new Date(etapes[0].date) && new Date(dateMin) <= new Date(etapes[etapes.length - 1].date)) {
-        sendMsg(req, res, error.etapes.alreadyTravel, new Date(etapes[0].date), new Date(etapes[etapes.length - 1].date), res.locals.user.preferedTimezone);
+        sendMsg(req, res, error.etapes.alreadyTravel, new Date(etapes[0].date), new Date(etapes[etapes.length - 1].date), res.locals.user.timezone);
         return false;
     }
 
     if (new Date(dateMax) >= new Date(etapes[0].date) && new Date(dateMax) <= new Date(etapes[etapes.length - 1].date)) {
-        sendMsg(req, res, error.etapes.alreadyTravel, new Date(etapes[0].date), new Date(etapes[etapes.length - 1].date), res.locals.user.preferedTimezone);
+        sendMsg(req, res, error.etapes.alreadyTravel, new Date(etapes[0].date), new Date(etapes[etapes.length - 1].date), res.locals.user.timezone);
         return false;
     }
     if ((new Date(dateMin) <= new Date(etapes[0].date) && new Date(dateMax) >= new Date(etapes[0].date)) && (new Date(dateMin) <= new Date(etapes[etapes.length - 1].date) && new Date(dateMax) >= new Date(etapes[etapes.length - 1].date))) {
-        sendMsg(req, res, error.etapes.alreadyTravel, new Date(etapes[0].date), new Date(etapes[etapes.length - 1].date), res.locals.user.preferedTimezone);
+        sendMsg(req, res, error.etapes.alreadyTravel, new Date(etapes[0].date), new Date(etapes[etapes.length - 1].date), res.locals.user.timezone);
         return false;
     }
 

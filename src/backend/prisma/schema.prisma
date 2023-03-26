@@ -35,8 +35,8 @@ model User {
   createdAt                      DateTime       @default(now())
   lastPasswordResetEmailedOn     DateTime?
   lastEmailVerificationEmailedOn DateTime?
-  preferedLanguage               String?        @db.VarChar(10) // TODO: rename to 'locale'
-  preferedTimezone               String?        @db.VarChar(50) // TODO: rename to 'timezone'
+  locale                         String?        @db.VarChar(10)
+  timezone                       String?        @db.VarChar(50)
 }
 
 model Travel {
