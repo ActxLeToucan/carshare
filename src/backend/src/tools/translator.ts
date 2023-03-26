@@ -60,6 +60,43 @@ const mailHtmlHeader = process.env.FRONTEND_LOGO === undefined || process.env.FR
     : `<a href="${process.env.FRONTEND_URL ?? ''}"><img src="${process.env.FRONTEND_LOGO ?? ''}" alt="${process.env.FRONTEND_NAME ?? ''}" style="width: 100px; height: 100px; margin: 0 auto; display: block;"/></a>`;
 
 const error = {
+
+    context:{
+        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: "Le contexte doit être une chaîne de caractères.",
+                en: 'context must be a string.'
+            },
+            code: 400
+        }),
+
+        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: "Le contexte est requis.",
+                en: 'context is required.'
+            },
+            code: 400
+        })
+    },
+
+    label: {
+        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: "Le label doit être une chaîne de caractères.",
+                en: 'Label must be a string.'
+            },
+            code: 400
+        }),
+
+        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: "Le label est requis.",
+                en: 'Label is required.'
+            },
+            code: 400
+        })
+    },
+
     email: {
         required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
@@ -104,6 +141,7 @@ const error = {
             code: 400
         })
     },
+
     password: {
         required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
@@ -844,12 +882,44 @@ const info = {
             },
             code: 200
         }),
+        updated: (req: Request, travel: Travel) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Trajet mis à jour',
+                en: 'Travel updated'
+            },
+            code: 200,
+            data: {
+                travel
+            }
+        }),
         unbooked: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Réservation annulée.',
                 en: 'Unbooked from trip.'
             },
             code: 200
+        })
+    },
+    etape:{
+        created: (req: Request, etape: Etape) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Etape créée',
+                en: 'Step created'
+            },
+            code: 201,
+            data: {
+                etape
+            }
+        }),
+        updated: (req: Request, etape: Etape) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Etape mis à jour',
+                en: 'Etape updated'
+            },
+            code: 200,
+            data: {
+                etape
+            }
         })
     },
     group: {
