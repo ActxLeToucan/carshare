@@ -84,7 +84,7 @@ function acceptOrRejectBooking (req: express.Request, res: express.Response, sta
         }).then((booking) => {
             const notifPassenger = (status === properties.booking.status.accepted
                 ? notifs.booking.accepted
-                : notifs.booking.rejected)('en', booking);
+                : notifs.booking.rejected)(booking.passenger, booking);
 
             // create passenger's notification
             prisma.notification.create({
@@ -113,7 +113,7 @@ function acceptOrRejectBooking (req: express.Request, res: express.Response, sta
 
                     const updatedDriverNotif = (status === properties.booking.status.accepted
                         ? notifs.request.accepted
-                        : notifs.request.rejected)('en', notif, booking.passenger, new Date());
+                        : notifs.request.rejected)(res.locals.user, notif, booking.passenger, new Date());
 
                     // update notification
                     prisma.notification.update({
@@ -216,14 +216,7 @@ exports.createBooking = (req: express.Request, res: express.Response, _: express
                     passenger: true
                 }
             }).then((booking) => {
-                const notifDriver = notifs.request.new('en', travel, res.locals.user, startEtape, endEtape, {
-                    id: booking.id,
-                    status: booking.status,
-                    departureId: startEtape.id,
-                    arrivalId: endEtape.id,
-                    comment: null,
-                    passengerId: booking.passengerId
-                });
+                const notifDriver = notifs.request.new(travel.driver, travel, booking, res.locals.user);
 
                 // create driver's notification
                 prisma.notification.create({
@@ -310,9 +303,9 @@ exports.cancelBooking = (req: express.Request, res: express.Response, next: expr
             }
 
             const etapesId = travel.etapes.map(elem => elem.id);
-            const passengerTravel = travelsAsPassenger.filter((elem: Passenger) => etapesId.includes(elem.departureId));
+            const passengerTravel = travelsAsPassenger.find((elem: Passenger) => etapesId.includes(elem.departureId));
 
-            if (passengerTravel === null) {
+            if (passengerTravel === undefined) {
                 sendMsg(req, res, error.travel.notAPassenger);
                 return;
             }
@@ -321,10 +314,10 @@ exports.cancelBooking = (req: express.Request, res: express.Response, next: expr
 
             prisma.passenger.delete({
                 where: {
-                    id: passengerTravel[0].id
+                    id: passengerTravel.id
                 }
             }).then(() => {
-                const notif = notifs.booking.unbooked('en', passengerTravel[0]); // TODO: get user language
+                const notif = notifs.booking.unbooked(travel.driver, passengerTravel);
                 const data = {
                     ...notif,
                     userId: travel.driverId,

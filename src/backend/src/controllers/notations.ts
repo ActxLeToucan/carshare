@@ -172,7 +172,7 @@ exports.createEvaluation = (req: express.Request, res: express.Response, _: expr
                     }
                 }).then((count) => {
                     if (count === 0) {
-                        sendMsg(req, res, error.evaluation.notpossible);
+                        sendMsg(req, res, error.evaluation.notPossible);
                         return;
                     }
 

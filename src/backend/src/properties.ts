@@ -1,6 +1,10 @@
 import { type Variants } from './tools/translator';
 
 const properties = {
+    settings: {
+        defaultLanguage: 'en',
+        defaultTimezone: 'UTC'
+    },
     email: {
         max: 64 // from schema.prisma
     },

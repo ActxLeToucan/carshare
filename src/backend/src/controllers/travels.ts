@@ -10,7 +10,7 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
     const { date, startCity, startContext, endCity, endContext } = req.query;
     if (!validator.checkCityField(startCity, req, res, 'startCity')) return;
     if (!validator.checkCityField(endCity, req, res, 'endCity')) return;
-    if (!validator.checkDateField(date, false, req, res)) return;
+    if (!validator.checkDateField(date, true, req, res)) return;
     if (startContext !== undefined && !validator.checkStringField(startContext, req, res, 'startContext')) return;
     if (endContext !== undefined && !validator.checkStringField(endContext, req, res, 'endContext')) return;
 
@@ -213,21 +213,21 @@ exports.cancelMyTravel = (req: express.Request, res: express.Response, _: expres
                     arrival: true,
                     passenger: true
                 }
-            }).then((passengers) => {
-                const data = passengers.map((passenger) => {
-                    const notif = notifs.travel.cancelled('en', passenger); // TODO: get user language
+            }).then((bookings) => {
+                const data = bookings.map((booking) => {
+                    const notif = notifs.travel.cancelled(booking.passenger, booking);
                     return {
                         ...notif,
-                        userId: passenger.passengerId,
+                        userId: booking.passengerId,
                         senderId: Number(res.locals.user.id),
-                        travelId: passenger.departure.travelId
+                        travelId: booking.departure.travelId
                     };
                 });
 
                 // create notifications
                 prisma.notification.createMany({ data }).then(() => {
                     for (const notif of data) {
-                        const passenger = passengers.find((p) => p.passengerId === notif.userId);
+                        const passenger = bookings.find((b) => b.passengerId === notif.userId);
                         // send email notification
                         if (passenger !== undefined) notify(passenger.passenger, notif);
                     }

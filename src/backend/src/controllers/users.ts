@@ -44,7 +44,7 @@ exports.signup = (req: express.Request, res: express.Response, _: express.NextFu
                             gender: genderSanitized
                         }
                     }).then((user) => {
-                        const notif = notifs.general.welcome('en', user); // TODO: use user's language
+                        const notif = notifs.general.welcome(user);
                         prisma.notification.create({
                             data: {
                                 user: { connect: { id: user.id } },
