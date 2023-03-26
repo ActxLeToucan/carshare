@@ -2,6 +2,7 @@ import type express from 'express';
 import { error, sendMsg } from './translator';
 import IsEmail from 'isemail';
 import properties from '../properties';
+import { type } from 'os';
 
 /**
  * Check if the email is in a valid format
@@ -30,6 +31,46 @@ function checkEmailField (email: any, req: express.Request, res: express.Respons
             sendMsg(req, res, error.email.max, properties.email.max);
             return false;
         }
+    }
+    return true;
+}
+
+/**
+ * Check if the label is in a valid format
+ * If the label is not valid, send an error message to the client
+ * @param label label to check
+ * @param req Express request
+ * @param res Express response
+ * @returns true if the label is valid, false otherwise
+ */
+function checkLabelField(label: any, req: express.Request, res: express.Response): boolean{
+    if(label === undefined || label === ''){
+        sendMsg(req, res, error.label.required);
+        return false;
+    }
+    if(typeof label !== 'string') {
+        sendMsg(req, res, error.label.type);
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Check if the label is in a valid format
+ * If the label is not valid, send an error message to the client
+ * @param context label to check
+ * @param req Express request
+ * @param res Express response
+ * @returns true if the label is valid, false otherwise
+ */
+function checkContextField(context: any, req: express.Request, res: express.Response): boolean{
+    if(context === undefined || context === ''){
+        sendMsg(req, res, error.context.required);
+        return false;
+    }
+    if(typeof context !== 'string') {
+        sendMsg(req, res, error.context.type);
+        return false;
     }
     return true;
 }
@@ -634,6 +675,10 @@ function dateAddHours (date: Date, hours: number): Date {
 
 export {
     checkEmailField,
+    checkLabelField,
+    checkContextField,
+    checkLatField,
+    checkLngField,
     checkPasswordField,
     checkOldPasswordField,
     checkLastNameField,
