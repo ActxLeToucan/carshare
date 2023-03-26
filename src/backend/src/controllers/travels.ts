@@ -293,88 +293,169 @@ exports.getTravel = (req: express.Request, res: express.Response, _: express.Nex
 }
 
 exports.updateTravel = (req: express.Request, res: express.Response, next: express.NextFunction) => { 
-    const userId = res.locals.user.id;
-    
     const travelId = validator.sanitizeId(req.query.id, req, res);
+    let stepIdList: Array<number> = [];
+    let { maxPassengers, price, description, driverId, groupId, steps} = req.body;
+
     if(travelId == null) return;
-
-    prisma.travel.findUnique({ where: { id: travelId } })
-        .then(async(travel) => {
-            
-            if(userId == travel?.driverId) {
-                let { maxPassengers, price, description, driverId, groupId} = req.body;
-                if(maxPassengers != undefined) {
-                    if (!validator.checkMaxPassengersField(maxPassengers, req, res)) return;
-                } else {
-                    maxPassengers = travel?.maxPassengers;
-                }
-                if(price != undefined) {
-                    if (!validator.checkPriceField(price, req, res)) return;
-                } else {
-                    price = travel?.price;
-                }
-                if(description != undefined) {
-                    if (!validator.checkDescriptionField(description, req, res, 'description')) return;
-                } else {
-                    description = travel?.description;
-                }
-                if(driverId != undefined) {
-                    if(!validator.sanitizeId(driverId, req, res)) return;
-                } else {
-                    driverId = travel?.driverId;
-                }
-            
-                if(groupId !== undefined) {
-                    if (groupId !== null) {
-                        if (typeof groupId !== 'number') {
-                            sendMsg(req, res, error.group.typeId);
-                            return;
-                        }
-                
-                        try {
-                            const count = await prisma.group.count({
-                                where: {
-                                    id: groupId,
-                                    creatorId: res.locals.user.id
-                                }
-                            });
-                
-                            if (count === 0) {
-                                sendMsg(req, res, error.group.notFound);
-                                return;
-                            }
-                        } catch (err) {
-                            console.error(err);
-                            sendMsg(req, res, error.generic.internalError);
-                        }
+    prisma.travel.findUnique({ 
+        where: { id: travelId }, 
+        include: { etapes: true } })
+    .then(async(travel) => {
+        if(travel == null) return;
+        if(travel.driverId != res.locals.user.id) {
+            sendMsg(req, res, error.travel.notDriver);
+            return;
+        }
+        if (!validator.checkMaxPassengersField(maxPassengers? maxPassengers : travel.maxPassengers, req, res)) return;
+        if (!validator.checkPriceField(price? price : travel.price, req, res)) return;
+        if (!validator.checkDescriptionField(description? description : travel.description, req, res, 'description')) return;
+        if (!validator.sanitizeId(driverId? driverId : travel.driverId, req, res)) return;
+        if (groupId !== undefined && groupId !== null) {
+            if (typeof groupId !== 'number') {
+                sendMsg(req, res, error.group.typeId);
+                return;
+            }
+    
+            try {
+                const count = await prisma.group.count({
+                    where: {
+                        id: groupId,
+                        creatorId: res.locals.user.id
                     }
-                } else {
-                    groupId = travel?.groupId;
+                });
+    
+                if (count === 0) {
+                    sendMsg(req, res, error.group.notFound);
+                    return;
                 }
+            } catch (err) {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
+            }
+        }
 
-            
-            
-                prisma.travel.update({
-                    where: {id: travelId},
+        for(let step of steps) {
+            if(step.id === null || step.id === undefined) {
+                prisma.etape.create({
                     data: {
-                        maxPassengers,
-                        price,
-                        description,
-                        driverId,
-                        groupId
+                        label: step.label,
+                        city: step.city,
+                        context: step.context,
+                        lat: step.lat,
+                        lng: step.lng,
+                        date: new Date(step.date),
+                        travelId: travel.id
                     }
-                }).then((travel) => {
-                    sendMsg(req, res, info.travel.updated, travel);
+                }).then((etape) => {
+                    console.log("a");
+                    
+                    stepIdList.push(etape.id);
                 }).catch((err) => {
                     console.error(err);
                     sendMsg(req, res, error.generic.internalError);
-                });
+                })
             } else {
-                sendMsg(req, res, error.travel.notDriver);
+                prisma.etape.findUnique({ where: {id: step.id}})
+                .then((etape) => {
+                    if(etape !== null) {
+                        if(etape.label !== step.label 
+                            && etape.city !== step.city 
+                            && etape.context !== step.context 
+                            && etape.lat !== step.lat 
+                            && etape.lng !== step.lng) {
+                                prisma.etape.update({
+                                    where: {id: step.id},
+                                    data: {
+                                        label: step.label,
+                                        city: step.city,
+                                        context: step.context,
+                                        lat: step.lat,
+                                        lng: step.lng,
+                                        date: new Date(step.date)
+                                    }
+                                }).then((etape) => {
+                                    console.log("b");
+                                    stepIdList.push(etape.id);
+                                }).catch((err) => {
+                                    console.error(err);
+                                    sendMsg(req, res, error.generic.internalError);
+                                })
+                        } else {
+                            console.log("c");
+                            stepIdList.push(step.id);
+                        }
+                    } else {                        
+                        prisma.etape.create({
+                            data: {
+                                label: step.label,
+                                city: step.city,
+                                context: step.context,
+                                lat: step.lat,
+                                lng: step.lng,
+                                date: new Date(step.date),
+                                travelId: travel.id
+                            }
+                        }).then((etape) => {
+                            console.log("d");
+                            stepIdList.push(etape.id);
+                        }).catch((err) => {
+                            console.error(err);
+                            sendMsg(req, res, error.generic.internalError);
+                        })
+                    }
+
+                }).catch((err) => {
+                    console.error(err);
+                    sendMsg(req, res, error.generic.internalError);
+                })
             }
+        }
+    }).catch((err) => {
+        sendMsg(req, res, error.generic.internalError);
+    })
+    prisma.travel.findUnique({
+        where: {id: travelId},
+        include: {etapes: true}
+    }).then((lastTravel) => {
+        if(lastTravel === null) return;
+        for(let element of lastTravel.etapes) {
+            console.log('id:', element.id);
+            console.log(stepIdList);
             
-        }).catch((err) => {
-            console.error(err);
-            sendMsg(req, res, error.generic.internalError);
-        });
+            if(!stepIdList.includes(element.id)) {
+                prisma.etape.delete({
+                    where: {
+                        id: element.id
+                    }
+                }).then(()=> {
+                    console.log("deleted");
+                    
+                })
+            }
+        }
+        
+    }).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
+
+    prisma.travel.update({
+        where: {id: travelId},
+        include: {etapes: true},
+        data: {
+            maxPassengers,
+            price,
+            description,
+            driverId,
+            etapes: {
+                connect: stepIdList.map(id => ({id}))
+            }
+        }
+    }).then((travel) => {
+        sendMsg(req, res, info.travel.updated, travel);
+    }).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
 }
