@@ -26,8 +26,8 @@ model User {
   level                          Int            @default(0)
   evaluationsPublished           Evaluation[]   @relation("evaluator")
   evaluationsReceived            Evaluation[]   @relation("evaluated")
-  travelsAsDriver                Travel[]       @relation("driver")
-  travelsAsPassenger             Passenger[]
+  travels                        Travel[]       @relation("driver")
+  bookings                       Booking[]
   notifications                  Notification[] @relation("recipient")
   notificationsSent              Notification[] @relation("sender")
   createdGroups                  Group[]        @relation("creator")
@@ -47,7 +47,7 @@ model Travel {
   status        Int            @default(0)
   driver        User           @relation(fields: [driverId], references: [id], name: "driver", onDelete: Cascade)
   driverId      Int
-  etapes        Etape[]
+  steps         Step[]
   evaluations   Evaluation[]
   notifications Notification[]
   group         Group?         @relation(fields: [groupId], references: [id], onDelete: SetNull)
@@ -55,33 +55,31 @@ model Travel {
   createdAt     DateTime       @default(now())
 }
 
-model Passenger {
-  // TODO: rename to Booking
+model Booking {
   id            Int            @id @default(autoincrement())
   passenger     User           @relation(fields: [passengerId], references: [id], onDelete: Cascade)
   passengerId   Int
   status        Int            @default(0)
   comment       String?        @db.Text
-  departure     Etape          @relation(name: "stepDeparture", fields: [departureId], references: [id], onDelete: Cascade)
+  departure     Step           @relation(name: "stepDeparture", fields: [departureId], references: [id], onDelete: Cascade)
   departureId   Int
-  arrival       Etape          @relation(name: "stepArrival", fields: [arrivalId], references: [id], onDelete: Cascade)
+  arrival       Step           @relation(name: "stepArrival", fields: [arrivalId], references: [id], onDelete: Cascade)
   arrivalId     Int
   notifications Notification[]
 }
 
-model Etape {
-  // TODO: rename to Step
-  id                     Int         @id @default(autoincrement())
-  label                  String      @db.Text // ex: "2ter Boulevard Charlemagne 54000 Nancy"
-  city                   String      @db.Text // ex: "Nancy"
-  context                String      @db.Text // ex: "54, Meurthe-et-Moselle, Grand Est"
-  lat                    Float // ex: 48.683188
-  lng                    Float // ex: 6.161877
-  travel                 Travel      @relation(fields: [travelId], references: [id], onDelete: Cascade)
-  travelId               Int
-  date                   DateTime
-  departuresOfPassengers Passenger[] @relation(name: "stepDeparture")
-  arrivalsOfPassengers   Passenger[] @relation(name: "stepArrival")
+model Step {
+  id                  Int       @id @default(autoincrement())
+  label               String    @db.Text // ex: "2ter Boulevard Charlemagne 54000 Nancy"
+  city                String    @db.Text // ex: "Nancy"
+  context             String    @db.Text // ex: "54, Meurthe-et-Moselle, Grand Est"
+  lat                 Float // ex: 48.683188
+  lng                 Float // ex: 6.161877
+  travel              Travel    @relation(fields: [travelId], references: [id], onDelete: Cascade)
+  travelId            Int
+  date                DateTime
+  departureOfBookings Booking[] @relation(name: "stepDeparture")
+  arrivalOfBookings   Booking[] @relation(name: "stepArrival")
 }
 
 model Evaluation {
@@ -97,18 +95,18 @@ model Evaluation {
 }
 
 model Notification {
-  id        Int        @id @default(autoincrement())
-  type      String?    @db.VarChar(25)
-  title     String     @db.Text
-  message   String     @db.Text
-  user      User       @relation(fields: [userId], references: [id], name: "recipient", onDelete: Cascade)
+  id        Int      @id @default(autoincrement())
+  type      String?  @db.VarChar(25)
+  title     String   @db.Text
+  message   String   @db.Text
+  user      User     @relation(fields: [userId], references: [id], name: "recipient", onDelete: Cascade)
   userId    Int
-  travel    Travel?    @relation(fields: [travelId], references: [id], onDelete: SetNull)
+  travel    Travel?  @relation(fields: [travelId], references: [id], onDelete: SetNull)
   travelId  Int?
-  sender    User?      @relation(fields: [senderId], references: [id], name: "sender", onDelete: SetNull)
+  sender    User?    @relation(fields: [senderId], references: [id], name: "sender", onDelete: SetNull)
   senderId  Int?
-  createdAt DateTime   @default(now())
-  booking   Passenger? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+  booking   Booking? @relation(fields: [bookingId], references: [id], onDelete: SetNull)
   bookingId Int?
 }
 

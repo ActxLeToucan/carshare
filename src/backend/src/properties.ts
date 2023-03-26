@@ -85,7 +85,7 @@ const properties = {
         min: -180,
         max: 180
     },
-    listOfEtape: {
+    stepList: {
         minLength: 2
     },
     query: {

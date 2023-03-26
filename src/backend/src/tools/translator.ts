@@ -1,5 +1,5 @@
 import { type Request, type Response } from 'express';
-import { type User, type Travel, type Group, type Etape, type Passenger, type Notification, type Evaluation } from '@prisma/client';
+import { type User, type Travel, type Group, type Step, type Booking, type Notification, type Evaluation } from '@prisma/client';
 
 import properties from '../properties';
 import { sendMail as mailerSend } from './mailer';
@@ -521,7 +521,7 @@ const error = {
             code: 400
         })
     },
-    etapes: {
+    steps: {
         required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Les étapes sont requises.',
@@ -529,7 +529,7 @@ const error = {
             },
             code: 400
         }),
-        etapeMin: (req: Request, length: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        min: (req: Request, length: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: `Un trajet doit comporter au minimum ${length} étape${length > 1 ? 's' : ''}.`,
                 en: `A trip must have at least ${length} step${length > 1 ? 's' : ''}.`
@@ -674,7 +674,7 @@ const error = {
             },
             code: 400
         }),
-        invalidEtapes: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        invalidSteps: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Les étapes ne sont pas valides.',
                 en: 'The steps are not valid.'
@@ -789,7 +789,7 @@ const info = {
         })
     },
     travel: {
-        created: (req: Request, travel: Travel & { etapes: Etape[] }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        created: (req: Request, travel: Travel & { steps: Step[] }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Trajet créé',
                 en: 'Travel created'
@@ -1051,19 +1051,19 @@ const mail = {
 
 const notifs = {
     request: {
-        new: (user: User, travel: Travel & { etapes: Etape[] }, booking: Passenger & { arrival: Etape, departure: Etape, passenger: User }, sender: User) => msgForLang<TemplateNotif, Notif>(user.locale, {
+        new: (user: User, travel: Travel & { steps: Step[] }, booking: Booking & { arrival: Step, departure: Step, passenger: User }, sender: User) => msgForLang<TemplateNotif, Notif>(user.locale, {
             title: {
                 fr: 'Nouvelle demande',
                 en: 'New request'
             },
             message: {
-                fr: `${sender.firstName ?? ''} ${sender.lastName ?? ''} souhaite vous accompagner sur le trajet ${travel.etapes[0].city} - ${travel.etapes[travel.etapes.length - 1].city}` +
-                 ` (du ${dateToString(new Date(travel.etapes[0].date), user.timezone, 'fr')}) de l'étape ${booking.departure.city} à ${booking.arrival.city}.` +
+                fr: `${sender.firstName ?? ''} ${sender.lastName ?? ''} souhaite vous accompagner sur le trajet ${travel.steps[0].city} - ${travel.steps[travel.steps.length - 1].city}` +
+                 ` (du ${dateToString(new Date(travel.steps[0].date), user.timezone, 'fr')}) de l'étape ${booking.departure.city} à ${booking.arrival.city}.` +
                     (booking.comment === null || booking.comment === ''
                         ? ''
                         : `\n\n${sender.firstName ?? ''} ${sender.lastName ?? ''} vous a laissé le message suivant :\n${booking.comment ?? ''}`),
-                en: `${sender.firstName ?? ''} ${sender.lastName ?? ''} wants to accompany you on the trip ${travel.etapes[0].city} - ${travel.etapes[travel.etapes.length - 1].city}` +
-                    ` (from ${dateToString(new Date(travel.etapes[0].date), user.timezone, 'en')}) from the step ${booking.departure.city} to ${booking.arrival.city}.` +
+                en: `${sender.firstName ?? ''} ${sender.lastName ?? ''} wants to accompany you on the trip ${travel.steps[0].city} - ${travel.steps[travel.steps.length - 1].city}` +
+                    ` (from ${dateToString(new Date(travel.steps[0].date), user.timezone, 'en')}) from the step ${booking.departure.city} to ${booking.arrival.city}.` +
                     (booking.comment === null || booking.comment === ''
                         ? ''
                         : `\n\n${sender.firstName ?? ''} ${sender.lastName ?? ''} left you the following message:\n${booking.comment ?? ''}`)
@@ -1105,7 +1105,7 @@ const notifs = {
         })
     },
     travel: {
-        cancelled: (user: User, booking: Passenger & { departure: Etape, arrival: Etape } & Record<string, any>) => msgForLang<TemplateNotif, Notif>(user.locale, {
+        cancelled: (user: User, booking: Booking & { departure: Step, arrival: Step } & Record<string, any>) => msgForLang<TemplateNotif, Notif>(user.locale, {
             title: {
                 fr: 'Annulation de trajet',
                 en: 'Travel cancelled'
@@ -1119,7 +1119,7 @@ const notifs = {
         })
     },
     booking: {
-        accepted: (user: User, booking: Passenger & { departure: Etape, arrival: Etape } & Record<string, any>) => msgForLang<TemplateNotif, Notif>(user.locale, {
+        accepted: (user: User, booking: Booking & { departure: Step, arrival: Step } & Record<string, any>) => msgForLang<TemplateNotif, Notif>(user.locale, {
             title: {
                 fr: 'Réservation acceptée',
                 en: 'Booking accepted'
@@ -1131,7 +1131,7 @@ const notifs = {
             type: 'standard',
             createdAt: new Date()
         }),
-        rejected: (user: User, booking: Passenger & { departure: Etape, arrival: Etape } & Record<string, any>) => msgForLang<TemplateNotif, Notif>(user.locale, {
+        rejected: (user: User, booking: Booking & { departure: Step, arrival: Step } & Record<string, any>) => msgForLang<TemplateNotif, Notif>(user.locale, {
             title: {
                 fr: 'Réservation refusée',
                 en: 'Booking rejected'
@@ -1143,14 +1143,14 @@ const notifs = {
             type: 'standard',
             createdAt: new Date()
         }),
-        unbooked: (user: User, passenger: (Passenger & { departure: Etape, arrival: Etape, passenger: User })) => msgForLang<TemplateNotif, Notif>(user.locale, {
+        unbooked: (user: User, booking: (Booking & { departure: Step, arrival: Step, passenger: User })) => msgForLang<TemplateNotif, Notif>(user.locale, {
             title: {
                 fr: 'Annulation de réservation',
                 en: 'Booking cancelation'
             },
             message: {
-                fr: `Le passager ${passenger.passenger.firstName ?? ''} ${passenger.passenger.lastName ?? ''} de votre trajet de ${passenger.departure.city} à ${passenger.arrival.city} du ${dateToString(passenger.departure.date, user.timezone, 'fr')} a annulé sa réservation.`,
-                en: `The passenger ${passenger.passenger.firstName ?? ''} ${passenger.passenger.lastName ?? ''} of your trip from ${passenger.departure.city} to ${passenger.arrival.city} on ${dateToString(passenger.departure.date, user.timezone, 'en')} has cancelled his booking.`
+                fr: `Le passager ${booking.passenger.firstName ?? ''} ${booking.passenger.lastName ?? ''} de votre trajet de ${booking.departure.city} à ${booking.arrival.city} du ${dateToString(booking.departure.date, user.timezone, 'fr')} a annulé sa réservation.`,
+                en: `The passenger ${booking.passenger.firstName ?? ''} ${booking.passenger.lastName ?? ''} of your trip from ${booking.departure.city} to ${booking.arrival.city} on ${dateToString(booking.departure.date, user.timezone, 'en')} has cancelled his booking.`
             },
             type: 'standard',
             createdAt: new Date()
