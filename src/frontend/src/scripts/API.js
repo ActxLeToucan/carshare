@@ -246,6 +246,7 @@ class API {
                     reject(err);
                 }
             };
+            
             fetch(API.API_URL + path, {
                 credentials: "omit",
                 method: method,

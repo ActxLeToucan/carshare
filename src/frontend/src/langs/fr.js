@@ -179,7 +179,7 @@ export default {
     GROUP_SELECTED: "Groupe sélectionné",
     SEARCH_GROUP: "Rechercher un groupe",
     GROUP_NAME: "Nom de groupe",
-    GROUP_CREATOR: "Createur",
+    GROUP_CREATOR: "Créateur",
     GROUP_CREATEDAT :"Date de creation",
 
     //parametres

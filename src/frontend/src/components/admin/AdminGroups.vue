@@ -1,5 +1,5 @@
 <template>
-    <div class="flex md:flex-row flex-col grow max-h-full min-h-0">
+    <div class="flex md:flex-row flex-col grow max-h-full max-w-full min-h-0">
         <div
             ref="query-zone"
             class="flex flex-col items-center h-full md:w-min w-full px-8 py-4 space-y-4 md:border-r-8 border-teal-500 mx-auto overflow-hidden"
@@ -42,7 +42,7 @@
             class="flex flex-col grow px-4 p-4 overflow-auto"
         >
             <button
-                ref="backtabs-btn"
+                ref="backbtn"
                 class="absolute md:hidden flex rounded-md border-2 border-slate-200 bg-white h-fit w-fit p-2 m-4"
             >
                 <svg
@@ -92,13 +92,13 @@
                                 class="mb-0"
                         />
                         <div class="flex grow h-fit justify-center p-4">
-                            <label
+                            <p 
                                 v-if="label != ''"
-                                class="flex text-xl dark:text-slate-400 font-bold whitespace-nowrap text-ellipsis w-fit"
+                                class="flex text-xl dark:text-slate-400 font-bold whitespace-nowrap text-ellipsis"
                                 :class="dark ? ' text-white' : ' text-slate-500'"
                             >
-                            {{ lang.USERS }}
-                            </label>
+                            {{ lang.MEMBERS }}
+                            </p>
                             <div
                                 v-if="selectedGroup?.users.length == 0"
                                 class="flex flex-col justify-center mx-auto max-w-full"
@@ -233,6 +233,22 @@ export default {
     },
     mounted() {
         Lang.AddCallback(lang => this.lang = lang);
+        const backbtn = this.$refs['backbtn'];
+        backbtn.addEventListener('click', () => {
+            this.displayPage(PAGE.QUERY);
+        });
+
+        this.searchLogZone = new LogZone(this.$refs["search-log-zone"]);
+
+        this.displayPage(PAGE.QUERY);
+        window.addEventListener("resize", _ => {
+            this.isMobile = window.innerWidth < 768;
+            this.displayPage();
+        });
+
+        this.pagination.onChanged(() => {
+            this.search();
+        });
     },
     methods: {
         displayPage(page) {
@@ -260,6 +276,7 @@ export default {
         },
         onCardClicked(group) {
             this.selectedGroup = group;
+            this.displayPage(PAGE.RESULTS);
         },
         searchLog(msg, type = Log.INFO) {
             if (!this.searchLogZone) return;
@@ -332,7 +349,7 @@ export default {
             this.deletePopup = popup;
         },
         showDeletePopup() {
-            this.deletePopup.setTitle(this.lang.DELETE + ' ' + this.selectedUser?.firstName + ' ' + this.selectedUser?.lastName);
+            this.deletePopup.setTitle(this.lang.DELETE + ' ' + this.selectedGroup?.name);
             this.deletePopup.show();
         }, 
         deleteGroup(popup) {
