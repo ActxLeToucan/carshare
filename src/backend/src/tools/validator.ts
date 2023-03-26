@@ -2,6 +2,7 @@ import type express from 'express';
 import { error, sendMsg } from './translator';
 import IsEmail from 'isemail';
 import properties from '../properties';
+import moment from 'moment-timezone';
 
 /**
  * Check if the email is in a valid format
@@ -619,6 +620,17 @@ function checkTravelHoursLimit (date: Date, req: express.Request, res: express.R
 }
 
 /**
+ * Check if the given timezone is valid for moment
+ * @param timezone Timezone to check
+ * @returns the timezone if it is valid, undefined otherwise
+ */
+function sanitizeTimezone (timezone: any): string | undefined {
+    if (timezone === undefined || typeof timezone !== 'string' || timezone === '') return undefined;
+    if (moment.tz.names().includes(timezone)) return timezone;
+    return undefined;
+}
+
+/**
  * Add hours to a date
  * @param date Date to add hours
  * @param hours Hours to add
@@ -650,5 +662,6 @@ export {
     checkTravelAlready,
     checkNoteField,
     checkNumberField,
-    checkTravelHoursLimit
+    checkTravelHoursLimit,
+    sanitizeTimezone
 };

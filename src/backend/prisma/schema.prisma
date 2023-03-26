@@ -35,8 +35,8 @@ model User {
   createdAt                      DateTime       @default(now())
   lastPasswordResetEmailedOn     DateTime?
   lastEmailVerificationEmailedOn DateTime?
-  preferedLanguage               String?        @db.VarChar(10)
-  preferedTimezone               String?        @db.VarChar(50)
+  preferedLanguage               String?        @db.VarChar(10) // TODO: rename to 'locale'
+  preferedTimezone               String?        @db.VarChar(50) // TODO: rename to 'timezone'
 }
 
 model Travel {
@@ -56,6 +56,7 @@ model Travel {
 }
 
 model Passenger {
+  // TODO: rename to Booking
   id            Int            @id @default(autoincrement())
   passenger     User           @relation(fields: [passengerId], references: [id], onDelete: Cascade)
   passengerId   Int
@@ -69,6 +70,7 @@ model Passenger {
 }
 
 model Etape {
+  // TODO: rename to Step
   id                     Int         @id @default(autoincrement())
   label                  String      @db.Text // ex: "2ter Boulevard Charlemagne 54000 Nancy"
   city                   String      @db.Text // ex: "Nancy"

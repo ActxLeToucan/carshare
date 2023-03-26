@@ -5,6 +5,7 @@ const properties = {
         defaultLanguage: 'en',
         defaultTimezone: 'UTC'
     },
+    languages: ['en', 'fr'],
     email: {
         max: 64 // from schema.prisma
     },

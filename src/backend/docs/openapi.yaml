@@ -57,6 +57,11 @@ paths:
                   type: boolean
                   required: false
                   default: false
+                timezone:
+                  type: string
+                  required: false
+                  default: null
+                  example: Europe/Paris
       responses:
         '201':
           description: User created
@@ -2233,6 +2238,16 @@ components:
         level:
           type: integer
           default: 0
+        locale:
+          type: string
+          nullable: true
+          default: null
+          example: fr
+        timezone:
+          type: string
+          nullable: true
+          default: null
+          example: Europe/Paris
     PrivateUser:
       type: object
       properties:
@@ -2275,6 +2290,16 @@ components:
         createdAt:
           type: string
           format: date-time
+        locale:
+          type: string
+          nullable: true
+          default: null
+          example: fr
+        timezone:
+          type: string
+          nullable: true
+          default: null
+          example: Europe/Paris
     Notification:
       type: object
       properties:
