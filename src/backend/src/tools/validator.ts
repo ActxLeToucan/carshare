@@ -476,7 +476,7 @@ function checkDatesOrder (date1: any, date2: any, req: express.Request, res: exp
     }
 
     if (new Date(date1) > new Date(date2)) {
-        sendMsg(req, res, error.etapes.badOrder);
+        sendMsg(req, res, error.steps.badOrder);
         return false;
     }
     return true;
@@ -487,24 +487,24 @@ function checkDatesOrder (date1: any, date2: any, req: express.Request, res: exp
  * If the user has already a travel, send an error message to the client
  * @param dateMin Date to check
  * @param dateMax Date to check
- * @param etapes
+ * @param steps
  * @param req Express request
  * @param res Express response
  * @returns true if the user doesn't have a trip , false otherwise
  */
-function checkTravelAlready (dateMin: any, dateMax: any, etapes: any, req: express.Request, res: express.Response): boolean {
-    if (etapes.length === 0) return true;
-    if (new Date(dateMin) >= new Date(etapes[0].date) && new Date(dateMin) <= new Date(etapes[etapes.length - 1].date)) {
-        sendMsg(req, res, error.etapes.alreadyTravel, new Date(etapes[0].date), new Date(etapes[etapes.length - 1].date), res.locals.user.timezone);
+function checkTravelAlready (dateMin: any, dateMax: any, steps: any, req: express.Request, res: express.Response): boolean {
+    if (steps.length === 0) return true;
+    if (new Date(dateMin) >= new Date(steps[0].date) && new Date(dateMin) <= new Date(steps[steps.length - 1].date)) {
+        sendMsg(req, res, error.steps.alreadyTravel, new Date(steps[0].date), new Date(steps[steps.length - 1].date), res.locals.user.timezone);
         return false;
     }
 
-    if (new Date(dateMax) >= new Date(etapes[0].date) && new Date(dateMax) <= new Date(etapes[etapes.length - 1].date)) {
-        sendMsg(req, res, error.etapes.alreadyTravel, new Date(etapes[0].date), new Date(etapes[etapes.length - 1].date), res.locals.user.timezone);
+    if (new Date(dateMax) >= new Date(steps[0].date) && new Date(dateMax) <= new Date(steps[steps.length - 1].date)) {
+        sendMsg(req, res, error.steps.alreadyTravel, new Date(steps[0].date), new Date(steps[steps.length - 1].date), res.locals.user.timezone);
         return false;
     }
-    if ((new Date(dateMin) <= new Date(etapes[0].date) && new Date(dateMax) >= new Date(etapes[0].date)) && (new Date(dateMin) <= new Date(etapes[etapes.length - 1].date) && new Date(dateMax) >= new Date(etapes[etapes.length - 1].date))) {
-        sendMsg(req, res, error.etapes.alreadyTravel, new Date(etapes[0].date), new Date(etapes[etapes.length - 1].date), res.locals.user.timezone);
+    if ((new Date(dateMin) <= new Date(steps[0].date) && new Date(dateMax) >= new Date(steps[0].date)) && (new Date(dateMin) <= new Date(steps[steps.length - 1].date) && new Date(dateMax) >= new Date(steps[steps.length - 1].date))) {
+        sendMsg(req, res, error.steps.alreadyTravel, new Date(steps[0].date), new Date(steps[steps.length - 1].date), res.locals.user.timezone);
         return false;
     }
 
@@ -512,40 +512,40 @@ function checkTravelAlready (dateMin: any, dateMax: any, etapes: any, req: expre
 }
 
 /**
- * Check if a listOfEtape field is valid
- * If the string is not valid, send an error message to the client
- * @param etapes Value to sanitize
+ * Check if a list of steps is valid
+ * If one step is not valid, send an error message to the client
+ * @param steps List of steps to check
  * @param req Express request
  * @param res Express response
- * @returns true if the value is valid, false otherwise
+ * @returns true if the list of steps is valid, false otherwise
  */
-function checkListOfEtapeField (etapes: any, req: express.Request, res: express.Response): boolean {
-    if (etapes === undefined || etapes === '') {
-        sendMsg(req, res, error.etapes.required);
+function checkStepList (steps: any, req: express.Request, res: express.Response): boolean {
+    if (steps === undefined || steps === '') {
+        sendMsg(req, res, error.steps.required);
         return false;
     }
-    if (typeof etapes !== 'object') {
-        sendMsg(req, res, error.etapes.type);
+    if (typeof steps !== 'object') {
+        sendMsg(req, res, error.steps.type);
         return false;
     }
-    if (etapes.length < 2) {
-        sendMsg(req, res, error.etapes.etapeMin, properties.listOfEtape.minLength);
+    if (steps.length < 2) {
+        sendMsg(req, res, error.steps.min, properties.stepList.minLength);
         return false;
     }
 
     let incr: number = 1;
-    for (const etape in etapes) {
-        if (!checkDateField(etapes[etape].date, true, req, res)) return false;
+    for (const step in steps) {
+        if (!checkDateField(steps[step].date, true, req, res)) return false;
 
-        if (etape !== String(etapes.length - 1)) {
-            if (!checkDatesOrder(etapes[etape].date, etapes[incr].date, req, res)) return false;
+        if (step !== String(steps.length - 1)) {
+            if (!checkDatesOrder(steps[step].date, steps[incr].date, req, res)) return false;
         }
 
-        if (!checkStringField(etapes[etape].label, req, res, 'label')) return false;
-        if (!checkStringField(etapes[etape].city, req, res, 'city')) return false;
-        if (!checkStringField(etapes[etape].context, req, res, 'context')) return false;
-        if (!checkLatField(etapes[etape].lat, req, res)) return false;
-        if (!checkLngField(etapes[etape].lng, req, res)) return false;
+        if (!checkStringField(steps[step].label, req, res, 'label')) return false;
+        if (!checkStringField(steps[step].city, req, res, 'city')) return false;
+        if (!checkStringField(steps[step].context, req, res, 'context')) return false;
+        if (!checkLatField(steps[step].lat, req, res)) return false;
+        if (!checkLngField(steps[step].lng, req, res)) return false;
 
         incr += 1;
     }
@@ -657,7 +657,7 @@ export {
     checkMaxPassengersField,
     checkPriceField,
     checkStringField,
-    checkListOfEtapeField,
+    checkStepList,
     checkDescriptionField,
     checkTravelAlready,
     checkNoteField,
