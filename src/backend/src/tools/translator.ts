@@ -690,10 +690,24 @@ const error = {
             },
             code: 404
         }),
-        alreadyReplied: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        notYours: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Vous avez déjà répondu à cette demande.',
-                en: 'You have already replied to this request.'
+                fr: 'Vous n\'êtes pas l\'auteur de cette réservation.',
+                en: 'You are not the author of this booking.'
+            },
+            code: 403
+        }),
+        notPending: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Cette réservation n\'est plus en attente.',
+                en: 'This booking is no longer pending.'
+            },
+            code: 400
+        }),
+        alreadyCancelled: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Cette réservation a déjà été annulée ou refusée.',
+                en: 'This booking has already been cancelled or rejected.'
             },
             code: 400
         }),
@@ -805,13 +819,6 @@ const info = {
                 en: 'Travel cancelled'
             },
             code: 200
-        }),
-        unbooked: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Réservation annulée.',
-                en: 'Unbooked from trip.'
-            },
-            code: 200
         })
     },
     group: {
@@ -887,6 +894,13 @@ const info = {
             msg: {
                 fr: `Vous venez de demander à rejoindre le trajet de ${user.firstName ?? ''} ${user.lastName ?? ''}.`,
                 en: `You have asked to join ${user.firstName ?? ''} ${user.lastName ?? ''}'s trip.`
+            },
+            code: 200
+        }),
+        cancelled: (req: Request, user: User) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Réservation annulée',
+                en: 'Booking cancelled'
             },
             code: 200
         })
@@ -1143,14 +1157,36 @@ const notifs = {
             type: 'standard',
             createdAt: new Date()
         }),
-        unbooked: (user: User, booking: (Booking & { departure: Step, arrival: Step, passenger: User })) => msgForLang<TemplateNotif, Notif>(user.locale, {
+        cancelled: (user: User, booking: (Booking & { departure: Step, arrival: Step, passenger: User }), travel: Travel & { steps: Step[] } & Record<string, any>, previousStatus: number) => msgForLang<TemplateNotif, Notif>(user.locale, {
             title: {
                 fr: 'Annulation de réservation',
-                en: 'Booking cancelation'
+                en: 'Booking cancellation'
             },
             message: {
-                fr: `Le passager ${booking.passenger.firstName ?? ''} ${booking.passenger.lastName ?? ''} de votre trajet de ${booking.departure.city} à ${booking.arrival.city} du ${dateToString(booking.departure.date, user.timezone, 'fr')} a annulé sa réservation.`,
-                en: `The passenger ${booking.passenger.firstName ?? ''} ${booking.passenger.lastName ?? ''} of your trip from ${booking.departure.city} to ${booking.arrival.city} on ${dateToString(booking.departure.date, user.timezone, 'en')} has cancelled his booking.`
+                fr: `${booking.passenger.firstName ?? ''} ${booking.passenger.lastName ?? ''} a annulé sa réservation de ${booking.departure.city} à ${booking.arrival.city}` +
+                ` sur le trajet ${travel.steps[0].city} - ${travel.steps[travel.steps.length - 1].city} du ${dateToString(booking.departure.date, user.timezone, 'fr')}.\n` +
+                (() => {
+                    switch (previousStatus) {
+                        case properties.booking.status.accepted:
+                            return 'Vous aviez accepté cette réservation.'
+                        case properties.booking.status.rejected:
+                            return 'Vous aviez refusé cette réservation.'
+                        default:
+                            return 'Vous n\'aviez pas encore répondu à cette demande.'
+                    }
+                })(),
+                en: `${booking.passenger.firstName ?? ''} ${booking.passenger.lastName ?? ''} cancelled his booking from ${booking.departure.city} to ${booking.arrival.city}` +
+                ` on the trip ${travel.steps[0].city} - ${travel.steps[travel.steps.length - 1].city} on ${dateToString(booking.departure.date, user.timezone, 'en')}.\n` +
+                (() => {
+                    switch (previousStatus) {
+                        case properties.booking.status.accepted:
+                            return 'You had accepted this booking.'
+                        case properties.booking.status.rejected:
+                            return 'You had rejected this booking.'
+                        default:
+                            return 'You had not yet answered this request.'
+                    }
+                })()
             },
             type: 'standard',
             createdAt: new Date()

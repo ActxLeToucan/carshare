@@ -44,7 +44,7 @@ function acceptOrRejectBooking (req: express.Request, res: express.Response, sta
         }
 
         if (booking.status !== properties.booking.status.pending) {
-            sendMsg(req, res, error.booking.alreadyReplied);
+            sendMsg(req, res, error.booking.notPending);
             return;
         }
 

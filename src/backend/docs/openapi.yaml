@@ -1747,7 +1747,7 @@ paths:
         - bearerAuth: [ ]
       responses:
         '200':
-          description: Trip unbooked
+          description: Booking cancelled
           content:
             application/json:
               schema:
@@ -1755,7 +1755,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: Unbooked from trip
+                    example: Booking cancelled
         '400':
           description: Bad request
           content:
@@ -1765,11 +1765,21 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: TravelId is required.
+                    example: Id is invalid.
         '401':
           $ref: '#/components/responses/noToken'
         '403':
-          $ref: '#/components/responses/insufficientPrivileges'
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: You are not the author of this booking.
+        '404':
+          $ref: '#/components/responses/bookingNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
