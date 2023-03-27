@@ -620,14 +620,34 @@ function checkTravelHoursLimit (date: Date, req: express.Request, res: express.R
 }
 
 /**
- * Check if the given timezone is valid for moment
- * @param timezone Timezone to check
+ * Sanitize the timezone
+ * @param timezone Timezone to sanitize
  * @returns the timezone if it is valid, undefined otherwise
  */
 function sanitizeTimezone (timezone: any): string | undefined {
     if (timezone === undefined || typeof timezone !== 'string' || timezone === '') return undefined;
     if (moment.tz.names().includes(timezone)) return timezone;
     return undefined;
+}
+
+/**
+ * Check if the language is valid
+ * If the language is not valid, send an error message to the client
+ * @param lang Language to check
+ * @param req Express request
+ * @param res Express response
+ * @returns true if the language is valid, false otherwise
+ */
+function checkLang (lang: any, req: express.Request, res: express.Response): boolean {
+    if (lang === undefined || typeof lang !== 'string' || lang === '') {
+        sendMsg(req, res, error.lang.required);
+        return false;
+    }
+    if (!properties.languages.includes(lang)) {
+        sendMsg(req, res, error.lang.unknown);
+        return false;
+    }
+    return true;
 }
 
 /**
@@ -663,5 +683,6 @@ export {
     checkNoteField,
     checkNumberField,
     checkTravelHoursLimit,
-    sanitizeTimezone
+    sanitizeTimezone,
+    checkLang
 };

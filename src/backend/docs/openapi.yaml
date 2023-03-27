@@ -2134,7 +2134,7 @@ components:
         mailNotif:
           type: boolean
           example: true
-        locale:
+        lang:
           type: string
           nullable: true
           example: en
@@ -2149,7 +2149,7 @@ components:
           type: boolean
           required: false
           example: true
-        locale:
+        lang:
           type: string
           nullable: true
           required: false
@@ -2280,7 +2280,7 @@ components:
         level:
           type: integer
           default: 0
-        locale:
+        lang:
           type: string
           nullable: true
           default: null

@@ -35,7 +35,7 @@ model User {
   createdAt                      DateTime       @default(now())
   lastPasswordResetEmailedOn     DateTime?
   lastEmailVerificationEmailedOn DateTime?
-  locale                         String?        @db.VarChar(10)
+  lang                           String?        @db.VarChar(10)
   timezone                       String?        @db.VarChar(50)
 }
 

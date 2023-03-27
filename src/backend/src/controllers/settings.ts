@@ -6,21 +6,29 @@ import * as validator from '../tools/validator';
 exports.getSettings = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     res.status(200).json({
         mailNotif: res.locals.user.mailNotif,
-        locale: res.locals.user.locale,
+        lang: res.locals.user.lang,
         timezone: res.locals.user.timezone
     });
 }
 
 exports.updateSettings = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const { mailNotif, locale, timezone } = req.body;
+    const { mailNotif, lang, timezone } = req.body;
 
     if (mailNotif !== undefined && !validator.checkBooleanField(mailNotif, req, res, 'mailNotif')) return;
-    if (locale !== undefined && !validator.checkLocale(locale, req, res)) return;
-    if (timezone !== undefined && !validator.checkTimezone(timezone, req, res)) return;
+    if (lang !== undefined && !validator.checkLang(lang, req, res)) return;
+    const timezoneSanitized = validator.sanitizeTimezone(timezone);
+    if (timezone !== undefined && timezoneSanitized === undefined) {
+        sendMsg(req, res, error.timezone.invalid);
+        return;
+    }
 
     prisma.user.update({
         where: { id: res.locals.user.id },
-        data: { mailNotif, locale, timezone }
+        data: {
+            mailNotif,
+            lang,
+            timezone: timezoneSanitized
+        }
     }).then(() => {
         sendMsg(req, res, info.settings.saved);
     }).catch((err) => {

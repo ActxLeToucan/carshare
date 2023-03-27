@@ -718,6 +718,31 @@ const error = {
             },
             code: 400
         })
+    },
+    timezone: {
+        invalid: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Fuseau horaire invalide.',
+                en: 'Invalid timezone.'
+            },
+            code: 400
+        })
+    },
+    lang: {
+        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Langue requise.',
+                en: 'Language required.'
+            },
+            code: 400
+        }),
+        unknown: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Langue inconnue.',
+                en: 'Unknown language.'
+            },
+            code: 400
+        })
     }
 } satisfies TranslationsMessageHTTP;
 
