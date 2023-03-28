@@ -327,6 +327,21 @@ function sanitizeId (id: any, req: express.Request, res: express.Response): numb
 
     return Number(id);
 }
+/**
+ * Sanitize the type
+ * @param type id to sanitize
+ * @param req Express request
+ * @param res Express response
+ * @returns The type string if it is valid, null otherwise
+ */
+function sanitizeType (type: any, req: express.Request, res: express.Response): string | undefined | null {
+    if (type !== 'past' && type !== 'future') {
+        sendMsg(req, res, error.id.invalid);
+        return null;
+    }
+
+    return type;
+}
 
 /**
  * Check if a price field is valid
@@ -684,5 +699,6 @@ export {
     checkNumberField,
     checkTravelHoursLimit,
     sanitizeTimezone,
-    checkLang
+    checkLang,
+    sanitizeType
 };

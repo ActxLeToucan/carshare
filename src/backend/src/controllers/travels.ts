@@ -2,7 +2,7 @@ import type express from 'express';
 import { prisma } from '../app';
 import * as validator from '../tools/validator';
 import { checkTravelHoursLimit } from '../tools/validator';
-import { displayableTravelPublic, displayableUserPublic, error, info, notifs, notify, sendMsg } from '../tools/translator';
+import { displayableTravelPublic, displayableUserPublic, displayableStep, error, info, notifs, notify, sendMsg } from '../tools/translator';
 import properties from '../properties';
 import { getMaxPassengers, preparePagination } from './_common';
 
@@ -295,20 +295,156 @@ exports.getTravel = (req: express.Request, res: express.Response, _: express.Nex
 exports.getMyTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const pagination = preparePagination(req, false);
 
-    prisma.travel.count({
-        where: { driverId: res.locals.user.id }
-    }).then((count) => {
-        prisma.travel.findMany({
-            where: { driverId: res.locals.user.id },
-            ...pagination.pagination
-        }).then(travels => {
-            res.status(200).json(pagination.results(travels, count));
+    const type = validator.sanitizeType(req.params.type, req, res);
+    if (type === null) return;
+
+    if (type === 'past') {
+        prisma.travel.count({
+            where: {
+                OR: [{
+                    driverId: res.locals.user.id,
+                    steps: {
+                        some: {
+                            date: {
+                                lte: new Date()
+                            }
+                        }
+                    }
+                },
+                {
+                    steps: {
+                        some: {
+                            departureOfBookings: {
+                                some: {
+                                    passengerId: res.locals.user.id
+                                }
+                            },
+                            date: {
+                                lte: new Date()
+                            }
+                        }
+                    }
+                }]
+            }
+        }).then((count) => {
+            prisma.travel.findMany({
+                where: {
+                    OR: [{
+                        driverId: res.locals.user.id,
+                        steps: {
+                            some: {
+                                date: {
+                                    lte: new Date()
+                                }
+                            }
+                        }
+                    },
+                    {
+                        steps: {
+                            some: {
+                                departureOfBookings: {
+                                    some: {
+                                        passengerId: res.locals.user.id
+                                    }
+                                },
+                                date: {
+                                    lte: new Date()
+                                }
+                            }
+                        }
+                    }]
+                },
+                include: {
+                    steps: true
+                },
+                ...pagination.pagination
+            }).then(travels => {
+                const data = travels.map((travel) => {
+                    return displayableStep(travel);
+                });
+                res.status(200).json(pagination.results(data, count));
+            }).catch((err) => {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
+            });
         }).catch((err) => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);
         });
-    }).catch((err) => {
-        console.error(err);
-        sendMsg(req, res, error.generic.internalError);
-    });
+    }
+
+    if (type === 'future') {
+        prisma.travel.count({
+            where: {
+                OR: [{
+                    driverId: res.locals.user.id,
+                    steps: {
+                        some: {
+                            date: {
+                                gte: new Date()
+                            }
+                        }
+                    }
+                },
+                {
+                    steps: {
+                        some: {
+                            departureOfBookings: {
+                                some: {
+                                    passengerId: res.locals.user.id
+                                }
+                            },
+                            date: {
+                                gte: new Date()
+                            }
+                        }
+                    }
+                }]
+            }
+        }).then((count) => {
+            prisma.travel.findMany({
+                where: {
+                    OR: [{
+                        driverId: res.locals.user.id,
+                        steps: {
+                            some: {
+                                date: {
+                                    gte: new Date()
+                                }
+                            }
+                        }
+                    },
+                    {
+                        steps: {
+                            some: {
+                                departureOfBookings: {
+                                    some: {
+                                        passengerId: res.locals.user.id
+                                    }
+                                },
+                                date: {
+                                    gte: new Date()
+                                }
+                            }
+                        }
+                    }]
+                },
+                include: {
+                    steps: true
+                },
+                ...pagination.pagination
+            }).then(travels => {
+                const data = travels.map((travel) => {
+                    return displayableStep(travel);
+                });
+                res.status(200).json(pagination.results(data, count));
+            }).catch((err) => {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
+            });
+        }).catch((err) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
+    }
 }

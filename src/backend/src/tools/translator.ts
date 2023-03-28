@@ -1416,6 +1416,18 @@ function dateToString (date: Date, timezone: string | null | undefined, lang: st
     if (lang === null || lang === undefined) lang = properties.settings.defaultLanguage;
     return moment.tz(date, timezone).locale(lang).format('LLL')
 }
+/**
+ * Returns a trip without all the steps, with only the start and finish.
+ * @param travel Travel to display
+ */
+function displayableStep (travel: Travel & { steps: Step[] }): Partial<Travel> {
+    const t = Object.assign({}, travel) as any; ;
+    t.departure = travel.steps[0];
+    t.arrival = travel.steps[travel.steps.length - 1];
+    delete t.steps;
+
+    return t;
+}
 
 export {
     error,
@@ -1430,5 +1442,6 @@ export {
     displayableTravelPublic,
     displayableGroup,
     displayableAverage,
-    displayableEvaluation
+    displayableEvaluation,
+    displayableStep
 };
