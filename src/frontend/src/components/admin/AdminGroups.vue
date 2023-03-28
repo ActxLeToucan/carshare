@@ -27,16 +27,34 @@
                 class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
                 style="max-height: 0;"
             />
-            <div class="flex w-full flex-col px-8 space-y-4 pt-4 max-w-full min-w-0">
+            <div class="flex w-full flex-col px-8 space-y-4 pt-4 max-w-full min-w-0 overflow-y-auto">
                 <admin-group-card
                     v-for="group in groups"
                     :key="group?.id"
-                    class="min-w-0 w-full show-up"
+                    class="min-w-0 w-full show-up  max-w-[20em]"
                     :data="group"
                     :onclick="onCardClicked"
                 />
             </div>
+            <div class="flex w-full justify-evenly items-center mt-4">
+                        <button-block
+                            :action="() => pagination.previous()"
+                            :disabled="!pagination.hasPrevious"
+                        >
+                            <chevron-left-icon class="w-8 h-8" />
+                        </button-block>
+                        <p class="text-xl font-bold text-slate-500">
+                            {{ pagination.index + 1 }} / {{ pagination.maxIndex + 1 }}
+                        </p>
+                        <button-block
+                            :action="() => pagination.next()"
+                            :disabled="!pagination.hasNext"
+                        >
+                            <chevron-right-icon class="w-8 h-8" />
+                        </button-block>
+            </div>
         </div>
+               
         <div
             ref="result-zone"
             class="flex flex-col grow px-4 p-4 overflow-auto"
@@ -91,14 +109,18 @@
                                 :value="selectedGroup.createdAt.substring(0,10)"
                                 class="mb-0"
                         />
-                        <div class="flex grow h-fit justify-center p-4">
+                        <div class="flex grow h-fit justify-center md:flex-col">
                             <p 
                                 v-if="label != ''"
                                 class="flex text-xl dark:text-slate-400 font-bold whitespace-nowrap text-ellipsis"
                                 :class="dark ? ' text-white' : ' text-slate-500'"
                             >
-                            {{ lang.MEMBERS }}
+                            {{lang.MEMBERS }}
                             </p>
+                            <div
+                              v-if="selectedGroup?.users.length > 0 && !loading"
+                              class="flex space-x-4 overflow-x-scroll w-full"
+                            ></div>
                             <div
                                 v-if="selectedGroup?.users.length == 0"
                                 class="flex flex-col justify-center mx-auto max-w-full"
@@ -172,7 +194,9 @@ import { Log, LogZone } from '../../scripts/Logs.js';
 import { genres, isPhoneNumber, levels } from '../../scripts/data';
 
 import {
-    MagnifyingGlassIcon
+    MagnifyingGlassIcon,
+    ChevronRightIcon,
+    ChevronLeftIcon
 } from '@heroicons/vue/24/outline';
 import { getTypedValue } from '../../scripts/data.js';
 import Lang from "../../scripts/Lang";
@@ -186,8 +210,9 @@ function search(obj) {
 
     const value = obj.$refs['query-zone'].querySelector('input').value;
 
-    API.execute_logged(API.ROUTE.GROUPS, API.METHOD.GET, User.CurrentUser?.getCredentials(), { search: value }).then((data) => {
-        obj.groups = data.data ?? data.group;
+    API.execute_logged(API.ROUTE.GROUPS +obj.pagination, API.METHOD.GET, User.CurrentUser?.getCredentials(), { search: value }).then((data) => {
+        obj.groups = data.data;
+        obj.pagination.total = data.total;
         log.delete();
     }).catch((err) => {
         log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
@@ -208,6 +233,8 @@ export default {
         Card,
         CardBadge,
         MagnifyingGlassIcon,
+        ChevronRightIcon,
+        ChevronLeftIcon,
       
         
     },
@@ -221,7 +248,7 @@ export default {
             genres,
             levels,
             lang: Lang.CurrentLang,
-            pagination: API.createPagination(),
+            pagination: API.createPagination(0,5),
             formUser: {
                 buttonEnabled: true,
             },
