@@ -6,7 +6,6 @@ import properties from '../properties';
 import * as validator from '../tools/validator';
 import { checkTravelHoursLimit } from '../tools/validator';
 import { getMaxPassengers } from './_common';
-import { type Passenger } from '@prisma/client';
 
 exports.acceptBooking = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     acceptOrRejectBooking(req, res, properties.booking.status.accepted, info.booking.accepted);
@@ -20,13 +19,13 @@ function acceptOrRejectBooking (req: express.Request, res: express.Response, sta
     const bookingId = validator.sanitizeId(req.params.id, req, res);
     if (bookingId === null) return;
 
-    prisma.passenger.findUnique({
+    prisma.booking.findUnique({
         where: { id: bookingId },
         include: {
             departure: {
                 include: {
                     travel: {
-                        include: { etapes: true }
+                        include: { steps: true }
                     }
                 }
             },
@@ -45,11 +44,11 @@ function acceptOrRejectBooking (req: express.Request, res: express.Response, sta
         }
 
         if (booking.status !== properties.booking.status.pending) {
-            sendMsg(req, res, error.booking.alreadyReplied);
+            sendMsg(req, res, error.booking.notPending);
             return;
         }
 
-        if (!checkTravelHoursLimit(booking.departure.travel.etapes[0].date, req, res)) return;
+        if (!checkTravelHoursLimit(booking.departure.travel.steps[0].date, req, res)) return;
 
         if (status === properties.booking.status.accepted) {
             // check if there is a place left in the car
@@ -73,7 +72,7 @@ function acceptOrRejectBooking (req: express.Request, res: express.Response, sta
         }
 
         // accept/reject booking
-        prisma.passenger.update({
+        prisma.booking.update({
             where: { id: bookingId },
             data: { status },
             include: {
@@ -84,7 +83,7 @@ function acceptOrRejectBooking (req: express.Request, res: express.Response, sta
         }).then((booking) => {
             const notifPassenger = (status === properties.booking.status.accepted
                 ? notifs.booking.accepted
-                : notifs.booking.rejected)('en', booking);
+                : notifs.booking.rejected)(booking.passenger, booking);
 
             // create passenger's notification
             prisma.notification.create({
@@ -113,7 +112,7 @@ function acceptOrRejectBooking (req: express.Request, res: express.Response, sta
 
                     const updatedDriverNotif = (status === properties.booking.status.accepted
                         ? notifs.request.accepted
-                        : notifs.request.rejected)('en', notif, booking.passenger, new Date());
+                        : notifs.request.rejected)(res.locals.user, notif, booking.passenger, new Date());
 
                     // update notification
                     prisma.notification.update({
@@ -142,213 +141,3 @@ function acceptOrRejectBooking (req: express.Request, res: express.Response, sta
         sendMsg(req, res, error.generic.internalError);
     });
 }
-
-exports.createBooking = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const { travelId, departureId, arrivalId } = req.body;
-
-    const travelIdSanitized = validator.sanitizeId(travelId, req, res);
-    if (travelIdSanitized === null) return;
-
-    const departureIdSanitized = validator.sanitizeId(departureId, req, res);
-    if (departureIdSanitized === null) return;
-
-    const arrivalIdSanitized = validator.sanitizeId(arrivalId, req, res);
-    if (arrivalIdSanitized === null) return;
-
-    prisma.travel.findUnique({
-        where: { id: travelIdSanitized },
-        include: {
-            etapes: true,
-            driver: true
-        }
-    }).then(async (travel) => {
-        if (travel === null) {
-            sendMsg(req, res, error.travel.notFound);
-            return;
-        }
-
-        if (travel.driverId === res.locals.user.id) {
-            sendMsg(req, res, error.travel.isDriver);
-            return;
-        }
-
-        if (!checkTravelHoursLimit(travel.etapes[0].date, req, res)) return;
-
-        const startEtapeIndex = travel.etapes.findIndex((e) => e.id === departureIdSanitized);
-        const endEtapeIndex = travel.etapes.findIndex((e) => e.id === arrivalIdSanitized);
-        const startEtape = travel.etapes[startEtapeIndex];
-        const endEtape = travel.etapes[endEtapeIndex];
-        if (startEtape === undefined || endEtape === undefined) {
-            sendMsg(req, res, error.travel.invalidEtapes);
-            return;
-        }
-
-        // check if there is a place left in the car
-        try {
-            const count: any = await getMaxPassengers(travelIdSanitized, startEtape, endEtape);
-            const passengers = Number(count[0].nbPassengers);
-            if (Number.isNaN(passengers)) {
-                console.error('Error while getting the number of passengers in the trip');
-                sendMsg(req, res, error.generic.internalError);
-                return;
-            }
-
-            if (passengers >= travel.maxPassengers) {
-                sendMsg(req, res, error.travel.noSeats);
-                return;
-            }
-        } catch (e) {
-            sendMsg(req, res, error.generic.internalError);
-            return;
-        }
-
-        const addBooking = () => {
-            prisma.passenger.create({
-                data: {
-                    status: properties.booking.status.pending,
-                    passengerId: Number(res.locals.user.id),
-                    departureId: startEtape.id,
-                    arrivalId: endEtape.id
-                },
-                include: {
-                    departure: true,
-                    arrival: true,
-                    passenger: true
-                }
-            }).then((booking) => {
-                const notifDriver = notifs.request.new('en', travel, res.locals.user, startEtape, endEtape, {
-                    id: booking.id,
-                    status: booking.status,
-                    departureId: startEtape.id,
-                    arrivalId: endEtape.id,
-                    comment: null,
-                    passengerId: booking.passengerId
-                });
-
-                // create driver's notification
-                prisma.notification.create({
-                    data: {
-                        ...notifDriver,
-                        userId: travel.driverId,
-                        senderId: Number(res.locals.user.id),
-                        bookingId: booking.id
-                    }
-                }).then(() => {
-                    // send email notification to passenger
-                    notify(travel.driver, notifDriver);
-
-                    sendMsg(req, res, info.booking.created, travel.driver);
-                }).catch((err: any) => {
-                    console.error(err);
-                    sendMsg(req, res, error.generic.internalError);
-                });
-            }).catch((err: any) => {
-                console.error(err);
-                sendMsg(req, res, error.generic.internalError);
-            });
-        };
-
-        const userEtapesIds = Array.from(travel.etapes).splice(startEtapeIndex, endEtapeIndex - startEtapeIndex + 1).map((e) => e.id);
-        const arrivalAndDepartures: object[] = [];
-        userEtapesIds.forEach((id) => {
-            arrivalAndDepartures.push({ arrivalId: id });
-            arrivalAndDepartures.push({ departureId: id });
-        });
-
-        prisma.passenger.findFirst({
-            where: {
-                AND: [
-                    { passengerId: res.locals.user.id },
-                    {
-                        OR: arrivalAndDepartures
-                    }
-                ]
-            }
-        }).then((booking) => {
-            if (booking !== null) {
-                sendMsg(req, res, error.booking.alreadyBooked);
-                return;
-            }
-            addBooking();
-        }).catch(err => {
-            console.error(err);
-            sendMsg(req, res, error.generic.internalError);
-        });
-    }).catch((err: any) => {
-        console.error(err);
-        sendMsg(req, res, error.travel.notFound);
-    });
-};
-
-exports.cancelBooking = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const travelId = validator.sanitizeId(req.params.id, req, res);
-    if (travelId === null) return;
-
-    prisma.passenger.findMany({
-        where: { passengerId: res.locals.user.id },
-        include: {
-            departure: true,
-            arrival: true,
-            passenger: true
-        }
-    }).then((travelsAsPassenger) => {
-        if (travelsAsPassenger === null) {
-            sendMsg(req, res, error.travel.notAPassenger);
-            return;
-        }
-
-        prisma.travel.findUnique({
-            where: { id: travelId },
-            include: {
-                etapes: true,
-                driver: true
-            }
-        }).then((travel) => {
-            if (travel === null) {
-                sendMsg(req, res, error.travel.notFound);
-                return;
-            }
-
-            const etapesId = travel.etapes.map(elem => elem.id);
-            const passengerTravel = travelsAsPassenger.filter((elem: Passenger) => etapesId.includes(elem.departureId));
-
-            if (passengerTravel === null) {
-                sendMsg(req, res, error.travel.notAPassenger);
-                return;
-            }
-
-            if (!checkTravelHoursLimit(travel.createdAt, req, res)) return;
-
-            prisma.passenger.delete({
-                where: {
-                    id: passengerTravel[0].id
-                }
-            }).then(() => {
-                const notif = notifs.booking.unbooked('en', passengerTravel[0]); // TODO: get user language
-                const data = {
-                    ...notif,
-                    userId: travel.driverId,
-                    senderId: Number(res.locals.user.id),
-                    travelId: travel.id
-                };
-
-                prisma.notification.create({ data }).then(() => {
-                    sendMsg(req, res, info.travel.unbooked);
-                    notify(travel.driver, data);
-                }).catch((err) => {
-                    console.error(err);
-                    sendMsg(req, res, error.generic.internalError);
-                });
-            }).catch((err) => {
-                console.error(err);
-                sendMsg(req, res, error.generic.internalError);
-            });
-        }).catch((err) => {
-            console.error(err);
-            sendMsg(req, res, error.generic.internalError);
-        });
-    }).catch((err) => {
-        console.error(err);
-        sendMsg(req, res, error.generic.internalError);
-    });
-};

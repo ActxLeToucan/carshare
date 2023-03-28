@@ -129,9 +129,6 @@ export default {
     BOOK_TRIP: "Réserver le trajet",
     DRIVER: "Conducteur",
 
-    // trips
-    TRIP_TITLE: "Consultation du trajet",
-
     // profile
     MY_PROFILE: "Mon profil",
     MY_INFOS: "Mes informations",
@@ -181,7 +178,7 @@ export default {
     GROUP_NAME: "Nom de groupe",
     GROUP_CREATOR :"Createur",
 
-    //parametres
+    // parameters
     NOTIF_PARAMS: "Paramètres de notifications",
     EMAIL_NOTIFICATIONS: "Notifier par email",
     THEME: "Thème",
@@ -192,12 +189,9 @@ export default {
     UPDATING_PARAMS: "Mise à jour des paramètres",
     PARAMS_UPDATED: "Paramètres mis à jour avec succès",
 
-        //trip
-        FUTURE_TRIPS: "Trajets à venir",
-        PAST_TRIPS: "Trajets passés",
-        TRIP_OFF: "Trajet du",
-        PASSENGER: "Passagers",
-
+    // trip
+    FUTURE_TRIPS: "Trajets futurs",
+    PAST_TRIPS: "Trajets passés",
 
     // informations
     ADDRESS_NOT_VERIFIED: "Adresse non vérifiée",
