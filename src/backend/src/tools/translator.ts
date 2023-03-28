@@ -1239,7 +1239,7 @@ const notifs = {
         })
     },
     group: {
-        nameUpdated: (lang: string, oldName: string, newName: string) => msgForLang<TemplateNotif, Notif>(lang, {
+        nameUpdated: (user: User, oldName: string, newName: string) => msgForLang<TemplateNotif, Notif>(user.lang, {
             title: {
                 fr: 'Nom du groupe modfié',
                 en: 'Group name updated'
