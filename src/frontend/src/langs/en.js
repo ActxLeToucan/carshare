@@ -129,9 +129,6 @@ export default {
     BOOK_TRIP: "Book the trip",
     DRIVER: "Driver",
 
-    // trips
-    TRIP_TITLE: "Consultation du trajet",
-
     // profile
     MY_PROFILE: "My profile",
     MY_INFOS: "My informations",
@@ -181,7 +178,7 @@ export default {
     GROUP_NAME: "Group name",
     GROUP_CREATOR :"Creator" , 
 
-    // parametres
+    // parameters
     NOTIF_PARAMS: "Notification settings",
     EMAIL_NOTIFICATIONS: "Notify by email",
     THEME: "Theme",
@@ -191,6 +188,10 @@ export default {
     LANGUAGE: "Language",
     UPDATING_PARAMS: "Updating parameters",
     PARAMS_UPDATED: "Parameters updated successfully",
+
+    // trip
+    FUTURE_TRIPS: "Future trips",
+    PAST_TRIPS: "Past trips",
 
     // informations
     ADDRESS_NOT_VERIFIED: "Address not verified",
