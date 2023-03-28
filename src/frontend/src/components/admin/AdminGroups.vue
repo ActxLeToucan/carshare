@@ -103,38 +103,34 @@
                         />
                         <input-text
                                 name="createdAt"
-                                :type="Date"
+                                :type="date"
                                 :label="lang.GROUP_CREATEDAT"
                                 :placeholder="lang.GROUP_CREATOR"
                                 :value="selectedGroup.createdAt.substring(0,10)"
-                                class="mb-0"
+                                class="mb-0" 
                         />
                         <div class="flex grow h-fit justify-center md:flex-col">
                             <p 
                                 v-if="label != ''"
-                                class="flex text-xl dark:text-slate-400 font-bold whitespace-nowrap text-ellipsis"
+                                class="flex text-xl dark:text-slate-400 font-bold whitespace-nowrap text-ellipsis mb-0"
                                 :class="dark ? ' text-white' : ' text-slate-500'"
                             >
                             {{lang.MEMBERS }}
                             </p>
-                            <div
-                              v-if="selectedGroup?.users.length > 0 && !loading"
-                              class="flex space-x-4 overflow-x-scroll w-full"
-                            ></div>
                             <div
                                 v-if="selectedGroup?.users.length == 0"
                                 class="flex flex-col justify-center mx-auto max-w-full"
                             >
                                 <card-badge
                                     :newline="true"
-                                    class="max-w-full"
+                                    class="max-w-full mb-0 md:max-w-[18em] max-w-[14em]"
                                     :title="lang.NO_USERS"
                                     :content="lang.NO_USERS_DESC"
                                 />
                             </div>
                             <div
                                 v-if="selectedGroup?.users.length > 0"
-                                class="flex overflow-x-auto space-x-4 w-full"
+                                class="flex overflow-x-auto space-x-4 w-full md:flex-col"
                             >
                                 <card-badge
                                     v-for="member in selectedGroup?.users"
