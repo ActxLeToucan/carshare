@@ -1090,7 +1090,7 @@ const mail = {
 
 const notifs = {
     request: {
-        new: (user: User, travel: Travel & { steps: Step[] }, booking: Booking & { arrival: Step, departure: Step, passenger: User }, sender: User) => msgForLang<TemplateNotif, Notif>(user.locale, {
+        new: (user: User, travel: Travel & { steps: Step[] }, booking: Booking & { arrival: Step, departure: Step, passenger: User }, sender: User) => msgForLang<TemplateNotif, Notif>(user.lang, {
             title: {
                 fr: 'Nouvelle demande',
                 en: 'New request'
@@ -1110,7 +1110,7 @@ const notifs = {
             type: 'request',
             createdAt: new Date()
         }),
-        accepted: (user: User, oldNotif: Notification, passenger: User, date: Date) => msgForLang<TemplateNotif, Notif>(user.locale, {
+        accepted: (user: User, oldNotif: Notification, passenger: User, date: Date) => msgForLang<TemplateNotif, Notif>(user.lang, {
             title: {
                 fr: `Demande de ${passenger.firstName ?? ''} ${passenger.lastName ?? ''} acceptée`,
                 en: `Request from ${passenger.firstName ?? ''} ${passenger.lastName ?? ''} accepted`
@@ -1126,7 +1126,7 @@ const notifs = {
             type: 'request.accepted',
             createdAt: date
         }),
-        rejected: (user: User, oldNotif: Notification, passenger: User, date: Date) => msgForLang<TemplateNotif, Notif>(user.locale, {
+        rejected: (user: User, oldNotif: Notification, passenger: User, date: Date) => msgForLang<TemplateNotif, Notif>(user.lang, {
             title: {
                 fr: `Demande de ${passenger.firstName ?? ''} ${passenger.lastName ?? ''} refusée`,
                 en: `Request from ${passenger.firstName ?? ''} ${passenger.lastName ?? ''} rejected`
@@ -1144,7 +1144,7 @@ const notifs = {
         })
     },
     travel: {
-        cancelled: (user: User, booking: Booking & { departure: Step, arrival: Step } & Record<string, any>) => msgForLang<TemplateNotif, Notif>(user.locale, {
+        cancelled: (user: User, booking: Booking & { departure: Step, arrival: Step } & Record<string, any>) => msgForLang<TemplateNotif, Notif>(user.lang, {
             title: {
                 fr: 'Annulation de trajet',
                 en: 'Travel cancelled'
@@ -1158,7 +1158,7 @@ const notifs = {
         })
     },
     booking: {
-        accepted: (user: User, booking: Booking & { departure: Step, arrival: Step } & Record<string, any>) => msgForLang<TemplateNotif, Notif>(user.locale, {
+        accepted: (user: User, booking: Booking & { departure: Step, arrival: Step } & Record<string, any>) => msgForLang<TemplateNotif, Notif>(user.lang, {
             title: {
                 fr: 'Réservation acceptée',
                 en: 'Booking accepted'
@@ -1170,7 +1170,7 @@ const notifs = {
             type: 'standard',
             createdAt: new Date()
         }),
-        rejected: (user: User, booking: Booking & { departure: Step, arrival: Step } & Record<string, any>) => msgForLang<TemplateNotif, Notif>(user.locale, {
+        rejected: (user: User, booking: Booking & { departure: Step, arrival: Step } & Record<string, any>) => msgForLang<TemplateNotif, Notif>(user.lang, {
             title: {
                 fr: 'Réservation refusée',
                 en: 'Booking rejected'
@@ -1182,7 +1182,7 @@ const notifs = {
             type: 'standard',
             createdAt: new Date()
         }),
-        cancelled: (user: User, booking: (Booking & { departure: Step, arrival: Step, passenger: User }), travel: Travel & { steps: Step[] } & Record<string, any>, previousStatus: number) => msgForLang<TemplateNotif, Notif>(user.locale, {
+        cancelled: (user: User, booking: (Booking & { departure: Step, arrival: Step, passenger: User }), travel: Travel & { steps: Step[] } & Record<string, any>, previousStatus: number) => msgForLang<TemplateNotif, Notif>(user.lang, {
             title: {
                 fr: 'Annulation de réservation',
                 en: 'Booking cancellation'
@@ -1218,7 +1218,7 @@ const notifs = {
         })
     },
     general: {
-        welcome: (user: User) => msgForLang<TemplateNotif, Notif>(user.locale, {
+        welcome: (user: User) => msgForLang<TemplateNotif, Notif>(user.lang, {
             title: {
                 fr: `Bienvenue sur ${process.env.FRONTEND_NAME ?? ''} !`,
                 en: `Welcome to ${process.env.FRONTEND_NAME ?? ''} !`
@@ -1317,7 +1317,7 @@ async function sendMail (req: Request, message: (req: Request, ...args: any) => 
  */
 function notify (user: User, notification: { type: string | null, title: string, message: string, createdAt: Date } & Record<string, any>) {
     if (!user.mailNotif || user.emailVerifiedOn === null) return;
-    mailerSend(mail.notification.new(user.locale, user, notification))
+    mailerSend(mail.notification.new(user.lang, user, notification))
         .then(() => {
             console.log(`Notification sent to ${user.email}.`);
         }).catch((err) => {
@@ -1408,13 +1408,13 @@ function displayableEvaluation (evaluation: Evaluation & { travel: Travel, evalu
  * Returns a date as a string
  * @param date Date to format
  * @param timezone Timezone to use (default: {@link properties.settings.defaultTimezone})
- * @param locale Locale to use (default: {@link properties.settings.defaultLanguage})
- * @returns Formatted date in the given timezone and locale
+ * @param lang Language to use (default: {@link properties.settings.defaultLanguage})
+ * @returns Formatted date in the given timezone and language
  */
-function dateToString (date: Date, timezone: string | null | undefined, locale: string | null | undefined) {
+function dateToString (date: Date, timezone: string | null | undefined, lang: string | null | undefined) {
     if (timezone === null || timezone === undefined) timezone = properties.settings.defaultTimezone;
-    if (locale === null || locale === undefined) locale = properties.settings.defaultLanguage;
-    return moment.tz(date, timezone).locale(locale).format('LLL')
+    if (lang === null || lang === undefined) lang = properties.settings.defaultLanguage;
+    return moment.tz(date, timezone).locale(lang).format('LLL')
 }
 
 export {
