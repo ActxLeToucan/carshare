@@ -87,7 +87,6 @@ export default {
         setData(data) {
             if (this.m_data.length != data.length) this.setSelection(-1);
             this.m_data = data;
-            this.showing = true;
         },
         setShowing(showing) {
             this.showing = showing;

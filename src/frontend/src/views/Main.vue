@@ -369,10 +369,13 @@ export default {
             });
         },
         reverseInputs() {
-            const start = this.startInput.value;
-            const end = this.endInput.value;
-            this.startInput.value = end;
-            this.endInput.value = start;
+            const tmpCity = this.startCity;
+            this.startCity = this.endCity;
+            this.endCity = tmpCity;
+
+            const tmpSelect = this.startSelector.getData();
+            this.startSelector.setData(this.endSelector.getData());
+            this.endSelector.setData(tmpSelect);
         },
         log(msg, type = Log.INFO) {
             if (!this.logZone) return null;

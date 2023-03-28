@@ -128,7 +128,8 @@ function onValidate(modal) {
             "lastName": payload.lastName,
             "phone": payload.phone,
             "gender": parseInt(payload.gender),
-            "hasCar": payload.hasCar === "true"
+            "hasCar": payload.hasCar === "true",
+            "timezone": Intl.DateTimeFormat().resolvedOptions().timeZone
         };
 
         API.execute(API.ROUTE.SIGNUP, API.METHOD.POST, userInfos, API.TYPE.JSON).then(res => {

@@ -10,7 +10,7 @@
                 </p>
                 <div class="flex flex-col grow h-fit w-fit space-y-2 w-full overflow-y-auto">
                     <div
-                        v-for="(step, index) in trip.etapes"
+                        v-for="(step, index) in trip.steps"
                         :key="step.id"
                         class="flex h-fit w-full justify-between items-center space-x-10 rounded-md border-2 py-1 px-2"
                         :class="(index < startIndex || index > endIndex) ? ' bg-slate-100 dark:bg-slate-700 border-slate-200 dark:border-slate-600' : ' bg-white dark:bg-slate-600 border-slate-300 dark:border-slate-500'"
@@ -156,8 +156,8 @@ export default {
             API.execute_logged(API.ROUTE.TRAVELS.GET + id, API.METHOD.GET, User.CurrentUser.getCredentials()).then(res => {
                 this.trip = res;
 
-                this.startIndex = this.trip?.etapes.findIndex(step => step.city == this.tripStart.value);
-                this.endIndex = this.trip?.etapes.findIndex(step => step.city == this.tripEnd.value);
+                this.startIndex = this.trip?.steps.findIndex(step => step.city == this.tripStart.value);
+                this.endIndex = this.trip?.steps.findIndex(step => step.city == this.tripEnd.value);
             }).catch(err => {
                 console.error(err);
                 this.popup?.hide();
@@ -172,10 +172,10 @@ export default {
         bookTrip() {
             const log = this.log("Envoi de la demande ...", Log.INFO);
 
-            API.execute_logged(API.ROUTE.BOOKINGS.CREATE, API.METHOD.POST, User.CurrentUser.getCredentials(), {
+            API.execute_logged(API.ROUTE.BOOKINGS.MY.NEW, API.METHOD.POST, User.CurrentUser.getCredentials(), {
                 travelId: this.trip.id,
-                departureId: this.trip.etapes[this.startIndex].id,
-                arrivalId: this.trip.etapes[this.endIndex].id,
+                departureId: this.trip.steps[this.startIndex].id,
+                arrivalId: this.trip.steps[this.endIndex].id,
             }).then(res => {
                 log.update(res.message, Log.SUCCESS);
                 setTimeout(() => { log.delete(); this.popup?.hide(); }, 4000);
