@@ -112,7 +112,7 @@
                         <div class="flex grow h-fit justify-center md:flex-col">
                             <p 
                                 v-if="label != ''"
-                                class="flex text-xl dark:text-slate-400 font-bold whitespace-nowrap text-ellipsis mb-0"
+                                class="flex text-xl dark:text-slate-400 font-bold whitespace-nowrap text-ellipsis  mb-0"
                                 :class="dark ? ' text-white' : ' text-slate-500'"
                             >
                             {{lang.MEMBERS }}
@@ -123,14 +123,14 @@
                             >
                                 <card-badge
                                     :newline="true"
-                                    class="max-w-full mb-0 md:max-w-[18em] max-w-[14em]"
+                                    class="max-w-full md:max-w-[18em] max-w-[14em]"
                                     :title="lang.NO_USERS"
                                     :content="lang.NO_USERS_DESC"
                                 />
                             </div>
                             <div
                                 v-if="selectedGroup?.users.length > 0"
-                                class="flex overflow-x-auto space-x-4 w-full md:flex-col"
+                                class=" flex flex-col justify-center mx-auto max-w-full md:flex-col"
                             >
                                 <card-badge
                                     v-for="member in selectedGroup?.users"
