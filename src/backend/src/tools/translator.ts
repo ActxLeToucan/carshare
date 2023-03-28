@@ -490,7 +490,7 @@ const error = {
         }),
         notCreator: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Vous n\'êtes pas le créateur de ce groupEnd.',
+                fr: 'Vous n\'êtes pas le créateur de ce groupe.',
                 en: 'You are not the creator of this group.'
             },
             code: 403
@@ -1245,8 +1245,8 @@ const notifs = {
                 en: 'Group name updated'
             },
             message: {
-                fr: `Le groupe: ${oldName} a été renommé en ${newName}.`,
-                en: `The group: ${oldName} has been renamed as ${newName}.`
+                fr: `Le groupe ${oldName} a été renommé en ${newName}.`,
+                en: `The group ${oldName} has been renamed as ${newName}.`
             },
             type: 'standard',
             createdAt: new Date()
