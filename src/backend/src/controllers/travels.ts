@@ -10,7 +10,7 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
     const { date, startCity, startContext, endCity, endContext } = req.query;
     if (!validator.checkCityField(startCity, req, res, 'startCity')) return;
     if (!validator.checkCityField(endCity, req, res, 'endCity')) return;
-    if (!validator.checkDateField(date, false, req, res)) return;
+    if (!validator.checkDateField(date, true, req, res)) return;
     if (startContext !== undefined && !validator.checkStringField(startContext, req, res, 'startContext')) return;
     if (endContext !== undefined && !validator.checkStringField(endContext, req, res, 'endContext')) return;
 
@@ -49,13 +49,14 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
                             arr.date          as 'arrival.date'
                      from travel t
                               inner join user u on u.id = t.driverId
-                              inner join etape dep on dep.travelId = t.id and dep.city = ${startCity}
-                              inner join etape arr on arr.travelId = t.id and arr.city = ${endCity}
+                              inner join step dep on dep.travelId = t.id and dep.city = ${startCity}
+                              inner join step arr on arr.travelId = t.id and arr.city = ${endCity}
                      where t.status = ${properties.travel.status.open}
                        and dep.date < arr.date
                        and IF(${startCtx} = '', true, dep.context = ${startCtx})
                        and IF(${endCtx} = '', true, arr.context = ${endCtx})
-                       and dep.date BETWEEN ${date1} and ${date2}`
+                       and dep.date BETWEEN ${date1} and ${date2}
+                       and t.groupId is null`
         .then(async (data: any) => {
             for (const travel of data) {
                 for (const key of Object.keys(travel)) {
@@ -114,7 +115,7 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
             sendMsg(req, res, error.generic.internalError);
         }
     }
-    if (!validator.checkListOfEtapeField(steps, req, res)) return;
+    if (!validator.checkStepList(steps, req, res)) return;
 
     prisma.travel.findMany({
         where: {
@@ -122,7 +123,7 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
             status: 0
         },
         select: {
-            etapes: {
+            steps: {
                 select: {
                     date: true
                 }
@@ -130,7 +131,7 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
         }
     }).then((travels) => {
         for (const elements of travels) {
-            if (!validator.checkTravelAlready(steps[0].date, steps[steps.length - 1].date, elements.etapes, req, res)) return;
+            if (!validator.checkTravelAlready(steps[0].date, steps[steps.length - 1].date, elements.steps, req, res)) return;
         }
 
         prisma.travel.create({
@@ -140,7 +141,7 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
                 description,
                 driverId: res.locals.user.id,
                 groupId,
-                etapes: {
+                steps: {
                     create: steps.map((step: { label: string, city: string, context: string, lat: number, lng: number, date: string }) => ({
                         label: step.label,
                         city: step.city,
@@ -152,7 +153,7 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
                 }
             },
             include: {
-                etapes: true
+                steps: true
             }
         }).then((travel) => {
             // TODO: notify users in the group
@@ -174,7 +175,7 @@ exports.cancelMyTravel = (req: express.Request, res: express.Response, _: expres
     prisma.travel.findUnique({
         where: { id: travelId },
         include: {
-            etapes: true
+            steps: true
         }
     }).then((travel) => {
         // verifications
@@ -193,7 +194,7 @@ exports.cancelMyTravel = (req: express.Request, res: express.Response, _: expres
             return;
         }
 
-        if (!checkTravelHoursLimit(travel.etapes[0].date, req, res)) return;
+        if (!checkTravelHoursLimit(travel.steps[0].date, req, res)) return;
 
         // cancel travel
         prisma.travel.update({
@@ -201,7 +202,7 @@ exports.cancelMyTravel = (req: express.Request, res: express.Response, _: expres
             data: { status: properties.travel.status.cancelled }
         }).then(() => {
             // get passengers and send notifications
-            prisma.passenger.findMany({
+            prisma.booking.findMany({
                 where: {
                     departure: {
                         travelId
@@ -212,23 +213,23 @@ exports.cancelMyTravel = (req: express.Request, res: express.Response, _: expres
                     arrival: true,
                     passenger: true
                 }
-            }).then((passengers) => {
-                const data = passengers.map((passenger) => {
-                    const notif = notifs.travel.cancelled('en', passenger); // TODO: get user language
+            }).then((bookings) => {
+                const data = bookings.map((booking) => {
+                    const notif = notifs.travel.cancelled(booking.passenger, booking);
                     return {
                         ...notif,
-                        userId: passenger.passengerId,
+                        userId: booking.passengerId,
                         senderId: Number(res.locals.user.id),
-                        travelId: passenger.departure.travelId
+                        travelId: booking.departure.travelId
                     };
                 });
 
                 // create notifications
                 prisma.notification.createMany({ data }).then(() => {
                     for (const notif of data) {
-                        const passenger = passengers.find((p) => p.passengerId === notif.userId);
+                        const booking = bookings.find((b) => b.passengerId === notif.userId);
                         // send email notification
-                        if (passenger !== undefined) notify(passenger.passenger, notif);
+                        if (booking !== undefined) notify(booking.passenger, notif);
                     }
 
                     sendMsg(req, res, info.travel.cancelled);
@@ -276,7 +277,7 @@ exports.getTravel = (req: express.Request, res: express.Response, _: express.Nex
     prisma.travel.findUnique({
         where: { id: travelId },
         include: {
-            etapes: true,
+            steps: true,
             driver: true // TODO : include passenger
         }
     }).then((travel) => {
@@ -286,6 +287,27 @@ exports.getTravel = (req: express.Request, res: express.Response, _: express.Nex
         }
         res.status(200).json(displayableTravelPublic(travel));
     }).catch(err => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
+}
+
+exports.getMyTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    const pagination = preparePagination(req, false);
+
+    prisma.travel.count({
+        where: { driverId: res.locals.user.id }
+    }).then((count) => {
+        prisma.travel.findMany({
+            where: { driverId: res.locals.user.id },
+            ...pagination.pagination
+        }).then(travels => {
+            res.status(200).json(pagination.results(travels, count));
+        }).catch((err) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
+    }).catch((err) => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
     });

@@ -10,7 +10,7 @@
         <textarea
             class="flex h-fit bg-white dark:bg-slate-600 border-b-4 border-slate-200 dark:border-slate-700 rounded-md px-4 py-2 font-bold text-lg max-w-full
                    hover:border-slate-300 transition-all focus:outline outline-transparent"
-            :class="dark ? ' text-slate-600 placeholder-slate-400 focus:border-slate-500 ' : ' text-slate-600 placeholder-slate-600/[0.5]  focus:border-teal-500 '"
+            :class="dark ? ' text-slate-600 dark:text-slate-300 placeholder-slate-400 focus:border-slate-500 ' : ' text-slate-600 dark:text-slate-300 placeholder-slate-600/[0.5]  focus:border-teal-500 '"
             :placeholder="placeholder"
             :type="type"
             :name="name"

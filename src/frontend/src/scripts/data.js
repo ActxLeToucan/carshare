@@ -43,9 +43,9 @@ export function isPhoneNumber(val) {
 }
 
 export const genres = [
-    {value: 1,  id: 'MALE'},
     {value: -1, id: 'UNSPECIFIED'},
     {value: 0,  id: 'FEMALE'},
+    {value: 1,  id: 'MALE'},
 ];
 
 export const themes = [

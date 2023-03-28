@@ -11,7 +11,7 @@ import { type User } from '@prisma/client';
 import properties from '../properties';
 
 exports.signup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const { email, password, lastName, firstName, phone, hasCar, gender } = req.body;
+    const { email, password, lastName, firstName, phone, hasCar, gender, timezone } = req.body;
 
     if (!validator.checkEmailField(email, req, res)) return;
     if (!validator.checkPasswordField(password, req, res)) return;
@@ -21,6 +21,7 @@ exports.signup = (req: express.Request, res: express.Response, _: express.NextFu
     if (phoneSanitized === null) return;
     if (hasCar !== undefined && !validator.checkBooleanField(hasCar, req, res, 'hasCar')) return;
     const genderSanitized = validator.sanitizeGender(gender);
+    const timezoneSanitized = validator.sanitizeTimezone(timezone);
 
     prisma.user.count({ where: { email } })
         .then((count) => {
@@ -31,7 +32,6 @@ exports.signup = (req: express.Request, res: express.Response, _: express.NextFu
 
             bcrypt.hash(password, properties.password.salt)
                 .then((hash) => {
-                    // TODO: save user's language
                     prisma.user.create({
                         data: {
                             email,
@@ -41,10 +41,12 @@ exports.signup = (req: express.Request, res: express.Response, _: express.NextFu
                             phone: phoneSanitized,
                             avatar: null,
                             hasCar,
-                            gender: genderSanitized
+                            gender: genderSanitized,
+                            lang: req.acceptsLanguages().find((lang) => lang in properties.languages), // detect language from browser
+                            timezone: timezoneSanitized
                         }
                     }).then((user) => {
-                        const notif = notifs.general.welcome('en', user); // TODO: use user's language
+                        const notif = notifs.general.welcome(user);
                         prisma.notification.create({
                             data: {
                                 user: { connect: { id: user.id } },
@@ -169,35 +171,37 @@ exports.askForPasswordReset = (req: express.Request, res: express.Response, _: e
 }
 
 exports.resetPassword = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    exports.updatePassword(req, res, next);
+    exports.updatePassword(req, res, next, false);
 }
 
-exports.updatePassword = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+exports.updatePassword = async (req: express.Request, res: express.Response, _: express.NextFunction, checkOld = true) => {
     if (!validator.checkPasswordField(req.body.password, req, res)) return;
-    if (!validator.checkOldPasswordField(req.body.oldPassword, req, res)) return;
+    if (checkOld && !validator.checkOldPasswordField(req.body.oldPassword, req, res)) return;
 
-    bcrypt.compare(req.body.oldPassword, res.locals.user.password)
-        .then((valid) => {
+    if (checkOld) {
+        try {
+            const valid = await bcrypt.compare(req.body.oldPassword, res.locals.user.password);
             if (!valid) {
                 sendMsg(req, res, error.auth.wrongPassword);
                 return;
             }
+        } catch (err) {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        }
+    }
 
-            bcrypt.hash(req.body.password, properties.password.salt)
-                .then((hash) => {
-                    prisma.user.update({
-                        where: { id: res.locals.user.id },
-                        data: { password: hash }
-                    }).then(() => {
-                        sendMsg(req, res, info.user.passwordChanged);
-                    }).catch((err) => {
-                        console.error(err);
-                        sendMsg(req, res, error.generic.internalError);
-                    });
-                }).catch((err) => {
-                    console.error(err);
-                    sendMsg(req, res, error.generic.internalError);
-                });
+    bcrypt.hash(req.body.password, properties.password.salt)
+        .then((hash) => {
+            prisma.user.update({
+                where: { id: res.locals.user.id },
+                data: { password: hash }
+            }).then(() => {
+                sendMsg(req, res, info.user.passwordChanged);
+            }).catch((err) => {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
+            });
         }).catch((err) => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);

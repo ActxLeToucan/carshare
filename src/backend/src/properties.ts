@@ -1,6 +1,11 @@
 import { type Variants } from './tools/translator';
 
 const properties = {
+    settings: {
+        defaultLanguage: 'en',
+        defaultTimezone: 'UTC'
+    },
+    languages: ['en', 'fr'],
     email: {
         max: 64 // from schema.prisma
     },
@@ -80,7 +85,7 @@ const properties = {
         min: -180,
         max: 180
     },
-    listOfEtape: {
+    stepList: {
         minLength: 2
     },
     query: {

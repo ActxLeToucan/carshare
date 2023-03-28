@@ -16,23 +16,17 @@ exports.getUserEvaluation = (req: express.Request, res: express.Response, next: 
             travel: {
                 driverId: userId
             }
-
         },
-        _avg: {
-            note: true
-        },
-        _count: {
-            note: true
-        }
-
-    }).then((driver) => {
+        _avg: { note: true },
+        _count: { note: true }
+    }).then((avgAsDriver) => {
         prisma.evaluation.aggregate({
             where: {
                 evaluatedId: userId,
                 travel: {
-                    etapes: {
+                    steps: {
                         some: {
-                            departuresOfPassengers: {
+                            departureOfBookings: {
                                 some: {
                                     passengerId: userId
                                 }
@@ -41,18 +35,13 @@ exports.getUserEvaluation = (req: express.Request, res: express.Response, next: 
                     }
                 }
             },
-            _avg: {
-                note: true
-            },
-            _count: {
-                note: true
-            }
-
-        }).then((passenger) => {
-            passenger = displayableAverage(passenger);
-            driver = displayableAverage(driver);
-
-            res.status(200).json({ driver, passenger });
+            _avg: { note: true },
+            _count: { note: true }
+        }).then((avgAsPassenger) => {
+            res.status(200).json({
+                driver: displayableAverage(avgAsDriver),
+                passenger: displayableAverage(avgAsPassenger)
+            });
         }).catch((err) => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);
@@ -125,9 +114,9 @@ exports.createEvaluation = (req: express.Request, res: express.Response, _: expr
                         status: properties.travel.status.ended,
                         OR: [{
                             driverId: evaluatedId,
-                            etapes: {
+                            steps: {
                                 some: {
-                                    departuresOfPassengers: {
+                                    departureOfBookings: {
                                         some: {
                                             passengerId: res.locals.user.id
                                         }
@@ -136,9 +125,9 @@ exports.createEvaluation = (req: express.Request, res: express.Response, _: expr
                             }
                         }, {
                             driverId: res.locals.user.id,
-                            etapes: {
+                            steps: {
                                 some: {
-                                    departuresOfPassengers: {
+                                    departureOfBookings: {
                                         some: {
                                             passengerId: evaluatedId
                                         }
@@ -147,9 +136,9 @@ exports.createEvaluation = (req: express.Request, res: express.Response, _: expr
                             }
                         }, {
                             AND: [{
-                                etapes: {
+                                steps: {
                                     some: {
-                                        departuresOfPassengers: {
+                                        departureOfBookings: {
                                             some: {
                                                 passengerId: res.locals.user.id
                                             }
@@ -157,9 +146,9 @@ exports.createEvaluation = (req: express.Request, res: express.Response, _: expr
                                     }
                                 }
                             }, {
-                                etapes: {
+                                steps: {
                                     some: {
-                                        departuresOfPassengers: {
+                                        departureOfBookings: {
                                             some: {
                                                 passengerId: evaluatedId
                                             }
@@ -172,7 +161,7 @@ exports.createEvaluation = (req: express.Request, res: express.Response, _: expr
                     }
                 }).then((count) => {
                     if (count === 0) {
-                        sendMsg(req, res, error.evaluation.notpossible);
+                        sendMsg(req, res, error.evaluation.notPossible);
                         return;
                     }
 

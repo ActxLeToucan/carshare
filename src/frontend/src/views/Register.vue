@@ -128,7 +128,8 @@ function onValidate(modal) {
             "lastName": payload.lastName,
             "phone": payload.phone,
             "gender": parseInt(payload.gender),
-            "hasCar": payload.hasCar === "true"
+            "hasCar": payload.hasCar === "true",
+            "timezone": Intl.DateTimeFormat().resolvedOptions().timeZone
         };
 
         API.execute(API.ROUTE.SIGNUP, API.METHOD.POST, userInfos, API.TYPE.JSON).then(res => {
@@ -154,7 +155,7 @@ function onValidate(modal) {
                 setTimeout(() => {
                     log.delete();
                     email_log.delete();
-                    resolve(false);
+                    resolve(true); // Even if the email verification failed, the user is still registered
                 }, 4000);
             });
 
