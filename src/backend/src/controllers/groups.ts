@@ -37,7 +37,8 @@ exports.getMyGroups = (req: express.Request, res: express.Response, next: expres
 exports.modifyNameGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const groupName = req.body.groupName;
     if (!validator.checkGroupNameField(groupName, req, res)) return;
-    const groupId = validator.sanitizeId(req.body.groupeId, req, res);
+    console.log(req.body.groupId);
+    const groupId = validator.sanitizeId(req.body.groupId, req, res);
     if (groupId === null) return;
     prisma.group.findUnique({
         where: {
@@ -66,7 +67,7 @@ exports.modifyNameGroup = (req: express.Request, res: express.Response, _: expre
                 users: true
             }
         }).then((group) => {
-            const notif = notifs.group.nameUpdated('en', oldName, groupName); // TODO: get user language
+            const notif = notifs.group.nameUpdated(res.locals.user, oldName, groupName); // TODO: get user language
 
             const data = group.users.map((user) => {
                 return {
