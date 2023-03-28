@@ -192,6 +192,7 @@ export default {
     // trip
     FUTURE_TRIPS: "Future trips",
     PAST_TRIPS: "Past trips",
+    CANCEL_TRIP: "Cancel trip",
 
     // informations
     ADDRESS_NOT_VERIFIED: "Address not verified",

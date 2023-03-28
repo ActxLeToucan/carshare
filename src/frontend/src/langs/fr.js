@@ -192,6 +192,7 @@ export default {
     // trip
     FUTURE_TRIPS: "Trajets futurs",
     PAST_TRIPS: "Trajets passés",
+    CANCEL_TRIP: "Annuler le trajet",
 
     // informations
     ADDRESS_NOT_VERIFIED: "Adresse non vérifiée",

@@ -22,6 +22,7 @@
                             <button-block
                                 class="flex justify-center items-center"
                                 :class="showPagBtnFuture? '': ' hidden '"
+                                :action="fetchNextFutureTrips"
                             >
                                 <div class="flex justify-center items-center space-x-2">
                                     <plus-icon class="w-6 h-6 inline" />
@@ -50,6 +51,7 @@
                             <button-block
                                 class="flex justify-center items-center"
                                 :class="showPagBtnPast? '': ' hidden '"
+                                :action="fetchNextPastTrips"
                             >
                                 <div class="flex justify-center items-center space-x-2">
                                     <plus-icon class="w-6 h-6 inline" />
@@ -63,12 +65,16 @@
         </div>
         <popup
             ref="trip-view"
-            title="UwU Popup trajet"
-            content="OwO contenu"
+            :title="lang.TRAVEL_CARD_LABEL.replace('{DATE}', new Date(selectedTrip?.departure?.date).toLocaleDateString())"
             :cancel-label="lang.BACK"
             :show-validate="false"
         >
-            <p class="text-lg text-slate-500 font-bold"> Snuggles and wuggles uwu ~~ </p>
+            <trip-detail
+                :trip-start="selectedTrip?.departure"
+                :trip-end="selectedTrip?.arrival"
+                :trip-id="selectedTrip?.id ?? null"
+                :edit-mode="true"
+            />
         </popup>
     </div>
 </template>
@@ -79,10 +85,13 @@ import FutureTripCard from './FutureTripCard.vue';
 import PastTripCard from './PastTripCard.vue';
 import ButtonBlock from '../inputs/ButtonBlock.vue';
 import Popup from '../cards/Popup.vue';
+import TripDetail from '../cards/TripDetail.vue';
 
 import {
     PlusIcon
 } from '@heroicons/vue/24/outline';
+import API from '../../scripts/API';
+import User from '../../scripts/User';
 
 export default {
     name: "UserTrips",
@@ -91,20 +100,77 @@ export default {
         PastTripCard,
         ButtonBlock,
         PlusIcon,
-        Popup
+        Popup,
+        TripDetail
     },
     data() {
-        return { lang: Lang.CurrentLang, futureTrips: [], pastTrips: [], showPagBtnFuture: false, showPagBtnPast: false }
+        return {
+            lang: Lang.CurrentLang,
+            futureTrips: [],
+            pastTrips: [],
+            showPagBtnFuture: false,
+            showPagBtnPast: false,
+            selectedTrip: null,
+            futurePagination: API.createPagination(0, 10),
+            pastPagination: API.createPagination(0, 10)
+        }
     },
     mounted() {
         Lang.AddCallback(lang => this.lang = lang);
 
         this.tripPreview = this.$refs["trip-view"];
+
+        this.fetchFutureTrips();
+        this.fetchPastTrips();
     },
     methods: {
         selectTrip(trip) {
-            console.log("Selected trip : ", trip);
+            this.selectedTrip = trip;
             this.tripPreview?.show();
+        },
+        fetchFutureTrips() {
+            API.execute_logged(
+                API.ROUTE.TRAVELS.MY + this.futurePagination.toString() + "&type=future",
+                API.METHOD.GET, User.CurrentUser.getCredentials()
+            ).then(res => {
+                const list = res.data;
+                list.forEach(trip => {
+                    if (!this.futureTrips.find(t => t.id === trip.id))
+                        this.futureTrips.push(trip);
+                });
+                this.futurePagination.total = res.total ?? 0;
+                if (res.next !== null)
+                    this.showPagBtnFuture = true;
+                else this.showPagBtnFuture = false;
+            }).catch(err => {
+                console.error(err);
+            });
+        },
+        fetchPastTrips() {
+            API.execute_logged(
+                API.ROUTE.TRAVELS.MY + this.pastPagination.toString() + "&type=past",
+                API.METHOD.GET, User.CurrentUser.getCredentials()
+            ).then(res => {
+                const list = res.data;
+                list.forEach(trip => {
+                    if (!this.pastTrips.find(t => t.id === trip.id))
+                        this.pastTrips.push(trip);
+                });
+                this.pastPagination.total = res.total ?? 0;
+                if (res.next !== null)
+                    this.showPagBtnPast = true;
+                else this.showPagBtnPast = false;
+            }).catch(err => {
+                console.error(err);
+            });
+        },
+        fetchNextPastTrips() {
+            this.pastPagination.next();
+            this.fetchPastTrips();
+        },
+        fetchNextFutureTrips() {
+            this.futurePagination.next();
+            this.fetchFutureTrips();
         }
     }
 }

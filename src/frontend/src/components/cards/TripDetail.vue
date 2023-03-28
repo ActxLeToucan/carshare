@@ -1,14 +1,14 @@
 <template>
-    <div>
+    <div class="flex flex-col grow w-full max-h-full min-h-0">
         <div
             v-if="trip != null"
-            class="flex md:flex-row flex-col grow min-w-0 max-w-[80vw] max-h-full min-h-0 space-y-4 items-center"
+            class="flex md:flex-row flex-col grow min-w-0 w-full max-h-full min-h-0"
         >
-            <div class="flex grow flex-col md:w-[50%] w-full justify-center items-center md:pr-4 space-y-4">
-                <p class="text-xl text-slate-600 dark:text-slate-300 font-bold whitespace-nowrap text-ellipsis overflow-hidden py-2">
+            <div class="flex grow flex-col md:w-[50%] w-full justify-center items-center md:pr-4">
+                <p class="text-xl text-slate-600 dark:text-slate-300 font-bold whitespace-nowrap text-ellipsis mb-1">
                     {{ lang.TRIP_DESTINATIONS }}
                 </p>
-                <div class="flex flex-col grow h-fit w-fit space-y-2 w-full overflow-y-auto">
+                <div class="flex flex-col grow h-fit w-fit space-y-2 w-full overflow-y-auto max-h-min min-h-[4em]">
                     <div
                         v-for="(step, index) in trip.steps"
                         :key="step.id"
@@ -29,7 +29,7 @@
                         </p>
                     </div>
                 </div>
-                <div class="flex flex-col grow rounded-lg bg-slate-200 dark:bg-slate-600 border-2 border-slate-200 dark:border-slate-600 w-full">
+                <div class="flex flex-col grow rounded-lg bg-slate-200 dark:bg-slate-600 border-2 border-slate-200 dark:border-slate-600 w-full mt-2">
                     <p class="text-xl text-slate-600 dark:text-slate-200 font-bold mx-2 mb-1">
                         {{ lang.TRIP_INFO }}
                     </p>
@@ -41,7 +41,7 @@
                 </div>
             </div>
             <span class="hidden md:flex grow h-40 w-1 bg-slate-200 dark:bg-slate-700 rounded-md my-auto" />
-            <div class="flex grow flex-col md:w-[50%] w-full justify-center items-center md:pl-4 space-y-4">
+            <div class="flex grow flex-col md:w-[50%] w-full items-center md:pl-4 space-y-4">
                 <div class="flex flex-col h-50% w-full">
                     <p class="text-xl text-slate-600 dark:text-slate-300 font-bold mx-2 mb-1 mr-auto">
                         {{ lang.PASSENGERS }}
@@ -85,9 +85,20 @@
                 </div>
             </div>
         </div>
-        <div class="flex w-full justify-center items-center my-4">
+        <div
+            v-show="!editMode"
+            class="flex w-full justify-center items-center my-4"
+        >
             <button-block :action="bookTrip">
                 {{ lang.BOOK_TRIP }}
+            </button-block>
+        </div>
+        <div
+            v-show="editMode"
+            class="flex w-full justify-end items-center my-4"
+        >
+            <button-block color="red" :action="removeTravel" v-show="!isPast">
+                {{ lang.CANCEL_TRIP }}
             </button-block>
         </div>
         <div
@@ -127,10 +138,15 @@ export default {
         tripEnd: {
             type: [Object, String, null],
             required: true,
-        }
+        },
+        editMode: {
+            type: Boolean,
+            required: false,
+            default: false,
+        },
     },
     data() {
-        return { User, lang: Lang.CurrentLang, trip: null, startIndex: null, endIndex: null };
+        return { User, lang: Lang.CurrentLang, trip: null, startIndex: null, endIndex: null, isPast: false };
     },
     watch: {
         tripId: function (newVal, oldVal) {
@@ -156,8 +172,10 @@ export default {
             API.execute_logged(API.ROUTE.TRAVELS.GET + id, API.METHOD.GET, User.CurrentUser.getCredentials()).then(res => {
                 this.trip = res;
 
-                this.startIndex = this.trip?.steps.findIndex(step => step.city == this.tripStart.value);
-                this.endIndex = this.trip?.steps.findIndex(step => step.city == this.tripEnd.value);
+                this.startIndex = this.tripStart !== undefined? this.trip?.steps.findIndex(step => step.city == this.tripStart.value) : 0;
+                this.endIndex   = this.tripEnd !== undefined? this.trip?.steps.findIndex(step => step.city == this.tripEnd.value) : this.trip.steps.length - 1;
+
+                this.isPast = new Date(this.trip.steps[this.trip.steps.length - 1].date) < new Date();
             }).catch(err => {
                 console.error(err);
                 this.popup?.hide();
@@ -185,8 +203,17 @@ export default {
                 console.error(err);
             });
         },
-        setPopup(popup) {
-            this.popup = popup;
+        removeTravel() {
+            const log = this.log("Annulation du trajet ...", Log.INFO);
+
+            API.execute_logged(API.ROUTE.TRAVELS.MY + "/" + this.trip.id, API.METHOD.DELETE, User.CurrentUser.getCredentials()).then(res => {
+                log.update(res.message, Log.SUCCESS);
+                setTimeout(() => { log.delete(); this.popup?.hide(); }, 4000);
+            }).catch(err => {
+                log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
+                setTimeout(() => { log.delete(); }, 6000);
+                console.error(err);
+            });
         }
     },
 };
