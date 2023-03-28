@@ -27,6 +27,7 @@
                 </p>
                 <input-choice
                     name="theme"
+                    :label="lang.THEME "
                     :value="selectedTheme"
                     :list="themes"
                     :onchange="onThemeChanged"
