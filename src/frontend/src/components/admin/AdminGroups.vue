@@ -2,7 +2,7 @@
     <div class="flex md:flex-row flex-col grow max-h-full max-w-full min-h-0">
         <div
             ref="query-zone"
-            class="flex flex-col items-center h-full md:w-min w-full px-8 py-4 space-y-4 md:border-r-8 border-teal-500 mx-auto overflow-hidden"
+            class="flex flex-col items-center h-full max-h-full md:w-min w-full min-w-0 max-w-full p-4 md:border-r-8 border-teal-500 mx-auto overflow-hidden"
         >
             <p class="text-2xl text-teal-500 py-2 font-bold mx-auto">
                 {{ lang.GROUPS }}
@@ -27,7 +27,7 @@
                 class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
                 style="max-height: 0;"
             />
-            <div class="flex w-full flex-col px-8 space-y-4 pt-4 max-w-full min-w-0 overflow-y-auto">
+            <div class="flex grow w-full flex-col px-8 space-y-4 pt-4 max-w-full min-w-0 overflow-y-auto">
                 <admin-group-card
                     v-for="group in groups"
                     :key="group?.id"
@@ -94,14 +94,14 @@
                             :placeholder="lang.GROUP_NAME"
                             :value="selectedGroup.name"
                         />
-                        <input-text
+                        <input-text-read-only
                             name="creatorId"
                             :label="lang.GROUP_CREATOR"
                             :placeholder="lang.GROUP_CREATOR"
                             :value="selectedGroup.creator.firstName +' ' + selectedGroup.creator.lastName"
                             class="mb-0"
                         />
-                        <input-text
+                        <input-text-read-only
                                 name="createdAt"
                                 :type="date"
                                 :label="lang.GROUP_CREATEDAT"
@@ -181,6 +181,7 @@
 import User from '../../scripts/User.js';
 import API from '../../scripts/API.js';
 import InputText from '../inputs/InputText.vue';
+import InputTextReadOnly from '../inputs/InputTextReadOnly.vue';
 import ButtonBlock from '../inputs/ButtonBlock.vue';
 import AdminGroupCard from './AdminGroupCard.vue';
 import CardPopup from '../cards/CardPopup.vue';
@@ -228,6 +229,7 @@ export default {
         CardPopup,
         Card,
         CardBadge,
+        InputTextReadOnly,
         MagnifyingGlassIcon,
         ChevronRightIcon,
         ChevronLeftIcon,
