@@ -2,7 +2,7 @@ import type express from 'express';
 import { prisma } from '../app';
 import * as validator from '../tools/validator';
 import { checkTravelHoursLimit } from '../tools/validator';
-import { displayableTravelPublic, displayableUserPublic, error, info, notifs, notify, sendMsg } from '../tools/translator';
+import { displayableTravelPublic, displayableUserPublic, displayableSteps, error, info, notifs, notify, sendMsg } from '../tools/translator';
 import properties from '../properties';
 import { getMaxPassengers, preparePagination } from './_common';
 
@@ -295,20 +295,98 @@ exports.getTravel = (req: express.Request, res: express.Response, _: express.Nex
 exports.getMyTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const pagination = preparePagination(req, false);
 
-    prisma.travel.count({
-        where: { driverId: res.locals.user.id }
-    }).then((count) => {
-        prisma.travel.findMany({
-            where: { driverId: res.locals.user.id },
-            ...pagination.pagination
-        }).then(travels => {
-            res.status(200).json(pagination.results(travels, count));
+    const type = validator.sanitizeType(req.query.type, req, res);
+    if (type === null) return;
+
+    let where: any
+    if (type === 'past') {
+        where = {
+            OR: [{
+                driverId: res.locals.user.id,
+                steps: {
+                    every: {
+                        date: {
+                            lt: new Date()
+                        }
+                    }
+                }
+            },
+            {
+                steps: {
+                    every: {
+                        departureOfBookings: {
+                            every: {
+                                passengerId: res.locals.user.id
+                            }
+                        },
+                        date: {
+                            lt: new Date()
+                        }
+                    }
+                }
+            }]
+        };
+    } else if (type === 'future') {
+        where = {
+            OR: [{
+                driverId: res.locals.user.id,
+                steps: {
+                    some: {
+                        date: {
+                            gte: new Date()
+                        }
+                    }
+                }
+            },
+            {
+                steps: {
+                    some: {
+                        date: {
+                            gte: new Date()
+                        },
+                        departureOfBookings: {
+                            some: {
+                                passengerId: res.locals.user.id
+                            }
+                        }
+                    }
+                }
+            }]
+        };
+    } else {
+        where = {
+            OR: [{
+                driverId: res.locals.user.id
+            },
+            {
+                steps: {
+                    some: {
+                        departureOfBookings: {
+                            some: {
+                                passengerId: res.locals.user.id
+                            }
+                        }
+                    }
+                }
+            }]
+        };
+    }
+
+    prisma.travel.count({ where })
+        .then((count) => {
+            prisma.travel.findMany({
+                where,
+                include: { driver: true, steps: true },
+                ...pagination.pagination
+            }).then(travels => {
+                const data = travels.map(displayableSteps)
+                res.status(200).json(pagination.results(data, count));
+            }).catch((err) => {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
+            });
         }).catch((err) => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);
         });
-    }).catch((err) => {
-        console.error(err);
-        sendMsg(req, res, error.generic.internalError);
-    });
 }
