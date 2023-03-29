@@ -152,10 +152,10 @@ export default {
         tripId: function (newVal, oldVal) {
             this.loadTrip(newVal);
         },
-        tripStart: function(newVal, oldVal) {
+        tripStart: function (newVal, oldVal) {
             this.loadTrip(this.tripId);
         },
-        tripEnd: function(newVal, oldVal) {
+        tripEnd: function (newVal, oldVal) {
             this.loadTrip(this.tripId);
         },
     },

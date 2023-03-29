@@ -552,8 +552,8 @@ const error = {
         }),
         alreadyTravel: (req: Request, dateDeb: Date, dateFin: Date, timezone: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Le conducteur a déjà un trajet de prévu du ${dateToString(dateDeb, timezone, 'fr')} au ${dateToString(dateFin, timezone, 'fr')}.`,
-                en: `The driver already has a trip planned from ${dateToString(dateDeb, timezone, 'en')} to ${dateToString(dateFin, timezone, 'en')}.`
+                fr: `Vous avez déjà un trajet de prévu du ${dateToString(dateDeb, timezone, 'fr')} au ${dateToString(dateFin, timezone, 'fr')}.`,
+                en: `You already have a trip planned from ${dateToString(dateDeb, timezone, 'en')} to ${dateToString(dateFin, timezone, 'en')}.`
             },
             code: 400
         })
