@@ -4,6 +4,7 @@ import { type User, type Travel, type Group, type Step, type Booking, type Notif
 import properties from '../properties';
 import { sendMail as mailerSend } from './mailer';
 import moment from 'moment-timezone';
+import { titleCase } from 'title-case';
 
 export type Variants = {
     en: any
@@ -1368,6 +1369,8 @@ function notify (user: User, notification: { type: string | null, title: string,
  */
 function displayableUserPrivate (user: User): Partial<User> {
     const u = user as any;
+    if (typeof u.firstName === 'string') u.firstName = titleCase(u.firstName);
+    if (typeof u.lastName === 'string') u.lastName = u.lastName.toUpperCase();
     delete u.password;
     delete u.lastPasswordResetEmailedOn;
     delete u.lastEmailVerificationEmailedOn;
