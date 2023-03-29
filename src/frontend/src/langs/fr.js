@@ -22,8 +22,8 @@ export default {
     SENDING_RESPONSE: "Envoi de la réponse",
     DELETING: "Suppression en cours",
 
-    // languages
-    ENGLISH: "Anglais",
+    // languages (do not translate)
+    ENGLISH: "English",
     FRENCH: "Français",
 
     // 404 page

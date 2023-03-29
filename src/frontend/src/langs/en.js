@@ -22,9 +22,9 @@ export default {
     SENDING_RESPONSE: "Sending response",
     DELETING: "Deleting",
 
-    // languages
+    // languages (do not translate)
     ENGLISH: "English",
-    FRENCH: "French",
+    FRENCH: "Français",
 
     // 404 page
     WOOPS: "Oops",
