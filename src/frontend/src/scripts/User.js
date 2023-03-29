@@ -31,6 +31,8 @@ class User {
     createdAt = null;
     token = null;
     emailVerifiedOn = null;
+    timezone = null;
+    lang = null;
 
     constructor(infos) {
         this.setInformations(infos, true);
@@ -38,7 +40,7 @@ class User {
     }
 
     setInformations(infos, checkToken = false) {
-        const props = ["id", "email", "firstName", "lastName", "phone", "avatar", "gender", "hasCar", "mailNotif", "level", "createdAt", "token", "emailVerifiedOn"];
+        const props = ["id", "email", "firstName", "lastName", "phone", "avatar", "gender", "hasCar", "mailNotif", "level", "createdAt", "token", "emailVerifiedOn", "timezone", "lang"];
         for (const prop of props) {
             if (this[prop] != infos[prop] && infos[prop] !== undefined) {
                 this[prop] = infos[prop];

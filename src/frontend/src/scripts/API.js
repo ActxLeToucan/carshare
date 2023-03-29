@@ -167,7 +167,7 @@ class API {
         RESETPWD: "/users/password-reset",
         USERS: "/users",
         GROUPS: "/groups",
-        SETTINGS : "/settings/notifications",
+        SETTINGS : "/settings",
         NOTIFS: "/notifications",
         MY_NOTIFS: "/notifications/my",
         ALL_NOITFS: "/notifications/all",

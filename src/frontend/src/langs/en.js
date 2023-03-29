@@ -24,9 +24,9 @@ export default {
     CREATOR: "Creator", 
     CREATION_DATE: "Creation date",
 
-    // languages
+    // languages (do not translate)
     ENGLISH: "English",
-    FRENCH: "French",
+    FRENCH: "Français",
 
     // 404 page
     WOOPS: "Oops",
@@ -49,7 +49,6 @@ export default {
     DELETE: "Delete",
     DELETE_ALL: "Delete all",
     DELETE_ACCOUNT: "Delete account",
-    DELETE_GROUP :"Delete group " , 
     ADD: "Add",
     SEARCH: "Search",
     VERIFY: "Verify",
@@ -87,8 +86,6 @@ export default {
     PASSWORD_SPECIFY: "Please specify the password",
     PASSWORD_CONFIRM_SPECIFY: "Please confirm the password",
     NAME_SPECIFY: "Please specify the name",
-    GROUPNAME_SPECIFY: "Please specify the group name",
-    CREATOR_SPECIFY: "Please specify the creator name",
 
     FIRSTNAME_TOOLONG: "The first name is too long",
     LASTNAME_TOOLONG: "The last name is too long",
@@ -183,7 +180,6 @@ export default {
     GROUP_SELECTED: "Group selected",
     SEARCH_GROUP: "Search group",
     GROUP_NAME: "Group name",
-    GROUP_DELETE_VERIFY: "Are you sure you want to delete this group ?\nThis action is irreversible.",
 
     // parametres
     NOTIF_PARAMS: "Notification settings",
@@ -194,7 +190,10 @@ export default {
     DISPLAY_PARAMS: "Display settings",
     LANGUAGE: "Language",
     UPDATING_PARAMS: "Updating parameters",
+    ERROR_UPDATING_PARAMS: "An error occurred while updating parameters.",
     PARAMS_UPDATED: "Parameters updated successfully",
+    OTHER_PARAMS: "Other settings",
+    TIMEZONE: "Timezone",
 
     // informations
     ADDRESS_NOT_VERIFIED: "Address not verified",
