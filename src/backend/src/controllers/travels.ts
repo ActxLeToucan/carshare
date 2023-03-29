@@ -2,7 +2,7 @@ import type express from 'express';
 import { prisma } from '../app';
 import * as validator from '../tools/validator';
 import { checkTravelHoursLimit } from '../tools/validator';
-import { displayableTravelPublic, displayableUserPublic, displayableStep, error, info, notifs, notify, sendMsg } from '../tools/translator';
+import { displayableTravelPublic, displayableUserPublic, displayableSteps, error, info, notifs, notify, sendMsg } from '../tools/translator';
 import properties from '../properties';
 import { getMaxPassengers, preparePagination } from './_common';
 
@@ -326,9 +326,7 @@ exports.getMyTravels = (req: express.Request, res: express.Response, _: express.
                 }
             }]
         };
-    }
-
-    if (type === 'future') {
+    } else if (type === 'future') {
         where = {
             OR: [{
                 driverId: res.locals.user.id,
@@ -355,9 +353,7 @@ exports.getMyTravels = (req: express.Request, res: express.Response, _: express.
                 }
             }]
         };
-    }
-
-    if (typeof type === 'undefined') {
+    } else {
         where = {
             OR: [{
                 driverId: res.locals.user.id
@@ -383,7 +379,7 @@ exports.getMyTravels = (req: express.Request, res: express.Response, _: express.
                 include: { driver: true, steps: true },
                 ...pagination.pagination
             }).then(travels => {
-                const data = travels.map(displayableStep)
+                const data = travels.map(displayableSteps)
                 res.status(200).json(pagination.results(data, count));
             }).catch((err) => {
                 console.error(err);
