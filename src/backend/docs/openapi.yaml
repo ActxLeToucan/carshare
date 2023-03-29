@@ -799,7 +799,7 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
-  /travels/my/:type:
+  /travels/my:
     get:
       summary: My travels
       description: Get all the trips created by the current user.
@@ -815,6 +815,7 @@ paths:
           description: string to choose between seeing future and past routes
           schema:
             type: string
+            required: false
             enum:
               - future
               - past
