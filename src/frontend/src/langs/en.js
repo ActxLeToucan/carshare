@@ -47,7 +47,6 @@ export default {
     DELETE: "Delete",
     DELETE_ALL: "Delete all",
     DELETE_ACCOUNT: "Delete account",
-    DELETE_GROUP :"Delete group " , 
     ADD: "Add",
     SEARCH: "Search",
     VERIFY: "Verify",
@@ -178,7 +177,6 @@ export default {
     SELECT_GROUP_DESC: "Please select a group of users to share your trip with",
     GROUP_SELECTED: "Group selected",
     SEARCH_GROUP: "Search group",
-    GROUP_NAME: "Group name",
     GROUP_CREATOR :"Creator" , 
 
     // parametres

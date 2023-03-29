@@ -47,7 +47,6 @@ export default {
     DELETE: "Supprimer",
     DELETE_ALL: "Tout supprimer",
     DELETE_ACCOUNT: "Supprimer le compte",
-    DELETE_GROUP :"Supprimer le groupe " , 
     ADD: "Ajouter",
     SEARCH: "Rechercher",
     VERIFY: "Vérifier",
@@ -178,10 +177,9 @@ export default {
     SELECT_GROUP_DESC: "Veuillez sélectionner un groupe d'utilisateurs pour pouvoir partager vos trajets avec eux",
     GROUP_SELECTED: "Groupe sélectionné",
     SEARCH_GROUP: "Rechercher un groupe",
-    GROUP_NAME: "Nom de groupe",
-    GROUP_CREATOR :"Createur",
+    GROUP_CREATOR :"Créateur",
 
-    //parametres
+    // parametres
     NOTIF_PARAMS: "Paramètres de notifications",
     EMAIL_NOTIFICATIONS: "Notifier par email",
     THEME: "Thème",
