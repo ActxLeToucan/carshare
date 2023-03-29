@@ -36,8 +36,7 @@
                         <button
                             v-for="group in groups"
                             :key="group.id"
-                            class="flex flex-col justify-center py-4 my-4 rounded-lg bg-slate-100 dark:bg-slate-700 px-4 w-fit max-w-[14em]
-                                    border-2 border-transparent hover:border-slate-200 hover:border-slate-600 cursor-pointer transition-all"
+                            class="flex flex-col justify-center py-4 my-4 rounded-lg bg-slate-100 dark:bg-slate-700 px-4 border-2 border-transparent hover:border-slate-200 hover:border-slate-600 cursor-pointer transition-all"
                             @click="showGroup(group)"
                         >
                             <p class="text-xl md:text-2xl text-slate-500 dark:text-slate-300 font-bold mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full">
@@ -47,6 +46,17 @@
                                 {{ group.users.length }} {{ group.users.length >= 2 ? lang.MEMBERS : lang.MEMBER }}
                             </p>
                         </button>
+                        <button-block
+                            v-show="showPagBtn"
+                            :disabled="loading"
+                            class="w-fit mt-8 mx-auto"
+                            :action="showMoreGroups"
+                        >
+                            <plus-icon class="w-7 h-7 mr-1.5 inline" />
+                            <p class="inline">
+                                {{ lang.LOAD_MORE }}
+                            </p>
+                        </button-block>
                     </div>
                 </card>
                 <div class="flex justify-center mt-4">
@@ -145,7 +155,8 @@ import InputText from '../inputs/InputText.vue';
 import CardPopup from '../cards/CardPopup.vue';
 
 import {
-    XMarkIcon
+    XMarkIcon,
+    PlusIcon
 } from '@heroicons/vue/24/outline';
 import API from '../../scripts/API';
 import User from '../../scripts/User';
@@ -159,10 +170,20 @@ export default {
         ButtonBlock,
         XMarkIcon,
         CardPopup,
-        InputText
+        InputText,
+        PlusIcon
     },
     data() {
-        return { groups: [], loading: false, lang: Lang.CurrentLang, selectedGroup: null, deletePopup: null, createPopup: null }
+        return {
+            groups: [],
+            loading: false,
+            lang: Lang.CurrentLang,
+            selectedGroup: null,
+            deletePopup: null,
+            createPopup: null,
+            showPagBtn: false,
+            pagination: API.createPagination(0, 5)
+        }
     },
     mounted() {
         Lang.AddCallback(lang => this.lang = lang);
@@ -211,7 +232,7 @@ export default {
             log.update(Lang.CurrentLang.CREATING_GROUP + " ...", Log.INFO);
             const name = popup.get("name");
 
-            API.execute_logged(API.ROUTE.GROUPS, API.METHOD.POST, User.CurrentUser?.getCredentials(), {name}).then(res => {
+            API.execute_logged(API.ROUTE.GROUPS + "/my", API.METHOD.POST, User.CurrentUser?.getCredentials(), {name}).then(res => {
                 log.update(Lang.CurrentLang.GROUP_CREATED, Log.SUCCESS);
                 setTimeout(() => {
                     log.delete();
@@ -227,14 +248,22 @@ export default {
         },
         updateGroups() {
             this.loading = true;
-            this.groups.splice(0, this.groups.length);
-            API.execute_logged(API.ROUTE.GROUPS, API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
+            API.execute_logged(API.ROUTE.GROUPS + "/my" + this.pagination, API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
                 const data = res.data ?? res.groups;
-                data.forEach(group => this.groups.push(group));
+                data.forEach(group => {
+                    if (!this.groups.find(g => g.id == group.id))
+                        this.groups.push(group)
+                });
                 this.loading = false;
+                this.pagination.total = res.total ?? 0;
+                this.showPagBtn = this.pagination.hasNext;
             }).catch(err => {
                 console.error(err);
             });
+        },
+        showMoreGroups() {
+            this.pagination.next();
+            this.updateGroups();
         }
     }
 }
