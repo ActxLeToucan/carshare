@@ -292,7 +292,8 @@ exports.getTravel = (req: express.Request, res: express.Response, _: express.Nex
                     some: {
                         departure: {
                             travelId: travel.id
-                        }
+                        },
+                        status: properties.booking.status.accepted
                     }
                 }
             }
