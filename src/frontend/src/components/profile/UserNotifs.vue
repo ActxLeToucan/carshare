@@ -106,7 +106,7 @@
                         class="w-fit mt-8 mx-auto"
                         :action="getNotifs"
                     >
-                        <PlusIcon class="w-7 h-7 mr-1.5 inline" />
+                        <plus-icon class="w-7 h-7 mr-1.5 inline" />
                         <p class="inline">
                             {{ lang.LOAD_MORE }}
                         </p>
@@ -136,7 +136,7 @@ import ButtonBlock from "../inputs/ButtonBlock.vue";
 
 import {
     TrashIcon,
-    PlusIcon,
+    PlusIcon
 } from "@heroicons/vue/20/solid";
 import CardPopup from "../cards/CardPopup.vue";
 import { Log, LogZone } from "../../scripts/Logs";

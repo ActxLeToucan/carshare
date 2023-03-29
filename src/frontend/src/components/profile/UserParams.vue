@@ -54,11 +54,11 @@
                     {{ lang.OTHER_PARAMS }}
                 </p>
                 <input-choice
+                    :list="Intl.supportedValuesOf('timeZone').map(tz => ({ value: tz, label: tz }))"
+                    :label="lang.TIMEZONE"
                     ref="timezone"
                     name="timezone"
-                    :label="lang.TIMEZONE"
                     :value="User?.CurrentUser?.timezone"
-                    :list="Intl.supportedValuesOf('timeZone').map(tz => ({ value: tz, label: tz }))"
                     :onchange="onTimezoneChanged"
                 />
                 <div

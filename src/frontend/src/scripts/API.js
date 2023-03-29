@@ -186,6 +186,7 @@ class API {
             ACCEPT: (id) => `/bookings/${id}/accept`,
             REJECT: (id) => `/bookings/${id}/reject`,
         }
+     
     };
 
     /**
