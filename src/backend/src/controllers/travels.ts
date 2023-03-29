@@ -299,152 +299,98 @@ exports.getMyTravels = (req: express.Request, res: express.Response, _: express.
     if (type === null) return;
 
     if (type === 'past') {
-        prisma.travel.count({
-            where: {
-                OR: [{
-                    driverId: res.locals.user.id,
-                    steps: {
-                        some: {
-                            date: {
-                                lte: new Date()
-                            }
+        const where = {
+            OR: [{
+                driverId: res.locals.user.id,
+                steps: {
+                    some: {
+                        date: {
+                            lte: new Date()
                         }
                     }
-                },
-                {
-                    steps: {
-                        some: {
-                            departureOfBookings: {
-                                some: {
-                                    passengerId: res.locals.user.id
-                                }
-                            },
-                            date: {
-                                lte: new Date()
+                }
+            },
+            {
+                steps: {
+                    some: {
+                        departureOfBookings: {
+                            some: {
+                                passengerId: res.locals.user.id
                             }
+                        },
+                        date: {
+                            lte: new Date()
                         }
                     }
-                }]
-            }
-        }).then((count) => {
-            prisma.travel.findMany({
-                where: {
-                    OR: [{
-                        driverId: res.locals.user.id,
-                        steps: {
-                            some: {
-                                date: {
-                                    lte: new Date()
-                                }
-                            }
-                        }
-                    },
-                    {
-                        steps: {
-                            some: {
-                                departureOfBookings: {
-                                    some: {
-                                        passengerId: res.locals.user.id
-                                    }
-                                },
-                                date: {
-                                    lte: new Date()
-                                }
-                            }
-                        }
-                    }]
-                },
-                include: {
-                    steps: true
-                },
-                ...pagination.pagination
-            }).then(travels => {
-                const data = travels.map((travel) => {
-                    return displayableStep(travel);
+                }
+            }]
+        };
+        prisma.travel.count({ where })
+            .then((count) => {
+                prisma.travel.findMany({
+                    where,
+                    include: { steps: true },
+                    ...pagination.pagination
+                }).then(travels => {
+                    const data = travels.map((travel) => {
+                        return displayableStep(travel);
+                    });
+                    res.status(200).json(pagination.results(data, count));
+                }).catch((err) => {
+                    console.error(err);
+                    sendMsg(req, res, error.generic.internalError);
                 });
-                res.status(200).json(pagination.results(data, count));
             }).catch((err) => {
                 console.error(err);
                 sendMsg(req, res, error.generic.internalError);
             });
-        }).catch((err) => {
-            console.error(err);
-            sendMsg(req, res, error.generic.internalError);
-        });
     }
 
     if (type === 'future') {
-        prisma.travel.count({
-            where: {
-                OR: [{
-                    driverId: res.locals.user.id,
-                    steps: {
-                        some: {
-                            date: {
-                                gte: new Date()
-                            }
+        const where = {
+            OR: [{
+                driverId: res.locals.user.id,
+                steps: {
+                    some: {
+                        date: {
+                            gte: new Date()
                         }
                     }
-                },
-                {
-                    steps: {
-                        some: {
-                            departureOfBookings: {
-                                some: {
-                                    passengerId: res.locals.user.id
-                                }
-                            },
-                            date: {
-                                gte: new Date()
+                }
+            },
+            {
+                steps: {
+                    some: {
+                        departureOfBookings: {
+                            some: {
+                                passengerId: res.locals.user.id
                             }
+                        },
+                        date: {
+                            gte: new Date()
                         }
                     }
-                }]
-            }
-        }).then((count) => {
-            prisma.travel.findMany({
-                where: {
-                    OR: [{
-                        driverId: res.locals.user.id,
-                        steps: {
-                            some: {
-                                date: {
-                                    gte: new Date()
-                                }
-                            }
-                        }
-                    },
-                    {
-                        steps: {
-                            some: {
-                                departureOfBookings: {
-                                    some: {
-                                        passengerId: res.locals.user.id
-                                    }
-                                },
-                                date: {
-                                    gte: new Date()
-                                }
-                            }
-                        }
-                    }]
-                },
-                include: {
-                    steps: true
-                },
-                ...pagination.pagination
-            }).then(travels => {
-                const data = travels.map((travel) => {
-                    return displayableStep(travel);
+                }
+            }]
+        };
+        prisma.travel.count({ where })
+            .then((count) => {
+                prisma.travel.findMany({
+                    where,
+                    include: { steps: true },
+                    ...pagination.pagination
+                }).then(travels => {
+                    const data = travels.map((travel) => {
+                        return displayableStep(travel);
+                    });
+                    res.status(200).json(pagination.results(data, count));
+                }).catch((err) => {
+                    console.error(err);
+                    sendMsg(req, res, error.generic.internalError);
                 });
-                res.status(200).json(pagination.results(data, count));
             }).catch((err) => {
                 console.error(err);
                 sendMsg(req, res, error.generic.internalError);
             });
-        }).catch((err) => {
-            console.error(err);
-            sendMsg(req, res, error.generic.internalError);
-        });
     }
 }
