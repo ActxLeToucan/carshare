@@ -48,7 +48,7 @@
                     </p>
                     <div class="flex bg-white dark:bg-slate-700 rounded-md border-2 border-slate-200 dark:border-slate-600 p-2 w-full min-h-[8em] items-center overflow-x-auto">
                         <p
-                            v-show="trip.passengers.length == 0"
+                            v-show="trip.passengers?.length == 0"
                             class="text-slate-500 dark:text-slate-400 text-lg font-semibold w-fit mx-auto"
                         >
                             {{ lang.NO_PASSENGERS }}.
@@ -71,11 +71,11 @@
                             <p class="text-xl text-slate-600 dark:text-slate-300 font-bold mx-2 mb-1 mx-auto text-center">
                                 {{ lang.DRIVER }}
                             </p>
-                            <div class="flex flex-col justify-center items-center m-2 h-20 w-20 items-center bg-white dark:bg-slate-700 rounded-md mx-auto">
-                                <div class="flex w-14 h-14 p-2 mx-auto">
-                                    <user-icon class="w-full text-slate-500 dark:text-slate-400" />
+                            <div class="flex flex-col justify-center items-center m-2 px-2 h-20 min-w-[5em] max-w-[10em] items-center bg-white dark:bg-slate-700 rounded-md mx-auto">
+                                <div class="flex w-11 h-11 mx-auto">
+                                    <user-icon class="w-10 text-slate-500 dark:text-slate-400 mx-auto" />
                                 </div>
-                                <p class="text-slate-500 dark:text-slate-300 text-lg font-semibold">
+                                <p class="text-slate-500 dark:text-slate-300 text-lg font-semibold max-w-full whitespace-nowrap text-ellipsis overflow-hidden">
                                     {{ trip.driver.firstName + " " + trip.driver.lastName.substring(0, 1) + "." }}
                                 </p>
                             </div>
