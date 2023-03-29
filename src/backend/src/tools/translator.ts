@@ -480,6 +480,20 @@ const error = {
                 en: 'Group id must be a number.'
             },
             code: 400
+        }),
+        requiredId: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Le champs groupeId est requis',
+                en: 'The field groupId is required'
+            },
+            code: 400
+        }),
+        notCreator: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Vous n\'êtes pas le créateur de ce groupe.',
+                en: 'You are not the creator of this group.'
+            },
+            code: 403
         })
     },
     number: {
@@ -863,6 +877,13 @@ const info = {
                 en: 'Group removed'
             },
             code: 200
+        }),
+        nameUpdated: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Nom du groupe modfié',
+                en: 'Group name updated'
+            },
+            code: 200
         })
     },
     notification: {
@@ -1212,6 +1233,20 @@ const notifs = {
                             return 'You had not yet answered this request.'
                     }
                 })()
+            },
+            type: 'standard',
+            createdAt: new Date()
+        })
+    },
+    group: {
+        nameUpdated: (user: User, oldName: string, newName: string) => msgForLang<TemplateNotif, Notif>(user.lang, {
+            title: {
+                fr: 'Nom du groupe modfié',
+                en: 'Group name updated'
+            },
+            message: {
+                fr: `Le groupe ${oldName} a été renommé en ${newName}.`,
+                en: `The group ${oldName} has been renamed as ${newName}.`
             },
             type: 'standard',
             createdAt: new Date()

@@ -1,5 +1,5 @@
 import type express from 'express';
-import { displayableGroup, error, info, sendMsg } from '../tools/translator';
+import { displayableGroup, error, info, notifs, notify, sendMsg } from '../tools/translator';
 import * as validator from '../tools/validator';
 import { prisma } from '../app';
 import { type Pagination, preparePagination } from './_common';
@@ -32,6 +32,70 @@ exports.getMyGroups = (req: express.Request, res: express.Response, next: expres
     getGroups(req, res, next, false, (_) => ({
         creatorId: res.locals.user.id
     }));
+}
+
+exports.modifyNameGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    const groupName = req.body.groupName;
+    if (!validator.checkGroupNameField(groupName, req, res)) return;
+    const groupId = validator.sanitizeId(req.params.id, req, res);
+    if (groupId === null) return;
+    prisma.group.findUnique({
+        where: {
+            id: groupId
+        }
+    }).then(group => {
+        if (group === null) {
+            sendMsg(req, res, error.group.notFound);
+            return;
+        }
+        if (group.creatorId !== res.locals.user.id) {
+            sendMsg(req, res, error.group.notCreator);
+            return;
+        }
+
+        const oldName = group.name;
+
+        prisma.group.update({
+            where: {
+                id: groupId
+            },
+            data: {
+                name: groupName
+            },
+            include: {
+                users: true
+            }
+        }).then((group) => {
+            const notif = notifs.group.nameUpdated(res.locals.user, oldName, groupName);
+
+            const data = group.users.map((user) => {
+                return {
+                    ...notif,
+                    userId: user.id,
+                    senderId: Number(res.locals.user.id)
+                };
+            });
+
+            prisma.notification.createMany({ data }).then(() => {
+                for (const notif of data) {
+                    const user = group.users.find((u) => u.id === notif.userId);
+                    // send email notification
+                    if (user !== undefined) notify(user, notif);
+                }
+
+                sendMsg(req, res, info.group.nameUpdated, group);
+            }).catch((err) => {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
+            });
+        }).catch((err) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
+    }).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
 }
 
 exports.searchGroups = (req: express.Request, res: express.Response, next: express.NextFunction) => {
