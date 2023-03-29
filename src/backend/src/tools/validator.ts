@@ -335,7 +335,7 @@ function sanitizeId (id: any, req: express.Request, res: express.Response): numb
  * @returns The type string if it is valid, null otherwise
  */
 function sanitizeType (type: any, req: express.Request, res: express.Response): string | undefined | null {
-    if (type !== 'past' && type !== 'future') {
+    if (type !== 'past' && type !== 'future' && typeof type !== 'undefined') {
         sendMsg(req, res, error.id.invalid);
         return null;
     }

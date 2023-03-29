@@ -813,7 +813,6 @@ paths:
         - name: type
           in: path
           description: string to choose between seeing future and past routes
-          required: true
           schema:
             type: string
             enum:
@@ -2564,6 +2563,8 @@ components:
           type: string
           format: date-time
           example: 2020-01-01T00:00:00.000Z
+        driver:
+          $ref: '#/components/schemas/PublicUser'
         departure:
           $ref: '#/components/schemas/Step'
         arrival:

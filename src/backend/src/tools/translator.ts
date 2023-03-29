@@ -1420,8 +1420,9 @@ function dateToString (date: Date, timezone: string | null | undefined, lang: st
  * Returns a trip without all the steps, with only the start and finish.
  * @param travel Travel to display
  */
-function displayableStep (travel: Travel & { steps: Step[] }): Partial<Travel> {
-    const t = Object.assign({}, travel) as any; ;
+function displayableStep (travel: Travel & { driver: User, steps: Step[] }): Partial<Travel> {
+    const t = Object.assign({}, travel) as any;
+    t.driver = displayableUserPublic(t.driver);
     t.departure = travel.steps[0];
     t.arrival = travel.steps[travel.steps.length - 1];
     delete t.steps;

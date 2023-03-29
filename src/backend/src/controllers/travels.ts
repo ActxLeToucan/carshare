@@ -295,7 +295,7 @@ exports.getTravel = (req: express.Request, res: express.Response, _: express.Nex
 exports.getMyTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const pagination = preparePagination(req, false);
 
-    const type = validator.sanitizeType(req.params.type, req, res);
+    const type = validator.sanitizeType(req.query.type, req, res);
     if (type === null) return;
 
     if (type === 'past') {
@@ -303,23 +303,23 @@ exports.getMyTravels = (req: express.Request, res: express.Response, _: express.
             OR: [{
                 driverId: res.locals.user.id,
                 steps: {
-                    some: {
+                    every: {
                         date: {
-                            lte: new Date()
+                            lt: new Date()
                         }
                     }
                 }
             },
             {
                 steps: {
-                    some: {
+                    every: {
                         departureOfBookings: {
-                            some: {
+                            every: {
                                 passengerId: res.locals.user.id
                             }
                         },
                         date: {
-                            lte: new Date()
+                            lt: new Date()
                         }
                     }
                 }
@@ -329,7 +329,7 @@ exports.getMyTravels = (req: express.Request, res: express.Response, _: express.
             .then((count) => {
                 prisma.travel.findMany({
                     where,
-                    include: { steps: true },
+                    include: { driver: true, steps: true },
                     ...pagination.pagination
                 }).then(travels => {
                     const data = travels.map((travel) => {
@@ -361,13 +361,13 @@ exports.getMyTravels = (req: express.Request, res: express.Response, _: express.
             {
                 steps: {
                     some: {
+                        date: {
+                            gte: new Date()
+                        },
                         departureOfBookings: {
                             some: {
                                 passengerId: res.locals.user.id
                             }
-                        },
-                        date: {
-                            gte: new Date()
                         }
                     }
                 }
@@ -377,7 +377,45 @@ exports.getMyTravels = (req: express.Request, res: express.Response, _: express.
             .then((count) => {
                 prisma.travel.findMany({
                     where,
-                    include: { steps: true },
+                    include: { driver: true, steps: true },
+                    ...pagination.pagination
+                }).then(travels => {
+                    const data = travels.map((travel) => {
+                        return displayableStep(travel);
+                    });
+                    res.status(200).json(pagination.results(data, count));
+                }).catch((err) => {
+                    console.error(err);
+                    sendMsg(req, res, error.generic.internalError);
+                });
+            }).catch((err) => {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
+            });
+    }
+
+    if (typeof type === 'undefined') {
+        const where = {
+            OR: [{
+                driverId: res.locals.user.id
+            },
+            {
+                steps: {
+                    some: {
+                        departureOfBookings: {
+                            some: {
+                                passengerId: res.locals.user.id
+                            }
+                        }
+                    }
+                }
+            }]
+        };
+        prisma.travel.count({ where })
+            .then((count) => {
+                prisma.travel.findMany({
+                    where,
+                    include: { driver: true, steps: true },
                     ...pagination.pagination
                 }).then(travels => {
                     const data = travels.map((travel) => {
