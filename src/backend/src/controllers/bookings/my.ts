@@ -2,7 +2,7 @@ import type express from 'express';
 import * as validator from '../../tools/validator';
 import { prisma } from '../../app';
 import { error, info, notifs, notify, sendMsg } from '../../tools/translator';
-import { checkTravelHoursLimit } from '../../tools/validator';
+import { checkTravelHoursEditable } from '../../tools/validator';
 import { getMaxPassengers, preparePagination } from '../_common';
 import properties from '../../properties';
 
@@ -35,7 +35,7 @@ exports.createBooking = (req: express.Request, res: express.Response, _: express
             return;
         }
 
-        if (!checkTravelHoursLimit(travel.steps[0].date, req, res)) return;
+        if (!checkTravelHoursEditable(travel.steps[0].date, req, res)) return;
 
         const startStepIndex = travel.steps.findIndex((s) => s.id === departureIdSanitized);
         const endStepIndex = travel.steps.findIndex((s) => s.id === arrivalIdSanitized);
@@ -172,7 +172,7 @@ exports.cancelMyBooking = (req: express.Request, res: express.Response, next: ex
             sendMsg(req, res, error.booking.notYours);
             return;
         }
-        if (!checkTravelHoursLimit(booking.departure.date, req, res)) return;
+        if (!checkTravelHoursEditable(booking.departure.date, req, res)) return;
 
         if (booking.status === properties.booking.status.cancelled || booking.status === properties.booking.status.rejected) {
             sendMsg(req, res, error.booking.alreadyCancelled);

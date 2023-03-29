@@ -4,7 +4,7 @@ import { prisma } from '../app';
 import { error, info, type MessageHTTP, notifs, notify, sendMsg } from '../tools/translator';
 import properties from '../properties';
 import * as validator from '../tools/validator';
-import { checkTravelHoursLimit } from '../tools/validator';
+import { checkTravelHoursEditable } from '../tools/validator';
 import { getMaxPassengers } from './_common';
 
 exports.acceptBooking = (req: express.Request, res: express.Response, _: express.NextFunction) => {
@@ -48,7 +48,7 @@ function acceptOrRejectBooking (req: express.Request, res: express.Response, sta
             return;
         }
 
-        if (!checkTravelHoursLimit(booking.departure.travel.steps[0].date, req, res)) return;
+        if (!checkTravelHoursEditable(booking.departure.travel.steps[0].date, req, res)) return;
 
         if (status === properties.booking.status.accepted) {
             // check if there is a place left in the car

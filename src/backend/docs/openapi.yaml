@@ -810,11 +810,20 @@ paths:
         - $ref: '#/components/parameters/Accept-Language'
         - $ref: '#/components/parameters/limit'
         - $ref: '#/components/parameters/offset'
+        - name: type
+          in: path
+          description: string to choose between seeing future and past routes
+          schema:
+            type: string
+            required: false
+            enum:
+              - future
+              - past
       security:
         - bearerAuth: [ ]
       responses:
         '200':
-          description: Travels as a driver
+          description: Future travels
           content:
             application/json:
               schema:
@@ -823,7 +832,7 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: '#/components/schemas/Travel'
+                      $ref: '#/components/schemas/TravelStep'
                   limit:
                     type: integer
                     example: 10
@@ -840,7 +849,7 @@ paths:
                     example: 0
                   total:
                     type: integer
-                    example: 12
+                    example: 2
         '401':
           $ref: '#/components/responses/noToken'
         '498':
@@ -1462,6 +1471,65 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
+  /groups/:id/name:
+    patch:
+      summary: Update name of a group
+      description: Update the name of a group
+      operationId: modifyNameGroup
+      tags:
+        - Groups
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - name: groupeId
+          in: path
+          description: The id of the group to rename
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                groupName:
+                  type: string
+                  example: Bilboquet
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Group renamed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Group renamed
+
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: groupId is invalid.
+        '401':
+          $ref: '#/components/responses/noToken'
+        '403':
+          $ref: '#/components/responses/insufficientPrivileges'
+        '404':
+          $ref: '#/components/responses/groupNotFound'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+
   /notation/average/:id:
     get:
       summary: Obtaining evaluation averages
@@ -1574,7 +1642,6 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
-
   /notations/:id:
     delete:
       summary: Delete an evaluation
@@ -1786,7 +1853,6 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
-
 
   /bookings/:id/accept:
     patch:
@@ -2525,3 +2591,40 @@ components:
           type: string
           format: date-time
           example: 2020-01-01T00:00:00.000Z
+    TravelStep:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        maxPassengers:
+          type: integer
+          example: 4
+        price:
+          type: number
+          example: 404
+        description:
+          type: string
+          nullable: true
+          example: No pets allowed
+        status:
+          type: integer
+          example: 1
+        driverId:
+          type: integer
+          example: 1
+        groupId:
+          type: integer
+          nullable: true
+          example: 1
+        createdAt:
+          type: string
+          format: date-time
+          example: 2020-01-01T00:00:00.000Z
+        driver:
+          $ref: '#/components/schemas/PublicUser'
+        departure:
+          $ref: '#/components/schemas/Step'
+        arrival:
+          $ref: '#/components/schemas/Step'
+
