@@ -1,10 +1,11 @@
 import type express from 'express';
 import { prisma } from '../app';
 import * as validator from '../tools/validator';
-import { checkTravelHoursLimit } from '../tools/validator';
+import { checkTravelHours, checkTravelHoursEditable } from '../tools/validator';
 import { displayableTravelPublic, displayableUserPublic, displayableSteps, error, info, notifs, notify, sendMsg } from '../tools/translator';
 import properties from '../properties';
 import { getMaxPassengers, preparePagination } from './_common';
+import moment from 'moment-timezone';
 
 exports.searchTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { date, startCity, startContext, endCity, endContext } = req.query;
@@ -17,8 +18,9 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
     const startCtx = startContext === undefined ? '' : startContext;
     const endCtx = endContext === undefined ? '' : endContext;
 
-    const date1 = new Date(new Date(date as string).getTime() - 1000 * 60 * 60);
-    const date2 = new Date(new Date(date as string).getTime() + 1000 * 60 * 60);
+    const d = new Date(date as string);
+    const date1 = moment(d).subtract(4, 'hour').toDate();
+    const date2 = moment(d).add(18, 'hour').toDate();
 
     prisma.$queryRaw`select t.*,
                             u.id              as 'driver.id',
@@ -78,7 +80,18 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
                     travel.passengers = -1;
                 }
             }
-            res.status(200).json(data.filter((travel: any) => travel.passengers < travel.maxPassengers));
+
+            data = data.filter((travel: any) => {
+                return travel.passengers < travel.maxPassengers && // Check if there is still seats available
+                    checkTravelHours(travel.departure.date); // Check if the beginning of the travel is not too early
+            });
+            data = data.sort((a: any, b: any) => {
+                const diffA = Math.abs(a.departure.date.getTime() - d.getTime());
+                const diffB = Math.abs(b.departure.date.getTime() - d.getTime());
+                return diffA - diffB;
+            });
+
+            res.status(200).json(data);
         }).catch((err) => {
             console.log(err);
             res.status(500).json(err);
@@ -194,7 +207,7 @@ exports.cancelMyTravel = (req: express.Request, res: express.Response, _: expres
             return;
         }
 
-        if (!checkTravelHoursLimit(travel.steps[0].date, req, res)) return;
+        if (!checkTravelHoursEditable(travel.steps[0].date, req, res)) return;
 
         // cancel travel
         prisma.travel.update({
