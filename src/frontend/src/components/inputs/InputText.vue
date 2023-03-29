@@ -8,15 +8,16 @@
             {{ label }}
         </label>
         <input
-            class="flex h-fit bg-white dark:bg-slate-600 border-b-4 border-slate-200 dark:border-slate-700 rounded-md px-4 py-2 font-bold text-lg whitespace-nowrap max-w-full min-w-0
-                   text-slate-500 dark:text-slate-200 text-ellipsis hover:border-slate-300 transition-all focus:outline outline-transparent"
-            :class="dark ? ' text-slate-600 placeholder-slate-400 focus:border-slate-500 ' : ' text-slate-600 placeholder-slate-600/[0.5]  focus:border-teal-500 '"
+            class="flex h-fit border-b-4 rounded-md px-4 py-2 border-slate-200 dark:border-slate-700 font-bold text-lg whitespace-nowrap max-w-full
+                   min-w-0 text-ellipsis transition-all focus:border-teal-500 focus:dark:border-teal-500 focus:outline outline-transparent"
+            :class="(dark ? ' text-slate-600 placeholder-slate-400 ' : ' text-slate-600 placeholder-slate-600/[0.5] ') + (isDisabled? ' bg-slate-100 dark:bg-slate-700 text-slate-300 dark:text-slate-300 ' : ' bg-white dark:bg-slate-600 text-slate-400 dark:text-slate-200 hover:border-slate-300 hover:dark:border-slate-500 ')"
             :placeholder="placeholder"
             :type="type"
             :name="name"
             :value="value"
             :min="min"
             :max="max"
+            :disabled="isDisabled"
         >
     </div>
 </template>
@@ -65,9 +66,17 @@ export default {
             default: "",
             required: false
         },
+        disabled: {
+            type: [Boolean, String],
+            default: false,
+            required: false
+        }
     },
     data() {
-        return {}
+        return {isDisabled: true}
+    },
+    mounted() {
+        this.isDisabled = (this.disabled == 'true' || this.disabled == true)
     }
 }
 </script>

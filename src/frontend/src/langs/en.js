@@ -21,6 +21,8 @@ export default {
     DEFAULT: "Default",
     SENDING_RESPONSE: "Sending response",
     DELETING: "Deleting",
+    CREATOR: "Creator", 
+    CREATION_DATE: "Creation date",
 
     // languages
     ENGLISH: "English",
@@ -168,6 +170,8 @@ export default {
     MEMBERS: "Members",
     MEMBER: "Member",
     DELETE_GROUP: "Delete group",
+    DELETING_GROUP: "Deleting group",
+    GROUP_DELETED: "Group deleted successfully",
     GROUP_DELETE_CONFIRMATION: "Are you sure you want to delete this group ?\nThis action is irreversible.",
     GROUP_NAME: "Group name",
     CREATING_GROUP: "Creating group",
@@ -179,8 +183,7 @@ export default {
     GROUP_SELECTED: "Group selected",
     SEARCH_GROUP: "Search group",
     GROUP_NAME: "Group name",
-    GROUP_CREATOR: "Creator", 
-    GROUP_CREATEDAT :"Creation date",
+    GROUP_DELETE_VERIFY: "Are you sure you want to delete this group ?\nThis action is irreversible.",
 
     // parametres
     NOTIF_PARAMS: "Notification settings",

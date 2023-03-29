@@ -166,7 +166,7 @@ class API {
         VERIFY: "/users/email-verification",
         RESETPWD: "/users/password-reset",
         USERS: "/users",
-        GROUPS: "/groups/my",
+        GROUPS: "/groups",
         SETTINGS : "/settings/notifications",
         NOTIFS: "/notifications",
         MY_NOTIFS: "/notifications/my",
@@ -250,7 +250,7 @@ class API {
                     reject(err);
                 }
             };
-            
+
             fetch(API.API_URL + path, {
                 credentials: "omit",
                 method: method,

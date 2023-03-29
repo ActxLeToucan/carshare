@@ -21,6 +21,8 @@ export default {
     DEFAULT: "Par défaut",
     SENDING_RESPONSE: "Envoi de la réponse",
     DELETING: "Suppression en cours",
+    CREATOR: "Créateur",
+    CREATION_DATE :"Date de création",
 
     // languages
     ENGLISH: "Anglais",
@@ -168,6 +170,8 @@ export default {
     MEMBERS: "Membres",
     MEMBER: "Membre",
     DELETE_GROUP: "Supprimer le groupe",
+    DELETING_GROUP: "Suppression du groupe",
+    GROUP_DELETED: "Groupe supprimé avec succès",
     GROUP_DELETE_CONFIRMATION: "Êtes-vous sûr de vouloir supprimer ce groupe ?\nCette action est irréversible.",
     GROUP_NAME: "Nom du groupe",
     CREATING_GROUP: "Création du groupe",
@@ -179,8 +183,7 @@ export default {
     GROUP_SELECTED: "Groupe sélectionné",
     SEARCH_GROUP: "Rechercher un groupe",
     GROUP_NAME: "Nom de groupe",
-    GROUP_CREATOR: "Créateur",
-    GROUP_CREATEDAT :"Date de creation",
+    GROUP_DELETE_VERIFY: "Êtes-vous sûr de vouloir supprimer ce groupe ?\nCette action est irréversible.",
 
     //parametres
     NOTIF_PARAMS: "Paramètres de notifications",
