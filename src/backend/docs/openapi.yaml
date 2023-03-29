@@ -823,7 +823,7 @@ paths:
         - bearerAuth: [ ]
       responses:
         '200':
-          description: Journey to the future
+          description: Future journey
           content:
             application/json:
               schema:
