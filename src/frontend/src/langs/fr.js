@@ -188,7 +188,10 @@ export default {
     DISPLAY_PARAMS: "Paramètres d'affichage",
     LANGUAGE: "Langue",
     UPDATING_PARAMS: "Mise à jour des paramètres",
+    ERROR_UPDATING_PARAMS: "Une erreur s'est produite lors de la mise à jour des paramètres.",
     PARAMS_UPDATED: "Paramètres mis à jour avec succès",
+    OTHER_PARAMS: "Autres paramètres",
+    TIMEZONE: "Fuseau horaire",
 
     // informations
     ADDRESS_NOT_VERIFIED: "Adresse non vérifiée",

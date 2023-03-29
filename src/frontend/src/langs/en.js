@@ -188,7 +188,10 @@ export default {
     DISPLAY_PARAMS: "Display settings",
     LANGUAGE: "Language",
     UPDATING_PARAMS: "Updating parameters",
+    ERROR_UPDATING_PARAMS: "An error occurred while updating parameters.",
     PARAMS_UPDATED: "Parameters updated successfully",
+    OTHER_PARAMS: "Other settings",
+    TIMEZONE: "Timezone",
 
     // informations
     ADDRESS_NOT_VERIFIED: "Address not verified",
