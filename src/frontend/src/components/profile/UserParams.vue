@@ -15,7 +15,7 @@
                     :onchange="onEmailNotifChanged"
                 />
                 <div
-                    ref="log-zone"
+                    ref="log-zone-notifs"
                     class="flex flex-col w-full justify-center items-center min-h-max h-max transition-all"
                     style="max-height: 0px;"
                 />
@@ -27,6 +27,7 @@
                 </p>
                 <input-choice
                     name="theme"
+                    :label="lang.THEME"
                     :value="selectedTheme"
                     :list="themes"
                     :onchange="onThemeChanged"
@@ -37,6 +38,28 @@
                     :value="selectedLanguage"
                     :list="languages"
                     :onchange="onLanguageChanged"
+                />
+                <div
+                    ref="log-zone-display"
+                    class="flex flex-col w-full justify-center items-center min-h-max h-max transition-all"
+                    style="max-height: 0px;"
+                />
+            </card-border>
+
+            <card-border class="w-full flex-col max-w-[35em]">
+                <p class="text-xl font-bold text-slate-500 dark:text-slate-300 text-center mx-auto">
+                    {{ lang.OTHER_PARAMS }}
+                </p>
+                <input-choice
+                    name="timezone"
+                    :label="lang.TIMEZONE"
+                    :value="User?.CurrentUser?.timezone"
+                    :list="Intl.supportedValuesOf('timeZone').map(tz => ({ value: tz, label: tz }))"
+                />
+                <div
+                    ref="log-zone-other"
+                    class="flex flex-col w-full justify-center items-center min-h-max h-max transition-all"
+                    style="max-height: 0px;"
                 />
             </card-border>
         </div>
@@ -75,13 +98,27 @@ export default {
         Lang.AddCallback(lang => this.lang = lang);
         if (User.CurrentUser == null) return;
 
-        this.logZone = new LogZone(this.$refs["log-zone"]);
+        this.logZoneNotifs = new LogZone(this.$refs["log-zone-notifs"]);
+        this.logZoneDisplay = new LogZone(this.$refs["log-zone-display"]);
+        this.logZoneOther = new LogZone(this.$refs["log-zone-other"]);
     },
     methods: {
-        log(msg, type = Log.INFO) {
-            if (!this.logZone) return null;
+        logNotifs(msg, type = Log.INFO) {
+            if (!this.logZoneNotifs) return null;
             const log = new Log(msg, type);
-            log.attachTo(this.logZone);
+            log.attachTo(this.logZoneNotifs);
+            return log;
+        },
+        logDisplay(msg, type = Log.INFO) {
+            if (!this.logZoneDisplay) return null;
+            const log = new Log(msg, type);
+            log.attachTo(this.logZoneDisplay);
+            return log;
+        },
+        logOther(msg, type = Log.INFO) {
+            if (!this.logZoneOther) return null;
+            const log = new Log(msg, type);
+            log.attachTo(this.logZoneOther);
             return log;
         },
         onThemeChanged(val) {
@@ -100,24 +137,19 @@ export default {
         onLanguageChanged(val) {
             const oldLang = Lang.CurrentCode;
             const res = Lang.LoadLang(val);
+            // FIXME reset the select may produce a recursive call
             if (res) this.selectedLanguage = val;
             else this.selectedLanguage = oldLang;
+            // TODO: save lang in db
         },
         onEmailNotifChanged(val) {
-            console.log("onEmailNotifChanged: ", val);
-            const msg_log = this.log( Lang.CurrentLang.UPDATING_PARAMS + " ...");
+            const msg_log = this.logNotifs( Lang.CurrentLang.UPDATING_PARAMS + " ...");
 
             const data = { mailNotif: val };
-            API.execute_logged(API.ROUTE.ME, API.METHOD.PATCH, User.CurrentUser.getCredentials(), data).then(res => {
-                User.CurrentUser.setInformations(res.user);
-                User.CurrentUser.save();
-                msg_log.update(Lang.CurrentLang.PARAMS_UPDATED, Log.SUCCESS);
-                setTimeout(() => { msg_log.delete(); }, 2000);
-            }).catch(err => {
+            this.saveParams(data, msg_log, () => {
+                // FIXME reset checkbox may produce a recursive call
                 const checkbox = document.querySelector("input[name='mail-notif']");
                 checkbox.checked = User.CurrentUser.mailNotif;
-                msg_log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
-                setTimeout(() => { msg_log.delete(); }, 4000);
             });
         },
         getCurrentTheme() {
@@ -126,6 +158,21 @@ export default {
             // 0 : Dark | 1 : Light | -1 Undefined (take OS preference)
             if (themeStored) return Number(themeStored) ?? -1;
             return -1;
+        },
+        saveParams(data, msg_log, resetFields) {
+            API.execute_logged(API.ROUTE.SETTINGS, API.METHOD.PATCH, User.CurrentUser.getCredentials(), data).then(res => {
+                for (const key in data) {
+                    if (Object.hasOwnProperty.call(User.CurrentUser, key))
+                        User.CurrentUser[key] = data[key];
+                }
+                User.CurrentUser.save();
+                msg_log.update(res.message, Log.SUCCESS);
+                setTimeout(() => { msg_log.delete(); }, 2000);
+            }).catch(err => {
+                msg_log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
+                setTimeout(() => { msg_log.delete(); }, 4000);
+                resetFields();
+            });
         }
     }
 }

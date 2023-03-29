@@ -32,7 +32,7 @@
                 <admin-user-card
                     v-for="user in usersList"
                     :key="user?.id"
-                    class="min-w-0 w-full show-up max-w-[20em]"
+                    class="min-w-0 w-full show-up max-w-[20em] mx-auto"
                     :data="user"
                     :onclick="onCardClicked"
                 />
@@ -57,11 +57,11 @@
         </div>
         <div
             ref="result-zone"
-            class="flex flex-col grow px-4 p-4 overflow-auto"
+            class="flex flex-col grow overflow-auto"
         >
             <button
                 ref="backbtn"
-                class="absolute md:hidden flex rounded-md border-2 border-slate-200 bg-white h-fit w-fit p-2"
+                class="absolute md:hidden flex rounded-md border-2 border-slate-200 bg-white h-fit w-fit p-1 m-2"
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -69,7 +69,7 @@
                     viewBox="0 0 24 24"
                     stroke-width="1.5"
                     stroke="currentColor"
-                    class="w-8 h-8"
+                    class="w-7 h-7"
                 >
                     <path
                         stroke-linecap="round"
