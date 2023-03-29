@@ -298,8 +298,9 @@ exports.getMyTravels = (req: express.Request, res: express.Response, _: express.
     const type = validator.sanitizeType(req.query.type, req, res);
     if (type === null) return;
 
+    let where: any
     if (type === 'past') {
-        const where = {
+        where = {
             OR: [{
                 driverId: res.locals.user.id,
                 steps: {
@@ -325,29 +326,10 @@ exports.getMyTravels = (req: express.Request, res: express.Response, _: express.
                 }
             }]
         };
-        prisma.travel.count({ where })
-            .then((count) => {
-                prisma.travel.findMany({
-                    where,
-                    include: { driver: true, steps: true },
-                    ...pagination.pagination
-                }).then(travels => {
-                    const data = travels.map((travel) => {
-                        return displayableStep(travel);
-                    });
-                    res.status(200).json(pagination.results(data, count));
-                }).catch((err) => {
-                    console.error(err);
-                    sendMsg(req, res, error.generic.internalError);
-                });
-            }).catch((err) => {
-                console.error(err);
-                sendMsg(req, res, error.generic.internalError);
-            });
     }
 
     if (type === 'future') {
-        const where = {
+        where = {
             OR: [{
                 driverId: res.locals.user.id,
                 steps: {
@@ -373,29 +355,10 @@ exports.getMyTravels = (req: express.Request, res: express.Response, _: express.
                 }
             }]
         };
-        prisma.travel.count({ where })
-            .then((count) => {
-                prisma.travel.findMany({
-                    where,
-                    include: { driver: true, steps: true },
-                    ...pagination.pagination
-                }).then(travels => {
-                    const data = travels.map((travel) => {
-                        return displayableStep(travel);
-                    });
-                    res.status(200).json(pagination.results(data, count));
-                }).catch((err) => {
-                    console.error(err);
-                    sendMsg(req, res, error.generic.internalError);
-                });
-            }).catch((err) => {
-                console.error(err);
-                sendMsg(req, res, error.generic.internalError);
-            });
     }
 
     if (typeof type === 'undefined') {
-        const where = {
+        where = {
             OR: [{
                 driverId: res.locals.user.id
             },
@@ -411,24 +374,23 @@ exports.getMyTravels = (req: express.Request, res: express.Response, _: express.
                 }
             }]
         };
-        prisma.travel.count({ where })
-            .then((count) => {
-                prisma.travel.findMany({
-                    where,
-                    include: { driver: true, steps: true },
-                    ...pagination.pagination
-                }).then(travels => {
-                    const data = travels.map((travel) => {
-                        return displayableStep(travel);
-                    });
-                    res.status(200).json(pagination.results(data, count));
-                }).catch((err) => {
-                    console.error(err);
-                    sendMsg(req, res, error.generic.internalError);
-                });
+    }
+
+    prisma.travel.count({ where })
+        .then((count) => {
+            prisma.travel.findMany({
+                where,
+                include: { driver: true, steps: true },
+                ...pagination.pagination
+            }).then(travels => {
+                const data = travels.map(displayableStep)
+                res.status(200).json(pagination.results(data, count));
             }).catch((err) => {
                 console.error(err);
                 sendMsg(req, res, error.generic.internalError);
             });
-    }
+        }).catch((err) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
 }
