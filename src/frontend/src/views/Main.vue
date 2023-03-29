@@ -338,8 +338,6 @@ export default {
         this.endSelector.attachInput(this.endInput);
 
         this.logZone = new LogZone(this.$refs["log-zone"]);
-
-        window.action = () => { this.selectTrip(9); }
     },
     methods: {
         onstartselected(city) {

@@ -5,25 +5,25 @@
     >
         <div class="flex w-fit">
             <p class="text-slate-500 dark:text-slate-200 text-lg font-bold whitespace-nowrap text-ellipsis overflow-hidden">
-                {{ new Date(trip.departure.date).toLocaleDateString() }}
+                {{ new Date(trip.departure?.date).toLocaleDateString() }}
             </p>
         </div>
         <div class="flex grow w-full space-x-4">
             <div class="flex grow space-x-12 justify-evenly">
                 <div class="flex w-fit justify-between space-x-2">
                     <p class="text-slate-400 dark:text-slate-400 text-lg font-semibold">
-                        {{ new Date(trip.departure.date).toLocaleTimeString().substring(0, 5) }}
+                        {{ new Date(trip.departure?.date).toLocaleTimeString().substring(0, 5) }}
                     </p>
                     <p class="text-slate-500 dark:text-slate-300 text-lg font-semibold">
-                        {{ trip.departure.city }}
+                        {{ trip.departure?.city }}
                     </p>
                 </div>
                 <div class="flex w-fit justify-between space-x-2">
                     <p class="text-slate-400 dark:text-slate-400 text-lg font-semibold">
-                        {{ new Date(trip.arrival.date).toLocaleTimeString().substring(0, 5) }}
+                        {{ new Date(trip.arrival?.date).toLocaleTimeString().substring(0, 5) }}
                     </p>
                     <p class="text-slate-500 dark:text-slate-300 text-lg font-semibold">
-                        {{ trip.arrival.city }}
+                        {{ trip.arrival?.city }}
                     </p>
                 </div>
             </div>
