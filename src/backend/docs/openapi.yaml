@@ -1462,7 +1462,7 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
-  /groups/name:
+  /groups/:id/name:
     patch:
       summary: Update name of a group
       description: Update the name of a group
