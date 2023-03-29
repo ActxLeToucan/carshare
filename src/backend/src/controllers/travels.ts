@@ -278,14 +278,31 @@ exports.getTravel = (req: express.Request, res: express.Response, _: express.Nex
         where: { id: travelId },
         include: {
             steps: true,
-            driver: true // TODO : include passenger
+            driver: true
         }
-    }).then((travel) => {
+    }).then((travel: any) => {
         if (travel === null) {
             sendMsg(req, res, error.travel.notFound);
             return;
         }
-        res.status(200).json(displayableTravelPublic(travel));
+
+        prisma.user.findMany({
+            where: {
+                bookings: {
+                    some: {
+                        departure: {
+                            travelId: travel.id
+                        }
+                    }
+                }
+            }
+        }).then((users) => {
+            travel.passengers = users.map(displayableUserPublic);
+            res.status(200).json(displayableTravelPublic(travel));
+        }).catch(err => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
     }).catch(err => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
