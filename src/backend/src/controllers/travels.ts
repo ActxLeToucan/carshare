@@ -78,7 +78,7 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
                     travel.passengers = -1;
                 }
             }
-            res.status(200).json(data);
+            res.status(200).json(data.filter((travel: any) => travel.passengers < travel.maxPassengers));
         }).catch((err) => {
             console.log(err);
             res.status(500).json(err);
