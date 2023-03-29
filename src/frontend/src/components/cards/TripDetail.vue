@@ -1,9 +1,7 @@
 <template>
     <div>
-        <div
-            v-if="trip != null"
-            class="flex md:flex-row flex-col grow min-w-0 max-w-[80vw] max-h-full min-h-0 space-y-4 items-center"
-        >
+        <div v-if="trip != null"
+            class="flex md:flex-row flex-col grow min-w-0 max-w-[80vw] max-h-full min-h-0 space-y-4 items-center">
             <div class="flex grow flex-col md:w-[50%] w-full justify-center items-center md:pr-4 space-y-4">
                 <p class="text-xl text-slate-600 dark:text-slate-300 font-bold whitespace-nowrap text-ellipsis overflow-hidden py-2">
                     {{ lang.TRIP_DESTINATIONS }}
@@ -90,11 +88,8 @@
                 {{ lang.BOOK_TRIP }}
             </button-block>
         </div>
-        <div
-            ref="log-zone"
-            class="flex flex-col w-full justify-center items-center min-h-max h-max transition-all"
-            style="max-height: 0px;"
-        />
+        <div ref="log-zone" class="flex flex-col w-full justify-center items-center min-h-max h-max transition-all"
+            style="max-height: 0px;" />
     </div>
 </template>
 
@@ -136,10 +131,10 @@ export default {
         tripId: function (newVal, oldVal) {
             this.loadTrip(newVal);
         },
-        tripStart: function(newVal, oldVal) {
+        tripStart: function (newVal, oldVal) {
             this.loadTrip(this.tripId);
         },
-        tripEnd: function(newVal, oldVal) {
+        tripEnd: function (newVal, oldVal) {
             this.loadTrip(this.tripId);
         },
     },

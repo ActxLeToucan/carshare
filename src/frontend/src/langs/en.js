@@ -21,6 +21,8 @@ export default {
     DEFAULT: "Default",
     SENDING_RESPONSE: "Sending response",
     DELETING: "Deleting",
+    CREATOR: "Creator", 
+    CREATION_DATE: "Creation date",
 
     // languages (do not translate)
     ENGLISH: "English",
@@ -84,8 +86,6 @@ export default {
     PASSWORD_SPECIFY: "Please specify the password",
     PASSWORD_CONFIRM_SPECIFY: "Please confirm the password",
     NAME_SPECIFY: "Please specify the name",
-    GROUPNAME_SPECIFY: "Please specify the group name",
-    CREATOR_SPECIFY: "Please specify the creator name",
 
     FIRSTNAME_TOOLONG: "The first name is too long",
     LASTNAME_TOOLONG: "The last name is too long",
@@ -167,6 +167,8 @@ export default {
     MEMBERS: "Members",
     MEMBER: "Member",
     DELETE_GROUP: "Delete group",
+    DELETING_GROUP: "Deleting group",
+    GROUP_DELETED: "Group deleted successfully",
     GROUP_DELETE_CONFIRMATION: "Are you sure you want to delete this group ?\nThis action is irreversible.",
     GROUP_NAME: "Group name",
     CREATING_GROUP: "Creating group",
@@ -177,7 +179,7 @@ export default {
     SELECT_GROUP_DESC: "Please select a group of users to share your trip with",
     GROUP_SELECTED: "Group selected",
     SEARCH_GROUP: "Search group",
-    GROUP_CREATOR :"Creator" , 
+    GROUP_NAME: "Group name",
 
     // parametres
     NOTIF_PARAMS: "Notification settings",

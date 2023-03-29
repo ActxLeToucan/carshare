@@ -21,6 +21,8 @@ export default {
     DEFAULT: "Par défaut",
     SENDING_RESPONSE: "Envoi de la réponse",
     DELETING: "Suppression en cours",
+    CREATOR: "Créateur",
+    CREATION_DATE :"Date de création",
 
     // languages (do not translate)
     ENGLISH: "English",
@@ -84,8 +86,6 @@ export default {
     PASSWORD_SPECIFY: "Veuillez renseignez votre mot de passe",
     PASSWORD_CONFIRM_SPECIFY: "Veuillez confirmer votre mot de passe",
     NAME_SPECIFY: "Veuillez renseignez le nom",
-    GROUPNAME_SPECIFY: "Veuillez renseignez le nom du groupe",
-    CREATOR_SPECIFY: "Veuillez renseignez le nom du créatur",
 
     FIRSTNAME_TOOLONG: "Le nom est trop long",
     LASTNAME_TOOLONG: "Le prénom est trop long",
@@ -167,6 +167,8 @@ export default {
     MEMBERS: "Membres",
     MEMBER: "Membre",
     DELETE_GROUP: "Supprimer le groupe",
+    DELETING_GROUP: "Suppression du groupe",
+    GROUP_DELETED: "Groupe supprimé avec succès",
     GROUP_DELETE_CONFIRMATION: "Êtes-vous sûr de vouloir supprimer ce groupe ?\nCette action est irréversible.",
     GROUP_NAME: "Nom du groupe",
     CREATING_GROUP: "Création du groupe",
@@ -177,7 +179,7 @@ export default {
     SELECT_GROUP_DESC: "Veuillez sélectionner un groupe d'utilisateurs pour pouvoir partager vos trajets avec eux",
     GROUP_SELECTED: "Groupe sélectionné",
     SEARCH_GROUP: "Rechercher un groupe",
-    GROUP_CREATOR :"Créateur",
+    GROUP_NAME: "Nom du groupe",
 
     // parametres
     NOTIF_PARAMS: "Paramètres de notifications",
