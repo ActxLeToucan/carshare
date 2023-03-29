@@ -166,7 +166,7 @@ class API {
         VERIFY: "/users/email-verification",
         RESETPWD: "/users/password-reset",
         USERS: "/users",
-        GROUPS: "/groups/my",
+        GROUPS: "/groups",
         SETTINGS : "/settings",
         NOTIFS: "/notifications",
         MY_NOTIFS: "/notifications/my",

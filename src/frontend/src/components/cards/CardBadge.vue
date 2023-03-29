@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col justify-center py-4 my-4 rounded-lg bg-slate-100 dark:bg-slate-700 px-4">
+    <div class="flex flex-col justify-center p-4 my-4 rounded-lg bg-slate-100 dark:bg-slate-700">
         <p
             class="text-xl text-center text-slate-500 dark:text-slate-300 font-bold mx-auto max-w-full"
             :class="newline? '' : 'whitespace-nowrap text-ellipsis overflow-hidden'"
