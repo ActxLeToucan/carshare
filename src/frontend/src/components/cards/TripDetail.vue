@@ -1,10 +1,10 @@
 <template>
-    <div class="flex flex-col grow w-full max-h-full min-h-0">
+    <div class="flex flex-col grow w-full max-h-full min-h-0 min-w-[80vw]">
         <div
             v-if="trip != null"
             class="flex md:flex-row flex-col grow min-w-0 w-full max-h-full min-h-0"
         >
-            <div class="flex grow flex-col md:w-[50%] w-full justify-center items-center md:pr-4">
+            <div class="flex grow flex-col md:w-[50%] w-fit justify-center items-center md:pr-4">
                 <p class="text-xl text-slate-600 dark:text-slate-300 font-bold whitespace-nowrap text-ellipsis mb-1">
                     {{ lang.TRIP_DESTINATIONS }}
                 </p>
@@ -29,8 +29,8 @@
                         </p>
                     </div>
                 </div>
-                <div class="flex flex-col grow rounded-lg bg-slate-200 dark:bg-slate-600 border-2 border-slate-200 dark:border-slate-600 w-full mt-2">
-                    <p class="text-xl text-slate-600 dark:text-slate-200 font-bold mx-2 mb-1">
+                <div class="flex flex-col grow rounded-lg bg-slate-200 dark:bg-slate-600 border-2 border-slate-200 dark:border-slate-600 w-fit min-w-full max-w-full mt-2">
+                    <p class="text-xl text-slate-600 dark:text-slate-200 font-bold mx-2 mb-1 whitespace-nowrap text-ellipsis overflow-hidden">
                         {{ lang.TRIP_INFO }}
                     </p>
                     <div class="flex grow rounded-md bg-white dark:bg-slate-700 p-2">
@@ -46,10 +46,22 @@
                     <p class="text-xl text-slate-600 dark:text-slate-300 font-bold mx-2 mb-1 mr-auto">
                         {{ lang.PASSENGERS }}
                     </p>
-                    <div class="flex bg-white dark:bg-slate-700 rounded-md border-2 border-slate-200 dark:border-slate-600 p-2 w-full min-h-[8em] items-center">
-                        <p class="text-slate-500 dark:text-slate-400 text-lg font-semibold w-fit mx-auto">
+                    <div class="flex bg-white dark:bg-slate-700 rounded-md border-2 border-slate-200 dark:border-slate-600 p-2 w-full min-h-[8em] items-center overflow-x-auto">
+                        <p
+                            v-show="trip.passengers.length == 0"
+                            class="text-slate-500 dark:text-slate-400 text-lg font-semibold w-fit mx-auto"
+                        >
                             {{ lang.NO_PASSENGERS }}.
                         </p>
+                        <div
+                            v-for="passenger in trip.passengers"
+                            :key="passenger.id"
+                            :class="passenger.id == User.CurrentUser.id ? 'bg-slate-200 dark:bg-slate-600' : 'bg-slate-100 dark:bg-slate-500'"
+                            class="mx-2 rounded-md px-2 py-1 max-w-[6em] justify-center hover:max-w-[20em] transition-all"
+                        >
+                            <user-icon class="w-full text-slate-600 dark:text-slate-50 w-8 h-8" />
+                            <p class="text-lg text-slate-600 dark:text-slate-50 font-semibold text-center whitespace-nowrap text-ellipsis overflow-hidden"> {{ passenger.firstName + ' ' + passenger.lastName.substring(0, 1) + '.' }} </p>
+                        </div>
                     </div>
                 </div>
 
@@ -119,12 +131,14 @@ import { Log, LogZone } from "../../scripts/Logs";
 import {
     UserIcon
 } from '@heroicons/vue/24/outline';
+import CardBadge from './CardBadge.vue';
 
 export default {
     name: "TripDetail",
     components: {
         ButtonBlock,
-        UserIcon
+        UserIcon,
+        CardBadge
     },
     props: {
         tripId: {
@@ -214,6 +228,9 @@ export default {
                 setTimeout(() => { log.delete(); }, 6000);
                 console.error(err);
             });
+        },
+        setPopup(popup) {
+            this.popup = popup;
         }
     },
 };
