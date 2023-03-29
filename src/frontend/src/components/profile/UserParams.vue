@@ -6,23 +6,6 @@
         <div class="flex flex-col grow justify-evenly items-center p-4 space-y-4">
             <card-border class="w-full flex-col max-w-[35em]">
                 <p class="text-xl font-bold text-slate-500 dark:text-slate-300 text-center mx-auto">
-                    {{ lang.NOTIF_PARAMS }}
-                </p>
-                <input-switch
-                    name="mail-notif"
-                    :label="lang.EMAIL_NOTIFICATIONS"
-                    :value="User?.CurrentUser?.mailNotif"
-                    :onchange="onEmailNotifChanged"
-                />
-                <div
-                    ref="log-zone-notifs"
-                    class="flex flex-col w-full justify-center items-center min-h-max h-max transition-all"
-                    style="max-height: 0px;"
-                />
-            </card-border>
-
-            <card-border class="w-full flex-col max-w-[35em]">
-                <p class="text-xl font-bold text-slate-500 dark:text-slate-300 text-center mx-auto">
                     {{ lang.DISPLAY_PARAMS }}
                 </p>
                 <input-choice
@@ -39,8 +22,28 @@
                     :list="languages"
                     :onchange="onLanguageChanged"
                 />
+            </card-border>
+            
+            <card-border class="w-full flex-col max-w-[35em]">
+                <p class="text-xl font-bold text-slate-500 dark:text-slate-300 text-center mx-auto">
+                    {{ lang.NOTIF_PARAMS }}
+                </p>
+                <input-switch
+                    name="mail-notif"
+                    :label="lang.EMAIL_NOTIFICATIONS"
+                    :value="User?.CurrentUser?.mailNotif"
+                    :onchange="onEmailNotifChanged"
+                />
+                <input-choice
+                    ref="lang-notif"
+                    name="lang-notif"
+                    :label="lang.LANGUAGE "
+                    :value="selectedLangNotif"
+                    :list="notifLanguages"
+                    :onchange="onNotifLanguageChanged"
+                />
                 <div
-                    ref="log-zone-display"
+                    ref="log-zone-notifs"
                     class="flex flex-col w-full justify-center items-center min-h-max h-max transition-all"
                     style="max-height: 0px;"
                 />
@@ -51,10 +54,12 @@
                     {{ lang.OTHER_PARAMS }}
                 </p>
                 <input-choice
+                    ref="timezone"
                     name="timezone"
                     :label="lang.TIMEZONE"
                     :value="User?.CurrentUser?.timezone"
                     :list="Intl.supportedValuesOf('timeZone').map(tz => ({ value: tz, label: tz }))"
+                    :onchange="onTimezoneChanged"
                 />
                 <div
                     ref="log-zone-other"
@@ -90,8 +95,10 @@ export default {
             lang: Lang.CurrentLang,
             selectedTheme: this.getCurrentTheme(),
             selectedLanguage: Lang.CurrentCode,
+            selectedLangNotif: User?.CurrentUser?.lang,
             themes,
             languages: Lang.Langs,
+            notifLanguages: Lang.Langs.filter(lang => lang.value),
         }
     },
     mounted() {
@@ -99,7 +106,6 @@ export default {
         if (User.CurrentUser == null) return;
 
         this.logZoneNotifs = new LogZone(this.$refs["log-zone-notifs"]);
-        this.logZoneDisplay = new LogZone(this.$refs["log-zone-display"]);
         this.logZoneOther = new LogZone(this.$refs["log-zone-other"]);
     },
     methods: {
@@ -107,12 +113,6 @@ export default {
             if (!this.logZoneNotifs) return null;
             const log = new Log(msg, type);
             log.attachTo(this.logZoneNotifs);
-            return log;
-        },
-        logDisplay(msg, type = Log.INFO) {
-            if (!this.logZoneDisplay) return null;
-            const log = new Log(msg, type);
-            log.attachTo(this.logZoneDisplay);
             return log;
         },
         logOther(msg, type = Log.INFO) {
@@ -137,19 +137,34 @@ export default {
         onLanguageChanged(val) {
             const oldLang = Lang.CurrentCode;
             const res = Lang.LoadLang(val);
-            // FIXME reset the select may produce a recursive call
             if (res) this.selectedLanguage = val;
             else this.selectedLanguage = oldLang;
-            // TODO: save lang in db
         },
         onEmailNotifChanged(val) {
-            const msg_log = this.logNotifs( Lang.CurrentLang.UPDATING_PARAMS + " ...");
+            const msg_log = this.logNotifs(Lang.CurrentLang.UPDATING_PARAMS + " ...");
 
             const data = { mailNotif: val };
             this.saveParams(data, msg_log, () => {
-                // FIXME reset checkbox may produce a recursive call
                 const checkbox = document.querySelector("input[name='mail-notif']");
                 checkbox.checked = User.CurrentUser.mailNotif;
+            });
+        },
+        onNotifLanguageChanged(val) {
+            const msg_log = this.logNotifs(Lang.CurrentLang.UPDATING_PARAMS + " ...");
+
+            const data = { lang: val };
+            this.saveParams(data, msg_log, () => {
+                const select = this.$refs["lang-notif"].$el.querySelector("select");
+                select.value = User.CurrentUser.lang;
+            });
+        },
+        onTimezoneChanged(val) {
+            const msg_log = this.logOther(Lang.CurrentLang.UPDATING_PARAMS + " ...");
+
+            const data = { timezone: val };
+            this.saveParams(data, msg_log, () => {
+                const select = this.$refs["timezone"].$el.querySelector("select");
+                select.value = User.CurrentUser.timezone;
             });
         },
         getCurrentTheme() {
