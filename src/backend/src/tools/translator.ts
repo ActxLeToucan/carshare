@@ -1182,7 +1182,7 @@ const notifs = {
         })
     },
     group: {
-        userAdded: (lang: string, group: Group) => msgForLang<TemplateNotif, Notif>(lang, {
+        userAdded: (user: User, group: Group) => msgForLang<TemplateNotif, Notif>(user.lang, {
             title: {
                 fr: 'Ajout dans un groupe',
                 en: 'Adding to a group'

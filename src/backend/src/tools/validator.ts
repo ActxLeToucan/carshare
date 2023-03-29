@@ -204,27 +204,6 @@ function checkBooleanField (value: any, req: express.Request, res: express.Respo
 }
 
 /**
- * Check if a boolean field is valid
- * If the number is not valid, send an error message to the client
- * @param value Value to sanitize
- * @param req Express request
- * @param res Express response
- * @param fieldName Name of the field
- * @returns true if the value is valid, false otherwise
- */
-function checkNumberField (value: any, req: express.Request, res: express.Response, fieldName: string): boolean {
-    if (value === undefined || value === '') {
-        sendMsg(req, res, error.number.required, fieldName);
-        return false;
-    }
-    if (typeof value !== 'number') {
-        sendMsg(req, res, error.number.type, fieldName);
-        return false;
-    }
-    return true;
-}
-
-/**
  * Check if the group name is in a valid format
  * If the group name is not valid, send an error message to the client
  * @param name Group name to check
@@ -703,7 +682,6 @@ export {
     checkDescriptionField,
     checkTravelAlready,
     checkNoteField,
-    checkNumberField,
     checkTravelHoursLimit,
     sanitizeTimezone,
     checkLang
