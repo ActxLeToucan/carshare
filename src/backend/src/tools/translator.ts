@@ -1203,20 +1203,6 @@ const notifs = {
             createdAt: new Date()
         })
     },
-    group: {
-        userAdded: (user: User, group: Group) => msgForLang<TemplateNotif, Notif>(user.lang, {
-            title: {
-                fr: 'Ajout dans un groupe',
-                en: 'Adding to a group'
-            },
-            message: {
-                fr: `Vous avez été ajouté dans le groupe ${group.name}, vous recevrez toutes les notifications de ce groupe.`,
-                en: `You have been added to the group ${group.name}, you will receive all notifications from this group.`
-            },
-            type: 'standard',
-            createdAt: new Date()
-        })
-    },
     booking: {
         accepted: (user: User, booking: Booking & { departure: Step, arrival: Step } & Record<string, any>) => msgForLang<TemplateNotif, Notif>(user.lang, {
             title: {
@@ -1286,6 +1272,18 @@ const notifs = {
             message: {
                 fr: `Le groupe ${oldName} a été renommé en ${newName}.`,
                 en: `The group ${oldName} has been renamed as ${newName}.`
+            },
+            type: 'standard',
+            createdAt: new Date()
+        }),
+        userAdded: (user: User, group: Group) => msgForLang<TemplateNotif, Notif>(user.lang, {
+            title: {
+                fr: 'Ajout dans un groupe',
+                en: 'Adding to a group'
+            },
+            message: {
+                fr: `Vous avez été ajouté dans le groupe ${group.name}, vous recevrez toutes les notifications de ce groupe.`,
+                en: `You have been added to the group ${group.name}, you will receive all notifications from this group.`
             },
             type: 'standard',
             createdAt: new Date()
