@@ -1471,6 +1471,65 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
+  /groups/:id/name:
+    patch:
+      summary: Update name of a group
+      description: Update the name of a group
+      operationId: modifyNameGroup
+      tags:
+        - Groups
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - name: groupeId
+          in: path
+          description: The id of the group to rename
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                groupName:
+                  type: string
+                  example: Bilboquet
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Group renamed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Group renamed
+
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: groupId is invalid.
+        '401':
+          $ref: '#/components/responses/noToken'
+        '403':
+          $ref: '#/components/responses/insufficientPrivileges'
+        '404':
+          $ref: '#/components/responses/groupNotFound'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+
   /notation/average/:id:
     get:
       summary: Obtaining evaluation averages
@@ -1583,7 +1642,6 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
-
   /notations/:id:
     delete:
       summary: Delete an evaluation
@@ -1795,7 +1853,6 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
-
 
   /bookings/:id/accept:
     patch:
