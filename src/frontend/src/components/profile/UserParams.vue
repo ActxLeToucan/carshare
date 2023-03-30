@@ -6,27 +6,11 @@
         <div class="flex flex-col grow justify-evenly items-center p-4 space-y-4">
             <card-border class="w-full flex-col max-w-[35em]">
                 <p class="text-xl font-bold text-slate-500 dark:text-slate-300 text-center mx-auto">
-                    {{ lang.NOTIF_PARAMS }}
-                </p>
-                <input-switch
-                    name="mail-notif"
-                    :label="lang.EMAIL_NOTIFICATIONS"
-                    :value="User?.CurrentUser?.mailNotif"
-                    :onchange="onEmailNotifChanged"
-                />
-                <div
-                    ref="log-zone"
-                    class="flex flex-col w-full justify-center items-center min-h-max h-max transition-all"
-                    style="max-height: 0px;"
-                />
-            </card-border>
-
-            <card-border class="w-full flex-col max-w-[35em]">
-                <p class="text-xl font-bold text-slate-500 dark:text-slate-300 text-center mx-auto">
                     {{ lang.DISPLAY_PARAMS }}
                 </p>
                 <input-choice
                     name="theme"
+                    :label="lang.THEME"
                     :value="selectedTheme"
                     :list="themes"
                     :onchange="onThemeChanged"
@@ -37,6 +21,50 @@
                     :value="selectedLanguage"
                     :list="languages"
                     :onchange="onLanguageChanged"
+                />
+            </card-border>
+            
+            <card-border class="w-full flex-col max-w-[35em]">
+                <p class="text-xl font-bold text-slate-500 dark:text-slate-300 text-center mx-auto">
+                    {{ lang.NOTIF_PARAMS }}
+                </p>
+                <input-switch
+                    name="mail-notif"
+                    :label="lang.EMAIL_NOTIFICATIONS"
+                    :value="User?.CurrentUser?.mailNotif"
+                    :onchange="onEmailNotifChanged"
+                />
+                <input-choice
+                    ref="lang-notif"
+                    name="lang-notif"
+                    :label="lang.LANGUAGE "
+                    :value="selectedLangNotif"
+                    :list="notifLanguages"
+                    :onchange="onNotifLanguageChanged"
+                />
+                <div
+                    ref="log-zone-notifs"
+                    class="flex flex-col w-full justify-center items-center min-h-max h-max transition-all"
+                    style="max-height: 0px;"
+                />
+            </card-border>
+
+            <card-border class="w-full flex-col max-w-[35em]">
+                <p class="text-xl font-bold text-slate-500 dark:text-slate-300 text-center mx-auto">
+                    {{ lang.OTHER_PARAMS }}
+                </p>
+                <input-choice
+                    :list="Intl.supportedValuesOf('timeZone').map(tz => ({ value: tz, label: tz }))"
+                    :label="lang.TIMEZONE"
+                    ref="timezone"
+                    name="timezone"
+                    :value="User?.CurrentUser?.timezone"
+                    :onchange="onTimezoneChanged"
+                />
+                <div
+                    ref="log-zone-other"
+                    class="flex flex-col w-full justify-center items-center min-h-max h-max transition-all"
+                    style="max-height: 0px;"
                 />
             </card-border>
         </div>
@@ -67,21 +95,30 @@ export default {
             lang: Lang.CurrentLang,
             selectedTheme: this.getCurrentTheme(),
             selectedLanguage: Lang.CurrentCode,
+            selectedLangNotif: User?.CurrentUser?.lang,
             themes,
             languages: Lang.Langs,
+            notifLanguages: Lang.Langs.filter(lang => lang.value),
         }
     },
     mounted() {
         Lang.AddCallback(lang => this.lang = lang);
         if (User.CurrentUser == null) return;
 
-        this.logZone = new LogZone(this.$refs["log-zone"]);
+        this.logZoneNotifs = new LogZone(this.$refs["log-zone-notifs"]);
+        this.logZoneOther = new LogZone(this.$refs["log-zone-other"]);
     },
     methods: {
-        log(msg, type = Log.INFO) {
-            if (!this.logZone) return null;
+        logNotifs(msg, type = Log.INFO) {
+            if (!this.logZoneNotifs) return null;
             const log = new Log(msg, type);
-            log.attachTo(this.logZone);
+            log.attachTo(this.logZoneNotifs);
+            return log;
+        },
+        logOther(msg, type = Log.INFO) {
+            if (!this.logZoneOther) return null;
+            const log = new Log(msg, type);
+            log.attachTo(this.logZoneOther);
             return log;
         },
         onThemeChanged(val) {
@@ -104,20 +141,30 @@ export default {
             else this.selectedLanguage = oldLang;
         },
         onEmailNotifChanged(val) {
-            console.log("onEmailNotifChanged: ", val);
-            const msg_log = this.log( Lang.CurrentLang.UPDATING_PARAMS + " ...");
+            const msg_log = this.logNotifs(Lang.CurrentLang.UPDATING_PARAMS + " ...");
 
             const data = { mailNotif: val };
-            API.execute_logged(API.ROUTE.ME, API.METHOD.PATCH, User.CurrentUser.getCredentials(), data).then(res => {
-                User.CurrentUser.setInformations(res.user);
-                User.CurrentUser.save();
-                msg_log.update(Lang.CurrentLang.PARAMS_UPDATED, Log.SUCCESS);
-                setTimeout(() => { msg_log.delete(); }, 2000);
-            }).catch(err => {
+            this.saveParams(data, msg_log, () => {
                 const checkbox = document.querySelector("input[name='mail-notif']");
                 checkbox.checked = User.CurrentUser.mailNotif;
-                msg_log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
-                setTimeout(() => { msg_log.delete(); }, 4000);
+            });
+        },
+        onNotifLanguageChanged(val) {
+            const msg_log = this.logNotifs(Lang.CurrentLang.UPDATING_PARAMS + " ...");
+
+            const data = { lang: val };
+            this.saveParams(data, msg_log, () => {
+                const select = this.$refs["lang-notif"].$el.querySelector("select");
+                select.value = User.CurrentUser.lang;
+            });
+        },
+        onTimezoneChanged(val) {
+            const msg_log = this.logOther(Lang.CurrentLang.UPDATING_PARAMS + " ...");
+
+            const data = { timezone: val };
+            this.saveParams(data, msg_log, () => {
+                const select = this.$refs["timezone"].$el.querySelector("select");
+                select.value = User.CurrentUser.timezone;
             });
         },
         getCurrentTheme() {
@@ -126,6 +173,21 @@ export default {
             // 0 : Dark | 1 : Light | -1 Undefined (take OS preference)
             if (themeStored) return Number(themeStored) ?? -1;
             return -1;
+        },
+        saveParams(data, msg_log, resetFields) {
+            API.execute_logged(API.ROUTE.SETTINGS, API.METHOD.PATCH, User.CurrentUser.getCredentials(), data).then(res => {
+                for (const key in data) {
+                    if (Object.hasOwnProperty.call(User.CurrentUser, key))
+                        User.CurrentUser[key] = data[key];
+                }
+                User.CurrentUser.save();
+                msg_log.update(res.message, Log.SUCCESS);
+                setTimeout(() => { msg_log.delete(); }, 2000);
+            }).catch(err => {
+                msg_log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
+                setTimeout(() => { msg_log.delete(); }, 4000);
+                resetFields();
+            });
         }
     }
 }

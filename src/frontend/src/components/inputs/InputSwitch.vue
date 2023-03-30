@@ -57,7 +57,7 @@ export default {
     },
     watch: {
         value: function (val) {
-            this.applyValue(val);
+            this.applyValue(val, false);
         }
     },
     mounted() {

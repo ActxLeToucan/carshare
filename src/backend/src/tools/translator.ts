@@ -4,6 +4,7 @@ import { type User, type Travel, type Group, type Step, type Booking, type Notif
 import properties from '../properties';
 import { sendMail as mailerSend } from './mailer';
 import moment from 'moment-timezone';
+import { titleCase } from 'title-case';
 
 export type Variants = {
     en: any
@@ -480,6 +481,20 @@ const error = {
                 en: 'Group id must be a number.'
             },
             code: 400
+        }),
+        requiredId: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Le champs groupeId est requis',
+                en: 'The field groupId is required'
+            },
+            code: 400
+        }),
+        notCreator: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Vous n\'êtes pas le créateur de ce groupe.',
+                en: 'You are not the creator of this group.'
+            },
+            code: 403
         })
     },
     number: {
@@ -552,8 +567,8 @@ const error = {
         }),
         alreadyTravel: (req: Request, dateDeb: Date, dateFin: Date, timezone: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Le conducteur a déjà un trajet de prévu du ${dateToString(dateDeb, timezone, 'fr')} au ${dateToString(dateFin, timezone, 'fr')}.`,
-                en: `The driver already has a trip planned from ${dateToString(dateDeb, timezone, 'en')} to ${dateToString(dateFin, timezone, 'en')}.`
+                fr: `Vous avez déjà un trajet de prévu du ${dateToString(dateDeb, timezone, 'fr')} au ${dateToString(dateFin, timezone, 'fr')}.`,
+                en: `You already have a trip planned from ${dateToString(dateDeb, timezone, 'en')} to ${dateToString(dateFin, timezone, 'en')}.`
             },
             code: 400
         })
@@ -863,6 +878,13 @@ const info = {
                 en: 'Group removed'
             },
             code: 200
+        }),
+        nameUpdated: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Nom du groupe modfié',
+                en: 'Group name updated'
+            },
+            code: 200
         })
     },
     notification: {
@@ -898,6 +920,13 @@ const info = {
                 en: 'Evaluation removed'
             },
             code: 200
+        }),
+        updated: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Évaluation modifiée',
+                en: 'Updated evaluation'
+            },
+            code: 201
         })
     },
     booking: {
@@ -1217,6 +1246,20 @@ const notifs = {
             createdAt: new Date()
         })
     },
+    group: {
+        nameUpdated: (user: User, oldName: string, newName: string) => msgForLang<TemplateNotif, Notif>(user.lang, {
+            title: {
+                fr: 'Nom du groupe modfié',
+                en: 'Group name updated'
+            },
+            message: {
+                fr: `Le groupe ${oldName} a été renommé en ${newName}.`,
+                en: `The group ${oldName} has been renamed as ${newName}.`
+            },
+            type: 'standard',
+            createdAt: new Date()
+        })
+    },
     general: {
         welcome: (user: User) => msgForLang<TemplateNotif, Notif>(user.lang, {
             title: {
@@ -1333,6 +1376,8 @@ function notify (user: User, notification: { type: string | null, title: string,
  */
 function displayableUserPrivate (user: User): Partial<User> {
     const u = user as any;
+    if (typeof u.firstName === 'string') u.firstName = titleCase(u.firstName);
+    if (typeof u.lastName === 'string') u.lastName = u.lastName.toUpperCase();
     delete u.password;
     delete u.lastPasswordResetEmailedOn;
     delete u.lastEmailVerificationEmailedOn;
@@ -1355,8 +1400,9 @@ function displayableUserPublic (user: User): Partial<User> {
  * Returns a travel without some properties for display to other users
  * @param travel Travel to display
  */
-function displayableTravelPublic (travel: Travel): Partial<Travel> {
+function displayableTravelPublic (travel: Travel & { steps: Step[], driver: User }): Partial<Travel> {
     const t = Object.assign({}, travel) as any;
+    t.steps.sort((a: Step, b: Step) => a.date.getTime() - b.date.getTime());
     delete t.groupId;
     t.driver = displayableUserPublic(t.driver);
     return t;
@@ -1416,6 +1462,20 @@ function dateToString (date: Date, timezone: string | null | undefined, lang: st
     if (lang === null || lang === undefined) lang = properties.settings.defaultLanguage;
     return moment.tz(date, timezone).locale(lang).format('LLL')
 }
+/**
+ * Returns a trip without all the steps, with only the start and finish.
+ * @param travel Travel to display
+ */
+function displayableSteps (travel: Travel & { driver: User, steps: Step[] }): Partial<Travel> {
+    const t = Object.assign({}, travel) as any;
+    t.steps.sort((a: Step, b: Step) => a.date.getTime() - b.date.getTime());
+    t.driver = displayableUserPublic(t.driver);
+    t.departure = travel.steps[0];
+    t.arrival = travel.steps[travel.steps.length - 1];
+    delete t.steps;
+
+    return t;
+}
 
 export {
     error,
@@ -1430,5 +1490,6 @@ export {
     displayableTravelPublic,
     displayableGroup,
     displayableAverage,
-    displayableEvaluation
+    displayableEvaluation,
+    displayableSteps
 };

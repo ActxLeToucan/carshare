@@ -166,8 +166,8 @@ class API {
         VERIFY: "/users/email-verification",
         RESETPWD: "/users/password-reset",
         USERS: "/users",
-        GROUPS: "/groups/my",
-        SETTINGS : "/settings/notifications",
+        GROUPS: "/groups",
+        SETTINGS : "/settings",
         NOTIFS: "/notifications",
         MY_NOTIFS: "/notifications/my",
         ALL_NOITFS: "/notifications/all",
@@ -186,6 +186,7 @@ class API {
             ACCEPT: (id) => `/bookings/${id}/accept`,
             REJECT: (id) => `/bookings/${id}/reject`,
         }
+     
     };
 
     /**
@@ -250,6 +251,7 @@ class API {
                     reject(err);
                 }
             };
+
             fetch(API.API_URL + path, {
                 credentials: "omit",
                 method: method,

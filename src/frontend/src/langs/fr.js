@@ -21,9 +21,12 @@ export default {
     DEFAULT: "Par défaut",
     SENDING_RESPONSE: "Envoi de la réponse",
     DELETING: "Suppression en cours",
+    CREATOR: "Créateur",
+    CREATION_DATE :"Date de création",
+    CANCELED: "Annulé",
 
-    // languages
-    ENGLISH: "Anglais",
+    // languages (do not translate)
+    ENGLISH: "English",
     FRENCH: "Français",
 
     // 404 page
@@ -47,7 +50,6 @@ export default {
     DELETE: "Supprimer",
     DELETE_ALL: "Tout supprimer",
     DELETE_ACCOUNT: "Supprimer le compte",
-    DELETE_GROUP :"Supprimer le groupe " , 
     ADD: "Ajouter",
     SEARCH: "Rechercher",
     VERIFY: "Vérifier",
@@ -85,8 +87,6 @@ export default {
     PASSWORD_SPECIFY: "Veuillez renseignez votre mot de passe",
     PASSWORD_CONFIRM_SPECIFY: "Veuillez confirmer votre mot de passe",
     NAME_SPECIFY: "Veuillez renseignez le nom",
-    GROUPNAME_SPECIFY: "Veuillez renseignez le nom du groupe",
-    CREATOR_SPECIFY: "Veuillez renseignez le nom du créatur",
 
     FIRSTNAME_TOOLONG: "Le nom est trop long",
     LASTNAME_TOOLONG: "Le prénom est trop long",
@@ -129,9 +129,6 @@ export default {
     BOOK_TRIP: "Réserver le trajet",
     DRIVER: "Conducteur",
 
-    // trips
-    TRIP_TITLE: "Consultation du trajet",
-
     // profile
     MY_PROFILE: "Mon profil",
     MY_INFOS: "Mes informations",
@@ -168,6 +165,8 @@ export default {
     MEMBERS: "Membres",
     MEMBER: "Membre",
     DELETE_GROUP: "Supprimer le groupe",
+    DELETING_GROUP: "Suppression du groupe",
+    GROUP_DELETED: "Groupe supprimé avec succès",
     GROUP_DELETE_CONFIRMATION: "Êtes-vous sûr de vouloir supprimer ce groupe ?\nCette action est irréversible.",
     GROUP_NAME: "Nom du groupe",
     CREATING_GROUP: "Création du groupe",
@@ -178,11 +177,9 @@ export default {
     SELECT_GROUP_DESC: "Veuillez sélectionner un groupe d'utilisateurs pour pouvoir partager vos trajets avec eux",
     GROUP_SELECTED: "Groupe sélectionné",
     SEARCH_GROUP: "Rechercher un groupe",
-    GROUP_NAME: "Nom de groupe",
-    GROUP_CREATOR: "Createur",
-    GROUP_CREATEDAT :"Date de creation",
+    GROUP_NAME: "Nom du groupe",
 
-    //parametres
+    // parametres
     NOTIF_PARAMS: "Paramètres de notifications",
     EMAIL_NOTIFICATIONS: "Notifier par email",
     THEME: "Thème",
@@ -191,7 +188,15 @@ export default {
     DISPLAY_PARAMS: "Paramètres d'affichage",
     LANGUAGE: "Langue",
     UPDATING_PARAMS: "Mise à jour des paramètres",
+    ERROR_UPDATING_PARAMS: "Une erreur s'est produite lors de la mise à jour des paramètres.",
     PARAMS_UPDATED: "Paramètres mis à jour avec succès",
+    OTHER_PARAMS: "Autres paramètres",
+    TIMEZONE: "Fuseau horaire",
+
+    // trip
+    FUTURE_TRIPS: "Trajets futurs",
+    PAST_TRIPS: "Trajets passés",
+    CANCEL_TRIP: "Annuler le trajet",
 
     // informations
     ADDRESS_NOT_VERIFIED: "Adresse non vérifiée",

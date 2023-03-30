@@ -3,7 +3,7 @@ import { app } from './app';
 import logger from './tools/logger';
 import { initMailer } from './tools/mailer';
 
-const port = normalizePort(process.env.PORT ?? '3000');
+const port = normalizePort(process.env.PORT ?? '4000');
 app.set('port', port);
 
 const server = http.createServer(app);
@@ -84,5 +84,5 @@ function errorHandler (error: NodeJS.ErrnoException) {
 }
 
 function startServer () {
-    server.listen(port);
+ server.listen(port);
 }

@@ -243,8 +243,8 @@ function checkDateField (date: any, dateDays: boolean, req: express.Request, res
     }
 
     if (dateDays) {
-        if (dateAddHours(new Date(), properties.travel.hoursLimit) > new Date(date)) {
-            sendMsg(req, res, error.date.tooSoon, dateAddHours(new Date(), properties.travel.hoursLimit), res.locals.user.timezone);
+        if (!checkTravelHours(new Date(date))) {
+            sendMsg(req, res, error.date.tooSoon, moment().add(properties.travel.hoursLimit, 'hours').toDate(), res.locals.user.timezone);
             return false;
         }
     }
@@ -326,6 +326,21 @@ function sanitizeId (id: any, req: express.Request, res: express.Response): numb
     }
 
     return Number(id);
+}
+/**
+ * Sanitize the type
+ * @param type id to sanitize
+ * @param req Express request
+ * @param res Express response
+ * @returns The type string if it is valid, null otherwise
+ */
+function sanitizeType (type: any, req: express.Request, res: express.Response): string | undefined | null {
+    if (type !== 'past' && type !== 'future' && typeof type !== 'undefined') {
+        sendMsg(req, res, error.id.invalid);
+        return null;
+    }
+
+    return type;
 }
 
 /**
@@ -603,16 +618,15 @@ function checkNumberField (value: any, req: express.Request, res: express.Respon
 }
 
 /**
- * Check if a date is in the future ({@link properties.travel.hoursLimit} hours)
+ * Check if a date is in editable depending on the travel hours limit
  * If the date is not valid, send an error message to the client
  * @param date Date to check
  * @param req Express request
  * @param res Express response
  * @returns whether the date is in the future
  */
-function checkTravelHoursLimit (date: Date, req: express.Request, res: express.Response): boolean {
-    const now = new Date();
-    if (dateAddHours(now, properties.travel.hoursLimit) > date) {
+function checkTravelHoursEditable (date: Date, req: express.Request, res: express.Response): boolean {
+    if (!checkTravelHours(date)) {
         sendMsg(req, res, error.travel.notModifiable, properties.travel.hoursLimit);
         return false;
     }
@@ -651,13 +665,12 @@ function checkLang (lang: any, req: express.Request, res: express.Response): boo
 }
 
 /**
- * Add hours to a date
- * @param date Date to add hours
- * @param hours Hours to add
- * @returns the new date
+ * Check if a date is in the future ({@link properties.travel.hoursLimit} hours)
+ * @param date Date to check
+ * @returns whether the date is in the future
  */
-function dateAddHours (date: Date, hours: number): Date {
-    return new Date(date.getTime() + hours * 60 * 60 * 1000);
+function checkTravelHours (date: Date): boolean {
+    return moment().add(properties.travel.hoursLimit, 'hours').toDate() <= date;
 }
 
 export {
@@ -682,7 +695,9 @@ export {
     checkTravelAlready,
     checkNoteField,
     checkNumberField,
-    checkTravelHoursLimit,
+    checkTravelHoursEditable,
     sanitizeTimezone,
-    checkLang
+    checkLang,
+    sanitizeType,
+    checkTravelHours
 };

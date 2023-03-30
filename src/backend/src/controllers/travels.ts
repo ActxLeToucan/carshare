@@ -1,10 +1,11 @@
 import type express from 'express';
 import { prisma } from '../app';
 import * as validator from '../tools/validator';
-import { checkTravelHoursLimit } from '../tools/validator';
-import { displayableTravelPublic, displayableUserPublic, error, info, notifs, notify, sendMsg } from '../tools/translator';
+import { checkTravelHours, checkTravelHoursEditable } from '../tools/validator';
+import { displayableTravelPublic, displayableUserPublic, displayableSteps, error, info, notifs, notify, sendMsg } from '../tools/translator';
 import properties from '../properties';
 import { getMaxPassengers, preparePagination } from './_common';
+import moment from 'moment-timezone';
 
 exports.searchTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { date, startCity, startContext, endCity, endContext } = req.query;
@@ -17,8 +18,9 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
     const startCtx = startContext === undefined ? '' : startContext;
     const endCtx = endContext === undefined ? '' : endContext;
 
-    const date1 = new Date(new Date(date as string).getTime() - 1000 * 60 * 60);
-    const date2 = new Date(new Date(date as string).getTime() + 1000 * 60 * 60);
+    const d = new Date(date as string);
+    const date1 = moment(d).subtract(4, 'hour').toDate();
+    const date2 = moment(d).add(18, 'hour').toDate();
 
     prisma.$queryRaw`select t.*,
                             u.id              as 'driver.id',
@@ -78,6 +80,17 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
                     travel.passengers = -1;
                 }
             }
+
+            data = data.filter((travel: any) => {
+                return travel.passengers < travel.maxPassengers && // Check if there is still seats available
+                    checkTravelHours(travel.departure.date); // Check if the beginning of the travel is not too early
+            });
+            data = data.sort((a: any, b: any) => {
+                const diffA = Math.abs(a.departure.date.getTime() - d.getTime());
+                const diffB = Math.abs(b.departure.date.getTime() - d.getTime());
+                return diffA - diffB;
+            });
+
             res.status(200).json(data);
         }).catch((err) => {
             console.log(err);
@@ -194,7 +207,7 @@ exports.cancelMyTravel = (req: express.Request, res: express.Response, _: expres
             return;
         }
 
-        if (!checkTravelHoursLimit(travel.steps[0].date, req, res)) return;
+        if (!checkTravelHoursEditable(travel.steps[0].date, req, res)) return;
 
         // cancel travel
         prisma.travel.update({
@@ -278,14 +291,32 @@ exports.getTravel = (req: express.Request, res: express.Response, _: express.Nex
         where: { id: travelId },
         include: {
             steps: true,
-            driver: true // TODO : include passenger
+            driver: true
         }
-    }).then((travel) => {
+    }).then((travel: any) => {
         if (travel === null) {
             sendMsg(req, res, error.travel.notFound);
             return;
         }
-        res.status(200).json(displayableTravelPublic(travel));
+
+        prisma.user.findMany({
+            where: {
+                bookings: {
+                    some: {
+                        departure: {
+                            travelId: travel.id
+                        },
+                        status: properties.booking.status.accepted
+                    }
+                }
+            }
+        }).then((users) => {
+            travel.passengers = users.map(displayableUserPublic);
+            res.status(200).json(displayableTravelPublic(travel));
+        }).catch(err => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
     }).catch(err => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
@@ -295,20 +326,98 @@ exports.getTravel = (req: express.Request, res: express.Response, _: express.Nex
 exports.getMyTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const pagination = preparePagination(req, false);
 
-    prisma.travel.count({
-        where: { driverId: res.locals.user.id }
-    }).then((count) => {
-        prisma.travel.findMany({
-            where: { driverId: res.locals.user.id },
-            ...pagination.pagination
-        }).then(travels => {
-            res.status(200).json(pagination.results(travels, count));
+    const type = validator.sanitizeType(req.query.type, req, res);
+    if (type === null) return;
+
+    let where: any
+    if (type === 'past') {
+        where = {
+            OR: [{
+                driverId: res.locals.user.id,
+                steps: {
+                    every: {
+                        date: {
+                            lt: new Date()
+                        }
+                    }
+                }
+            },
+            {
+                steps: {
+                    every: {
+                        departureOfBookings: {
+                            every: {
+                                passengerId: res.locals.user.id
+                            }
+                        },
+                        date: {
+                            lt: new Date()
+                        }
+                    }
+                }
+            }]
+        };
+    } else if (type === 'future') {
+        where = {
+            OR: [{
+                driverId: res.locals.user.id,
+                steps: {
+                    some: {
+                        date: {
+                            gte: new Date()
+                        }
+                    }
+                }
+            },
+            {
+                steps: {
+                    some: {
+                        date: {
+                            gte: new Date()
+                        },
+                        departureOfBookings: {
+                            some: {
+                                passengerId: res.locals.user.id
+                            }
+                        }
+                    }
+                }
+            }]
+        };
+    } else {
+        where = {
+            OR: [{
+                driverId: res.locals.user.id
+            },
+            {
+                steps: {
+                    some: {
+                        departureOfBookings: {
+                            some: {
+                                passengerId: res.locals.user.id
+                            }
+                        }
+                    }
+                }
+            }]
+        };
+    }
+
+    prisma.travel.count({ where })
+        .then((count) => {
+            prisma.travel.findMany({
+                where,
+                include: { driver: true, steps: true },
+                ...pagination.pagination
+            }).then(travels => {
+                const data = travels.map(displayableSteps)
+                res.status(200).json(pagination.results(data, count));
+            }).catch((err) => {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
+            });
         }).catch((err) => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);
         });
-    }).catch((err) => {
-        console.error(err);
-        sendMsg(req, res, error.generic.internalError);
-    });
 }

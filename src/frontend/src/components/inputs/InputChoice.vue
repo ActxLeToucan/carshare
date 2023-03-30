@@ -37,9 +37,9 @@ function setup(obj) {
     obj.inputEl = null;
     obj.selectEl = null;
 
-    obj.setSelected = (el) => {
+    obj.setSelected = (el, triggerEvent=true) => {
         obj.selected = el;
-        if (obj.onchange) {
+        if (obj.onchange && triggerEvent) {
             obj.onchange(el);
         }
         if (obj.inputEl != null) {
@@ -102,7 +102,7 @@ export default {
     },
     watch: {
         value: function (val) {
-            this.setSelected(val);
+            this.setSelected(val, false);
         }
     },
     mounted() {
