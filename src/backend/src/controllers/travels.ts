@@ -244,7 +244,6 @@ exports.cancelMyTravel = (req: express.Request, res: express.Response, _: expres
                         // send email notification
                         if (booking !== undefined) notify(booking.passenger, notif);
                     }
-
                     sendMsg(req, res, info.travel.cancelled);
                 }).catch((err) => {
                     console.error(err);
