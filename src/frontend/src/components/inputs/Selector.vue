@@ -9,7 +9,7 @@
                 v-for="el in m_data"
                 :key="el.id"
                 class="cursor-pointer hover:bg-slate-50 hover:dark:bg-slate-500 px-2 py-1 min-w-full rounded-md border-2 border-transparent
-                       w-full hover:border-slate-200 hover:w-fit"
+                       w-full hover:border-slate-200 hover:dark:border-slate-400 hover:w-fit"
                 @click="() => {onclicked(el);}"
             >
                 <p class="text-lg text-slate-500 dark:text-slate-300 whitespace-nowrap text-ellipsis overflow-hidden font-semibold">
@@ -101,11 +101,11 @@ export default {
             let index = 0;
             for (const child of children) {
                 if (index == this.m_selection) {
-                    child.classList.add("bg-slate-50", "border-slate-200", "w-fit");
+                    child.classList.add("bg-slate-50", "dark:bg-slate-500", "border-slate-200", "dark:border-slate-400", "w-fit");
                     child.classList.remove("w-full", "border-transparent");
                 } else {
                     child.classList.add("w-full", "border-transparent");
-                    child.classList.remove("bg-slate-50", "border-slate-200", "w-fit");
+                    child.classList.remove("bg-slate-50", "dark:bg-slate-500", "border-slate-200", "dark:border-slate-400", "w-fit");
                 }
                 index++;
             }

@@ -37,7 +37,7 @@
                 </div>
 
                 <div class="flex grow justify-end">
-                    <div class="flex w-full justify-between">
+                    <div class="flex w-full justify-between space-x-8">
                         <p class="text-slate-500 dark:text-slate-300 text-lg font-bold">
                             {{ trip.slots }} {{ Number(trip.slots.substr(trip.slots.length - 1, 1)) > 1 ? lang.SLOTS: lang.SLOT }}
                         </p>

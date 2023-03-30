@@ -23,6 +23,7 @@ export default {
     DELETING: "Suppression en cours",
     CREATOR: "Créateur",
     CREATION_DATE :"Date de création",
+    CANCELED: "Annulé",
 
     // languages (do not translate)
     ENGLISH: "English",
@@ -128,9 +129,6 @@ export default {
     BOOK_TRIP: "Réserver le trajet",
     DRIVER: "Conducteur",
 
-    // trips
-    TRIP_TITLE: "Consultation du trajet",
-
     // profile
     MY_PROFILE: "Mon profil",
     MY_INFOS: "Mes informations",
@@ -194,6 +192,11 @@ export default {
     PARAMS_UPDATED: "Paramètres mis à jour avec succès",
     OTHER_PARAMS: "Autres paramètres",
     TIMEZONE: "Fuseau horaire",
+
+    // trip
+    FUTURE_TRIPS: "Trajets futurs",
+    PAST_TRIPS: "Trajets passés",
+    CANCEL_TRIP: "Annuler le trajet",
 
     // informations
     ADDRESS_NOT_VERIFIED: "Adresse non vérifiée",

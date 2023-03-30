@@ -4,7 +4,7 @@
         <div class="flex md:flex-row flex-col grow max-h-min min-h-0">
             <div
                 ref="tabs-zone"
-                class="show-right flex flex-col items-center h-full md:w-min w-full min-h-0 px-8 py-4 space-y-4 md:border-r-8 border-teal-500 mx-auto overflow-hidden"
+                class="show-right flex flex-col items-center h-full md:w-min w-full min-h-0 px-8 py-4 space-y-4 md:border-r-8 border-teal-500 mx-auto overflow-hidden min-w-min"
             >
                 <p class="text-2xl text-teal-500 py-2 font-bold mx-auto">
                     {{ lang.PROFILE }}
@@ -24,9 +24,6 @@
                 <button-tab href="#groups">
                     {{ lang.MY_GROUPS }}
                 </button-tab>
-                <button-tab href="#evals">
-                    {{ lang.MY_EVALS }}
-                </button-tab>
                 <button-tab href="#params">
                     {{ lang.PARAMS }}
                 </button-tab>
@@ -38,7 +35,7 @@
             </div>
             <div
                 ref="content-zone"
-                class="flex flex-col md:grow min-h-0 max-h-full"
+                class="flex flex-col md:grow min-h-0 max-h-full max-w-full min-w-0"
             >
                 <button
                     ref="backtabs-btn"
@@ -62,7 +59,7 @@
 
                 <tab-window
                     default-hash="#infos"
-                    class="md:pt-0 pt-5 max-h-full max-w-full"
+                    class="md:pt-0 pt-5 max-h-full max-w-full min-w-0"
                 >
                     <tab-div
                         hash="#infos"
@@ -83,10 +80,6 @@
                         <user-groups />
                     </tab-div>
 
-                    <tab-div hash="#evals">
-                        <user-evals />
-                    </tab-div>
-
                     <tab-div hash="#params">
                         <user-params />
                     </tab-div>
@@ -105,7 +98,6 @@ import TabDiv from '../components/cards/TabDiv.vue';
 import UserInfos from '../components/profile/UserInfos.vue';
 import UserNotifs from '../components/profile/UserNotifs.vue';
 import UserTrips from '../components/profile/UserTrips.vue';
-import UserEvals from '../components/profile/UserEvals.vue';
 import UserParams from '../components/profile/UserParams.vue';
 import UserGroups from '../components/profile/UserGroups.vue';
 import User from '../scripts/User';
@@ -122,7 +114,6 @@ export default {
         UserInfos,
         UserNotifs,
         UserTrips,
-        UserEvals,
         UserParams,
         UserGroups
     },
