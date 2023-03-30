@@ -111,8 +111,8 @@
                     </div>
                     <div class="flex grow justify-end p-2">
                         <button-block
+                            :action="showDeletePopup"
                             color="red"
-                            :action="deletePopup?.show"
                         >
                             {{ lang.DELETE_GROUP }}
                         </button-block>
@@ -209,9 +209,27 @@ export default {
         setDeletePopup(popup) {
             this.deletePopup = popup;
         },
-        removeGroup() {
-            this.selectedGroup
+        showDeletePopup() {
+            this.deletePopup.setTitle(this.lang.DELETE + ' ' + this.selectedGroup?.name);
+            this.deletePopup.show();
         },
+        removeGroup(popup) {
+            popup.setTitle(this.lang.DELETE + ' ' + this.selectedGroup?.name);
+            const log = popup.log(Lang.CurrentLang.DELETING_GROUP + "...", Log.INFO);
+            API.execute_logged(API.ROUTE.GROUPS + "/" + this.selectedGroup.id, API.METHOD.DELETE, User.CurrentUser?.getCredentials()).then((data) => {
+                log.update(Lang.CurrentLang.GROUP_DELETED, Log.SUCCESS);
+                this.groups.splice(this.groups.indexOf(this.selectedGroup), 1);
+                this.selectedGroup = null;
+                setTimeout(() => {
+                    log.delete();
+                    popup.hide();
+                }, 2000);
+            }).catch(err => {
+                setTimeout(() => {
+                }, 4000);
+             
+            });
+        }, 
         createGroup(popup) {
             const log = popup.log(Lang.CurrentLang.INPUT_VERIFICATION + " ...", Log.INFO);
 
