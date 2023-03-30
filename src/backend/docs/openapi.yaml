@@ -1688,7 +1688,63 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
-
+    patch:
+      summary: Edit an evaluation
+      description: Edit the evaluation, with the id in parameter
+      operationId: editEvaluation
+      tags:
+        - Notations
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - name: id
+          in: path
+          description: The id of the evaluation to edit
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: The note of the evaluation
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                note:
+                  type: integer
+                  required: true
+                  example: 3
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Updated evaluation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Updated evaluation
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Id is invalid.
+        '401':
+          $ref: '#/components/responses/noToken'
+        '404':
+          $ref: '#/components/responses/evaluationNotFound'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
   /bookings/my:
     post:
       summary: Create a new booking
