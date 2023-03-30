@@ -23,6 +23,7 @@ export default {
     DELETING: "Deleting",
     CREATOR: "Creator", 
     CREATION_DATE: "Creation date",
+    CANCELED: "Canceled",
 
     // languages (do not translate)
     ENGLISH: "English",
@@ -128,9 +129,6 @@ export default {
     BOOK_TRIP: "Book the trip",
     DRIVER: "Driver",
 
-    // trips
-    TRIP_TITLE: "Consultation du trajet",
-
     // profile
     MY_PROFILE: "My profile",
     MY_INFOS: "My informations",
@@ -181,7 +179,7 @@ export default {
     SEARCH_GROUP: "Search group",
     GROUP_NAME: "Group name",
 
-    // parametres
+    // parameters
     NOTIF_PARAMS: "Notification settings",
     EMAIL_NOTIFICATIONS: "Notify by email",
     THEME: "Theme",
@@ -194,6 +192,11 @@ export default {
     PARAMS_UPDATED: "Parameters updated successfully",
     OTHER_PARAMS: "Other settings",
     TIMEZONE: "Timezone",
+
+    // trip
+    FUTURE_TRIPS: "Future trips",
+    PAST_TRIPS: "Past trips",
+    CANCEL_TRIP: "Cancel trip",
 
     // informations
     ADDRESS_NOT_VERIFIED: "Address not verified",
