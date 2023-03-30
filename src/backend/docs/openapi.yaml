@@ -1066,6 +1066,35 @@ paths:
         '500':
           $ref: '#/components/responses/internalError'
 
+  /travels/:id/delete:
+    delete:
+      summary: Delete a travel (admin)
+      description: Travel deleted by admin
+      operationId: deleteTravel
+      tags:
+        -Travels
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - name: id
+          in: path
+          description: The id of the booking to cancel
+          required: true
+          schema:
+            type: integer
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Travel deleted
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Travel deleted
+
   /settings:
     get:
       summary: Settings
