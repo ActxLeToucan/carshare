@@ -88,25 +88,7 @@ import re from "../../scripts/Regex";
 
 const PAGE = { QUERY: 1, RESULTS: 2 };
 
-function search(obj) {
-    obj.searchBar.buttonEnabled = false;
-    const log = obj.searchLog(Lang.CurrentLang.SEARCHING + "...", Log.INFO);
 
-    const value = obj.$refs['query-zone'].querySelector('input').value;
-
-    API.execute_logged(API.ROUTE.TRAVELS.GET, API.METHOD.GET, User.CurrentUser?.getCredentials(), { search: value }).then((data) => {
-        obj.groups = data.data ?? data.group;
-        log.delete();
-        console.log("travels")
-    }).catch((err) => {
-        log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
-        setTimeout(() => { log.delete(); }, 4000);
-    }).finally(() => {
-        obj.searchBar.buttonEnabled = true;
-    });
-
-    
-}
 
 export default {
     name: 'AdminTrips',
@@ -143,7 +125,50 @@ export default {
             log.attachTo(this.searchLogZone);
             return log;
         },
+        search(obj) {
+            const log = this.log(Lang.CurrentLang.SEARCHING, Log.INFO);
+
+
+            const value = obj.$refs['query-zone'].querySelector('input').value;
+
+            API.execute_logged(API.ROUTE.TRAVELS.SEARCH, API.METHOD.GET, User.CurrentUser?.getCredentials(), { search: value }).then((data) => {
+                this.setTrips(data);
+                log.delete();
+                console.log("travels")
+            }).catch((err) => {
+                log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
+                this.setTrips(err);
+                setTimeout(() => { log.delete(); }, 4000);
+            }).finally(() => {
+                obj.searchBar.buttonEnabled = true;
+            });
+
+
+        },
+        setTrips(list) {
+            for (const el of list) {
+                this.trips.push({
+                    id: el.id,
+                    date: new Date(el.departure.date).toLocaleDateString(),
+                    author: el.driver.firstName + " " + el.driver.lastName?.substring(0, 1) + ".",
+                    startCity: el.departure.city,
+                    startTime: new Date(el.departure.date).toLocaleTimeString().substring(0, 5),
+                    endCity: el.arrival.city,
+                    endTime: new Date(el.arrival.date).toLocaleTimeString().substring(0, 5),
+                    slots: el.maxPassengers - (el.passengers === undefined ? 0 : el.passengers) + " / " + el.maxPassengers,
+                    price: el.price,
+                });
+                console.log('vdf')
+            }
+        },
+        log(msg, type = Log.INFO) {
+            if (!this.logZone) return null;
+            const log = new Log(msg, type);
+            log.attachTo(this.logZone);
+            return log;
+        },
         
+
     }
 }
 </script>
