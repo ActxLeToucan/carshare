@@ -1202,14 +1202,16 @@ const notifs = {
             type: 'standard',
             createdAt: new Date()
         }),
-        updated: (user: User, booking: Booking & { departure: Step, passenger: User, arrival: Step } & Record<string, any>, updatedTravel: Travel & { steps: Step[], driver: User } & Record<string, any>, byAnAdmin: boolean) => msgForLang<TemplateNotif, Notif>(user.lang, {
+        updated: (user: User, travel: Travel & { steps: Step[] }) => msgForLang<TemplateNotif, Notif>(user.lang, {
             title: {
-                fr: 'Modification de trajet',
-                en: 'Travel updated'
+                fr: 'Modification de votre trajet par un administrateur',
+                en: 'Your trip has been modified by an administrator'
             },
             message: {
-                fr: `Votre trajet de ${booking.departure.city} à ${booking.arrival.city} du ${dateToString(booking.departure.date, user.timezone, 'fr')} a été modifié par ${byAnAdmin ? 'un administrateur' : 'le conducteur'}. Consultez vos réservations pour plus de détails.`,
-                en: `Your trip from ${booking.departure.city} to ${booking.arrival.city} on ${dateToString(booking.departure.date, user.timezone, 'en')} has been updated by ${byAnAdmin ? 'an administrator' : 'the driver'}. Consult your bookings for more details.`
+                fr: `Votre trajet de ${travel.steps[0].city} à ${travel.steps[travel.steps.length - 1].city} du ${dateToString(new Date(travel.steps[0].date), user.timezone, 'fr')} a été modifié par un administrateur.` +
+                '\n\nVeuillez vérifier que les informations sont correctes et que vous êtes toujours disponible pour ce trajet.',
+                en: `Your trip from ${travel.steps[0].city} to ${travel.steps[travel.steps.length - 1].city} on ${dateToString(new Date(travel.steps[0].date), user.timezone, 'en')} has been modified by an administrator.` +
+                '\n\nPlease check that the information is correct and that you are still available for this trip.'
             },
             type: 'standard',
             createdAt: new Date()
@@ -1270,6 +1272,34 @@ const notifs = {
                             return 'You had not yet answered this request.'
                     }
                 })()
+            },
+            type: 'standard',
+            createdAt: new Date()
+        }),
+        travelUpdated: (user: User, booking: Booking & { departure: Step, passenger: User, arrival: Step } & Record<string, any>, byAnAdmin: boolean) => msgForLang<TemplateNotif, Notif>(user.lang, {
+            title: {
+                fr: 'Modification de trajet',
+                en: 'Travel updated'
+            },
+            message: {
+                fr: `Votre trajet de ${booking.departure.city} à ${booking.arrival.city} du ${dateToString(booking.departure.date, user.timezone, 'fr')} a été modifié par ${byAnAdmin ? 'un administrateur' : 'le conducteur'}.` +
+                '\n\nVeuillez vérifier que vous êtes toujours disponible pour ce trajet.',
+                en: `Your trip from ${booking.departure.city} to ${booking.arrival.city} on ${dateToString(booking.departure.date, user.timezone, 'en')} has been updated by ${byAnAdmin ? 'an administrator' : 'the driver'}.` +
+                '\n\nPlease check that you are still available for this trip.'
+            },
+            type: 'standard',
+            createdAt: new Date()
+        }),
+        deletedDueToTravelUpdate: (user: User, booking: Booking & { departure: Step, passenger: User, arrival: Step } & Record<string, any>, updatedTravel: Travel & { steps: Step[], driver: User } & Record<string, any>, byAnAdmin: boolean) => msgForLang<TemplateNotif, Notif>(user.lang, {
+            title: {
+                fr: 'Réservation supprimée suite à modification de trajet',
+                en: 'Booking deleted due to travel update'
+            },
+            message: {
+                fr: `Votre réservation pour le trajet ${booking.departure.city} - ${booking.arrival.city} du ${dateToString(booking.departure.date, user.timezone, 'fr')} a été supprimée suite à une modification du trajet par ${byAnAdmin ? 'un administrateur' : 'le conducteur'}.` +
+                `\nLe trajet ne passe plus par ${updatedTravel.steps.findIndex(s => s.id === booking.departure.id) === -1 ? booking.departure.city : booking.arrival.city}.`,
+                en: `Your booking for the trip ${booking.departure.city} - ${booking.arrival.city} on ${dateToString(booking.departure.date, user.timezone, 'en')} has been deleted due to a modification of the trip by ${byAnAdmin ? 'an administrator' : 'the driver'}.` +
+                `\nThe travel no longer passes through ${updatedTravel.steps.findIndex(s => s.id === booking.departure.id) === -1 ? booking.departure.city : booking.arrival.city}.`
             },
             type: 'standard',
             createdAt: new Date()

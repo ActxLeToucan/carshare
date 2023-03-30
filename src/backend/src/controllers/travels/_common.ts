@@ -157,23 +157,43 @@ async function update (req: express.Request, res: express.Response, asAdmin: boo
         }
     });
 
-    // Create notifications
-    const data = bookings.map((booking) => {
-        const notif = notifs.travel.updated(booking.passenger, booking, updatedTravel, asAdmin);
-        return {
-            ...notif,
-            userId: booking.passenger.id,
-            senderId: Number(res.locals.user.id),
-            travelId: updatedTravel.id,
-            bookingId: booking.id
-        }
-    });
+    // Create notifications for passengers
+    const data = bookings
+        .filter(booking => booking.status === properties.booking.status.pending || booking.status === properties.booking.status.accepted)
+        .map((booking) => {
+            const bookingDeleted = stepsToDelete.map((s: Step) => s.id).includes(booking.departure.id) || stepsToDelete.map((s: Step) => s.id).includes(booking.arrival.id);
+            const notif = bookingDeleted
+                ? notifs.booking.deletedDueToTravelUpdate(booking.passenger, booking, updatedTravel, asAdmin)
+                : notifs.booking.travelUpdated(booking.passenger, booking, asAdmin);
+            return {
+                ...notif,
+                userId: booking.passenger.id,
+                senderId: Number(res.locals.user.id),
+                travelId: updatedTravel.id,
+                bookingId: bookingDeleted ? undefined : booking.id
+            }
+        });
 
     await prisma.notification.createMany({ data });
     for (const notif of data) {
         const booking = bookings.find((b: Booking) => b.id === notif.bookingId);
         // Send email notification
         if (booking !== undefined) notify(booking.passenger, notif);
+    }
+
+    // Create notifications for driver
+    if (asAdmin) {
+        const notif = notifs.travel.updated(updatedTravel.driver, updatedTravel);
+        await prisma.notification.create({
+            data: {
+                ...notif,
+                userId: updatedTravel.driver.id,
+                senderId: Number(res.locals.user.id),
+                travelId: updatedTravel.id
+            }
+        });
+        // Send email notification
+        notify(updatedTravel.driver, notif);
     }
 
     sendMsg(req, res, info.travel.updated, updatedTravel);

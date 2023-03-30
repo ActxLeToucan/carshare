@@ -154,6 +154,9 @@ export default {
     DELETE_ALL_NOTIFS_CONFIRMATION: "Are you sure you want to delete all your notifications ?\nThey will be deleted, even if they are not displayed on this page.\nThis action is irreversible.",
     DELETING_NOTIFS: "Deleting notifications",
     NOTIFS_DELETED: "Notifications deleted successfully",
+    ACCEPT: "Accept",
+    REJECT: "Reject",
+    SEE_TRAVEL: "See travel",
 
     // groups
     NO_GROUPS: "You haven't created any group yet",
@@ -177,7 +180,6 @@ export default {
     SELECT_GROUP_DESC: "Please select a group of users to share your trip with",
     GROUP_SELECTED: "Group selected",
     SEARCH_GROUP: "Search group",
-    GROUP_NAME: "Group name",
 
     // parameters
     NOTIF_PARAMS: "Notification settings",
@@ -197,6 +199,9 @@ export default {
     FUTURE_TRIPS: "Future trips",
     PAST_TRIPS: "Past trips",
     CANCEL_TRIP: "Cancel trip",
+
+    // booking
+    BOOKING_DOESNT_EXIST_ANYMORE: "This booking doesn't exist anymore.",
 
     // informations
     ADDRESS_NOT_VERIFIED: "Address not verified",

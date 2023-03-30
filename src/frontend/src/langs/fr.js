@@ -154,6 +154,9 @@ export default {
     DELETE_ALL_NOTIFS_CONFIRMATION: "Êtes-vous sûr de vouloir supprimer toutes vos notifications ?\nElles seront supprimées, même si elles ne sont pas affichées sur cette page.\nCette action est irréversible.",
     DELETING_NOTIFS: "Suppression des notifications",
     NOTIFS_DELETED: "Notifications supprimées avec succès",
+    ACCEPT: "Accepter",
+    REJECT: "Refuser",
+    SEE_TRAVEL: "Voir le trajet",
 
     // groups
     NO_GROUPS: "Vous n'avez pas encore créé de groupe",
@@ -177,7 +180,6 @@ export default {
     SELECT_GROUP_DESC: "Veuillez sélectionner un groupe d'utilisateurs pour pouvoir partager vos trajets avec eux",
     GROUP_SELECTED: "Groupe sélectionné",
     SEARCH_GROUP: "Rechercher un groupe",
-    GROUP_NAME: "Nom du groupe",
 
     // parametres
     NOTIF_PARAMS: "Paramètres de notifications",
@@ -197,6 +199,9 @@ export default {
     FUTURE_TRIPS: "Trajets futurs",
     PAST_TRIPS: "Trajets passés",
     CANCEL_TRIP: "Annuler le trajet",
+
+    // booking
+    BOOKING_DOESNT_EXIST_ANYMORE: "Cette réservation n'existe plus.",
 
     // informations
     ADDRESS_NOT_VERIFIED: "Adresse non vérifiée",
