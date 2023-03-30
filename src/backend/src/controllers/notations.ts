@@ -201,6 +201,42 @@ exports.createEvaluation = (req: express.Request, res: express.Response, _: expr
     });
 }
 
+exports.editEvaluation = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    const { note } = req.body;
+    const evaluationId = validator.sanitizeId(req.params.id, req, res);
+    if (evaluationId === null) return;
+
+    if (!validator.checkNoteField(note, req, res)) return;
+
+    prisma.evaluation.findUnique({
+        where: {
+            id: evaluationId
+        }
+    }).then((evaluation) => {
+        if (evaluation === null || evaluation.evaluatorId !== res.locals.user.id) {
+            sendMsg(req, res, error.evaluation.notFound)
+            return;
+        }
+
+        prisma.evaluation.update({
+            where: {
+                id: evaluationId
+            },
+            data: {
+                note
+            }
+        }).then(() => {
+            sendMsg(req, res, info.evaluation.updated);
+        }).catch((err) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        })
+    }).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    })
+}
+
 exports.deleteEvaluation = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const notationId = validator.sanitizeId(req.params.id, req, res);
     if (notationId === null) return;

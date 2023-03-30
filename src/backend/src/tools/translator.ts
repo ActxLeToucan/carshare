@@ -920,6 +920,13 @@ const info = {
                 en: 'Evaluation removed'
             },
             code: 200
+        }),
+        updated: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Évaluation modifiée',
+                en: 'Updated evaluation'
+            },
+            code: 201
         })
     },
     booking: {
