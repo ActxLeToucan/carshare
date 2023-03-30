@@ -859,6 +859,14 @@ const info = {
                 en: 'Travel cancelled'
             },
             code: 200
+        }),
+
+        deleted: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Trajet supprimé',
+                en: 'Travel deleted'
+            },
+            code: 200
         })
     },
     group: {
@@ -1181,6 +1189,18 @@ const notifs = {
             message: {
                 fr: `Votre trajet de ${booking.departure.city} à ${booking.arrival.city} du ${dateToString(booking.departure.date, user.timezone, 'fr')} a été annulé par le conducteur.`,
                 en: `Your trip from ${booking.departure.city} to ${booking.arrival.city} on ${dateToString(booking.departure.date, user.timezone, 'en')} has been cancelled by the driver.`
+            },
+            type: 'standard',
+            createdAt: new Date()
+        }),
+        deleted: (user: User, travel: Travel & { steps: Step[] }) => msgForLang<TemplateNotif, Notif>(user.lang, {
+            title: {
+                fr: 'Suppression de trajet',
+                en: 'Travel deleted'
+            },
+            message: {
+                fr: `Votre trajet de ${travel.steps[0].city} à ${travel.steps[travel.steps.length - 1].city} du ${dateToString(new Date(travel.steps[0].date), user.timezone, 'fr')} a été supprimé par l'admin.`,
+                en: `Your trip from ${travel.steps[0].city} à ${travel.steps[travel.steps.length - 1].city} on ${dateToString(new Date(travel.steps[0].date), user.timezone, 'en')} has been deleted by the admin.`
             },
             type: 'standard',
             createdAt: new Date()
