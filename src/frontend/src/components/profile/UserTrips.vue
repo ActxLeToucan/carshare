@@ -6,7 +6,7 @@
 
         <div class="flex grow h-fit flex-col space-y-4 mx-10 min-w-0 max-w-full">
             <div class="flex flex-col w-full h-fit min-w-0">
-                <p class="text-2xl text-slate-500 font-semibold"> {{ lang.FUTURE_TRIPS }} </p>
+                <p class="text-2xl text-slate-500 dark:text-slate-400 font-semibold"> {{ lang.FUTURE_TRIPS }} </p>
                 <div class="flex grow h-fit p-4 min-w-0 max-w-full">
                     <div class="flex h-fit w-full space-x-4 overflow-x-auto min-w-0 max-w-full">
                         <future-trip-card
@@ -35,7 +35,7 @@
             </div>
 
             <div class="flex flex-col w-full h-fit">
-                <p class="text-2xl text-slate-500 font-semibold"> {{ lang.PAST_TRIPS }} </p>
+                <p class="text-2xl text-slate-500 dark:text-slate-400 font-semibold"> {{ lang.PAST_TRIPS }} </p>
                 <div class="flex grow h-fit p-4">
                     <div class="flex flex-col h-fit w-full space-y-4 justify-center items-center">
                         <past-trip-card
@@ -70,8 +70,8 @@
             :show-validate="false"
         >
             <trip-detail
-                :trip-start="selectedTrip?.departure"
-                :trip-end="selectedTrip?.arrival"
+                :trip-start="null"
+                :trip-end="null"
                 :trip-id="selectedTrip?.id ?? null"
                 :edit-mode="true"
             />
@@ -126,6 +126,7 @@ export default {
     methods: {
         selectTrip(trip) {
             this.selectedTrip = trip;
+            this.tripPreview?.setTitle(Lang.CurrentLang.TRAVEL_CARD_LABEL.replace('{DATE}', new Date(this.selectedTrip?.departure?.date).toLocaleDateString()));
             this.tripPreview?.show();
         },
         fetchFutureTrips() {

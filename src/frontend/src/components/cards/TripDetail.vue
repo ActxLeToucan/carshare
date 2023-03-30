@@ -1,5 +1,5 @@
 <template>
-    <div class="flex flex-col grow w-full max-h-full min-h-0 min-w-[80vw]">
+    <div class="flex flex-col grow w-full max-h-full min-h-0 min-w-[60vw]">
         <div
             v-if="trip != null"
             class="flex md:flex-row flex-col grow min-w-0 w-full max-h-full min-h-0"
@@ -29,7 +29,7 @@
                         </p>
                     </div>
                 </div>
-                <div class="flex flex-col grow rounded-lg bg-slate-200 dark:bg-slate-600 border-2 border-slate-200 dark:border-slate-600 w-fit min-w-full max-w-full mt-2">
+                <div class="flex flex-col grow rounded-lg bg-slate-200 dark:bg-slate-600 border-2 border-slate-200 dark:border-slate-600 w-fit min-w-full max-w-full mt-4">
                     <p class="text-xl text-slate-600 dark:text-slate-200 font-bold mx-2 mb-1 whitespace-nowrap text-ellipsis overflow-hidden">
                         {{ lang.TRIP_INFO }}
                     </p>
@@ -109,7 +109,12 @@
             v-show="editMode"
             class="flex w-full justify-end items-center my-4"
         >
-            <button-block color="red" :action="removeTravel" v-show="!isPast">
+            <button-block
+                v-show="!isPast"
+                color="red"
+                :action="removeTravel"
+                :disabled="trip?.status == -1"
+            >
                 {{ lang.CANCEL_TRIP }}
             </button-block>
         </div>
@@ -131,14 +136,14 @@ import { Log, LogZone } from "../../scripts/Logs";
 import {
     UserIcon
 } from '@heroicons/vue/24/outline';
-import CardBadge from './CardBadge.vue';
+import CardBadge from "../cards/CardBadge.vue"
 
 export default {
     name: "TripDetail",
     components: {
         ButtonBlock,
         UserIcon,
-        CardBadge
+       
     },
     props: {
         tripId: {
@@ -186,8 +191,8 @@ export default {
             API.execute_logged(API.ROUTE.TRAVELS.GET + id, API.METHOD.GET, User.CurrentUser.getCredentials()).then(res => {
                 this.trip = res;
 
-                this.startIndex = this.tripStart !== undefined? this.trip?.steps.findIndex(step => step.city == this.tripStart.value) : 0;
-                this.endIndex   = this.tripEnd !== undefined? this.trip?.steps.findIndex(step => step.city == this.tripEnd.value) : this.trip.steps.length - 1;
+                this.startIndex = (this.tripStart)? this.trip?.steps.findIndex(step => step.city == this.tripStart.value) : 0;
+                this.endIndex   = (this.tripEnd)? this.trip?.steps.findIndex(step => step.city == this.tripEnd.value) : this.trip.steps.length - 1;
 
                 this.isPast = new Date(this.trip.steps[this.trip.steps.length - 1].date) < new Date();
             }).catch(err => {

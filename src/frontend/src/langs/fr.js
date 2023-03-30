@@ -23,6 +23,7 @@ export default {
     DELETING: "Suppression en cours",
     CREATOR: "Créateur",
     CREATION_DATE :"Date de création",
+    CANCELED: "Annulé",
 
     // languages (do not translate)
     ENGLISH: "English",

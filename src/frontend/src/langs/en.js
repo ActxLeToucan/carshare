@@ -23,6 +23,7 @@ export default {
     DELETING: "Deleting",
     CREATOR: "Creator", 
     CREATION_DATE: "Creation date",
+    CANCELED: "Canceled",
 
     // languages (do not translate)
     ENGLISH: "English",
