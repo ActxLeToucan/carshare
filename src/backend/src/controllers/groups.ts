@@ -131,7 +131,7 @@ function getGroups (req: express.Request, res: express.Response, next: express.N
 
 exports.addUserGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const userMail = req.body.userMail;
-    if (!validator.checkEmailField(userMail, req, res)) return;
+    if (!validator.checkEmailField(userMail, req, res, false)) return;
 
     const groupId = validator.sanitizeId(req.params.id, req, res);
     if (groupId === null) return;
