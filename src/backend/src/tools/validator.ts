@@ -695,8 +695,6 @@ export {
     checkDescriptionField,
     checkTravelAlready,
     checkNoteField,
-    checkTravelHoursLimit,
-    checkNumberField,
     checkTravelHoursEditable,
     sanitizeTimezone,
     checkLang,

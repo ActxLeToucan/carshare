@@ -1,11 +1,11 @@
 import type express from 'express';
-import {displayableGroup, error, info, sendMsg, type Notif, notifs, notify} from '../tools/translator';
+import { displayableGroup, error, info, sendMsg, type Notif, notifs, notify } from '../tools/translator';
 import * as validator from '../tools/validator';
-import {prisma} from '../app';
-import {type Pagination, preparePagination} from './_common';
+import { prisma } from '../app';
+import { type Pagination, preparePagination } from './_common';
 
 exports.createGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const {name} = req.body;
+    const { name } = req.body;
     if (!validator.checkGroupNameField(name, req, res)) return;
     prisma.group.create({
         data: {
@@ -106,7 +106,7 @@ exports.searchGroups = (req: express.Request, res: express.Response, next: expre
     }));
 }
 
-function getGroups(req: express.Request, res: express.Response, next: express.NextFunction, searchMode: boolean, where: (pagination: Pagination) => any) {
+function getGroups (req: express.Request, res: express.Response, next: express.NextFunction, searchMode: boolean, where: (pagination: Pagination) => any) {
     const pagination = preparePagination(req, searchMode);
 
     prisma.group.count().then((count) => {
@@ -130,7 +130,7 @@ function getGroups(req: express.Request, res: express.Response, next: express.Ne
 }
 
 exports.addUserGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const {userMail} = req.body;
+    const userMail = req.body.userMail;
     if (!validator.checkEmailField(userMail, req, res)) return;
 
     const groupId = validator.sanitizeId(req.params.id, req, res);
@@ -195,7 +195,7 @@ exports.addUserGroup = (req: express.Request, res: express.Response, _: express.
                         creator: true
                     }
                 }).then((group) => {
-                    const notif: Notif = notifs.group.userAdded(user, group);
+                    const notif: Notif = notifs.group.userAdded(user, group, res.locals.user);
                     const data =
                         {
                             userId,
@@ -206,7 +206,7 @@ exports.addUserGroup = (req: express.Request, res: express.Response, _: express.
                             createdAt: notif.createdAt
                         };
 
-                    prisma.notification.create({data}).then(() => {
+                    prisma.notification.create({ data }).then(() => {
                         notify(user, data);
 
                         sendMsg(req, res, info.group.userAdd, group);
@@ -231,7 +231,6 @@ exports.addUserGroup = (req: express.Request, res: express.Response, _: express.
         sendMsg(req, res, error.generic.internalError);
     });
 }
-
 
 exports.deleteGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const groupId = validator.sanitizeId(req.params.id, req, res);

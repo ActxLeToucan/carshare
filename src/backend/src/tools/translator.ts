@@ -484,8 +484,8 @@ const error = {
         }),
         creatorMember: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Le créateur du groupe ne peut pas être un membre.',
-                en: 'The creator of the group cannot be a member.'
+                fr: 'Vous ne pouvez pas être un membre du groupe que vous avez créé.',
+                en: 'You cannot be a member of the group you created.'
             },
             code: 400
         }),
@@ -888,7 +888,7 @@ const info = {
         }),
         userAdd: (req: Request, group: Group & { users: User[], creator: User }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Utilisateur ajouter',
+                fr: 'Utilisateur ajouté',
                 en: 'User add'
             },
             code: 201,
@@ -1276,14 +1276,14 @@ const notifs = {
             type: 'standard',
             createdAt: new Date()
         }),
-        userAdded: (user: User, group: Group) => msgForLang<TemplateNotif, Notif>(user.lang, {
+        userAdded: (user: User, group: Group, creator: User) => msgForLang<TemplateNotif, Notif>(user.lang, {
             title: {
                 fr: 'Ajout dans un groupe',
                 en: 'Adding to a group'
             },
             message: {
-                fr: `Vous avez été ajouté dans le groupe ${group.name}, vous recevrez toutes les notifications de ce groupe.`,
-                en: `You have been added to the group ${group.name}, you will receive all notifications from this group.`
+                fr: `${creator.firstName ?? ''} ${creator.lastName ?? ''} vous a ajouté dans le groupe ${group.name}, vous recevrez toutes les notifications de ce groupe.`,
+                en: `${creator.firstName ?? ''} ${creator.lastName ?? ''} added you to the group ${group.name}, you will receive all notifications from this group.`
             },
             type: 'standard',
             createdAt: new Date()
