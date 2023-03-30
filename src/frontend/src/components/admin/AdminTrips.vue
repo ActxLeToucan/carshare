@@ -27,7 +27,7 @@
                     class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
                     style="max-height: 0;"
             />
-            <div class="flex w-full flex-col px-8 space-y-4 pt-4 max-w-full min-w-0">
+            <div class="flex grow w-full flex-col px-8 space-y-4 pt-4 max-w-full min-w-0">
                     <admin-trip-card
                         v-for="group in groups"
                         :key="group?.id"
@@ -35,6 +35,23 @@
                         :data="group"
                         :onclick="onCardClicked"
                     />
+            </div>
+            <div class="flex w-full justify-evenly items-center mt-4">
+                <button-block
+                    :action="() => pagination.previous()"
+                    :disabled="!pagination.hasPrevious"
+                >
+                    <chevron-left-icon class="w-8 h-8" />
+                </button-block>
+                <p class="text-xl font-bold text-slate-500">
+                    {{ pagination.index + 1 }} / {{ pagination.maxIndex + 1 }}
+                </p>
+                <button-block
+                    :action="() => pagination.next()"
+                    :disabled="!pagination.hasNext"
+                >
+                    <chevron-right-icon class="w-8 h-8" />
+                </button-block>
             </div>
         </div>
         <div
@@ -79,17 +96,33 @@ import { Log, LogZone } from '../../scripts/Logs.js';
 import { genres, isPhoneNumber, levels } from '../../scripts/data';
 
 import {
-    MagnifyingGlassIcon
+    MagnifyingGlassIcon,
+     ChevronRightIcon,
+    ChevronLeftIcon
 } from '@heroicons/vue/24/outline';
 import { getTypedValue } from '../../scripts/data.js';
 import Lang from "../../scripts/Lang";
 import re from "../../scripts/Regex";
-
-
 const PAGE = { QUERY: 1, RESULTS: 2 };
 
+function search(obj) {
+    obj.searchBar.buttonEnabled = false;
+    const log = obj.searchLog(Lang.CurrentLang.SEARCHING + "...", Log.INFO);
 
+    const value = obj.$refs['query-zone'].querySelector('input').value;
 
+    API.execute_logged(API.ROUTE.TRAVELS.GET+ obj.pagination + "&query=" + value, API.METHOD.GET, User.CurrentUser?.getCredentials(), { search: value }).then((data) => {
+        obj.groups = data.data;
+        obj.pagination.total = data.total;
+        log.delete();
+    }).catch((err) => {
+        log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
+        setTimeout(() => { log.delete(); }, 4000);
+    }).finally(() => {
+        obj.searchBar.buttonEnabled = true;
+    });
+
+}
 export default {
     name: 'AdminTrips',
     components: {
@@ -100,10 +133,13 @@ export default {
         Card,
         CardBadge,
         MagnifyingGlassIcon,
+        ChevronRightIcon,
+        ChevronLeftIcon
     },
     data() {
         return {
             User, lang: Lang.CurrentLang,
+            pagination: API.createPagination(0, 5),
             searchBar: {
                 buttonEnabled: true,
             },
@@ -125,26 +161,7 @@ export default {
             log.attachTo(this.searchLogZone);
             return log;
         },
-        search(obj) {
-            const log = this.log(Lang.CurrentLang.SEARCHING, Log.INFO);
-
-
-            const value = obj.$refs['query-zone'].querySelector('input').value;
-
-            API.execute_logged(API.ROUTE.TRAVELS.SEARCH, API.METHOD.GET, User.CurrentUser?.getCredentials(), { search: value }).then((data) => {
-                this.setTrips(data);
-                log.delete();
-                console.log("travels")
-            }).catch((err) => {
-                log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
-                this.setTrips(err);
-                setTimeout(() => { log.delete(); }, 4000);
-            }).finally(() => {
-                obj.searchBar.buttonEnabled = true;
-            });
-
-
-        },
+      
         setTrips(list) {
             for (const el of list) {
                 this.trips.push({
