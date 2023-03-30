@@ -420,3 +420,52 @@ exports.getMyTravels = (req: express.Request, res: express.Response, _: express.
             sendMsg(req, res, error.generic.internalError);
         });
 }
+
+exports.deleteTravel = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    const travelId = validator.sanitizeId(req.params.id, req, res);
+    if (travelId === null) return;
+
+    prisma.travel.findUnique({
+        where: { id: travelId },
+        include: {
+            steps: true,
+            driver: true
+        }
+    }).then((travel) => {
+        if (travel === null) {
+            sendMsg(req, res, error.travel.notFound);
+            return;
+        }
+
+        prisma.travel.delete({
+            where: { id: travelId },
+            include: {
+                steps: true,
+                driver: true
+            }
+        }).then((travel) => {
+            const notifDriver = notifs.travel.deleted(travel.driver, travel);
+            // create driver's notification
+            prisma.notification.create({
+                data: {
+                    ...notifDriver,
+                    userId: travel.driverId,
+                    senderId: Number(res.locals.user.id)
+                }
+            }).then(() => {
+                // send email notification to driver
+                notify(travel.driver, notifDriver);
+                sendMsg(req, res, info.travel.deleted, travel.driver);
+            }).catch((err: any) => {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
+            });
+        }).catch((err: any) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
+    }).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
+}
