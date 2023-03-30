@@ -84,5 +84,5 @@ function errorHandler (error: NodeJS.ErrnoException) {
 }
 
 function startServer () {
- server.listen(port);
+    server.listen(port);
 }

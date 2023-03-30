@@ -695,6 +695,13 @@ const error = {
                 en: 'The steps are not valid.'
             },
             code: 400
+        }),
+        tooManyPassengers: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Il y a plus de passagers que de places.',
+                en: 'There are more passengers than seats.'
+            },
+            code: 400
         })
     },
     booking: {
@@ -843,14 +850,24 @@ const info = {
         })
     },
     travel: {
-        created: (req: Request, travel: Travel & { steps: Step[] }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        created: (req: Request, travel: Travel & { steps: Step[], driver: User }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Trajet créé',
                 en: 'Travel created'
             },
             code: 201,
             data: {
-                travel
+                travel: displayableTravel(travel)
+            }
+        }),
+        updated: (req: Request, travel: Travel & { steps: Step[], driver: User }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Trajet mis à jour',
+                en: 'Travel updated'
+            },
+            code: 200,
+            data: {
+                travel: displayableTravel(travel)
             }
         }),
         cancelled: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
@@ -1184,6 +1201,18 @@ const notifs = {
             },
             type: 'standard',
             createdAt: new Date()
+        }),
+        updated: (user: User, booking: Booking & { departure: Step, passenger: User, arrival: Step } & Record<string, any>, updatedTravel: Travel & { steps: Step[], driver: User } & Record<string, any>, byAnAdmin: boolean) => msgForLang<TemplateNotif, Notif>(user.lang, {
+            title: {
+                fr: 'Modification de trajet',
+                en: 'Travel updated'
+            },
+            message: {
+                fr: `Votre trajet de ${booking.departure.city} à ${booking.arrival.city} du ${dateToString(booking.departure.date, user.timezone, 'fr')} a été modifié par ${byAnAdmin ? 'un administrateur' : 'le conducteur'}. Consultez vos réservations pour plus de détails.`,
+                en: `Your trip from ${booking.departure.city} to ${booking.arrival.city} on ${dateToString(booking.departure.date, user.timezone, 'en')} has been updated by ${byAnAdmin ? 'an administrator' : 'the driver'}. Consult your bookings for more details.`
+            },
+            type: 'standard',
+            createdAt: new Date()
         })
     },
     booking: {
@@ -1397,10 +1426,10 @@ function displayableUserPublic (user: User): Partial<User> {
 }
 
 /**
- * Returns a travel without some properties for display to other users
+ * Returns a travel without some properties for display to all users
  * @param travel Travel to display
  */
-function displayableTravelPublic (travel: Travel & { steps: Step[], driver: User }): Partial<Travel> {
+function displayableTravel (travel: Travel & { steps: Step[], driver: User }): Partial<Travel> {
     const t = Object.assign({}, travel) as any;
     t.steps.sort((a: Step, b: Step) => a.date.getTime() - b.date.getTime());
     delete t.groupId;
@@ -1487,7 +1516,7 @@ export {
     notify,
     displayableUserPrivate,
     displayableUserPublic,
-    displayableTravelPublic,
+    displayableTravel,
     displayableGroup,
     displayableAverage,
     displayableEvaluation,
