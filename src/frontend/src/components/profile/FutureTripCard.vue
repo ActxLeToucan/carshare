@@ -29,7 +29,13 @@
             <div class="flex grow justify-end">
                 <div class="flex w-full justify-between items-center space-x-8">
                     <p class="text-slate-500 dark:text-slate-300 text-lg font-bold">
-                        {{ trip.maxPassengers - trip.passengers }} / {{ trip.maxPassengers }} {{ Number(trip.maxPassengers) > 1 ? lang.SLOTS: lang.SLOT }}
+                        {{ trip.passengers ? (trip.maxPassengers - trip.passengers) + " /" : "" }} {{ trip.maxPassengers }} {{ Number(trip.maxPassengers) > 1 ? lang.SLOTS: lang.SLOT }}
+                    </p>
+                    <p
+                        v-show="trip.status == -1"
+                        class="text-slate-300 dark:text-slate-500 text-base font-semibold"
+                    >
+                        {{ lang.CANCELED }}
                     </p>
                 </div>
             </div>
