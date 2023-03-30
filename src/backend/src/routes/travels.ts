@@ -13,5 +13,6 @@ router.delete('/my/:id', auth.access, emailVerified, controller.cancelMyTravel);
 
 // admin routes
 router.get('/', auth.access, controller.getTravels);
+router.delete('/:id/delete', auth.access, admin, controller.deleteTravel);
 
 module.exports = router;
