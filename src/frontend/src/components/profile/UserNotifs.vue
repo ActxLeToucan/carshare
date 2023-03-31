@@ -74,24 +74,38 @@
                                 {{ notif.message }}
                             </p>
                             <div
-                                v-if="notif.type === 'request'"
-                                class="mt-4"
+                                v-if="notif.type === 'request' || notif.travelId"
+                                class="flex-wrap align-middle mt-4 items-center"
                             >
                                 <button-block
-                                    class="inline-block mr-4"
-                                    :disabled="notif.locked"
-                                    :action="() => acceptOrReject(notif, true)"
-                                >
-                                    Accepter
-                                </button-block>
-                                <button-block
+                                    v-if="notif.travelId"
                                     class="inline-block"
-                                    color="red"
                                     :disabled="notif.locked"
-                                    :action="() => acceptOrReject(notif, false)"
+                                    :action="() => showTravel(notif.travelId)"
                                 >
-                                    Refuser
+                                    {{ lang.SEE_TRAVEL }}
                                 </button-block>
+                                <div
+                                    v-if="notif.travelId && notif.type === 'request'"
+                                    class="inline-block border-l-2 border-slate-400 dark:border-slate-600 h-4 mx-4"
+                                />
+                                <span v-if="notif.type === 'request'">
+                                    <button-block
+                                        class="inline-block mt-2 mr-4"
+                                        :disabled="notif.locked"
+                                        :action="() => acceptOrReject(notif, true)"
+                                    >
+                                        {{ lang.ACCEPT }}
+                                    </button-block>
+                                    <button-block
+                                        class="inline-block mt-2"
+                                        color="red"
+                                        :disabled="notif.locked"
+                                        :action="() => acceptOrReject(notif, false)"
+                                    >
+                                        {{ lang.REJECT }}
+                                    </button-block>
+                                </span>
                             </div>
                             <div
                                 :ref="`log-notif-${notif.id}`"
@@ -123,6 +137,19 @@
             :onload="setDeleteAllPopup"
             :onvalidate="deleteAll"
         />
+        <popup
+            ref="trip-view"
+            :title="lang.TRAVEL_CARD_LABEL"
+            :cancel-label="lang.BACK"
+            :show-validate="false"
+        >
+            <trip-detail
+                :trip-start="null"
+                :trip-end="null"
+                :trip-id="travelId ?? null"
+                :edit-mode="false"
+            />
+        </popup>
     </div>
 </template>
 
@@ -140,16 +167,20 @@ import {
 } from "@heroicons/vue/20/solid";
 import CardPopup from "../cards/CardPopup.vue";
 import { Log, LogZone } from "../../scripts/Logs";
+import Popup from "../cards/Popup.vue";
+import TripDetail from "../cards/TripDetail.vue";
 
 export default {
     name: "UserNotifs",
     components: {
+        Popup,
         CardPopup,
         ButtonBlock,
         CardBorder,
         CardBadge,
         TrashIcon,
         PlusIcon,
+        TripDetail
     },
     data() {
         return {
@@ -159,6 +190,7 @@ export default {
             minorLoading: false,
             error: null,
             next: 0,
+            travelId: null
         };
     },
     computed: {
@@ -170,6 +202,8 @@ export default {
         Lang.AddCallback((lang) => (this.lang = lang));
         this.getNotifs();
         this.logZones = {};
+
+        this.tripPreview = this.$refs["trip-view"];
     },
     methods: {
         getNotifs() {
@@ -253,6 +287,15 @@ export default {
             notif.type = `request.${accept ? "accepted" : "rejected"}`;
             notif.locked = true;
             const log = this.notifLog(notif, this.lang.SENDING_RESPONSE + "...", Log.INFO);
+            if (notif.bookingId === null) {
+                log.update(this.lang.BOOKING_DOESNT_EXIST_ANYMORE, Log.ERROR);
+                setTimeout(() => {
+                    log.delete();
+                    notif.locked = false;
+                    notif.type = 'request';
+                }, 6000);
+                return;
+            }
             API.execute_logged(
                 accept
                     ? API.ROUTE.BOOKINGS.ACCEPT(notif.bookingId)
@@ -283,6 +326,11 @@ export default {
             const log = new Log(msg, type);
             log.attachTo(this.logZones[notif.id]);
             return log;
+        },
+        showTravel(travelId) {
+            this.travelId = travelId;
+            this.tripPreview?.setTitle(Lang.CurrentLang.TRAVEL_CARD_LABEL);
+            this.tripPreview?.show();
         },
     },
 };
