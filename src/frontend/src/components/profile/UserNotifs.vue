@@ -137,6 +137,19 @@
             :onload="setDeleteAllPopup"
             :onvalidate="deleteAll"
         />
+        <popup
+            ref="trip-view"
+            :title="lang.TRAVEL_CARD_LABEL"
+            :cancel-label="lang.BACK"
+            :show-validate="false"
+        >
+            <trip-detail
+                :trip-start="null"
+                :trip-end="null"
+                :trip-id="travelId ?? null"
+                :edit-mode="false"
+            />
+        </popup>
     </div>
 </template>
 
@@ -154,16 +167,20 @@ import {
 } from "@heroicons/vue/20/solid";
 import CardPopup from "../cards/CardPopup.vue";
 import { Log, LogZone } from "../../scripts/Logs";
+import Popup from "../cards/Popup.vue";
+import TripDetail from "../cards/TripDetail.vue";
 
 export default {
     name: "UserNotifs",
     components: {
+        Popup,
         CardPopup,
         ButtonBlock,
         CardBorder,
         CardBadge,
         TrashIcon,
         PlusIcon,
+        TripDetail
     },
     data() {
         return {
@@ -173,6 +190,7 @@ export default {
             minorLoading: false,
             error: null,
             next: 0,
+            travelId: null
         };
     },
     computed: {
@@ -184,6 +202,8 @@ export default {
         Lang.AddCallback((lang) => (this.lang = lang));
         this.getNotifs();
         this.logZones = {};
+
+        this.tripPreview = this.$refs["trip-view"];
     },
     methods: {
         getNotifs() {
@@ -306,7 +326,9 @@ export default {
             return log;
         },
         showTravel(travelId) {
-            // TODO: show travel
+            this.travelId = travelId;
+            this.tripPreview?.setTitle(Lang.CurrentLang.TRAVEL_CARD_LABEL);
+            this.tripPreview?.show();
         },
     },
 };
