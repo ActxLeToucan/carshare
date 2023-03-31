@@ -137,7 +137,7 @@
             :onload="setDeleteAllPopup"
             :onvalidate="deleteAll"
         />
-        <popup
+        <card-popup
             ref="trip-view"
             :title="lang.TRAVEL_CARD_LABEL"
             :cancel-label="lang.BACK"
@@ -149,7 +149,7 @@
                 :trip-id="travelId ?? null"
                 :edit-mode="false"
             />
-        </popup>
+        </card-popup>
     </div>
 </template>
 
@@ -167,13 +167,11 @@ import {
 } from "@heroicons/vue/20/solid";
 import CardPopup from "../cards/CardPopup.vue";
 import { Log, LogZone } from "../../scripts/Logs";
-import Popup from "../cards/Popup.vue";
 import TripDetail from "../cards/TripDetail.vue";
 
 export default {
     name: "UserNotifs",
     components: {
-        Popup,
         CardPopup,
         ButtonBlock,
         CardBorder,

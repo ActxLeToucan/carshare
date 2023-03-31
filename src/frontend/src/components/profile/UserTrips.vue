@@ -63,7 +63,7 @@
                 </div>
             </div>
         </div>
-        <popup
+        <card-popup
             ref="trip-view"
             :title="lang.TRAVEL_CARD_LABEL.replace('{DATE}', new Date(selectedTrip?.departure?.date).toLocaleDateString())"
             :cancel-label="lang.BACK"
@@ -75,7 +75,7 @@
                 :trip-id="selectedTrip?.id ?? null"
                 :edit-mode="true"
             />
-        </popup>
+        </card-popup>
     </div>
 </template>
 
@@ -84,7 +84,7 @@ import Lang from '../../scripts/Lang';
 import FutureTripCard from './FutureTripCard.vue';
 import PastTripCard from './PastTripCard.vue';
 import ButtonBlock from '../inputs/ButtonBlock.vue';
-import Popup from '../cards/Popup.vue';
+import CardPopup from '../cards/CardPopup.vue';
 import TripDetail from '../cards/TripDetail.vue';
 
 import {
@@ -100,7 +100,7 @@ export default {
         PastTripCard,
         ButtonBlock,
         PlusIcon,
-        Popup,
+        CardPopup,
         TripDetail
     },
     data() {

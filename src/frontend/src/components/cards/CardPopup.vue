@@ -99,7 +99,7 @@ export default {
         },
         disableValidate: {
             type: [Boolean, String],
-            default: true,
+            default: false,
             required: false
         },
         oncancel: {

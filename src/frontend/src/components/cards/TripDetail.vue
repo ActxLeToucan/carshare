@@ -9,11 +9,12 @@
                     {{ lang.TRIP_DESTINATIONS }}
                 </p>
                 <div class="flex flex-col grow h-fit w-fit space-y-2 w-full overflow-y-auto max-h-min min-h-[4em]">
-                    <div
+                    <button
                         v-for="(step, index) in trip.steps"
                         :key="step.id"
                         class="flex h-fit w-full justify-between items-center space-x-10 rounded-md border-2 py-1 px-2"
-                        :class="(index < startIndex || index > endIndex) ? ' bg-slate-100 dark:bg-slate-700 border-slate-200 dark:border-slate-600' : ' bg-white dark:bg-slate-600 border-slate-300 dark:border-slate-500'"
+                        :class="(index < startIndex || index > endIndex) ? ' bg-slate-100 dark:bg-slate-700 border-slate-200 dark:border-slate-600 ' + (!editMode? 'hover:border-slate-300 hover:dark:border-slate-500' : 'cursor-default') : ' bg-white dark:bg-slate-600 border-slate-300 dark:border-slate-500 ' + (!editMode? 'hover:border-slate-400 hover:dark:border-slate-400' : 'cursor-default')"
+                        @click="toogleStep(index)"
                     >
                         <p
                             class="text-xl font-bold whitespace-nowrap text-ellipsis overflow-hidden"
@@ -27,7 +28,7 @@
                         >
                             {{ new Date(step.date).toLocaleTimeString().substring(0, 5) }}
                         </p>
-                    </div>
+                    </button>
                 </div>
                 <div class="flex flex-col grow rounded-lg bg-slate-200 dark:bg-slate-600 border-2 border-slate-200 dark:border-slate-600 w-fit min-w-full max-w-full mt-4">
                     <p class="text-xl text-slate-600 dark:text-slate-200 font-bold mx-2 mb-1 whitespace-nowrap text-ellipsis overflow-hidden">
@@ -237,6 +238,17 @@ export default {
         },
         setPopup(popup) {
             this.popup = popup;
+        },
+        toogleStep(index) {
+            if (this.editMode) return;
+
+            const mid = (this.startIndex + this.endIndex) / 2;
+            if (index < mid) {
+                this.startIndex = index;
+            } else {
+                this.endIndex = index;
+            }
+            this.$forceUpdate();
         }
     },
 };
