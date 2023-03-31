@@ -212,6 +212,7 @@ export default {
                 User.CurrentUser?.getCredentials()
             ).then((_) => {
                 this.notifs = this.notifs.filter((n) => n.id !== notif.id);
+                window.topbar?.fetchNotifs();
             }).catch((err) => {
                 log.update(this.lang.ERROR + " : " + err.message, Log.ERROR);
                 notif.locked = false;
@@ -235,6 +236,7 @@ export default {
                 User.CurrentUser?.getCredentials()
             ).then((_) => {
                 this.notifs = [];
+                window.topbar?.fetchNotifs();
                 log.update(this.lang.NOTIFS_DELETED, Log.SUCCESS);
                 setTimeout(() => {
                     log.delete();
