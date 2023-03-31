@@ -1,6 +1,6 @@
 export default {
     // common
-    CARSHARE: "Car share",
+    CARSHARE: "Car Share",
     CARSHARE_DESC: "Covoiturez entre amis ou inconnus !",
     WELCOME: "Bienvenue sur Car Share !",
     WELCOME_DESC: "Pour commencer à utiliser l'application, veuillez vous connecter ou vous inscrire.",
@@ -75,9 +75,9 @@ export default {
     REQUIRED_FIELDS: "Champs obligatoires",
     INPUT_VERIFICATION: "Vérification des entrées",
     DATA_SENDING: "Envoi des données",
-    REGISTER_SUCCESS: "Compte créé avec succès",
+    REGISTER_SUCCESS: "Compte créé avec succès !",
     SENDING_EMAILVERIF: "Envoi de l'email de vérification",
-    SENDING_EMAIL_SUCCESS: "Email envoyé avec succès",
+    SENDING_EMAIL_SUCCESS: "Email envoyé avec succès !",
 
     // checks errors
     FIRSTNAME_SPECIFY: "Veuillez renseignez votre nom",
@@ -105,8 +105,8 @@ export default {
     // login
     LOGIN_TITLE: "Connexion",
     LOGIN_DESC: "Veuillez remplir les champs ci-dessous pour vous connecter",
-    FORGOT_PASSWORD: "Mot de passe oublié",
-    LOGIN_SUCCESS: "Connecté avec succès",
+    FORGOT_PASSWORD: "Mot de passe oublié ?",
+    LOGIN_SUCCESS: "Connecté avec succès !",
 
     // main screen
     STARTING_POINT: "Départ",
