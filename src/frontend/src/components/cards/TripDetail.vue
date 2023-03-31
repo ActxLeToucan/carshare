@@ -101,7 +101,7 @@
             </div>
         </div>
         <div
-            v-show="!editMode"
+            v-show="!editMode && (User.CurrentUser.id !== trip?.driver?.id || isPast)"
             class="flex w-full justify-center items-center my-4"
         >
             <button-block :action="bookTrip">
@@ -109,7 +109,7 @@
             </button-block>
         </div>
         <div
-            v-show="editMode"
+            v-show="editMode && (User.CurrentUser.id === trip?.driver?.id)"
             class="flex w-full justify-end items-center my-4"
         >
             <button-block
@@ -139,14 +139,12 @@ import { Log, LogZone } from "../../scripts/Logs";
 import {
     UserIcon
 } from '@heroicons/vue/24/outline';
-import CardBadge from './CardBadge.vue';
 
 export default {
     name: "TripDetail",
     components: {
         ButtonBlock,
-        UserIcon,
-        CardBadge
+        UserIcon
     },
     props: {
         tripId: {
