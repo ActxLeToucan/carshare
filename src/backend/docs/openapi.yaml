@@ -916,12 +916,15 @@ paths:
               properties:
                 maxPassengers:
                   type: integer
+                  required: false
                   example: 10
                 price:
                   type: integer
+                  required: false
                   example: 78
                 description:
                   type: string
+                  required: false
                   example: Voyage non fumeur
                 steps:
                   type: array
@@ -1074,6 +1077,79 @@ paths:
                     example: Id is invalid.
         '401':
           $ref: '#/components/responses/noToken'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+    patch:
+      summary: Update travel
+      description: Update a travel of the current user.
+      operationId: updateMyTravel
+      tags:
+        - Travels
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - name: id
+          in: path
+          description: Travel id
+          required: true
+          schema:
+            type: integer
+            example: 1
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        description: Travel to update
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                maxPassengers:
+                  type: integer
+                  required: false
+                  example: 10
+                price:
+                  type: integer
+                  required: false
+                  example: 78
+                description:
+                  type: string
+                  required: false
+                  example: Voyage non fumeur
+                steps:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/StepInput'
+      responses:
+        '200':
+          description: Travel updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Travel updated"
+                  travel:
+                    $ref: '#/components/schemas/PublicTravel'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Invalid id"
+        '401':
+          $ref: '#/components/responses/noToken'
+        '403':
+          $ref: '#/components/responses/insufficientPrivileges'
+        '404':
+          $ref: '#/components/responses/travelNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':

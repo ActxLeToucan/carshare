@@ -968,7 +968,7 @@ const info = {
             },
             code: 200
         }),
-        cancelled: (req: Request, user: User) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        cancelled: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Réservation annulée',
                 en: 'Booking cancelled'

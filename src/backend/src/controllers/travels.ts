@@ -6,6 +6,7 @@ import { displayableTravel, displayableUserPublic, error, info, sendMsg } from '
 import properties from '../properties';
 import { getMaxPassengers, preparePagination } from './_common';
 import moment from 'moment-timezone';
+import * as _travel from './travels/_common';
 
 exports.searchTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { date, startCity, startContext, endCity, endContext } = req.query;
@@ -237,6 +238,13 @@ exports.getTravel = (req: express.Request, res: express.Response, _: express.Nex
             sendMsg(req, res, error.generic.internalError);
         });
     }).catch(err => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
+}
+
+exports.updateTravel = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    _travel.update(req, res, true).catch((err) => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
     });
