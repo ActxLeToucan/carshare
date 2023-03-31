@@ -133,7 +133,7 @@ function onValidate(modal) {
         };
 
         API.execute(API.ROUTE.SIGNUP, API.METHOD.POST, userInfos, API.TYPE.JSON).then(res => {
-            log.update(Lang.CurrentLang.REGISTER_SUCCESS + " !", Log.SUCCESS);
+            log.update(Lang.CurrentLang.REGISTER_SUCCESS, Log.SUCCESS);
 
             const user = new User(res.user);
             user.setInformations({token: res.token});
@@ -141,7 +141,7 @@ function onValidate(modal) {
 
             const email_log = modal.log(Lang.CurrentLang.SENDING_EMAILVERIF + " ...", Log.INFO);
             API.execute_logged(API.ROUTE.VERIFY, API.METHOD.POST, user.getCredentials(), {email: userInfos.email}, API.TYPE.JSON).then(res => {
-                email_log.update(Lang.CurrentLang.SENDING_EMAIL_SUCCESS + " !", Log.SUCCESS);
+                email_log.update(Lang.CurrentLang.SENDING_EMAIL_SUCCESS, Log.SUCCESS);
 
                 setTimeout(() => {
                     log.delete();
