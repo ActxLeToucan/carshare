@@ -40,6 +40,15 @@ export default {
     VALIDATION_SUCCESS: "Account validated successfully !\nYou can close this page.",
     VALIDATION_NO_TOKEN: "No token provided in the link,\nplease check the link you received by email.",
 
+    // reinit password page
+    REINIT_PASSWORD_TITLE: "Reset password",
+    REINIT_NO_TOKEN: "No token provided in the link",
+    PASSWORD_REINIT_SUCCESS: "Password reset successfully !",
+
+    // Recovery page (forgot password)
+    RECOVERY_TITLE: "You forgot your password ?",
+    RECOVERY_DESC: "No problem ! We will send you an email to reset your password.",
+
     // actions
     LOGIN: "Login",
     REGISTER: "Register",

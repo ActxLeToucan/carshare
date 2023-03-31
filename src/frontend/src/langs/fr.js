@@ -40,6 +40,15 @@ export default {
     VALIDATION_SUCCESS: "Compte validé avec succès !\nVous pouvez fermer cette page.",
     VALIDATION_NO_TOKEN: "Aucun token n'a été fourni dans le lien,\nveuillez vérifier le lien que vous avez reçu par email.",
 
+    // reinit password page
+    REINIT_PASSWORD_TITLE: "Réinitialisation du mot de passe",
+    REINIT_NO_TOKEN: "Aucun token de réinitialisation n'a été fourni",
+    PASSWORD_REINIT_SUCCESS: "Mot de passe réinitialisé avec succès !",
+
+    // Recovery page (forgot password)
+    RECOVERY_TITLE: "Vous avez oublié votre mot de passe ?",
+    RECOVERY_DESC: "Pas de soucis ! Nous vous enverrons un mail pour le réinitialiser.",
+
     // actions
     LOGIN: "Se connecter",
     REGISTER: "S'inscrire",

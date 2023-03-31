@@ -5,7 +5,7 @@
             <card-modal
                 :oncancel="onCancel"
                 :onvalidate="onValidate"
-                title="Mot de passe oublié"
+                :title="lang.FORGOT_PASSWORD"
             >
                 <div class="py-4">
                     <p class="text-lg font-semibold text-slate-500">
@@ -17,8 +17,8 @@
                 </div>
                 <input-text
                     name="email"
-                    label="Email"
-                    placeholder="Adresse mail"
+                    :label="lang.EMAIL"
+                    :placeholder="lang.EMAIL"
                     type="email"
                 />
             </card-modal>
@@ -33,9 +33,10 @@ import InputText from '../components/inputs/InputText.vue';
 import { Log } from '../scripts/Logs';
 import User from '../scripts/User';
 import API from '../scripts/API';
+import Lang from '../scripts/Lang';
 
 const field_checks = [
-    {field: "email",            check: (value) => value.length > 0, error: "Veuillez renseignez votre adresse email."}
+    {field: "email",            check: (value) => value.length > 0, error: lang.EMAIL_SPECIFY}
 ];
 
 function onCancel(modal) {
@@ -44,7 +45,7 @@ function onCancel(modal) {
 
 function onValidate(modal) {
     return new Promise((resolve, reject) => {
-        const log = modal.log("Vérification des entrées ...", Log.INFO);
+        const log = modal.log(Lang.CurrentLang + " ...", Log.INFO);
         for (let i = 0; i < field_checks.length; i++) {
             const check = field_checks[i];
             const result = check.check(modal.get(check.field), modal);
@@ -56,7 +57,7 @@ function onValidate(modal) {
                 return;
             }
         }
-        log.update("Envoi des données ...", Log.INFO);
+        log.update(Lang.CurrentLang.DATA_SENDING + " ...", Log.INFO);
 
         const payload = modal.getPayload();
         const data = { email: payload.email };
@@ -69,7 +70,7 @@ function onValidate(modal) {
                 resolve(true);
             }, 6000);
         }).catch(err => {
-            log.update("Erreur : " + err.message, Log.ERROR);
+            log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
             
             setTimeout(() => {
                 log.delete();
@@ -87,7 +88,7 @@ export default {
         InputText
     },
     data() {
-        return { User }
+        return { User, lang: Lang.CurrentLang }
     },
     methods: {
         onCancel,
