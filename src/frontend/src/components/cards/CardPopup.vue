@@ -42,6 +42,8 @@
                 <button-block
                     v-show="showValidate"
                     ref="btn-validate"
+                    :disabled="disableValidate"
+                    :action="execOnValidate"
                     :color="color"
                 >
                     {{ validateLabel }}
@@ -95,6 +97,11 @@ export default {
             default: true,
             required: false
         },
+        disableValidate: {
+            type: [Boolean, String],
+            default: true,
+            required: false
+        },
         oncancel: {
             type: Function,
             default: () => true,
@@ -142,14 +149,6 @@ export default {
         this.$refs["btn-cancel"].$el.addEventListener("click", () => {
             executeAfter(
                 this.cancel?.(this),
-                res => {
-                    if (res) this.hide();
-                }
-            );
-        });
-        this.$refs["btn-validate"].$el.addEventListener("click", () => {
-            executeAfter(
-                this.validate?.(this),
                 res => {
                     if (res) this.hide();
                 }
@@ -212,6 +211,14 @@ export default {
         setTitle(title) {
             this.m_title = title;
         },
+        execOnValidate() {
+            executeAfter(
+                this.validate?.(this),
+                res => {
+                    if (res) this.hide();
+                }
+            );
+        }
     }
 }
 </script>
