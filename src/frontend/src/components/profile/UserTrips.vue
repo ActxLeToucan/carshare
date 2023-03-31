@@ -4,10 +4,10 @@
             {{ lang.MY_TRIPS }}
         </p>
 
-        <div class="flex grow h-fit flex-col space-y-4 mx-10 min-w-0 max-w-full">
+        <div class="flex grow h-fit flex-col space-y-4 md:mx-10 mx-2 min-w-0 max-w-full">
             <div class="flex flex-col w-full h-fit min-w-0">
                 <p class="text-2xl text-slate-500 dark:text-slate-400 font-semibold"> {{ lang.FUTURE_TRIPS }} </p>
-                <div class="flex grow h-fit p-4 min-w-0 max-w-full">
+                <div class="flex grow h-fit md:p-4 py-4 px-2 min-w-0 max-w-full">
                     <div class="flex h-fit w-full space-x-4 overflow-x-auto min-w-0 max-w-full">
                         <future-trip-card
                             v-for="trip in futureTrips"
