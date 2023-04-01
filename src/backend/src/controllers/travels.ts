@@ -2,7 +2,7 @@ import type express from 'express';
 import { prisma } from '../app';
 import * as validator from '../tools/validator';
 import { checkTravelHours } from '../tools/validator';
-import { displayableTravel, displayableUserPublic, error, info, sendMsg } from '../tools/translator';
+import { displayableTravel, displayableUserPublic, error, info, notifs, notify, sendMsg } from '../tools/translator';
 import properties from '../properties';
 import { getMaxPassengers, preparePagination } from './_common';
 import moment from 'moment-timezone';

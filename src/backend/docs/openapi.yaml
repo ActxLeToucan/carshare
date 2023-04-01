@@ -1233,6 +1233,24 @@ paths:
                   message:
                     type: string
                     example: Travel deleted
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Invalid id
+        '401':
+          $ref: '#/components/responses/noToken'
+        '403':
+          $ref: '#/components/responses/insufficientPrivileges'
+        '404':
+          $ref: '#/components/responses/travelNotFound'
+        '500':
+          $ref: '#/components/responses/internalError'
 
   /settings:
     get:
