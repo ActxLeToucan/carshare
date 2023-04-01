@@ -765,6 +765,22 @@ const error = {
             },
             code: 400
         })
+    },
+    time: {
+        invalid: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Heure invalide.',
+                en: 'Invalid time.'
+            },
+            code: 400
+        }),
+        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Heure requise.',
+                en: 'Time required.'
+            },
+            code: 400
+        })
     }
 } satisfies TranslationsMessageHTTP;
 

@@ -9,19 +9,46 @@ import moment from 'moment-timezone';
 import * as _travel from './travels/_common';
 
 exports.searchTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const { date, startCity, startContext, endCity, endContext } = req.query;
+    const { date, time, startCity, startContext, endCity, endContext } = req.query;
+
     if (!validator.checkCityField(startCity, req, res, 'startCity')) return;
     if (!validator.checkCityField(endCity, req, res, 'endCity')) return;
-    if (!validator.checkDateField(date, true, req, res)) return;
+    if (!validator.checkDateField(date, false, req, res)) return;
     if (startContext !== undefined && !validator.checkStringField(startContext, req, res, 'startContext')) return;
     if (endContext !== undefined && !validator.checkStringField(endContext, req, res, 'endContext')) return;
+
+    let timeSanitized;
+    if (time !== undefined) {
+        timeSanitized = validator.sanitizeTime(time, req, res);
+        if (timeSanitized === null) return;
+    }
 
     const startCtx = startContext === undefined ? '' : startContext;
     const endCtx = endContext === undefined ? '' : endContext;
 
     const d = new Date(date as string);
-    const date1 = moment(d).subtract(4, 'hour').toDate();
-    const date2 = moment(d).add(18, 'hour').toDate();
+    let date1, date2;
+    if (timeSanitized === undefined) {
+        // check if the date is not before today + 24h
+        if (!checkTravelHours(d)) {
+            sendMsg(req, res, error.date.tooSoon, moment().add(properties.travel.hoursLimit, 'hours').toDate(), res.locals.user.timezone);
+            return;
+        }
+        date1 = d;
+        date2 = moment(d).add(1, 'day').toDate();
+    } else {
+        // add time to date
+        const dt = moment(d).add(timeSanitized.hours(), 'hours').add(timeSanitized.minutes(), 'minutes');
+        // check if the date is not before today + 24h
+        if (!checkTravelHours(dt.toDate())) {
+            sendMsg(req, res, error.date.tooSoon, moment().add(properties.travel.hoursLimit, 'hours').toDate(), res.locals.user.timezone);
+            return;
+        }
+        // search for 4h before and 18h after
+        date1 = moment(dt).subtract(4, 'hour').toDate();
+        date2 = moment(dt).add(18, 'hour').toDate();
+    }
+    console.log(date1, date2);
 
     prisma.$queryRaw`select t.*,
                             u.id              as 'driver.id',
