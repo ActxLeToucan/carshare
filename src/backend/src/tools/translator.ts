@@ -482,6 +482,20 @@ const error = {
             },
             code: 400
         }),
+        creatorMember: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Vous ne pouvez pas être un membre du groupe que vous avez créé.',
+                en: 'You cannot be a member of the group you created.'
+            },
+            code: 400
+        }),
+        alreadyMember: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'L\'utilisateur est déjà dans le groupe.',
+                en: 'The user is already in the group.'
+            },
+            code: 400
+        }),
         requiredId: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Le champs groupeId est requis',
@@ -899,6 +913,16 @@ const info = {
             msg: {
                 fr: 'Groupe créé',
                 en: 'Group created'
+            },
+            code: 201,
+            data: {
+                group: displayableGroup(group)
+            }
+        }),
+        userAdd: (req: Request, group: Group & { users: User[], creator: User }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Utilisateur ajouté',
+                en: 'User added'
             },
             code: 201,
             data: {
@@ -1344,6 +1368,18 @@ const notifs = {
             message: {
                 fr: `Le groupe ${oldName} a été renommé en ${newName}.`,
                 en: `The group ${oldName} has been renamed as ${newName}.`
+            },
+            type: 'standard',
+            createdAt: new Date()
+        }),
+        userAdded: (user: User, group: Group, creator: User) => msgForLang<TemplateNotif, Notif>(user.lang, {
+            title: {
+                fr: 'Ajout dans un groupe',
+                en: 'Added to a group'
+            },
+            message: {
+                fr: `${creator.firstName ?? ''} ${creator.lastName ?? ''} vous a ajouté dans le groupe ${group.name}, vous recevrez toutes les notifications de ce groupe.`,
+                en: `${creator.firstName ?? ''} ${creator.lastName ?? ''} added you to the group ${group.name}, you will receive all notifications from this group.`
             },
             type: 'standard',
             createdAt: new Date()
