@@ -7,7 +7,7 @@ import properties from '../properties';
 import { getMaxPassengers, preparePagination } from './_common';
 import moment from 'moment-timezone';
 import * as _travel from './travels/_common';
-import { Booking, type Group, type User } from '@prisma/client';
+import { type Group, type User } from '@prisma/client';
 
 exports.searchTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { date, time, startCity, startContext, endCity, endContext } = req.query;
@@ -49,7 +49,6 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
         date1 = moment(dt).subtract(4, 'hour').toDate();
         date2 = moment(dt).add(18, 'hour').toDate();
     }
-    console.log(date1, date2);
 
     prisma.$queryRaw`select t.*,
                             u.id              as 'driver.id',
@@ -87,7 +86,8 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
                        and IF(${startCtx} = '', true, dep.context = ${startCtx})
                        and IF(${endCtx} = '', true, arr.context = ${endCtx})
                        and dep.date BETWEEN ${date1} and ${date2}
-                       and t.groupId is null`
+                       and (t.groupId in (select groupId from _users where B = ${res.locals.user.id})
+                         or t.groupId is null)`
         .then(async (data: any) => {
             for (const travel of data) {
                 for (const key of Object.keys(travel)) {
