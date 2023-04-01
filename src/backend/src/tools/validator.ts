@@ -444,9 +444,9 @@ function checkLatField (value: any, req: express.Request, res: express.Response)
  * @param fieldName Name of the field
  * @returns true if the value is valid, false otherwise
  */
-function checkDescriptionField (value: any, req: express.Request, res: express.Response, fieldName: string): boolean {
+function checkDescriptionField (value: any, req: express.Request, res: express.Response): boolean {
     if (typeof value !== 'string' && value !== undefined && value !== null) {
-        sendMsg(req, res, error.string.type, fieldName);
+        sendMsg(req, res, error.string.type, 'description');
         return false;
     }
     return true;
@@ -502,7 +502,7 @@ function checkDatesOrder (date1: any, date2: any, req: express.Request, res: exp
  * If the user has already a travel, send an error message to the client
  * @param dateMin Date to check
  * @param dateMax Date to check
- * @param steps
+ * @param steps Steps of an existing travel
  * @param req Express request
  * @param res Express response
  * @returns true if the user doesn't have a trip , false otherwise
@@ -561,6 +561,8 @@ function checkStepList (steps: any, req: express.Request, res: express.Response)
         if (!checkStringField(steps[step].context, req, res, 'context')) return false;
         if (!checkLatField(steps[step].lat, req, res)) return false;
         if (!checkLngField(steps[step].lng, req, res)) return false;
+
+        if (steps[step].id !== undefined && typeof steps[step].id !== 'number') return false;
 
         incr += 1;
     }

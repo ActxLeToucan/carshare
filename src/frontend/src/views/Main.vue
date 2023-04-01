@@ -97,11 +97,18 @@
                             <span class="md:block hidden bg-teal-600 w-1 h-14 rounded-lg" />
                             <div class="flex md:flex-row flex-col md:space-x-2 md:space-y-2 space-y-0 w-min">
                                 <input-text
-                                    name="datetime"
+                                    name="date"
                                     class="w-48 mx-auto max-w-fit"
                                     placeholder="date"
                                     dark="true"
-                                    type="datetime-local"
+                                    type="date"
+                                />
+                                <input-text
+                                    name="time"
+                                    class="w-48 mx-auto max-w-fit"
+                                    placeholder="date"
+                                    dark="true"
+                                    type="time"
                                 />
                             </div>
                             <span class="md:block hidden bg-teal-600 w-1 h-14 rounded-lg" />
@@ -325,7 +332,7 @@ export default {
 
         this.startInput = this.$el.querySelector('input[name="startingpoint"]');
         this.endInput = this.$el.querySelector('input[name="endingpoint"]');
-        this.dateInput = this.$el.querySelector('input[name="datetime"]');
+        this.dateInput = this.$el.querySelector('input[name="date"]');
         this.startSelector = this.$refs["startSelector"];
         this.endSelector = this.$refs["endSelector"];
 
@@ -338,8 +345,6 @@ export default {
         this.endSelector.attachInput(this.endInput);
 
         this.logZone = new LogZone(this.$refs["log-zone"]);
-
-        window.action = () => { this.selectTrip(9); }
     },
     methods: {
         onstartselected(city) {
@@ -385,7 +390,8 @@ export default {
         },
         searchTrips() {
             const msg_log = this.log(Lang.CurrentLang.INPUT_VERIFICATION, Log.INFO);
-            const input_date = document.querySelector("input[name=datetime]");
+            const input_date = document.querySelector("input[name=date]");
+            const input_time = document.querySelector("input[name=time]");
             const input_start = document.querySelector("input[name=startingpoint]");
             const input_end = document.querySelector("input[name=endingpoint]");
 
@@ -401,13 +407,18 @@ export default {
                     msg_log.update(check.msg, Log.WARNING);
                     check.field.focus();
                     setTimeout(() => { msg_log.delete(); }, 6000);
-                    return;
+                    // return;
                 }
+            }
+
+            let input = input_date.value;
+            if (input_time.value != '') {
+                input = input + 'T' + input_time.value;
             }
 
             msg_log.update(Lang.CurrentLang.SEARCHING + " ...", Log.INFO);
             API.execute_logged(API.ROUTE.TRAVELS.SEARCH + API.createParameters({
-                date: new Date(input_date.value).toISOString(),
+                date: new Date(input).toISOString(),
                 startCity: this.startCity.value,
                 endCity: this.endCity.value,
                 startContext: this.startCity.desc,

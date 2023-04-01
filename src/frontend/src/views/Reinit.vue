@@ -5,7 +5,7 @@
             <card-modal
                 :oncancel="onCancel"
                 :onvalidate="onValidate"
-                title="Réinitialiser le mot de passe"
+                :title="lang.REINIT_PASSWORD_TITLE"
             >
                 <div class="py-4">
                     <p class="text-lg font-semibold text-slate-500">
@@ -14,13 +14,14 @@
                 </div>
                 <input-text
                     name="password"
-                    label="Mot de passe"
+                    :label="lang.PASSWORD"
+                    :placeholder="lang.PASSWORD"
                     type="password"
                 />
                 <input-text
                     name="password-confirm"
-                    label="Confirmation"
-                    placeholder="Confirmation du mot de passe"
+                    :label="lang.PASSWORD_CONFIRM"
+                    :placeholder="lang.PASSWORD_CONFIRM"
                     type="password"
                 />
             </card-modal>
@@ -35,6 +36,7 @@ import InputText from '../components/inputs/InputText.vue';
 import { Log } from '../scripts/Logs';
 import User from '../scripts/User';
 import API from '../scripts/API';
+import Lang from '../scripts/Lang';
 
 function isPhoneNumber(val) {
     if (!val) return false;
@@ -48,8 +50,8 @@ const genres = [
 ];
 
 const field_checks = [
-    {field: "password",         check: (value) => value.length > 0, error: "Veuillez renseignez votre mot de passe."},
-    {field: "password-confirm", check: (value) => value.length > 0, error: "Veuillez confirmer votre mot de passe."},
+    {field: "password",         check: (value) => value.length > 0, error: Lang.CurrentLang.PASSWORD_SPECIFY},
+    {field: "password-confirm", check: (value) => value.length > 0, error: Lang.CurrentLang.PASSWORD_CONFIRM_SPECIFY},
 
     {field: "password-confirm", check: (value, modal) => value === modal.get("password"), error: "Les mots de passe ne correspondent pas."},
     {field: "password",         check: (value) => value.length >= 10,                     error: "Le mot de passe doit faire au moins 10 caractères."},
@@ -65,7 +67,7 @@ function onCancel(modal) {
 
 function onValidate(modal) {
     return new Promise((resolve, reject) => {
-        const log = modal.log("Vérification des entrées ...", Log.INFO);
+        const log = modal.log(Lang.CurrentLang.INPUT_VERIFICATION + " ...", Log.INFO);
         for (let i = 0; i < field_checks.length; i++) {
             const check = field_checks[i];
             const result = check.check(modal.get(check.field), modal);
@@ -77,14 +79,14 @@ function onValidate(modal) {
                 return;
             }
         }
-        log.update("Envoi des données ...", Log.INFO);
+        log.update(Lang.CurrentLang.DATA_SENDING + " ...", Log.INFO);
 
         const payload = modal.getPayload();
         const data = { "password": payload.password };
         const token = modal.$route.query.token;
         
         if (!token) {
-            log.update("Erreur : Aucun token de réinitialisation n'a été fourni.", Log.ERROR);
+            log.update(Lang.CurrentLang.ERROR + " : " + Lang.CurrentLang.REINIT_NO_TOKEN, Log.ERROR);
             setTimeout(() => { log.delete(); }, 4000);
             resolve(false);
             return;
@@ -92,7 +94,7 @@ function onValidate(modal) {
         const creds = new API.Credentials({token: "bearer " + token, type: API.Credentials.TYPE.TOKEN});
 
         API.execute_logged(API.ROUTE.RESETPWD, API.METHOD.PATCH, creds, data, API.TYPE.JSON).then(res => {
-            log.update("Mot de passe réinitialisé avec succès !", Log.SUCCESS);
+            log.update(Lang.CurrentLang.PASSWORD_REINIT_SUCCESS, Log.SUCCESS);
 
             setTimeout(() => {
                 log.delete();
@@ -117,7 +119,7 @@ export default {
         InputText,
     },
     data() {
-        return { User, genres }
+        return { User, genres, lang: Lang.CurrentLang }
     },
     methods: {
         onCancel,
