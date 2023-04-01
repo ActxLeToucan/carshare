@@ -208,6 +208,10 @@ export default {
     FUTURE_TRIPS: "Trajets futurs",
     PAST_TRIPS: "Trajets passés",
     CANCEL_TRIP: "Annuler le trajet",
+    LOADING_TRIP: "Chargement du trajet",
+    LOADING_TRIP_DESC: "Veuillez patienter pendant que nous chargeons les informations du trajet",
+    LOADING_TRIPS: "Chargement des trajets",
+    LOADING_TRIPS_DESC: "Chargement de tous vos trajets",
 
     // booking
     BOOKING_DOESNT_EXIST_ANYMORE: "Cette réservation n'existe plus.",

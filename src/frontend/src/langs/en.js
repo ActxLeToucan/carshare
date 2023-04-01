@@ -208,6 +208,10 @@ export default {
     FUTURE_TRIPS: "Future trips",
     PAST_TRIPS: "Past trips",
     CANCEL_TRIP: "Cancel trip",
+    LOADING_TRIP: "Loading trip",
+    LOADING_TRIP_DESC: "Please wait while we load the trip informations",
+    LOADING_TRIPS: "Loading trips",
+    LOADING_TRIPS_DESC: "Loading all your trips",
 
     // booking
     BOOKING_DOESNT_EXIST_ANYMORE: "This booking doesn't exist anymore.",
