@@ -747,10 +747,10 @@ const error = {
             },
             code: 400
         }),
-        alreadyBooked: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        sameTime: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Vous avez déjà réservé ce trajet.',
-                en: 'You have already booked this travel.'
+                fr: 'Vous avez une autre réservation durant cette période.',
+                en: 'You have another booking during this period.'
             },
             code: 400
         })

@@ -2,7 +2,7 @@ import type express from 'express';
 import * as validator from '../../tools/validator';
 import { prisma } from '../../app';
 import { error, info, notifs, notify, sendMsg } from '../../tools/translator';
-import { checkTravelHoursEditable } from '../../tools/validator';
+import { checkTravelHours, checkTravelHoursEditable } from '../../tools/validator';
 import { getMaxPassengers, preparePagination } from '../_common';
 import properties from '../../properties';
 
@@ -26,7 +26,7 @@ exports.createBooking = (req: express.Request, res: express.Response, _: express
             },
             driver: true
         }
-    }).then(async (travel) => {
+    }).then((travel) => {
         if (travel === null) {
             sendMsg(req, res, error.travel.notFound);
             return;
@@ -37,7 +37,10 @@ exports.createBooking = (req: express.Request, res: express.Response, _: express
             return;
         }
 
-        if (!checkTravelHoursEditable(travel.steps[0].date, req, res)) return;
+        if (!checkTravelHours(travel.steps[0].date)) {
+            sendMsg(req, res, error.date.tooSoon, travel.steps[0].date, res.locals.user.timezone);
+            return;
+        }
 
         const startStepIndex = travel.steps.findIndex((s) => s.id === departureIdSanitized);
         const endStepIndex = travel.steps.findIndex((s) => s.id === arrivalIdSanitized);
@@ -45,24 +48,6 @@ exports.createBooking = (req: express.Request, res: express.Response, _: express
         const endStep = travel.steps[endStepIndex];
         if (startStep === undefined || endStep === undefined) {
             sendMsg(req, res, error.travel.invalidSteps);
-            return;
-        }
-
-        // check if there is a place left in the car
-        try {
-            const count: any = await getMaxPassengers(travelIdSanitized, startStep, endStep);
-            const passengers = Number(count[0].nbPassengers);
-            if (Number.isNaN(passengers)) {
-                throw new Error('Error while getting the number of passengers in the trip');
-            }
-
-            if (passengers >= travel.maxPassengers) {
-                sendMsg(req, res, error.travel.noSeats);
-                return;
-            }
-        } catch (e) {
-            console.error(e);
-            sendMsg(req, res, error.generic.internalError);
             return;
         }
 
@@ -105,37 +90,63 @@ exports.createBooking = (req: express.Request, res: express.Response, _: express
             });
         };
 
-        const userStepsIds = Array.from(travel.steps).splice(startStepIndex, endStepIndex - startStepIndex + 1).map((e) => e.id);
-        const arrivalAndDepartures: object[] = [];
-        userStepsIds.forEach((id) => {
-            arrivalAndDepartures.push({ arrivalId: id });
-            arrivalAndDepartures.push({ departureId: id });
-        });
-
+        // check if there is no other booking in the same time for the same user
         prisma.booking.count({
             where: {
                 AND: [
                     { passengerId: res.locals.user.id },
                     {
-                        status: {
-                            not: properties.booking.status.cancelled
-                        }
+                        OR: [
+                            { status: properties.booking.status.pending },
+                            { status: properties.booking.status.accepted }
+                        ]
                     },
                     {
-                        status: {
-                            not: properties.booking.status.rejected
-                        }
-                    },
-                    {
-                        OR: arrivalAndDepartures
+                        OR: [
+                            {
+                                departure: {
+                                    date: {
+                                        gte: startStep.date,
+                                        lte: endStep.date
+                                    }
+                                }
+                            },
+                            {
+                                arrival: {
+                                    date: {
+                                        gte: startStep.date,
+                                        lte: endStep.date
+                                    }
+                                }
+                            }
+                        ]
                     }
                 ]
             }
-        }).then((nb) => {
+        }).then(async (nb) => {
             if (nb > 0) {
-                sendMsg(req, res, error.booking.alreadyBooked);
+                sendMsg(req, res, error.booking.sameTime);
                 return;
             }
+
+            // check if there is a place left in the car
+            try {
+                const count: any = await getMaxPassengers(travelIdSanitized, startStep, endStep);
+                const passengers = Number(count[0].nbPassengers);
+                if (Number.isNaN(passengers)) {
+                    throw new Error('Error while getting the number of passengers in the trip');
+                }
+
+                if (passengers >= travel.maxPassengers) {
+                    sendMsg(req, res, error.travel.noSeats);
+                    return;
+                }
+            } catch (e) {
+                console.error(e);
+                sendMsg(req, res, error.generic.internalError);
+                return;
+            }
+
             addBooking();
         }).catch(err => {
             console.error(err);
