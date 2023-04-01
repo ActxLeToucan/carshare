@@ -1,11 +1,11 @@
 import type express from 'express';
-import * as validator from '../../tools/validator';
-import { checkTravelHours } from '../../tools/validator';
+import validator from '../../tools/validator';
 import { prisma } from '../../app';
 import { error, info, notifs, notify, sendMsg } from '../../tools/translator';
 import { getMaxPassengers } from '../_common';
 import { type Booking, type Step } from '@prisma/client';
 import properties from '../../properties';
+import sanitizer from '../../tools/sanitizer';
 
 /**
  * Update a travel
@@ -15,14 +15,14 @@ import properties from '../../properties';
  * @param asAdmin Weather to update as an admin or not
  */
 async function update (req: express.Request, res: express.Response, asAdmin: boolean) {
-    const travelId = validator.sanitizeId(req.params.id, req, res);
+    const travelId = sanitizer.id(req.params.id, req, res);
     if (travelId === null) return;
 
     const { maxPassengers, price, description, steps } = req.body;
 
-    if (maxPassengers !== undefined && !validator.checkMaxPassengersField(maxPassengers, req, res)) return;
-    if (price !== undefined && !validator.checkPriceField(price, req, res)) return;
-    if (description !== undefined && !validator.checkDescriptionField(description, req, res)) return;
+    if (maxPassengers !== undefined && !validator.maxPassengers(maxPassengers, req, res)) return;
+    if (price !== undefined && !validator.price(price, req, res)) return;
+    if (description !== undefined && !validator.description(description, req, res)) return;
 
     if (!validator.checkStepList(steps, req, res)) return;
 
@@ -52,7 +52,7 @@ async function update (req: express.Request, res: express.Response, asAdmin: boo
 
     // Check if the travel is editable
     const firstStep = travel.steps.at(0);
-    if (firstStep !== undefined && !checkTravelHours(firstStep.date)) {
+    if (firstStep !== undefined && !validator.checkTravelHours(firstStep.date)) {
         sendMsg(req, res, error.travel.notModifiable);
         return;
     }

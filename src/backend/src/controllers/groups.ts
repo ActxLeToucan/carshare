@@ -1,12 +1,13 @@
 import type express from 'express';
 import { displayableGroup, error, info, sendMsg, type Notif, notifs, notify } from '../tools/translator';
-import * as validator from '../tools/validator';
+import validator from '../tools/validator';
 import { prisma } from '../app';
 import { type Pagination, preparePagination } from './_common';
+import sanitizer from '../tools/sanitizer';
 
 exports.createGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { name } = req.body;
-    if (!validator.checkGroupNameField(name, req, res)) return;
+    if (!validator.groupName(name, req, res)) return;
     prisma.group.create({
         data: {
             name,
@@ -36,8 +37,8 @@ exports.getMyGroups = (req: express.Request, res: express.Response, next: expres
 
 exports.modifyNameGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const groupName = req.body.groupName;
-    if (!validator.checkGroupNameField(groupName, req, res)) return;
-    const groupId = validator.sanitizeId(req.params.id, req, res);
+    if (!validator.groupName(groupName, req, res)) return;
+    const groupId = sanitizer.id(req.params.id, req, res);
     if (groupId === null) return;
     prisma.group.findUnique({
         where: {
@@ -131,9 +132,9 @@ function getGroups (req: express.Request, res: express.Response, next: express.N
 
 exports.addUserGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const email = req.body.email;
-    if (!validator.checkEmailField(email, req, res, false)) return;
+    if (!validator.email(email, req, res, false)) return;
 
-    const groupId = validator.sanitizeId(req.params.id, req, res);
+    const groupId = sanitizer.id(req.params.id, req, res);
     if (groupId === null) return;
 
     prisma.group.count({
@@ -223,7 +224,7 @@ exports.addUserGroup = (req: express.Request, res: express.Response, _: express.
 }
 
 exports.deleteGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const groupId = validator.sanitizeId(req.params.id, req, res);
+    const groupId = sanitizer.id(req.params.id, req, res);
     if (groupId === null) return;
 
     prisma.group.count({ where: { id: groupId } })

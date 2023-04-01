@@ -1,26 +1,27 @@
 import type express from 'express';
 import { prisma } from '../app';
-import * as validator from '../tools/validator';
-import { checkTravelHours } from '../tools/validator';
+import validator from '../tools/validator';
+
 import { displayableTravel, displayableUserPublic, error, info, notifs, notify, sendMsg } from '../tools/translator';
 import properties from '../properties';
 import { getMaxPassengers, preparePagination } from './_common';
 import moment from 'moment-timezone';
 import * as _travel from './travels/_common';
 import { type Group, type User } from '@prisma/client';
+import sanitizer from '../tools/sanitizer';
 
 exports.searchTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { date, time, startCity, startContext, endCity, endContext } = req.query;
 
-    if (!validator.checkCityField(startCity, req, res, 'startCity')) return;
-    if (!validator.checkCityField(endCity, req, res, 'endCity')) return;
-    if (!validator.checkDateField(date, false, req, res)) return;
-    if (startContext !== undefined && !validator.checkStringField(startContext, req, res, 'startContext')) return;
-    if (endContext !== undefined && !validator.checkStringField(endContext, req, res, 'endContext')) return;
+    if (!validator.city(startCity, req, res, 'startCity')) return;
+    if (!validator.city(endCity, req, res, 'endCity')) return;
+    if (!validator.date(date, false, req, res)) return;
+    if (startContext !== undefined && !validator.typeString(startContext, req, res, 'startContext')) return;
+    if (endContext !== undefined && !validator.typeString(endContext, req, res, 'endContext')) return;
 
     let timeSanitized;
     if (time !== undefined) {
-        timeSanitized = validator.sanitizeTime(time, req, res);
+        timeSanitized = sanitizer.time(time, req, res);
         if (timeSanitized === null) return;
     }
 
@@ -31,7 +32,7 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
     let date1, date2;
     if (timeSanitized === undefined) {
         // check if the date is not before today + 24h
-        if (!checkTravelHours(d)) {
+        if (!validator.checkTravelHours(d)) {
             sendMsg(req, res, error.date.tooSoon, moment().add(properties.travel.hoursLimit, 'hours').toDate(), res.locals.user.timezone);
             return;
         }
@@ -41,7 +42,7 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
         // add time to date
         const dt = moment(d).add(timeSanitized.hours(), 'hours').add(timeSanitized.minutes(), 'minutes');
         // check if the date is not before today + 24h
-        if (!checkTravelHours(dt.toDate())) {
+        if (!validator.checkTravelHours(dt.toDate())) {
             sendMsg(req, res, error.date.tooSoon, moment().add(properties.travel.hoursLimit, 'hours').toDate(), res.locals.user.timezone);
             return;
         }
@@ -112,7 +113,7 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
 
             data = data.filter((travel: any) => {
                 return travel.passengers < travel.maxPassengers && // Check if there is still seats available
-                    checkTravelHours(travel.departure.date); // Check if the beginning of the travel is not too early
+                    validator.checkTravelHours(travel.departure.date); // Check if the beginning of the travel is not too early
             });
             data = data.sort((a: any, b: any) => {
                 const diffA = Math.abs(a.departure.date.getTime() - d.getTime());
@@ -130,9 +131,9 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
 exports.createTravel = async (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { maxPassengers, price, description, groupId, steps } = req.body;
 
-    if (!validator.checkMaxPassengersField(maxPassengers, req, res)) return;
-    if (!validator.checkPriceField(price, req, res)) return;
-    if (!validator.checkDescriptionField(description, req, res)) return;
+    if (!validator.maxPassengers(maxPassengers, req, res)) return;
+    if (!validator.price(price, req, res)) return;
+    if (!validator.description(description, req, res)) return;
 
     let group: (Group & { users: User[] }) | null = null;
     if (groupId !== undefined && groupId !== null) {
@@ -256,7 +257,7 @@ exports.getTravels = (req: express.Request, res: express.Response, _: express.Ne
 }
 
 exports.getTravel = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const travelId = validator.sanitizeId(req.params.id, req, res);
+    const travelId = sanitizer.id(req.params.id, req, res);
     if (travelId === null) return;
 
     prisma.travel.findUnique({

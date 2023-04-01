@@ -1,7 +1,8 @@
-import * as validator from '../../tools/validator';
+import validator from '../../tools/validator';
 import { prisma } from '../../app';
 import { error, info, sendMsg } from '../../tools/translator';
 import type express from 'express';
+import sanitizer from '../../tools/sanitizer';
 
 /**
  * Update a user
@@ -14,19 +15,19 @@ import type express from 'express';
 async function update (req: express.Request, res: express.Response, userId: number, asAdmin: boolean) {
     const { email, lastName, firstName, phone, hasCar, gender, mailNotif, level } = req.body;
 
-    if (email !== undefined && !validator.checkEmailField(email, req, res)) return;
-    if (lastName !== undefined && !validator.checkLastNameField(lastName, req, res)) return;
-    if (firstName !== undefined && !validator.checkFirstNameField(firstName, req, res)) return;
-    if (hasCar !== undefined && !validator.checkBooleanField(hasCar, req, res, 'hasCar')) return;
-    if (mailNotif !== undefined && !validator.checkBooleanField(mailNotif, req, res, 'mailNotif')) return;
-    if (asAdmin && level !== undefined && !validator.checkLevelField(level, req, res)) return;
+    if (email !== undefined && !validator.email(email, req, res)) return;
+    if (lastName !== undefined && !validator.lastname(lastName, req, res)) return;
+    if (firstName !== undefined && !validator.firstname(firstName, req, res)) return;
+    if (hasCar !== undefined && !validator.typeBoolean(hasCar, req, res, 'hasCar')) return;
+    if (mailNotif !== undefined && !validator.typeBoolean(mailNotif, req, res, 'mailNotif')) return;
+    if (asAdmin && level !== undefined && !validator.level(level, req, res)) return;
     let _phoneSanitized;
     if (phone !== undefined) {
-        _phoneSanitized = validator.sanitizePhone(phone, req, res);
+        _phoneSanitized = sanitizer.phone(phone, req, res);
         if (_phoneSanitized === null) return;
     }
     const phoneSanitized = _phoneSanitized;
-    const genderSanitized = validator.sanitizeGender(gender);
+    const genderSanitized = sanitizer.gender(gender);
 
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (user === null) {

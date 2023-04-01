@@ -13,7 +13,7 @@ import moment from 'moment-timezone';
  * @param checkFormat If true, check if the email is valid
  * @returns true if the email is valid, false otherwise
  */
-function checkEmailField (email: any, req: express.Request, res: express.Response, checkFormat: boolean = true): boolean {
+function email (email: any, req: express.Request, res: express.Response, checkFormat: boolean = true): boolean {
     if (email === undefined || email === '') {
         sendMsg(req, res, error.email.required);
         return false;
@@ -44,7 +44,7 @@ function checkEmailField (email: any, req: express.Request, res: express.Respons
  * @param checkFormat If true, check if the password is valid
  * @returns true if the password is valid, false otherwise
  */
-function checkPasswordField (password: any, req: express.Request, res: express.Response, checkFormat = true): boolean {
+function password (password: any, req: express.Request, res: express.Response, checkFormat = true): boolean {
     if (password === undefined || password === '') {
         sendMsg(req, res, error.password.required);
         return false;
@@ -90,7 +90,7 @@ function checkPasswordField (password: any, req: express.Request, res: express.R
  * @param res Express response
  * @returns true if the old password is valid, false otherwise
  */
-function checkOldPasswordField (oldPassword: any, req: express.Request, res: express.Response): boolean {
+function passwordOld (oldPassword: any, req: express.Request, res: express.Response): boolean {
     if (oldPassword === undefined || oldPassword === '') {
         sendMsg(req, res, error.oldPassword.required);
         return false;
@@ -110,7 +110,7 @@ function checkOldPasswordField (oldPassword: any, req: express.Request, res: exp
  * @param res Express response
  * @returns true if the lastname is valid, false otherwise
  */
-function checkLastNameField (lastname: any, req: express.Request, res: express.Response): boolean {
+function lastname (lastname: any, req: express.Request, res: express.Response): boolean {
     if (lastname === undefined || lastname === '') {
         sendMsg(req, res, error.lastname.required);
         return false;
@@ -138,7 +138,7 @@ function checkLastNameField (lastname: any, req: express.Request, res: express.R
  * @param res Express response
  * @returns true if the firstname is valid, false otherwise
  */
-function checkFirstNameField (firstname: any, req: express.Request, res: express.Response): boolean {
+function firstname (firstname: any, req: express.Request, res: express.Response): boolean {
     if (firstname === undefined || firstname === '') {
         sendMsg(req, res, error.firstname.required);
         return false;
@@ -166,7 +166,7 @@ function checkFirstNameField (firstname: any, req: express.Request, res: express
  * @param res Express response
  * @returns true if the level is valid, false otherwise
  */
-function checkLevelField (level: any, req: express.Request, res: express.Response): boolean {
+function level (level: any, req: express.Request, res: express.Response): boolean {
     if (level === undefined || level === '') {
         sendMsg(req, res, error.level.required);
         return false;
@@ -191,7 +191,7 @@ function checkLevelField (level: any, req: express.Request, res: express.Respons
  * @param fieldName Name of the field
  * @returns true if the value is valid, false otherwise
  */
-function checkBooleanField (value: any, req: express.Request, res: express.Response, fieldName: string): boolean {
+function typeBoolean (value: any, req: express.Request, res: express.Response, fieldName: string): boolean {
     if (value === undefined || value === '') {
         sendMsg(req, res, error.boolean.required, fieldName);
         return false;
@@ -211,7 +211,7 @@ function checkBooleanField (value: any, req: express.Request, res: express.Respo
  * @param res Express response
  * @returns true if the group name is valid, false otherwise
  */
-function checkGroupNameField (name: any, req: express.Request, res: express.Response): boolean {
+function groupName (name: any, req: express.Request, res: express.Response): boolean {
     if (name === undefined || name === '') {
         sendMsg(req, res, error.groupName.required);
         return false;
@@ -232,7 +232,7 @@ function checkGroupNameField (name: any, req: express.Request, res: express.Resp
  * @param res Express response
  * @returns true if the date is valid, false otherwise
  */
-function checkDateField (date: any, dateDays: boolean, req: express.Request, res: express.Response): boolean {
+function date (date: any, dateDays: boolean, req: express.Request, res: express.Response): boolean {
     if (date === undefined || date === '') {
         sendMsg(req, res, error.date.required);
         return false;
@@ -260,7 +260,7 @@ function checkDateField (date: any, dateDays: boolean, req: express.Request, res
  * @param fieldName Name of the field
  * @returns true if the city is valid, false otherwise
  */
-function checkCityField (name: any, req: express.Request, res: express.Response, fieldName: string): boolean {
+function city (name: any, req: express.Request, res: express.Response, fieldName: string): boolean {
     if (name === undefined || name === '') {
         sendMsg(req, res, error.city.required, fieldName);
         return false;
@@ -273,77 +273,6 @@ function checkCityField (name: any, req: express.Request, res: express.Response,
 }
 
 /**
- * Sanitize the phone number
- * If the phone is not valid, send an error message to the client
- * @param phone Phone to sanitize
- * @param req Express request
- * @param res Express response
- * @returns The phone number if it is valid, null otherwise
- */
-function sanitizePhone (phone: any, req: express.Request, res: express.Response): string | null {
-    if (phone === undefined || phone === '') {
-        sendMsg(req, res, error.phone.required);
-        return null;
-    }
-    if (typeof phone !== 'string') {
-        sendMsg(req, res, error.phone.type);
-        return null;
-    }
-    const num = phone.replace(/(\.|\s|-)/g, '').trim();
-    if (num.match(/^((00[0-9]{2})?0[0-9][0-9]{8}|\+[0-9]{11,12})$/) === null) {
-        sendMsg(req, res, error.phone.invalid);
-        return null;
-    }
-    return num;
-}
-
-/**
- * Sanitize the gender
- * @param gender Gender to sanitize
- * @returns Gender if it is valid, undefined otherwise
- */
-function sanitizeGender (gender: any): number | undefined {
-    if (typeof gender !== 'number') {
-        return undefined;
-    }
-    if (!properties.gender.values.includes(gender)) {
-        return undefined;
-    }
-    return gender;
-}
-
-/**
- * Sanitize the id of user
- * @param id id to sanitize
- * @param req Express request
- * @param res Express response
- * @returns The id number if it is valid, null otherwise
- */
-function sanitizeId (id: any, req: express.Request, res: express.Response): number | null {
-    if (id === '' || Number.isNaN(Number(id))) {
-        sendMsg(req, res, error.id.invalid);
-        return null;
-    }
-
-    return Number(id);
-}
-/**
- * Sanitize the type
- * @param type id to sanitize
- * @param req Express request
- * @param res Express response
- * @returns The type string if it is valid, null otherwise
- */
-function sanitizeType (type: any, req: express.Request, res: express.Response): string | undefined | null {
-    if (type !== 'past' && type !== 'future' && typeof type !== 'undefined') {
-        sendMsg(req, res, error.id.invalid);
-        return null;
-    }
-
-    return type;
-}
-
-/**
  * Check if a price field is valid
  * If the price is not valid, send an error message to the client
  * @param value Value to sanitize
@@ -351,7 +280,7 @@ function sanitizeType (type: any, req: express.Request, res: express.Response): 
  * @param res Express response
  * @returns true if the value is valid and a positive number, false otherwise
  */
-function checkPriceField (value: any, req: express.Request, res: express.Response): boolean {
+function price (value: any, req: express.Request, res: express.Response): boolean {
     if (typeof value !== 'number' && value !== undefined && value !== null) {
         sendMsg(req, res, error.number.type, 'price');
         return false;
@@ -372,7 +301,7 @@ function checkPriceField (value: any, req: express.Request, res: express.Respons
  * @param res Express response
  * @returns true if the value is valid, false otherwise
  */
-function checkMaxPassengersField (value: any, req: express.Request, res: express.Response): boolean {
+function maxPassengers (value: any, req: express.Request, res: express.Response): boolean {
     if (typeof value !== 'number' && value !== undefined && value !== null) {
         sendMsg(req, res, error.number.type, 'maxPassengers');
         return false;
@@ -393,7 +322,7 @@ function checkMaxPassengersField (value: any, req: express.Request, res: express
  * @param res Express response
  * @returns true if the value is valid and if the value is between -180 and 180, false otherwise
  */
-function checkLngField (value: any, req: express.Request, res: express.Response): boolean {
+function longitude (value: any, req: express.Request, res: express.Response): boolean {
     if (value === undefined || value === '') {
         sendMsg(req, res, error.number.required, 'lng');
         return false;
@@ -418,7 +347,7 @@ function checkLngField (value: any, req: express.Request, res: express.Response)
  * @param res Express response
  * @returns true if the value is valid and if the value is between -90 and 90, false otherwise
  */
-function checkLatField (value: any, req: express.Request, res: express.Response): boolean {
+function latitude (value: any, req: express.Request, res: express.Response): boolean {
     if (value === undefined || value === '') {
         sendMsg(req, res, error.number.required, 'lng');
         return false;
@@ -441,10 +370,9 @@ function checkLatField (value: any, req: express.Request, res: express.Response)
  * @param value Value to sanitize
  * @param req Express request
  * @param res Express response
- * @param fieldName Name of the field
  * @returns true if the value is valid, false otherwise
  */
-function checkDescriptionField (value: any, req: express.Request, res: express.Response): boolean {
+function description (value: any, req: express.Request, res: express.Response): boolean {
     if (typeof value !== 'string' && value !== undefined && value !== null) {
         sendMsg(req, res, error.string.type, 'description');
         return false;
@@ -461,7 +389,7 @@ function checkDescriptionField (value: any, req: express.Request, res: express.R
  * @param fieldName Name of the field
  * @returns true if the value is valid, false otherwise
  */
-function checkStringField (value: any, req: express.Request, res: express.Response, fieldName: string): boolean {
+function typeString (value: any, req: express.Request, res: express.Response, fieldName: string): boolean {
     if (value === undefined || value === '') {
         sendMsg(req, res, error.string.required, fieldName);
         return false;
@@ -483,7 +411,7 @@ function checkStringField (value: any, req: express.Request, res: express.Respon
  * @returns true if the date is in a good order, false otherwise
  */
 function checkDatesOrder (date1: any, date2: any, req: express.Request, res: express.Response): boolean {
-    if (!checkDateField(date2, true, req, res)) return false;
+    if (!date(date2, true, req, res)) return false;
 
     if (new Date(date1).getTime() === new Date(date2).getTime()) {
         sendMsg(req, res, error.date.identical);
@@ -550,17 +478,17 @@ function checkStepList (steps: any, req: express.Request, res: express.Response)
 
     let incr: number = 1;
     for (const step in steps) {
-        if (!checkDateField(steps[step].date, true, req, res)) return false;
+        if (!date(steps[step].date, true, req, res)) return false;
 
         if (step !== String(steps.length - 1)) {
             if (!checkDatesOrder(steps[step].date, steps[incr].date, req, res)) return false;
         }
 
-        if (!checkStringField(steps[step].label, req, res, 'label')) return false;
-        if (!checkStringField(steps[step].city, req, res, 'city')) return false;
-        if (!checkStringField(steps[step].context, req, res, 'context')) return false;
-        if (!checkLatField(steps[step].lat, req, res)) return false;
-        if (!checkLngField(steps[step].lng, req, res)) return false;
+        if (!typeString(steps[step].label, req, res, 'label')) return false;
+        if (!typeString(steps[step].city, req, res, 'city')) return false;
+        if (!typeString(steps[step].context, req, res, 'context')) return false;
+        if (!latitude(steps[step].lat, req, res)) return false;
+        if (!longitude(steps[step].lng, req, res)) return false;
 
         if (steps[step].id !== undefined && typeof steps[step].id !== 'number') return false;
 
@@ -577,7 +505,7 @@ function checkStepList (steps: any, req: express.Request, res: express.Response)
  * @param res Express response
  * @returns true if the value is valid, false otherwise
  */
-function checkNoteField (value: any, req: express.Request, res: express.Response): boolean {
+function note (value: any, req: express.Request, res: express.Response): boolean {
     if (value === undefined || value === '') {
         sendMsg(req, res, error.number.required, 'note');
         return false;
@@ -607,7 +535,7 @@ function checkNoteField (value: any, req: express.Request, res: express.Response
  * @param fieldName Name of the field
  * @returns true if the value is valid, false otherwise
  */
-function checkNumberField (value: any, req: express.Request, res: express.Response, fieldName: string): boolean {
+function typeNumber (value: any, req: express.Request, res: express.Response, fieldName: string): boolean {
     if (value === undefined || value === '') {
         sendMsg(req, res, error.number.required, fieldName);
         return false;
@@ -636,17 +564,6 @@ function checkTravelHoursEditable (date: Date, req: express.Request, res: expres
 }
 
 /**
- * Sanitize the timezone
- * @param timezone Timezone to sanitize
- * @returns the timezone if it is valid, undefined otherwise
- */
-function sanitizeTimezone (timezone: any): string | undefined {
-    if (timezone === undefined || typeof timezone !== 'string' || timezone === '') return undefined;
-    if (moment.tz.names().includes(timezone)) return timezone;
-    return undefined;
-}
-
-/**
  * Check if the language is valid
  * If the language is not valid, send an error message to the client
  * @param lang Language to check
@@ -654,7 +571,7 @@ function sanitizeTimezone (timezone: any): string | undefined {
  * @param res Express response
  * @returns true if the language is valid, false otherwise
  */
-function checkLang (lang: any, req: express.Request, res: express.Response): boolean {
+function lang (lang: any, req: express.Request, res: express.Response): boolean {
     if (lang === undefined || typeof lang !== 'string' || lang === '') {
         sendMsg(req, res, error.lang.required);
         return false;
@@ -667,27 +584,6 @@ function checkLang (lang: any, req: express.Request, res: express.Response): boo
 }
 
 /**
- * Sanitize the time
- * If the time is not valid, send an error message to the client
- * @param time Time to sanitize
- * @param req Express request
- * @param res Express response
- * @returns the time as a moment object if it is valid, null otherwise
- */
-function sanitizeTime (time: any, req: express.Request, res: express.Response): moment.Moment | null {
-    if (time === undefined || typeof time !== 'string' || time === '') {
-        sendMsg(req, res, error.time.required);
-        return null;
-    }
-    const momentTime = moment(time, 'HH:mm', true);
-    if (!momentTime.isValid()) {
-        sendMsg(req, res, error.time.invalid);
-        return null;
-    }
-    return momentTime;
-}
-
-/**
  * Check if a date is in the future ({@link properties.travel.hoursLimit} hours)
  * @param date Date to check
  * @returns whether the date is in the future
@@ -696,32 +592,35 @@ function checkTravelHours (date: Date): boolean {
     return moment().add(properties.travel.hoursLimit, 'hours').toDate() <= date;
 }
 
-export {
-    checkEmailField,
-    checkPasswordField,
-    checkOldPasswordField,
-    checkLastNameField,
-    checkFirstNameField,
-    checkLevelField,
-    checkGroupNameField,
-    checkBooleanField,
-    checkNumberField,
-    checkDateField,
-    checkCityField,
-    sanitizePhone,
-    sanitizeGender,
-    sanitizeId,
-    checkMaxPassengersField,
-    checkPriceField,
-    checkStringField,
+/**
+ * Check if a number is an integer and is in the range of the integer properties
+ * @param number Number to check
+ */
+function typeInteger (number: number): boolean {
+    return Number.isInteger(number) && !(number < properties.integer.min || number > properties.integer.max);
+}
+
+export default {
+    city,
+    date,
+    description,
+    email,
+    firstname,
+    groupName,
+    lang,
+    lastname,
+    level,
+    maxPassengers,
+    note,
+    password,
+    passwordOld,
+    price,
     checkStepList,
-    checkDescriptionField,
     checkTravelAlready,
-    checkNoteField,
-    checkTravelHoursEditable,
-    sanitizeTimezone,
-    checkLang,
-    sanitizeType,
     checkTravelHours,
-    sanitizeTime
+    checkTravelHoursEditable,
+    typeBoolean,
+    typeInteger,
+    typeNumber,
+    typeString
 };

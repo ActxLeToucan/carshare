@@ -62,6 +62,15 @@ const mailHtmlHeader = process.env.FRONTEND_LOGO === undefined || process.env.FR
     : `<a href="${process.env.FRONTEND_URL ?? ''}"><img src="${process.env.FRONTEND_LOGO ?? ''}" alt="${process.env.FRONTEND_NAME ?? ''}" style="width: 100px; height: 100px; margin: 0 auto; display: block;"/></a>`;
 
 const error = {
+    integer: {
+        outOfRange: (req: Request, min: number, max: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Un nombre entier doit être compris entre ${min} et ${max}.`,
+                en: `An integer must be between ${min} and ${max}.`
+            },
+            code: 400
+        })
+    },
     email: {
         required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
@@ -714,6 +723,13 @@ const error = {
             msg: {
                 fr: 'Il y a plus de passagers que de places.',
                 en: 'There are more passengers than seats.'
+            },
+            code: 400
+        }),
+        invalidType: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Le type de trajet est invalide.',
+                en: 'The type of travel is invalid.'
             },
             code: 400
         })

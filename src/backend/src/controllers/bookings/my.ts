@@ -1,21 +1,21 @@
 import type express from 'express';
-import * as validator from '../../tools/validator';
 import { prisma } from '../../app';
 import { error, info, notifs, notify, sendMsg } from '../../tools/translator';
-import { checkTravelHours, checkTravelHoursEditable } from '../../tools/validator';
+import validator from '../../tools/validator';
 import { getMaxPassengers, preparePagination } from '../_common';
 import properties from '../../properties';
+import sanitizer from '../../tools/sanitizer';
 
 exports.createBooking = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { travelId, departureId, arrivalId } = req.body;
 
-    const travelIdSanitized = validator.sanitizeId(travelId, req, res);
+    const travelIdSanitized = sanitizer.id(travelId, req, res);
     if (travelIdSanitized === null) return;
 
-    const departureIdSanitized = validator.sanitizeId(departureId, req, res);
+    const departureIdSanitized = sanitizer.id(departureId, req, res);
     if (departureIdSanitized === null) return;
 
-    const arrivalIdSanitized = validator.sanitizeId(arrivalId, req, res);
+    const arrivalIdSanitized = sanitizer.id(arrivalId, req, res);
     if (arrivalIdSanitized === null) return;
 
     prisma.travel.findUnique({
@@ -37,7 +37,7 @@ exports.createBooking = (req: express.Request, res: express.Response, _: express
             return;
         }
 
-        if (!checkTravelHours(travel.steps[0].date)) {
+        if (!validator.checkTravelHours(travel.steps[0].date)) {
             sendMsg(req, res, error.date.tooSoon, travel.steps[0].date, res.locals.user.timezone);
             return;
         }
@@ -159,7 +159,7 @@ exports.createBooking = (req: express.Request, res: express.Response, _: express
 };
 
 exports.cancelMyBooking = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const bookingId = validator.sanitizeId(req.params.id, req, res);
+    const bookingId = sanitizer.id(req.params.id, req, res);
     if (bookingId === null) return;
 
     prisma.booking.findUnique({
@@ -187,7 +187,7 @@ exports.cancelMyBooking = (req: express.Request, res: express.Response, next: ex
             sendMsg(req, res, error.booking.notYours);
             return;
         }
-        if (!checkTravelHoursEditable(booking.departure.date, req, res)) return;
+        if (!validator.checkTravelHoursEditable(booking.departure.date, req, res)) return;
 
         if (booking.status === properties.booking.status.cancelled || booking.status === properties.booking.status.rejected) {
             sendMsg(req, res, error.booking.alreadyCancelled);

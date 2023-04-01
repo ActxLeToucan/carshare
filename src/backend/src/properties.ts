@@ -108,6 +108,10 @@ const properties = {
             accepted: 1, // this value can not be changed, it is used in the database
             rejected: 2
         }
+    },
+    integer: {
+        min: -2147483648,
+        max: 2147483647
     }
 } satisfies Record<string, Record<string, any>>;
 
