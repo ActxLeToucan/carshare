@@ -21,7 +21,9 @@ exports.createBooking = (req: express.Request, res: express.Response, _: express
     prisma.travel.findUnique({
         where: { id: travelIdSanitized },
         include: {
-            steps: true,
+            steps: {
+                orderBy: { date: 'asc' }
+            },
             driver: true
         }
     }).then(async (travel) => {
@@ -157,7 +159,9 @@ exports.cancelMyBooking = (req: express.Request, res: express.Response, next: ex
                     travel: {
                         include: {
                             driver: true,
-                            steps: true
+                            steps: {
+                                orderBy: { date: 'asc' }
+                            }
                         }
                     }
                 }
