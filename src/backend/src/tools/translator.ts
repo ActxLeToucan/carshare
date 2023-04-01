@@ -1527,7 +1527,6 @@ function displayableUserPublic (user: User): Partial<User> {
  */
 function displayableTravel (travel: Travel & { steps: Step[], driver: User }): Partial<Travel> {
     const t = Object.assign({}, travel) as any;
-    t.steps.sort((a: Step, b: Step) => a.date.getTime() - b.date.getTime());
     delete t.groupId;
     t.driver = displayableUserPublic(t.driver);
     return t;
@@ -1593,7 +1592,6 @@ function dateToString (date: Date, timezone: string | null | undefined, lang: st
  */
 function displayableSteps (travel: Travel & { driver: User, steps: Step[] }): Partial<Travel> {
     const t = Object.assign({}, travel) as any;
-    t.steps.sort((a: Step, b: Step) => a.date.getTime() - b.date.getTime());
     t.driver = displayableUserPublic(t.driver);
     t.departure = travel.steps[0];
     t.arrival = travel.steps[travel.steps.length - 1];

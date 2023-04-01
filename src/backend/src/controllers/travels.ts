@@ -170,12 +170,12 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
         },
         select: {
             steps: {
-                select: { date: true }
+                select: { date: true },
+                orderBy: { date: 'asc' }
             }
         }
     }).then((travels) => {
         for (const travel of travels) {
-            travel.steps.sort((a: any, b: any) => a.date.getTime() - b.date.getTime());
             if (!validator.checkTravelAlready(steps[0].date, steps[steps.length - 1].date, travel.steps, req, res)) return;
         }
 
@@ -198,7 +198,9 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
                 }
             },
             include: {
-                steps: true,
+                steps: {
+                    orderBy: { date: 'asc' }
+                },
                 driver: true
             }
         }).then((travel) => {
@@ -260,7 +262,9 @@ exports.getTravel = (req: express.Request, res: express.Response, _: express.Nex
     prisma.travel.findUnique({
         where: { id: travelId },
         include: {
-            steps: true,
+            steps: {
+                orderBy: { date: 'asc' }
+            },
             driver: true
         }
     }).then((travel: any) => {

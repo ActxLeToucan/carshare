@@ -25,7 +25,11 @@ function acceptOrRejectBooking (req: express.Request, res: express.Response, sta
             departure: {
                 include: {
                     travel: {
-                        include: { steps: true }
+                        include: {
+                            steps: {
+                                orderBy: { date: 'asc' }
+                            }
+                        }
                     }
                 }
             },

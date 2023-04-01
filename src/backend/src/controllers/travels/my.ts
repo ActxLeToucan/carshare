@@ -91,7 +91,12 @@ exports.getMyTravels = (req: express.Request, res: express.Response, _: express.
         .then((count) => {
             prisma.travel.findMany({
                 where,
-                include: { driver: true, steps: true },
+                include: {
+                    driver: true,
+                    steps: {
+                        orderBy: { date: 'asc' }
+                    }
+                },
                 ...pagination.pagination
             }).then(travels => {
                 const data = travels.map(displayableSteps)
@@ -113,7 +118,9 @@ exports.cancelMyTravel = (req: express.Request, res: express.Response, _: expres
     prisma.travel.findUnique({
         where: { id: travelId },
         include: {
-            steps: true
+            steps: {
+                orderBy: { date: 'asc' }
+            }
         }
     }).then((travel) => {
         // verifications

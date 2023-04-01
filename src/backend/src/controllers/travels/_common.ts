@@ -29,7 +29,11 @@ async function update (req: express.Request, res: express.Response, asAdmin: boo
     // Check if the travel exists
     const travel = await prisma.travel.findUnique({
         where: { id: travelId },
-        include: { steps: true }
+        include: {
+            steps: {
+                orderBy: { date: 'asc' }
+            }
+        }
     });
     if (travel === null) {
         sendMsg(req, res, error.travel.notFound);
@@ -45,9 +49,6 @@ async function update (req: express.Request, res: express.Response, asAdmin: boo
         sendMsg(req, res, error.travel.notOpen);
         return;
     }
-
-    // Sort steps by date
-    travel.steps.sort((a: Step, b: Step) => a.date.getTime() - b.date.getTime());
 
     // Check if the travel is editable
     const firstStep = travel.steps.at(0);
@@ -90,12 +91,12 @@ async function update (req: express.Request, res: express.Response, asAdmin: boo
         },
         select: {
             steps: {
-                select: { date: true }
+                select: { date: true },
+                orderBy: { date: 'asc' }
             }
         }
     });
     for (const travelSteps of travelsSteps) {
-        travelSteps.steps.sort((a: any, b: any) => a.date.getTime() - b.date.getTime());
         if (!validator.checkTravelAlready(steps[0].date, steps[steps.length - 1].date, travelSteps.steps, req, res)) return;
     }
 
@@ -152,7 +153,9 @@ async function update (req: express.Request, res: express.Response, asAdmin: boo
             description
         },
         include: {
-            steps: true,
+            steps: {
+                orderBy: { date: 'asc' }
+            },
             driver: true
         }
     });
