@@ -1,5 +1,5 @@
 import type express from 'express';
-import { displayableGroup, error, info, notifs, notify, sendMsg } from '../tools/translator';
+import { displayableGroup, error, info, sendMsg, type Notif, notifs, notify } from '../tools/translator';
 import * as validator from '../tools/validator';
 import { prisma } from '../app';
 import { type Pagination, preparePagination } from './_common';
@@ -129,34 +129,118 @@ function getGroups (req: express.Request, res: express.Response, next: express.N
     });
 }
 
-exports.deleteGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+exports.addUserGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    const email = req.body.email;
+    if (!validator.checkEmailField(email, req, res, false)) return;
+
     const groupId = validator.sanitizeId(req.params.id, req, res);
     if (groupId === null) return;
 
     prisma.group.count({
         where: {
-            id: groupId
+            id: groupId,
+            creatorId: res.locals.user.id
         }
-
-    }).then((count) => {
-        if (count <= 0) {
+    }).then((countG) => {
+        if (countG !== 1) {
             sendMsg(req, res, error.group.notFound);
             return;
         }
 
-        prisma.group.delete({
-            where: {
-                id: groupId
+        prisma.user.findUnique({ where: { email } })
+            .then((user) => {
+                if (user === null) {
+                    sendMsg(req, res, error.user.notFound);
+                    return;
+                }
 
-            }
-        }).then(() => {
-            sendMsg(req, res, info.group.deleted);
-        }).catch((err) => {
-            console.error(err);
-            sendMsg(req, res, error.generic.internalError);
-        });
+                const userId: number = user.id;
+                if (userId === res.locals.user.id) {
+                    sendMsg(req, res, error.group.creatorMember);
+                    return;
+                }
+                prisma.group.count({
+                    where: {
+                        id: groupId,
+                        users: {
+                            some: { id: userId }
+                        }
+                    }
+                }).then((count) => {
+                    if (count === 1) {
+                        sendMsg(req, res, error.group.alreadyMember);
+                        return;
+                    }
+
+                    prisma.group.update({
+                        where: { id: groupId },
+                        data: {
+                            users: {
+                                connect: {
+                                    id: userId
+                                }
+                            }
+                        },
+                        include: {
+                            users: true,
+                            creator: true
+                        }
+                    }).then((group) => {
+                        const notif: Notif = notifs.group.userAdded(user, group, res.locals.user);
+                        const data = {
+                            userId,
+                            title: notif.title,
+                            message: notif.message,
+                            type: notif.type,
+                            senderId: Number(res.locals.user.id),
+                            createdAt: notif.createdAt
+                        };
+
+                        prisma.notification.create({ data }).then(() => {
+                            notify(user, data);
+
+                            sendMsg(req, res, info.group.userAdd, group);
+                        }).catch((err) => {
+                            console.error(err);
+                            sendMsg(req, res, error.generic.internalError);
+                        });
+                    }).catch((err) => {
+                        console.error(err);
+                        sendMsg(req, res, error.generic.internalError);
+                    });
+                }).catch((err) => {
+                    console.error(err);
+                    sendMsg(req, res, error.generic.internalError);
+                });
+            }).catch((err) => {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
+            });
     }).catch((err) => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
     });
+}
+
+exports.deleteGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    const groupId = validator.sanitizeId(req.params.id, req, res);
+    if (groupId === null) return;
+
+    prisma.group.count({ where: { id: groupId } })
+        .then((count) => {
+            if (count <= 0) {
+                sendMsg(req, res, error.group.notFound);
+                return;
+            }
+            prisma.group.delete({ where: { id: groupId } })
+                .then(() => {
+                    sendMsg(req, res, info.group.deleted);
+                }).catch((err) => {
+                    console.error(err);
+                    sendMsg(req, res, error.generic.internalError);
+                });
+        }).catch((err) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
 }
