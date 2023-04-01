@@ -1,5 +1,11 @@
 <template>
     <div class="flex flex-col grow w-full h-fit min-h-0 min-w-[60vw]">
+        <h1
+            v-if="trip != null"
+            class="text-xl font-bold text-center text-teal-500 mb-4"
+        >
+            {{ lang.TRAVEL_CARD_LABEL.replace('{DATE}', new Date(trip.steps[0]?.date).toLocaleDateString()) }}
+        </h1>
         <div
             v-if="trip != null"
             class="flex md:flex-row flex-col grow min-w-0 w-full h-fit md:space-y-0 space-y-4"
@@ -102,7 +108,7 @@
             </div>
         </div>
         <div
-            v-show="!editMode && (User.CurrentUser.id !== trip?.driver?.id || isPast)"
+            v-show="trip != null && !editMode && (User.CurrentUser.id !== trip?.driver?.id || isPast)"
             class="flex w-full justify-center items-center my-4"
         >
             <button-block :action="bookTrip">
@@ -114,7 +120,7 @@
             class="flex w-full justify-end items-center my-4"
         >
             <button-block
-                v-show="!isPast"
+                v-show="trip != null && !isPast"
                 color="red"
                 :action="removeTravel"
                 :disabled="trip?.status == -1"
@@ -123,6 +129,7 @@
             </button-block>
         </div>
         <div
+            v-show="trip != null"
             ref="log-zone"
             class="flex flex-col w-full justify-center items-center min-h-max h-max transition-all"
             style="max-height: 0px;"
@@ -171,6 +178,7 @@ export default {
     },
     watch: {
         tripId: function (newVal, oldVal) {
+            console.log("TripID changed : " + newVal)
             this.loadTrip(newVal);
         },
         tripStart: function (newVal, oldVal) {
