@@ -1249,6 +1249,8 @@ paths:
           $ref: '#/components/responses/insufficientPrivileges'
         '404':
           $ref: '#/components/responses/travelNotFound'
+        '498':
+          $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
 
