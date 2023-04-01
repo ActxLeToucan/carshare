@@ -4,8 +4,6 @@
  * If the data are not valid, an error message can be sent to the client.
  *
  * If your function returns data, you should put it in the sanitizer.ts file.
- *
- * TODO: factorize some functions (ex: {@link email}, {@link password}, ... should use ${@link typeString})
  */
 
 import type express from 'express';
@@ -13,6 +11,92 @@ import { error, sendMsg } from './translator';
 import IsEmail from 'isemail';
 import properties from '../properties';
 import moment from 'moment-timezone';
+
+/**
+ * Check if a boolean field is valid
+ * @param value Value to sanitize
+ * @param sendError If true, send an error message to the client
+ * @param req Express request
+ * @param res Express response
+ * @param fieldName Name of the field
+ * @returns true if the value is valid, false otherwise
+ */
+function typeBoolean (value: any, sendError: boolean, req: express.Request, res: express.Response, fieldName: string): boolean {
+    if (value === undefined || value === '') {
+        if (sendError) sendMsg(req, res, error.boolean.required, fieldName);
+        return false;
+    }
+    if (typeof value !== 'boolean') {
+        if (sendError) sendMsg(req, res, error.boolean.type, fieldName);
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Check if a number is an integer and is in the range of the integer properties
+ * @param number Number to check
+ * @param sendError If true, send an error message to the client
+ * @param req Express request
+ * @param res Express response
+ * @param fieldName Name of the field
+ * @param inBody Weather write "field" or "parameter" in the error message
+ */
+function typeInteger (number: number, sendError: boolean, req: express.Request, res: express.Response, fieldName: string, inBody: boolean = true): boolean {
+    if (!typeNumber(number, sendError, req, res, fieldName, inBody)) return false;
+    if (!Number.isInteger(number)) {
+        if (sendError) sendMsg(req, res, error.integer.type, fieldName, inBody);
+        return false;
+    }
+    if (number < properties.integer.min || number > properties.integer.max) {
+        if (sendError) sendMsg(req, res, error.integer.outOfRange, properties.integer.min, properties.integer.max, fieldName, inBody);
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Check if a number field is valid
+ * @param value Value to sanitize
+ * @param sendError If true, send an error message to the client
+ * @param req Express request
+ * @param res Express response
+ * @param fieldName Name of the field
+ * @param inBody Weather write "field" or "parameter" in the error message
+ * @returns true if the value is valid, false otherwise
+ */
+function typeNumber (value: any, sendError: boolean, req: express.Request, res: express.Response, fieldName: string, inBody: boolean = true): boolean {
+    if (value === undefined || value === '') {
+        if (sendError) sendMsg(req, res, error.number.required, fieldName, inBody);
+        return false;
+    }
+    if (typeof value !== 'number') {
+        if (sendError) sendMsg(req, res, error.number.type, fieldName, inBody);
+        return false;
+    }
+    return true;
+}
+
+/**
+ * Check if a string field is valid
+ * @param value Value to sanitize
+ * @param sendError If true, send an error message to the client
+ * @param req Express request
+ * @param res Express response
+ * @param fieldName Name of the field
+ * @returns true if the value is valid, false otherwise
+ */
+function typeString (value: any, sendError: boolean, req: express.Request, res: express.Response, fieldName: string): boolean {
+    if (value === undefined || value === '') {
+        if (sendError) sendMsg(req, res, error.string.required, fieldName);
+        return false;
+    }
+    if (typeof value !== 'string') {
+        if (sendError) sendMsg(req, res, error.string.type, fieldName);
+        return false;
+    }
+    return true;
+}
 
 /**
  * Check if the email is in a valid format
@@ -24,14 +108,7 @@ import moment from 'moment-timezone';
  * @returns true if the email is valid, false otherwise
  */
 function email (email: any, sendError: boolean, req: express.Request, res: express.Response, checkFormat: boolean = true): boolean {
-    if (email === undefined || email === '') {
-        if (sendError) sendMsg(req, res, error.email.required);
-        return false;
-    }
-    if (typeof email !== 'string') {
-        if (sendError) sendMsg(req, res, error.email.type);
-        return false;
-    }
+    if (!typeString(email, sendError, req, res, 'email')) return false;
     if (checkFormat) {
         if (!IsEmail.validate(email)) {
             if (sendError) sendMsg(req, res, error.email.invalid);
@@ -55,14 +132,7 @@ function email (email: any, sendError: boolean, req: express.Request, res: expre
  * @returns true if the password is valid, false otherwise
  */
 function password (password: any, sendError: boolean, req: express.Request, res: express.Response, checkFormat = true): boolean {
-    if (password === undefined || password === '') {
-        if (sendError) sendMsg(req, res, error.password.required);
-        return false;
-    }
-    if (typeof password !== 'string') {
-        if (sendError) sendMsg(req, res, error.password.type);
-        return false;
-    }
+    if (!typeString(password, sendError, req, res, 'password')) return false;
     if (checkFormat) {
         if (password.length < properties.password.min) {
             if (sendError) sendMsg(req, res, error.password.min, properties.password.min);
@@ -101,15 +171,7 @@ function password (password: any, sendError: boolean, req: express.Request, res:
  * @returns true if the old password is valid, false otherwise
  */
 function passwordOld (oldPassword: any, sendError: boolean, req: express.Request, res: express.Response): boolean {
-    if (oldPassword === undefined || oldPassword === '') {
-        if (sendError) sendMsg(req, res, error.oldPassword.required);
-        return false;
-    }
-    if (typeof oldPassword !== 'string') {
-        if (sendError) sendMsg(req, res, error.oldPassword.type);
-        return false;
-    }
-    return true;
+    return typeString(oldPassword, sendError, req, res, 'oldPassword');
 }
 
 /**
@@ -120,15 +182,8 @@ function passwordOld (oldPassword: any, sendError: boolean, req: express.Request
  * @param res Express response
  * @returns true if the lastname is valid, false otherwise
  */
-function lastname (lastname: any, sendError: boolean, req: express.Request, res: express.Response): boolean {
-    if (lastname === undefined || lastname === '') {
-        if (sendError) sendMsg(req, res, error.lastname.required);
-        return false;
-    }
-    if (typeof lastname !== 'string') {
-        if (sendError) sendMsg(req, res, error.lastname.type);
-        return false;
-    }
+function lastName (lastname: any, sendError: boolean, req: express.Request, res: express.Response): boolean {
+    if (!typeString(lastname, sendError, req, res, 'lastName')) return false;
     if (lastname.length > properties.lastname.max) {
         if (sendError) sendMsg(req, res, error.lastname.max, properties.lastname.max);
         return false;
@@ -148,15 +203,8 @@ function lastname (lastname: any, sendError: boolean, req: express.Request, res:
  * @param res Express response
  * @returns true if the firstname is valid, false otherwise
  */
-function firstname (firstname: any, sendError: boolean, req: express.Request, res: express.Response): boolean {
-    if (firstname === undefined || firstname === '') {
-        if (sendError) sendMsg(req, res, error.firstname.required);
-        return false;
-    }
-    if (typeof firstname !== 'string') {
-        if (sendError) sendMsg(req, res, error.firstname.type);
-        return false;
-    }
+function firstName (firstname: any, sendError: boolean, req: express.Request, res: express.Response): boolean {
+    if (!typeString(firstname, sendError, req, res, 'firstname')) return false;
     if (firstname.length > properties.firstname.max) {
         if (sendError) sendMsg(req, res, error.firstname.max, properties.firstname.max);
         return false;
@@ -177,37 +225,9 @@ function firstname (firstname: any, sendError: boolean, req: express.Request, re
  * @returns true if the level is valid, false otherwise
  */
 function level (level: any, sendError: boolean, req: express.Request, res: express.Response): boolean {
-    if (level === undefined || level === '') {
-        if (sendError) sendMsg(req, res, error.level.required);
-        return false;
-    }
-    if (typeof level !== 'number') {
-        if (sendError) sendMsg(req, res, error.level.type);
-        return false;
-    }
+    if (!typeInteger(level, sendError, req, res, 'level')) return false;
     if (res.locals.user.level <= level) {
         if (sendError) sendMsg(req, res, error.level.tooHigh);
-        return false;
-    }
-    return true;
-}
-
-/**
- * Check if a boolean field is valid
- * @param value Value to sanitize
- * @param sendError If true, send an error message to the client
- * @param req Express request
- * @param res Express response
- * @param fieldName Name of the field
- * @returns true if the value is valid, false otherwise
- */
-function typeBoolean (value: any, sendError: boolean, req: express.Request, res: express.Response, fieldName: string): boolean {
-    if (value === undefined || value === '') {
-        if (sendError) sendMsg(req, res, error.boolean.required, fieldName);
-        return false;
-    }
-    if (typeof value !== 'boolean') {
-        if (sendError) sendMsg(req, res, error.boolean.type, fieldName);
         return false;
     }
     return true;
@@ -222,15 +242,7 @@ function typeBoolean (value: any, sendError: boolean, req: express.Request, res:
  * @returns true if the group name is valid, false otherwise
  */
 function groupName (name: any, sendError: boolean, req: express.Request, res: express.Response): boolean {
-    if (name === undefined || name === '') {
-        if (sendError) sendMsg(req, res, error.groupName.required);
-        return false;
-    }
-    if (typeof name !== 'string') {
-        if (sendError) sendMsg(req, res, error.groupName.type);
-        return false;
-    }
-    return true;
+    return typeString(name, sendError, req, res, 'name');
 }
 
 /**
@@ -271,15 +283,7 @@ function date (date: any, sendError: boolean, req: express.Request, res: express
  * @returns true if the city is valid, false otherwise
  */
 function city (name: any, sendError: boolean, req: express.Request, res: express.Response, fieldName: string): boolean {
-    if (name === undefined || name === '') {
-        if (sendError) sendMsg(req, res, error.city.required, fieldName);
-        return false;
-    }
-    if (typeof name !== 'string') {
-        if (sendError) sendMsg(req, res, error.city.type, fieldName);
-        return false;
-    }
-    return true;
+    return typeString(name, sendError, req, res, fieldName);
 }
 
 /**
@@ -291,10 +295,7 @@ function city (name: any, sendError: boolean, req: express.Request, res: express
  * @returns true if the value is valid and a positive number, false otherwise
  */
 function price (value: any, sendError: boolean, req: express.Request, res: express.Response): boolean {
-    if (typeof value !== 'number' && value !== undefined && value !== null) {
-        if (sendError) sendMsg(req, res, error.number.type, 'price');
-        return false;
-    }
+    if (!typeNumber(value, sendError, req, res, 'price')) return false;
 
     if (value < 0) {
         if (sendError) sendMsg(req, res, error.number.min, 'price', 0);
@@ -312,10 +313,7 @@ function price (value: any, sendError: boolean, req: express.Request, res: expre
  * @returns true if the value is valid, false otherwise
  */
 function maxPassengers (value: any, sendError: boolean, req: express.Request, res: express.Response): boolean {
-    if (typeof value !== 'number' && value !== undefined && value !== null) {
-        if (sendError) sendMsg(req, res, error.number.type, 'maxPassengers');
-        return false;
-    }
+    if (!typeInteger(value, sendError, req, res, 'maxPassengers')) return false;
 
     if (value < 1) {
         if (sendError) sendMsg(req, res, error.number.min, 'maxPassengers', 1);
@@ -333,14 +331,7 @@ function maxPassengers (value: any, sendError: boolean, req: express.Request, re
  * @returns true if the value is valid and if the value is between -180 and 180, false otherwise
  */
 function longitude (value: any, sendError: boolean, req: express.Request, res: express.Response): boolean {
-    if (value === undefined || value === '') {
-        if (sendError) sendMsg(req, res, error.number.required, 'lng');
-        return false;
-    }
-    if (typeof value !== 'number') {
-        if (sendError) sendMsg(req, res, error.number.type, 'lng');
-        return false;
-    }
+    if (!typeNumber(value, sendError, req, res, 'lng')) return false;
 
     if (value < -180 || value > 180) {
         if (sendError) sendMsg(req, res, error.longitude.minMax, properties.longitude.min, properties.longitude.max);
@@ -358,14 +349,7 @@ function longitude (value: any, sendError: boolean, req: express.Request, res: e
  * @returns true if the value is valid and if the value is between -90 and 90, false otherwise
  */
 function latitude (value: any, sendError: boolean, req: express.Request, res: express.Response): boolean {
-    if (value === undefined || value === '') {
-        if (sendError) sendMsg(req, res, error.number.required, 'lng');
-        return false;
-    }
-    if (typeof value !== 'number') {
-        if (sendError) sendMsg(req, res, error.number.type, 'lng');
-        return false;
-    }
+    if (!typeNumber(value, sendError, req, res, 'lat')) return false;
 
     if (value < -90 || value > 90) {
         if (sendError) sendMsg(req, res, error.latitude.minMax, properties.latitude.min, properties.latitude.max);
@@ -383,32 +367,7 @@ function latitude (value: any, sendError: boolean, req: express.Request, res: ex
  * @returns true if the value is valid, false otherwise
  */
 function description (value: any, sendError: boolean, req: express.Request, res: express.Response): boolean {
-    if (typeof value !== 'string' && value !== undefined && value !== null) {
-        if (sendError) sendMsg(req, res, error.string.type, 'description');
-        return false;
-    }
-    return true;
-}
-
-/**
- * Check if a string field is valid
- * @param value Value to sanitize
- * @param sendError If true, send an error message to the client
- * @param req Express request
- * @param res Express response
- * @param fieldName Name of the field
- * @returns true if the value is valid, false otherwise
- */
-function typeString (value: any, sendError: boolean, req: express.Request, res: express.Response, fieldName: string): boolean {
-    if (value === undefined || value === '') {
-        if (sendError) sendMsg(req, res, error.string.required, fieldName);
-        return false;
-    }
-    if (typeof value !== 'string') {
-        if (sendError) sendMsg(req, res, error.string.type, fieldName);
-        return false;
-    }
-    return true;
+    return typeString(value, sendError, req, res, 'description');
 }
 
 /**
@@ -516,42 +475,14 @@ function checkStepList (steps: any, sendError: boolean, req: express.Request, re
  * @returns true if the value is valid, false otherwise
  */
 function note (value: any, sendError: boolean, req: express.Request, res: express.Response): boolean {
-    if (value === undefined || value === '') {
-        if (sendError) sendMsg(req, res, error.number.required, 'note');
-        return false;
-    }
-    if (typeof value !== 'number') {
-        if (sendError) sendMsg(req, res, error.number.type, 'note');
-        return false;
-    }
+    if (!typeInteger(value, sendError, req, res, 'note')) return false;
 
     if (value < 0) {
         if (sendError) sendMsg(req, res, error.number.min, 'note', 0);
         return false;
     }
     if (value > 5) {
-        if (sendError) sendMsg(req, res, error.number.min, 'note', 5);
-        return false;
-    }
-    return true;
-}
-
-/**
- * Check if a number field is valid
- * @param value Value to sanitize
- * @param sendError If true, send an error message to the client
- * @param req Express request
- * @param res Express response
- * @param fieldName Name of the field
- * @returns true if the value is valid, false otherwise
- */
-function typeNumber (value: any, sendError: boolean, req: express.Request, res: express.Response, fieldName: string): boolean {
-    if (value === undefined || value === '') {
-        if (sendError) sendMsg(req, res, error.number.required, fieldName);
-        return false;
-    }
-    if (typeof value !== 'number') {
-        if (sendError) sendMsg(req, res, error.number.type, fieldName);
+        if (sendError) sendMsg(req, res, error.number.max, 'note', 5);
         return false;
     }
     return true;
@@ -582,10 +513,7 @@ function checkTravelHoursEditable (date: Date, sendError: boolean, req: express.
  * @returns true if the language is valid, false otherwise
  */
 function lang (lang: any, sendError: boolean, req: express.Request, res: express.Response): boolean {
-    if (lang === undefined || typeof lang !== 'string' || lang === '') {
-        if (sendError) sendMsg(req, res, error.lang.required);
-        return false;
-    }
+    if (!typeString(lang, sendError, req, res, 'lang')) return false;
     if (!properties.languages.includes(lang)) {
         if (sendError) sendMsg(req, res, error.lang.unknown);
         return false;
@@ -602,23 +530,18 @@ function checkTravelHours (date: Date): boolean {
     return moment().add(properties.travel.hoursLimit, 'hours').toDate() <= date;
 }
 
-/**
- * Check if a number is an integer and is in the range of the integer properties
- * @param number Number to check
- */
-function typeInteger (number: number): boolean {
-    return Number.isInteger(number) && !(number < properties.integer.min || number > properties.integer.max);
-}
-
 export default {
+    typeBoolean,
+    typeInteger,
+    typeString,
     city,
     date,
     description,
     email,
-    firstname,
+    firstName,
     groupName,
     lang,
-    lastname,
+    lastName,
     level,
     maxPassengers,
     note,
@@ -628,9 +551,5 @@ export default {
     checkStepList,
     checkTravelAlready,
     checkTravelHours,
-    checkTravelHoursEditable,
-    typeBoolean,
-    typeInteger,
-    typeNumber,
-    typeString
+    checkTravelHoursEditable
 };

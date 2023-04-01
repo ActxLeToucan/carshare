@@ -63,29 +63,22 @@ const mailHtmlHeader = process.env.FRONTEND_LOGO === undefined || process.env.FR
 
 const error = {
     integer: {
-        outOfRange: (req: Request, min: number, max: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        type: (req: Request, field: string, inBody: boolean = true) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Un nombre entier doit être compris entre ${min} et ${max}.`,
-                en: `An integer must be between ${min} and ${max}.`
+                fr: `La valeur du ${inBody ? 'champ' : 'paramètre'} ${field} doit être un entier.`,
+                en: `The value of the ${inBody ? 'field' : 'parameter'} ${field} must be an integer.`
+            },
+            code: 400
+        }),
+        outOfRange: (req: Request, min: number, max: number, field: string, inBody: boolean = true) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `La valeur du ${inBody ? 'champ' : 'paramètre'} ${field} doit être comprise entre ${min} et ${max}.`,
+                en: `The value of the ${inBody ? 'field' : 'parameter'} ${field} must be between ${min} and ${max}.`
             },
             code: 400
         })
     },
     email: {
-        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: "L'adresse email est requise.",
-                en: 'Email address is required.'
-            },
-            code: 400
-        }),
-        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: "L'adresse email doit être une chaîne de caractères.",
-                en: 'Email address must be a string.'
-            },
-            code: 400
-        }),
         max: (req: Request, length: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: `L'adresse email doit contenir au plus ${length} caractère${length > 1 ? 's' : ''}.`,
@@ -116,20 +109,6 @@ const error = {
         })
     },
     password: {
-        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Le mot de passe est requis.',
-                en: 'Password is required.'
-            },
-            code: 400
-        }),
-        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Le mot de passe doit être une chaîne de caractères.',
-                en: 'Password must be a string.'
-            },
-            code: 400
-        }),
         min: (req: Request, length: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: `Le mot de passe doit contenir au moins ${length} caractère${length > 1 ? 's' : ''}.`,
@@ -166,37 +145,7 @@ const error = {
             code: 400
         })
     },
-    oldPassword: {
-        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'L\'ancien mot de passe est requis.',
-                en: 'Old password is required.'
-            },
-            code: 400
-        }),
-        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'L\'ancien mot de passe doit être une chaîne de caractères.',
-                en: 'Old password must be a string.'
-            },
-            code: 400
-        })
-    },
     lastname: {
-        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Le nom est requis.',
-                en: 'Lastname is required.'
-            },
-            code: 400
-        }),
-        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Le nom doit être une chaîne de caractères.',
-                en: 'Lastname must be a string.'
-            },
-            code: 400
-        }),
         max: (req: Request, length: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: `Le nom doit contenir au plus ${length} caractère${length > 1 ? 's' : ''}.`,
@@ -213,20 +162,6 @@ const error = {
         })
     },
     firstname: {
-        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Le prénom est requis.',
-                en: 'Firstname is required.'
-            },
-            code: 400
-        }),
-        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Le prénom doit être une chaîne de caractères.',
-                en: 'Firstname must be a string.'
-            },
-            code: 400
-        }),
         max: (req: Request, length: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: `Le prénom doit contenir au plus ${length} caractère${length > 1 ? 's' : ''}.`,
@@ -266,42 +201,12 @@ const error = {
         })
     },
     level: {
-        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Le niveau est requis.',
-                en: 'Level is required.'
-            },
-            code: 400
-        }),
-        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Le niveau doit être un nombre.',
-                en: 'Level must be a number.'
-            },
-            code: 400
-        }),
         tooHigh: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'a mountain too [H]igh | Le niveau est trop élevé par rapport à votre niveau.',
                 en: 'Level is too high compared to your level.'
             },
             code: 403
-        })
-    },
-    groupName: {
-        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Le nom du groupe est requis.',
-                en: 'Group name is required.'
-            },
-            code: 400
-        }),
-        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Le nom du groupe doit être une chaîne de caractères.',
-                en: 'Group name must be a string.'
-            },
-            code: 400
         })
     },
     boolean: {
@@ -521,17 +426,17 @@ const error = {
         })
     },
     number: {
-        required: (req: Request, fieldName: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        required: (req: Request, fieldName: string, inBody: boolean = true) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Le champ "${fieldName}" est requis.`,
-                en: `Field "${fieldName}" is required.`
+                fr: `Le ${inBody ? 'champ' : 'paramètre'} "${fieldName}" est requis.`,
+                en: `${inBody ? 'Field' : 'Parameter'} "${fieldName}" is required.`
             },
             code: 400
         }),
-        type: (req: Request, fieldName: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        type: (req: Request, fieldName: string, inBody: boolean = true) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Le champ "${fieldName}" doit être un nombre.`,
-                en: `Field "${fieldName}" must be a number.`
+                fr: `Le ${inBody ? 'champ' : 'paramètre'} "${fieldName}" doit être un nombre.`,
+                en: `${inBody ? 'Field' : 'Parameter'} "${fieldName}" must be a number.`
             },
             code: 400
         }),
@@ -539,6 +444,13 @@ const error = {
             msg: {
                 fr: `Le champ "${fieldName}" doit être supérieur ou égal à ${min}.`,
                 en: `Field "${fieldName}" must be greater than or equal to ${min}.`
+            },
+            code: 400
+        }),
+        max: (req: Request, fieldName: string, max: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Le champ "${fieldName}" doit être inférieur ou égal à ${max}.`,
+                en: `Field "${fieldName}" must be less than or equal to ${max}.`
             },
             code: 400
         })
@@ -621,22 +533,6 @@ const error = {
                 en: 'Notification not found.'
             },
             code: 404
-        })
-    },
-    city: {
-        required: (req: Request, field: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: `Le champ "${field}" est requis.`,
-                en: `Field "${field}" is required.`
-            },
-            code: 400
-        }),
-        type: (req: Request, field: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: `Le champ "${field}" doit être une chaîne de caractères.`,
-                en: `Field "${field}" must be a string.`
-            },
-            code: 400
         })
     },
     evaluation: {
@@ -781,13 +677,6 @@ const error = {
         })
     },
     lang: {
-        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Langue requise.',
-                en: 'Language required.'
-            },
-            code: 400
-        }),
         unknown: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Langue inconnue.',

@@ -58,10 +58,7 @@ function id (id: any, req: express.Request, res: express.Response): number | nul
     }
 
     const num = Number(id);
-    if (!validator.typeInteger(num)) {
-        sendMsg(req, res, error.integer.outOfRange, properties.integer.min, properties.integer.max);
-        return null;
-    }
+    if (!validator.typeInteger(num, true, req, res, 'id', false)) return null;
 
     return num;
 }

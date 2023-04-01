@@ -77,8 +77,8 @@ exports.createEvaluation = (req: express.Request, res: express.Response, _: expr
     const { note, travelId, evaluatedId } = req.body;
 
     if (!validator.note(note, true, req, res)) return;
-    if (!validator.typeNumber(travelId, true, req, res, 'travelId')) return;
-    if (!validator.typeNumber(evaluatedId, true, req, res, 'evaluatedId')) return;
+    if (!validator.typeInteger(travelId, true, req, res, 'travelId')) return;
+    if (!validator.typeInteger(evaluatedId, true, req, res, 'evaluatedId')) return;
 
     prisma.travel.count({
         where: {

@@ -16,8 +16,8 @@ exports.signup = (req: express.Request, res: express.Response, _: express.NextFu
 
     if (!validator.email(email, true, req, res)) return;
     if (!validator.password(password, true, req, res)) return;
-    if (!validator.lastname(lastName, true, req, res)) return;
-    if (!validator.firstname(firstName, true, req, res)) return;
+    if (!validator.lastName(lastName, true, req, res)) return;
+    if (!validator.firstName(firstName, true, req, res)) return;
     const phoneSanitized = sanitizer.phone(phone, req, res);
     if (phoneSanitized === null) return;
     if (hasCar !== undefined && !validator.typeBoolean(hasCar, true, req, res, 'hasCar')) return;
