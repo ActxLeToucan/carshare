@@ -1557,7 +1557,7 @@ paths:
     post:
       summary: Add a new member
       description: Add a new member in a group.
-      operationId: addMember
+      operationId: addUserGroup
       tags:
         - Groups
       parameters:
@@ -1578,13 +1578,13 @@ paths:
             schema:
               type: object
               properties:
-                userMail:
+                email:
                   type: string
                   required: true
                   example: john@example.com
       responses:
         '200':
-          description: user added
+          description: User added
           content:
             application/json:
               schema:
@@ -1592,7 +1592,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: User add
+                    example: User added
                   group:
                     $ref: '#/components/schemas/Group'
         '400':

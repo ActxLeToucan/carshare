@@ -906,7 +906,7 @@ const info = {
         userAdd: (req: Request, group: Group & { users: User[], creator: User }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Utilisateur ajouté',
-                en: 'User add'
+                en: 'User added'
             },
             code: 201,
             data: {
@@ -1345,7 +1345,7 @@ const notifs = {
         userAdded: (user: User, group: Group, creator: User) => msgForLang<TemplateNotif, Notif>(user.lang, {
             title: {
                 fr: 'Ajout dans un groupe',
-                en: 'Adding to a group'
+                en: 'Added to a group'
             },
             message: {
                 fr: `${creator.firstName ?? ''} ${creator.lastName ?? ''} vous a ajouté dans le groupe ${group.name}, vous recevrez toutes les notifications de ce groupe.`,

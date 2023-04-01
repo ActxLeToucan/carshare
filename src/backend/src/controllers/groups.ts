@@ -130,8 +130,8 @@ function getGroups (req: express.Request, res: express.Response, next: express.N
 }
 
 exports.addUserGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const userMail = req.body.userMail;
-    if (!validator.checkEmailField(userMail, req, res, false)) return;
+    const email = req.body.email;
+    if (!validator.checkEmailField(email, req, res, false)) return;
 
     const groupId = validator.sanitizeId(req.params.id, req, res);
     if (groupId === null) return;
@@ -147,57 +147,47 @@ exports.addUserGroup = (req: express.Request, res: express.Response, _: express.
             return;
         }
 
-        prisma.user.findUnique({
-            where: {
-                email: userMail
-            }
-        }).then((user) => {
-            if (user === null) {
-                sendMsg(req, res, error.user.notFound);
-                return;
-            }
-
-            const userId: number = user.id;
-            if (userId === res.locals.user.id) {
-                sendMsg(req, res, error.group.creatorMember);
-                return;
-            }
-            prisma.group.count({
-                where: {
-                    id: groupId,
-                    users: {
-                        some: {
-                            id: userId
-                        }
-                    }
-
-                }
-
-            }).then((count) => {
-                if (count === 1) {
-                    sendMsg(req, res, error.group.alreadyMember);
+        prisma.user.findUnique({ where: { email } })
+            .then((user) => {
+                if (user === null) {
+                    sendMsg(req, res, error.user.notFound);
                     return;
                 }
 
-                prisma.group.update({
+                const userId: number = user.id;
+                if (userId === res.locals.user.id) {
+                    sendMsg(req, res, error.group.creatorMember);
+                    return;
+                }
+                prisma.group.count({
                     where: {
-                        id: groupId
-                    },
-                    data: {
+                        id: groupId,
                         users: {
-                            connect: {
-                                id: userId
-                            }
+                            some: { id: userId }
                         }
-                    },
-                    include: {
-                        users: true,
-                        creator: true
                     }
-                }).then((group) => {
-                    const notif: Notif = notifs.group.userAdded(user, group, res.locals.user);
-                    const data =
-                        {
+                }).then((count) => {
+                    if (count === 1) {
+                        sendMsg(req, res, error.group.alreadyMember);
+                        return;
+                    }
+
+                    prisma.group.update({
+                        where: { id: groupId },
+                        data: {
+                            users: {
+                                connect: {
+                                    id: userId
+                                }
+                            }
+                        },
+                        include: {
+                            users: true,
+                            creator: true
+                        }
+                    }).then((group) => {
+                        const notif: Notif = notifs.group.userAdded(user, group, res.locals.user);
+                        const data = {
                             userId,
                             title: notif.title,
                             message: notif.message,
@@ -206,10 +196,14 @@ exports.addUserGroup = (req: express.Request, res: express.Response, _: express.
                             createdAt: notif.createdAt
                         };
 
-                    prisma.notification.create({ data }).then(() => {
-                        notify(user, data);
+                        prisma.notification.create({ data }).then(() => {
+                            notify(user, data);
 
-                        sendMsg(req, res, info.group.userAdd, group);
+                            sendMsg(req, res, info.group.userAdd, group);
+                        }).catch((err) => {
+                            console.error(err);
+                            sendMsg(req, res, error.generic.internalError);
+                        });
                     }).catch((err) => {
                         console.error(err);
                         sendMsg(req, res, error.generic.internalError);
@@ -222,10 +216,6 @@ exports.addUserGroup = (req: express.Request, res: express.Response, _: express.
                 console.error(err);
                 sendMsg(req, res, error.generic.internalError);
             });
-        }).catch((err) => {
-            console.error(err);
-            sendMsg(req, res, error.generic.internalError);
-        });
     }).catch((err) => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
@@ -236,29 +226,21 @@ exports.deleteGroup = (req: express.Request, res: express.Response, _: express.N
     const groupId = validator.sanitizeId(req.params.id, req, res);
     if (groupId === null) return;
 
-    prisma.group.count({
-        where: {
-            id: groupId
-        }
-
-    }).then((count) => {
-        if (count <= 0) {
-            sendMsg(req, res, error.group.notFound);
-            return;
-        }
-        prisma.group.delete({
-            where: {
-                id: groupId
-
+    prisma.group.count({ where: { id: groupId } })
+        .then((count) => {
+            if (count <= 0) {
+                sendMsg(req, res, error.group.notFound);
+                return;
             }
-        }).then(() => {
-            sendMsg(req, res, info.group.deleted);
+            prisma.group.delete({ where: { id: groupId } })
+                .then(() => {
+                    sendMsg(req, res, info.group.deleted);
+                }).catch((err) => {
+                    console.error(err);
+                    sendMsg(req, res, error.generic.internalError);
+                });
         }).catch((err) => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);
         });
-    }).catch((err) => {
-        console.error(err);
-        sendMsg(req, res, error.generic.internalError);
-    });
 }
