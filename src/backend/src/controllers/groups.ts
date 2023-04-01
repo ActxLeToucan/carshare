@@ -160,3 +160,101 @@ exports.deleteGroup = (req: express.Request, res: express.Response, _: express.N
         sendMsg(req, res, error.generic.internalError);
     });
 }
+
+exports.memberRemove = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    const userId = req.body.userId;
+    if (!validator.checkNumberField(userId, req, res, 'userId')) return;
+
+    const groupId = validator.sanitizeId(req.params.id, req, res);
+    if (groupId === null) return;
+
+    prisma.group.count({
+        where: {
+            id: groupId,
+            creatorId: res.locals.user.id
+        }
+    }).then((countG) => {
+        if (countG !== 1) {
+            sendMsg(req, res, error.group.notFound);
+            return;
+        }
+
+        prisma.user.findUnique({
+            where: {
+                id: userId
+            }
+        }).then((user) => {
+            if (user === null) {
+                sendMsg(req, res, error.user.notFound);
+                return;
+            }
+
+            prisma.group.count({
+                where: {
+                    id: groupId,
+                    users: {
+                        some: {
+                            id: userId
+                        }
+                    }
+
+                }
+
+            }).then((count) => {
+                if (count !== 1) {
+                    sendMsg(req, res, error.group.notMember);
+                    return;
+                }
+
+                prisma.group.update({
+                    where: {
+                        id: groupId
+                    },
+                    data: {
+                        users: {
+                            disconnect: {
+                                id: userId
+                            }
+                        }
+                    },
+                    include: {
+                        users: true,
+                        creator: true
+                    }
+                }).then((group) => {
+                    const notif = notifs.group.userRemoved(user, group, res.locals.user);
+                    const data =
+                        {
+                            userId,
+                            title: notif.title,
+                            message: notif.message,
+                            type: notif.type,
+                            senderId: Number(res.locals.user.id),
+                            createdAt: notif.createdAt
+                        };
+
+                    prisma.notification.create({ data }).then(() => {
+                        notify(user, data);
+
+                        sendMsg(req, res, info.group.memberRemove, group);
+                    }).catch((err) => {
+                        console.error(err);
+                        sendMsg(req, res, error.generic.internalError);
+                    });
+                }).catch((err) => {
+                    console.error(err);
+                    sendMsg(req, res, error.generic.internalError);
+                });
+            }).catch((err) => {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
+            });
+        }).catch((err) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
+    }).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
+}

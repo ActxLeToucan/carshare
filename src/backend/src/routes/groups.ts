@@ -9,6 +9,7 @@ const admin = require('../middlewares/admin');
 router.post('/my', auth.access, emailVerified, controller.createGroup);
 router.get('/my', auth.access, emailVerified, controller.getMyGroups);
 router.patch('/:id/name', auth.access, emailVerified, controller.modifyNameGroup);
+router.patch('/:id/member', auth.access, emailVerified, controller.memberRemove);
 
 // admin routes
 router.get('/', auth.access, emailVerified, admin, controller.searchGroups);
