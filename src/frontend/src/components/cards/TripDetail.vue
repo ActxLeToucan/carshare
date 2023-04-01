@@ -134,6 +134,15 @@
             class="flex flex-col w-full justify-center items-center min-h-max h-max transition-all"
             style="max-height: 0px;"
         />
+        <div
+            v-show="state == 'loading'"
+            class="w-40 h-40 justify-center items-center flex mx-auto"
+        >
+            <card-badge
+                :title="lang.LOADING_TRIP"
+                :content="lang.LOADING_TRIP_DESC"
+            />
+        </div>
     </div>
 </template>
 
@@ -147,12 +156,14 @@ import { Log, LogZone } from "../../scripts/Logs";
 import {
     UserIcon
 } from '@heroicons/vue/24/outline';
+import CardBadge from './CardBadge.vue';
 
 export default {
     name: "TripDetail",
     components: {
         ButtonBlock,
-        UserIcon
+        UserIcon,
+        CardBadge
     },
     props: {
         tripId: {
@@ -174,11 +185,10 @@ export default {
         },
     },
     data() {
-        return { User, lang: Lang.CurrentLang, trip: null, startIndex: null, endIndex: null, isPast: false };
+        return { User, lang: Lang.CurrentLang, trip: null, startIndex: null, endIndex: null, isPast: false, state: null };
     },
     watch: {
         tripId: function (newVal, oldVal) {
-            console.log("TripID changed : " + newVal)
             this.loadTrip(newVal);
         },
         tripStart: function (newVal, oldVal) {
@@ -197,6 +207,8 @@ export default {
     methods: {
         loadTrip(id) {
             if (id == null) return;
+            this.trip = null;
+            this.state = "loading";
 
             API.execute_logged(API.ROUTE.TRAVELS.GET + id, API.METHOD.GET, User.CurrentUser.getCredentials()).then(res => {
                 this.trip = res;
@@ -205,9 +217,11 @@ export default {
                 this.endIndex   = (this.tripEnd)? this.trip?.steps.findIndex(step => step.city == this.tripEnd.value) : this.trip.steps.length - 1;
 
                 this.isPast = new Date(this.trip.steps[this.trip.steps.length - 1].date) < new Date();
+                this.state = "done";
             }).catch(err => {
                 console.error(err);
                 this.popup?.hide();
+                this.state = "error";
             });
         },
         log(msg, type = Log.INFO) {
