@@ -779,6 +779,22 @@ const error = {
             },
             code: 400
         })
+    },
+    time: {
+        invalid: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Heure invalide.',
+                en: 'Invalid time.'
+            },
+            code: 400
+        }),
+        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Heure requise.',
+                en: 'Time required.'
+            },
+            code: 400
+        })
     }
 } satisfies TranslationsMessageHTTP;
 
@@ -1236,6 +1252,20 @@ const notifs = {
                 '\n\nVeuillez vérifier que les informations sont correctes et que vous êtes toujours disponible pour ce trajet.',
                 en: `Your trip from ${travel.steps[0].city} to ${travel.steps[travel.steps.length - 1].city} on ${dateToString(new Date(travel.steps[0].date), user.timezone, 'en')} has been modified by an administrator.` +
                 '\n\nPlease check that the information is correct and that you are still available for this trip.'
+            },
+            type: 'standard',
+            createdAt: new Date()
+        }),
+        invitation: (user: User, travel: Travel & { steps: Step[], driver: User }, groupName: string) => msgForLang<TemplateNotif, Notif>(user.lang, {
+            title: {
+                fr: `Invitation de ${travel.driver.firstName ?? ''} ${travel.driver.lastName ?? ''}`,
+                en: `Invitation from ${travel.driver.firstName ?? ''} ${travel.driver.lastName ?? ''}`
+            },
+            message: {
+                fr: `Vous êtes dans le groupe "${groupName}" de ${travel.driver.firstName ?? ''} ${travel.driver.lastName ?? ''} et ce conducteur vous invite à le/la rejoindre` +
+                    ` sur le trajet ${travel.steps[0].city} - ${travel.steps[travel.steps.length - 1].city} (du ${dateToString(new Date(travel.steps[0].date), user.timezone, 'fr')}).`,
+                en: `You are in the group "${groupName}" of ${travel.driver.firstName ?? ''} ${travel.driver.lastName ?? ''} and this driver invites you to join him/her` +
+                    ` on the trip ${travel.steps[0].city} - ${travel.steps[travel.steps.length - 1].city} (on ${dateToString(new Date(travel.steps[0].date), user.timezone, 'en')}).`
             },
             type: 'standard',
             createdAt: new Date()

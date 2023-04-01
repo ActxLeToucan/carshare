@@ -667,6 +667,27 @@ function checkLang (lang: any, req: express.Request, res: express.Response): boo
 }
 
 /**
+ * Sanitize the time
+ * If the time is not valid, send an error message to the client
+ * @param time Time to sanitize
+ * @param req Express request
+ * @param res Express response
+ * @returns the time as a moment object if it is valid, null otherwise
+ */
+function sanitizeTime (time: any, req: express.Request, res: express.Response): moment.Moment | null {
+    if (time === undefined || typeof time !== 'string' || time === '') {
+        sendMsg(req, res, error.time.required);
+        return null;
+    }
+    const momentTime = moment(time, 'HH:mm', true);
+    if (!momentTime.isValid()) {
+        sendMsg(req, res, error.time.invalid);
+        return null;
+    }
+    return momentTime;
+}
+
+/**
  * Check if a date is in the future ({@link properties.travel.hoursLimit} hours)
  * @param date Date to check
  * @returns whether the date is in the future
@@ -701,5 +722,6 @@ export {
     sanitizeTimezone,
     checkLang,
     sanitizeType,
-    checkTravelHours
+    checkTravelHours,
+    sanitizeTime
 };
