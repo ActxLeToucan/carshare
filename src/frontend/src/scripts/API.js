@@ -91,11 +91,11 @@ class Pagination {
     }
 
     get hasPrevious() {
-        return this._offset > 0;
+        return this.index > 0;
     }
 
     get hasNext() {
-        return this._offset < this.maxIndex * this.limit;
+        return this.index < this.maxIndex;
     }
 
     get index() {
@@ -107,7 +107,7 @@ class Pagination {
     }
 
     get maxIndex() {
-        return Math.floor(this._total / this._limit);
+        return Math.ceil(this._total / this._limit) - 1;
     }
 
     get offset() {

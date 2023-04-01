@@ -16,7 +16,7 @@
                     placeholder="Rechercher"
                 />
                 <button-block
-                    :action="search"
+                    :action="() => { pagination.offset = 0; selectedGroup = null; search(this) }"
                     :disabled="!searchBar.buttonEnabled"
                 >
                     <magnifying-glass-icon class="w-7 h-7" />
