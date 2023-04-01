@@ -187,7 +187,7 @@ exports.cancelMyBooking = (req: express.Request, res: express.Response, next: ex
             sendMsg(req, res, error.booking.notYours);
             return;
         }
-        if (!validator.checkTravelHoursEditable(booking.departure.date, req, res)) return;
+        if (!validator.checkTravelHoursEditable(booking.departure.date, true, req, res)) return;
 
         if (booking.status === properties.booking.status.cancelled || booking.status === properties.booking.status.rejected) {
             sendMsg(req, res, error.booking.alreadyCancelled);

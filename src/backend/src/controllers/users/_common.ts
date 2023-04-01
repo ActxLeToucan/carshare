@@ -15,12 +15,12 @@ import sanitizer from '../../tools/sanitizer';
 async function update (req: express.Request, res: express.Response, userId: number, asAdmin: boolean) {
     const { email, lastName, firstName, phone, hasCar, gender, mailNotif, level } = req.body;
 
-    if (email !== undefined && !validator.email(email, req, res)) return;
-    if (lastName !== undefined && !validator.lastname(lastName, req, res)) return;
-    if (firstName !== undefined && !validator.firstname(firstName, req, res)) return;
-    if (hasCar !== undefined && !validator.typeBoolean(hasCar, req, res, 'hasCar')) return;
-    if (mailNotif !== undefined && !validator.typeBoolean(mailNotif, req, res, 'mailNotif')) return;
-    if (asAdmin && level !== undefined && !validator.level(level, req, res)) return;
+    if (email !== undefined && !validator.email(email, true, req, res)) return;
+    if (lastName !== undefined && !validator.lastname(lastName, true, req, res)) return;
+    if (firstName !== undefined && !validator.firstname(firstName, true, req, res)) return;
+    if (hasCar !== undefined && !validator.typeBoolean(hasCar, true, req, res, 'hasCar')) return;
+    if (mailNotif !== undefined && !validator.typeBoolean(mailNotif, true, req, res, 'mailNotif')) return;
+    if (asAdmin && level !== undefined && !validator.level(level, true, req, res)) return;
     let _phoneSanitized;
     if (phone !== undefined) {
         _phoneSanitized = sanitizer.phone(phone, req, res);

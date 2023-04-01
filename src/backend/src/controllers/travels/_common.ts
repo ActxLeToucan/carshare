@@ -20,11 +20,11 @@ async function update (req: express.Request, res: express.Response, asAdmin: boo
 
     const { maxPassengers, price, description, steps } = req.body;
 
-    if (maxPassengers !== undefined && !validator.maxPassengers(maxPassengers, req, res)) return;
-    if (price !== undefined && !validator.price(price, req, res)) return;
-    if (description !== undefined && !validator.description(description, req, res)) return;
+    if (maxPassengers !== undefined && !validator.maxPassengers(maxPassengers, true, req, res)) return;
+    if (price !== undefined && !validator.price(price, true, req, res)) return;
+    if (description !== undefined && !validator.description(description, true, req, res)) return;
 
-    if (!validator.checkStepList(steps, req, res)) return;
+    if (!validator.checkStepList(steps, true, req, res)) return;
 
     // Check if the travel exists
     const travel = await prisma.travel.findUnique({
@@ -97,7 +97,7 @@ async function update (req: express.Request, res: express.Response, asAdmin: boo
         }
     });
     for (const travelSteps of travelsSteps) {
-        if (!validator.checkTravelAlready(steps[0].date, steps[steps.length - 1].date, travelSteps.steps, req, res)) return;
+        if (!validator.checkTravelAlready(steps[0].date, steps[steps.length - 1].date, travelSteps.steps, true, req, res)) return;
     }
 
     // Get bookings for notifications (before any update to preserve the old data)

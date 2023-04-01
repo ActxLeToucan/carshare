@@ -13,11 +13,11 @@ import sanitizer from '../tools/sanitizer';
 exports.searchTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { date, time, startCity, startContext, endCity, endContext } = req.query;
 
-    if (!validator.city(startCity, req, res, 'startCity')) return;
-    if (!validator.city(endCity, req, res, 'endCity')) return;
-    if (!validator.date(date, false, req, res)) return;
-    if (startContext !== undefined && !validator.typeString(startContext, req, res, 'startContext')) return;
-    if (endContext !== undefined && !validator.typeString(endContext, req, res, 'endContext')) return;
+    if (!validator.city(startCity, true, req, res, 'startCity')) return;
+    if (!validator.city(endCity, true, req, res, 'endCity')) return;
+    if (!validator.date(date, true, req, res, false)) return;
+    if (startContext !== undefined && !validator.typeString(startContext, true, req, res, 'startContext')) return;
+    if (endContext !== undefined && !validator.typeString(endContext, true, req, res, 'endContext')) return;
 
     let timeSanitized;
     if (time !== undefined) {
@@ -131,9 +131,9 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
 exports.createTravel = async (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { maxPassengers, price, description, groupId, steps } = req.body;
 
-    if (!validator.maxPassengers(maxPassengers, req, res)) return;
-    if (!validator.price(price, req, res)) return;
-    if (!validator.description(description, req, res)) return;
+    if (!validator.maxPassengers(maxPassengers, true, req, res)) return;
+    if (!validator.price(price, true, req, res)) return;
+    if (!validator.description(description, true, req, res)) return;
 
     let group: (Group & { users: User[] }) | null = null;
     if (groupId !== undefined && groupId !== null) {
@@ -162,7 +162,7 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
             sendMsg(req, res, error.generic.internalError);
         }
     }
-    if (!validator.checkStepList(steps, req, res)) return;
+    if (!validator.checkStepList(steps, true, req, res)) return;
 
     prisma.travel.findMany({
         where: {
@@ -177,7 +177,7 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
         }
     }).then((travels) => {
         for (const travel of travels) {
-            if (!validator.checkTravelAlready(steps[0].date, steps[steps.length - 1].date, travel.steps, req, res)) return;
+            if (!validator.checkTravelAlready(steps[0].date, steps[steps.length - 1].date, travel.steps, true, req, res)) return;
         }
 
         prisma.travel.create({

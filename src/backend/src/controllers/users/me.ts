@@ -12,7 +12,7 @@ exports.getMe = (req: express.Request, res: express.Response, _: express.NextFun
 }
 
 exports.deleteMe = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    if (!validator.password(req.body.password, req, res, false)) return;
+    if (!validator.password(req.body.password, true, req, res, false)) return;
 
     bcrypt.compare(req.body.password, res.locals.user.password)
         .then((valid) => {

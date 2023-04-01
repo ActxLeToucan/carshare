@@ -142,7 +142,7 @@ exports.cancelMyTravel = (req: express.Request, res: express.Response, _: expres
             return;
         }
 
-        if (!validator.checkTravelHoursEditable(travel.steps[0].date, req, res)) return;
+        if (!validator.checkTravelHoursEditable(travel.steps[0].date, true, req, res)) return;
 
         // cancel travel
         prisma.travel.update({

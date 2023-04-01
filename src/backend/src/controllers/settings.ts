@@ -15,8 +15,8 @@ exports.getSettings = (req: express.Request, res: express.Response, _: express.N
 exports.updateSettings = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { mailNotif, lang, timezone } = req.body;
 
-    if (mailNotif !== undefined && !validator.typeBoolean(mailNotif, req, res, 'mailNotif')) return;
-    if (lang !== undefined && !validator.lang(lang, req, res)) return;
+    if (mailNotif !== undefined && !validator.typeBoolean(mailNotif, true, req, res, 'mailNotif')) return;
+    if (lang !== undefined && !validator.lang(lang, true, req, res)) return;
     const timezoneSanitized = sanitizer.timezone(timezone);
     if (timezone !== undefined && timezoneSanitized === undefined) {
         sendMsg(req, res, error.timezone.invalid);

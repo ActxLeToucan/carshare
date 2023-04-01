@@ -14,13 +14,13 @@ import sanitizer from '../tools/sanitizer';
 exports.signup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { email, password, lastName, firstName, phone, hasCar, gender, timezone } = req.body;
 
-    if (!validator.email(email, req, res)) return;
-    if (!validator.password(password, req, res)) return;
-    if (!validator.lastname(lastName, req, res)) return;
-    if (!validator.firstname(firstName, req, res)) return;
+    if (!validator.email(email, true, req, res)) return;
+    if (!validator.password(password, true, req, res)) return;
+    if (!validator.lastname(lastName, true, req, res)) return;
+    if (!validator.firstname(firstName, true, req, res)) return;
     const phoneSanitized = sanitizer.phone(phone, req, res);
     if (phoneSanitized === null) return;
-    if (hasCar !== undefined && !validator.typeBoolean(hasCar, req, res, 'hasCar')) return;
+    if (hasCar !== undefined && !validator.typeBoolean(hasCar, true, req, res, 'hasCar')) return;
     const genderSanitized = sanitizer.gender(gender);
     const timezoneSanitized = sanitizer.timezone(timezone);
 
@@ -84,8 +84,8 @@ exports.signup = (req: express.Request, res: express.Response, _: express.NextFu
 }
 
 exports.login = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    if (!validator.email(req.body.email, req, res, false)) return;
-    if (!validator.password(req.body.password, req, res, false)) return;
+    if (!validator.email(req.body.email, true, req, res, false)) return;
+    if (!validator.password(req.body.password, true, req, res, false)) return;
 
     prisma.user.findUnique({ where: { email: req.body.email } })
         .then((user) => {
@@ -121,7 +121,7 @@ exports.login = (req: express.Request, res: express.Response, _: express.NextFun
 }
 
 exports.askForPasswordReset = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    if (!validator.email(req.body.email, req, res, false)) return;
+    if (!validator.email(req.body.email, true, req, res, false)) return;
 
     prisma.user.findUnique({ where: { email: req.body.email } })
         .then((user) => {
@@ -176,8 +176,8 @@ exports.resetPassword = (req: express.Request, res: express.Response, next: expr
 }
 
 exports.updatePassword = async (req: express.Request, res: express.Response, _: express.NextFunction, checkOld = true) => {
-    if (!validator.password(req.body.password, req, res)) return;
-    if (checkOld && !validator.passwordOld(req.body.oldPassword, req, res)) return;
+    if (!validator.password(req.body.password, true, req, res)) return;
+    if (checkOld && !validator.passwordOld(req.body.oldPassword, true, req, res)) return;
 
     if (checkOld) {
         try {

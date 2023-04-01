@@ -52,7 +52,7 @@ function acceptOrRejectBooking (req: express.Request, res: express.Response, sta
             return;
         }
 
-        if (!validator.checkTravelHoursEditable(booking.departure.travel.steps[0].date, req, res)) return;
+        if (!validator.checkTravelHoursEditable(booking.departure.travel.steps[0].date, true, req, res)) return;
 
         if (status === properties.booking.status.accepted) {
             // check if there is a place left in the car

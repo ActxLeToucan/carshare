@@ -7,7 +7,7 @@ import sanitizer from '../tools/sanitizer';
 
 exports.createGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { name } = req.body;
-    if (!validator.groupName(name, req, res)) return;
+    if (!validator.groupName(name, true, req, res)) return;
     prisma.group.create({
         data: {
             name,
@@ -37,7 +37,7 @@ exports.getMyGroups = (req: express.Request, res: express.Response, next: expres
 
 exports.modifyNameGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const groupName = req.body.groupName;
-    if (!validator.groupName(groupName, req, res)) return;
+    if (!validator.groupName(groupName, true, req, res)) return;
     const groupId = sanitizer.id(req.params.id, req, res);
     if (groupId === null) return;
     prisma.group.findUnique({
@@ -132,7 +132,7 @@ function getGroups (req: express.Request, res: express.Response, next: express.N
 
 exports.addUserGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const email = req.body.email;
-    if (!validator.email(email, req, res, false)) return;
+    if (!validator.email(email, true, req, res, false)) return;
 
     const groupId = sanitizer.id(req.params.id, req, res);
     if (groupId === null) return;

@@ -76,9 +76,9 @@ exports.getAverageTravel = (req: express.Request, res: express.Response, next: e
 exports.createEvaluation = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { note, travelId, evaluatedId } = req.body;
 
-    if (!validator.note(note, req, res)) return;
-    if (!validator.typeNumber(travelId, req, res, 'travelId')) return;
-    if (!validator.typeNumber(evaluatedId, req, res, 'evaluatedId')) return;
+    if (!validator.note(note, true, req, res)) return;
+    if (!validator.typeNumber(travelId, true, req, res, 'travelId')) return;
+    if (!validator.typeNumber(evaluatedId, true, req, res, 'evaluatedId')) return;
 
     prisma.travel.count({
         where: {
@@ -207,7 +207,7 @@ exports.editEvaluation = (req: express.Request, res: express.Response, _: expres
     const evaluationId = sanitizer.id(req.params.id, req, res);
     if (evaluationId === null) return;
 
-    if (!validator.note(note, req, res)) return;
+    if (!validator.note(note, true, req, res)) return;
 
     prisma.evaluation.findUnique({
         where: {
