@@ -10,7 +10,7 @@
         </div>
         <div class="flex flex-col grow">
             <div class="flex w-full justify-between space-x-8">
-                <p class="text-slate-500 dark:text-slate-300 text-lg font-semibold">
+                <p class="text-slate-500 dark:text-slate-300 text-lg font-semibold whitespace-nowrap text-ellipsis overflow-hidden">
                     {{ trip.departure?.city }}
                 </p>
                 <p class="text-slate-400 dark:text-slate-400 text-lg font-semibold">
@@ -18,7 +18,7 @@
                 </p>
             </div>
             <div class="flex w-full justify-between space-x-8">
-                <p class="text-slate-500 dark:text-slate-300 text-lg font-semibold">
+                <p class="text-slate-500 dark:text-slate-300 text-lg font-semibold whitespace-nowrap text-ellipsis overflow-hidden">
                     {{ trip.arrival?.city }}
                 </p>
                 <p class="text-slate-400 dark:text-slate-400 text-lg font-semibold">
