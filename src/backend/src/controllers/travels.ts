@@ -2,11 +2,12 @@ import type express from 'express';
 import { prisma } from '../app';
 import * as validator from '../tools/validator';
 import { checkTravelHours } from '../tools/validator';
-import { displayableTravel, displayableUserPublic, error, info, sendMsg } from '../tools/translator';
+import { displayableTravel, displayableUserPublic, error, info, notifs, notify, sendMsg } from '../tools/translator';
 import properties from '../properties';
 import { getMaxPassengers, preparePagination } from './_common';
 import moment from 'moment-timezone';
 import * as _travel from './travels/_common';
+import { Booking, type Group, type User } from '@prisma/client';
 
 exports.searchTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { date, time, startCity, startContext, endCity, endContext } = req.query;
@@ -133,6 +134,7 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
     if (!validator.checkPriceField(price, req, res)) return;
     if (!validator.checkDescriptionField(description, req, res)) return;
 
+    let group: (Group & { users: User[] }) | null = null;
     if (groupId !== undefined && groupId !== null) {
         if (typeof groupId !== 'number') {
             sendMsg(req, res, error.group.typeId);
@@ -140,15 +142,18 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
         }
 
         try {
-            const count = await prisma.group.count({
-                where: {
-                    id: groupId,
-                    creatorId: res.locals.user.id
-                }
+            group = await prisma.group.findUnique({
+                where: { id: groupId },
+                include: { users: true }
             });
 
-            if (count === 0) {
+            if (group === null) {
                 sendMsg(req, res, error.group.notFound);
+                return;
+            }
+
+            if (group.creatorId !== res.locals.user.id) {
+                sendMsg(req, res, error.group.notCreator);
                 return;
             }
         } catch (err) {
@@ -165,9 +170,7 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
         },
         select: {
             steps: {
-                select: {
-                    date: true
-                }
+                select: { date: true }
             }
         }
     }).then((travels) => {
@@ -199,8 +202,28 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
                 driver: true
             }
         }).then((travel) => {
-            // TODO: notify users in the group
-            sendMsg(req, res, info.travel.created, travel);
+            const users = group === null ? [] : group.users;
+            const data = users.map((user) => {
+                const notif = notifs.travel.invitation(user, travel, group?.name ?? 'noname');
+                return {
+                    ...notif,
+                    userId: user.id,
+                    senderId: travel.driver.id,
+                    travelId: travel.id
+                }
+            });
+            prisma.notification.createMany({ data }).then(() => {
+                for (const notif of data) {
+                    const user = users.find((u) => u.id === notif.userId);
+                    // Send email notification
+                    if (user !== undefined) notify(user, notif);
+                }
+
+                sendMsg(req, res, info.travel.created, travel);
+            }).catch((err) => {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
+            });
         }).catch((err) => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);

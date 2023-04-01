@@ -1231,6 +1231,20 @@ const notifs = {
             },
             type: 'standard',
             createdAt: new Date()
+        }),
+        invitation: (user: User, travel: Travel & { steps: Step[], driver: User }, groupName: string) => msgForLang<TemplateNotif, Notif>(user.lang, {
+            title: {
+                fr: `Invitation de ${travel.driver.firstName ?? ''} ${travel.driver.lastName ?? ''}`,
+                en: `Invitation from ${travel.driver.firstName ?? ''} ${travel.driver.lastName ?? ''}`
+            },
+            message: {
+                fr: `Vous êtes dans le groupe "${groupName}" de ${travel.driver.firstName ?? ''} ${travel.driver.lastName ?? ''} et ce conducteur vous invite à le/la rejoindre` +
+                    ` sur le trajet ${travel.steps[0].city} - ${travel.steps[travel.steps.length - 1].city} (du ${dateToString(new Date(travel.steps[0].date), user.timezone, 'fr')}).`,
+                en: `You are in the group "${groupName}" of ${travel.driver.firstName ?? ''} ${travel.driver.lastName ?? ''} and this driver invites you to join him/her` +
+                    ` on the trip ${travel.steps[0].city} - ${travel.steps[travel.steps.length - 1].city} (on ${dateToString(new Date(travel.steps[0].date), user.timezone, 'en')}).`
+            },
+            type: 'standard',
+            createdAt: new Date()
         })
     },
     booking: {
