@@ -65,7 +65,6 @@
         </div>
         <card-popup
             ref="trip-view"
-            :title="lang.TRAVEL_CARD_LABEL.replace('{DATE}', new Date(selectedTrip?.departure?.date).toLocaleDateString())"
             :cancel-label="lang.BACK"
             :show-validate="false"
         >
@@ -126,7 +125,6 @@ export default {
     methods: {
         selectTrip(trip) {
             this.selectedTrip = trip;
-            this.tripPreview?.setTitle(Lang.CurrentLang.TRAVEL_CARD_LABEL.replace('{DATE}', new Date(this.selectedTrip?.departure?.date).toLocaleDateString()));
             this.tripPreview?.show();
         },
         fetchFutureTrips() {

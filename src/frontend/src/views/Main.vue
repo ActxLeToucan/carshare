@@ -473,7 +473,6 @@ export default {
             this.selectedTripId = null;
             this.selectedTripId = id;
             const popup = this.$refs["trip-details"];
-            popup.setTitle(Lang.CurrentLang.TRIP_DETAILS);
             popup.show();
         },
         onpopupcancel(popup) {
