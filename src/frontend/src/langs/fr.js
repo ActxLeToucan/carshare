@@ -1,6 +1,6 @@
 export default {
     // common
-    CARSHARE: "Car share",
+    CARSHARE: "Car Share",
     CARSHARE_DESC: "Covoiturez entre amis ou inconnus !",
     WELCOME: "Bienvenue sur Car Share !",
     WELCOME_DESC: "Pour commencer à utiliser l'application, veuillez vous connecter ou vous inscrire.",
@@ -40,6 +40,15 @@ export default {
     VALIDATION_SUCCESS: "Compte validé avec succès !\nVous pouvez fermer cette page.",
     VALIDATION_NO_TOKEN: "Aucun token n'a été fourni dans le lien,\nveuillez vérifier le lien que vous avez reçu par email.",
 
+    // reinit password page
+    REINIT_PASSWORD_TITLE: "Réinitialisation du mot de passe",
+    REINIT_NO_TOKEN: "Aucun token de réinitialisation n'a été fourni",
+    PASSWORD_REINIT_SUCCESS: "Mot de passe réinitialisé avec succès !",
+
+    // Recovery page (forgot password)
+    RECOVERY_TITLE: "Vous avez oublié votre mot de passe ?",
+    RECOVERY_DESC: "Pas de soucis ! Nous vous enverrons un mail pour le réinitialiser.",
+
     // actions
     LOGIN: "Se connecter",
     REGISTER: "S'inscrire",
@@ -75,9 +84,9 @@ export default {
     REQUIRED_FIELDS: "Champs obligatoires",
     INPUT_VERIFICATION: "Vérification des entrées",
     DATA_SENDING: "Envoi des données",
-    REGISTER_SUCCESS: "Compte créé avec succès",
+    REGISTER_SUCCESS: "Compte créé avec succès !",
     SENDING_EMAILVERIF: "Envoi de l'email de vérification",
-    SENDING_EMAIL_SUCCESS: "Email envoyé avec succès",
+    SENDING_EMAIL_SUCCESS: "Email envoyé avec succès !",
 
     // checks errors
     FIRSTNAME_SPECIFY: "Veuillez renseignez votre nom",
@@ -105,8 +114,8 @@ export default {
     // login
     LOGIN_TITLE: "Connexion",
     LOGIN_DESC: "Veuillez remplir les champs ci-dessous pour vous connecter",
-    FORGOT_PASSWORD: "Mot de passe oublié",
-    LOGIN_SUCCESS: "Connecté avec succès",
+    FORGOT_PASSWORD: "Mot de passe oublié ?",
+    LOGIN_SUCCESS: "Connecté avec succès !",
 
     // main screen
     STARTING_POINT: "Départ",
@@ -154,6 +163,9 @@ export default {
     DELETE_ALL_NOTIFS_CONFIRMATION: "Êtes-vous sûr de vouloir supprimer toutes vos notifications ?\nElles seront supprimées, même si elles ne sont pas affichées sur cette page.\nCette action est irréversible.",
     DELETING_NOTIFS: "Suppression des notifications",
     NOTIFS_DELETED: "Notifications supprimées avec succès",
+    ACCEPT: "Accepter",
+    REJECT: "Refuser",
+    SEE_TRAVEL: "Voir le trajet",
 
     // groups
     NO_GROUPS: "Vous n'avez pas encore créé de groupe",
@@ -177,7 +189,6 @@ export default {
     SELECT_GROUP_DESC: "Veuillez sélectionner un groupe d'utilisateurs pour pouvoir partager vos trajets avec eux",
     GROUP_SELECTED: "Groupe sélectionné",
     SEARCH_GROUP: "Rechercher un groupe",
-    GROUP_NAME: "Nom du groupe",
 
     // parametres
     NOTIF_PARAMS: "Paramètres de notifications",
@@ -197,6 +208,9 @@ export default {
     FUTURE_TRIPS: "Trajets futurs",
     PAST_TRIPS: "Trajets passés",
     CANCEL_TRIP: "Annuler le trajet",
+
+    // booking
+    BOOKING_DOESNT_EXIST_ANYMORE: "Cette réservation n'existe plus.",
 
     // informations
     ADDRESS_NOT_VERIFIED: "Adresse non vérifiée",

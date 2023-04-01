@@ -136,6 +136,7 @@
             :cancel-label="lang.CANCEL"
             :validate-label="lang.CREATE"
             :onvalidate="createGroup"
+            :disable-validate="isCreating"
         >
             <input-text
                 :label="lang.GROUP_NAME"
@@ -182,7 +183,8 @@ export default {
             deletePopup: null,
             createPopup: null,
             showPagBtn: false,
-            pagination: API.createPagination(0, 5)
+            pagination: API.createPagination(0, 5),
+            isCreating: false
         }
     },
     mounted() {
@@ -231,6 +233,7 @@ export default {
             });
         }, 
         createGroup(popup) {
+            this.isCreating = true;
             const log = popup.log(Lang.CurrentLang.INPUT_VERIFICATION + " ...", Log.INFO);
 
             const field_checks = [
@@ -244,6 +247,7 @@ export default {
                     popup.focus(check.field);
                     log.update(check.error, Log.WARNING);
                     setTimeout(() => { log.delete(); }, 4000);
+                    this.isCreating = false;
                     return;
                 }
             }
@@ -255,10 +259,12 @@ export default {
                 setTimeout(() => {
                     log.delete();
                     popup.hide();
+                    this.isCreating = false;
                 }, 2000);
                 this.updateGroups();
             }).catch(err => {
                 log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
+                this.isCreating = false;
                 setTimeout(() => {
                     log.delete();
                 }, 6000);

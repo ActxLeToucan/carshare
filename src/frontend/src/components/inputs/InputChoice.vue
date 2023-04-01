@@ -1,15 +1,15 @@
 <template>
-    <div class="flex h-fit w-full justify-between md:space-x-8 items-center my-2">
+    <div class="flex h-fit w-full justify-between md:space-x-8 space-x-4 items-center my-2 min-w-0 max-w-full">
         <label class="flex text-xl text-slate-500 dark:text-slate-400 font-bold whitespace-nowrap text-ellipsis w-fit">
             {{ label }}
         </label>
-        <div>
+        <div class="min-w-0 max-w-full">
             <select
                 id=""
                 ref="select"
                 name=""
                 class="flex w-fit h-fit bg-white dark:bg-slate-600 rounded-md text-slate-600 dark:text-slate-300 font-bold text-lg whitespace-nowrap text-ellipsis outline-none
-                       outline-transparent px-4 py-2 border-b-4 border-slate-200 dark:border-slate-700 transition-all focus:border-teal-500 hover:border-slate-300"
+                       min-w-0 max-w-full outline-transparent px-4 py-2 border-b-4 border-slate-200 dark:border-slate-700 transition-all focus:border-teal-500 hover:border-slate-300"
             >
                 <option
                     v-for="el in elements"

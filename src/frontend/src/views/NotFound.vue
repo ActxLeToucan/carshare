@@ -23,7 +23,7 @@
                         style="animation-delay: 0.1s"
                         class="show-down md:text-4xl text-2xl text-slate-500 text-center font-bold mx-auto"
                     >
-                        {{ lang.WOOPS }} !
+                        {{ lang.WOOPS }}
                     </p>
                     <p
                         style="animation-delay: 0.2s"

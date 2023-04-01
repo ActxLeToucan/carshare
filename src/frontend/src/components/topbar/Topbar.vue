@@ -20,6 +20,16 @@
                     </button-text>
                 </div>
                 <div class="flex w-[20%] h-fit justify-end space-x-4">
+                    <router-link
+                        to="/profile#notifs"
+                        class="relative flex text-slate-500 justify-center items-center my-auto"
+                    >
+                        <bell-icon class="w-7 h-7" />
+                        <span
+                            v-show="hasNotifs"
+                            class="absolute top-0 right-0 bg-red-500 rounded-2xl w-2 h-2"
+                        />
+                    </router-link>
                     <button-block href="/profile">
                         {{ lang.MY_PROFILE }}
                     </button-block>
@@ -80,6 +90,12 @@ import User from '../../scripts/User.js';
 import Lang from '../../scripts/Lang';
 import { goTo } from '../../scripts/redirects';
 
+import {
+    BellIcon
+} from '@heroicons/vue/24/outline';
+import API from '../../scripts/API';
+
+
 const buttons = [
     {
         id: 'HOME',
@@ -99,14 +115,15 @@ export default {
     name: 'TopBar',
     components: {
         ButtonText,
-        ButtonBlock
+        ButtonBlock,
+        BellIcon
     },
     data() {
         // if the topbar is displayed, it's a page that requires authentication
         // so we check if the user is logged in, if not we redirect him to the home page
         // (with buttons to login or register)
-        if (User.CurrentUser === null) {
-            goTo(this, '/home');
+        if (!User.CurrentUser) {
+            window.location.href = '/home';
             return { lang: Lang.CurrentLang };
         }
 
@@ -121,13 +138,18 @@ export default {
                 buttons.splice( buttons.findIndex( button => button.id === 'ADMIN' ), 1 )
         }
 
-        return { buttons, lang: Lang.CurrentLang }
+        return { buttons, lang: Lang.CurrentLang, hasNotifs: false }
     },
     mounted() {
         Lang.AddCallback(lang => {
             this.lang = lang;
             this.buttons = buttons;
         });
+
+        if (!User.CurrentUser) {
+            window.location.href = '/home';
+            return { lang: Lang.CurrentLang };
+        }
 
         const btn = this.$refs["btn-mobile"];
         const menu = this.$refs["menu-mobile"];
@@ -143,6 +165,19 @@ export default {
                 menu.style.maxHeight = "0px";
             }
         });
+
+        window.topbar = this;
+        this.fetchNotifs();
+    },
+    methods: {
+        fetchNotifs() {
+            API.execute_logged(API.ROUTE.MY_NOTIFS, API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
+                const nbNotifs = res?.data?.length ?? 0;
+                this.hasNotifs = nbNotifs > 0;
+            }).catch(err => {
+                console.error(err);
+            });
+        }
     }
 }
 </script>

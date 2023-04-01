@@ -1,19 +1,20 @@
 <template>
-    <div class="flex flex-col grow w-full max-h-full min-h-0 min-w-[60vw]">
+    <div class="flex flex-col grow w-full h-fit min-h-0 min-w-[60vw]">
         <div
             v-if="trip != null"
-            class="flex md:flex-row flex-col grow min-w-0 w-full max-h-full min-h-0"
+            class="flex md:flex-row flex-col grow min-w-0 w-full h-fit md:space-y-0 space-y-4"
         >
-            <div class="flex grow flex-col md:w-[50%] w-fit justify-center items-center md:pr-4">
+            <div class="flex grow flex-col md:w-[50%] w-fit max-w-full justify-center items-center md:pr-4">
                 <p class="text-xl text-slate-600 dark:text-slate-300 font-bold whitespace-nowrap text-ellipsis mb-1">
                     {{ lang.TRIP_DESTINATIONS }}
                 </p>
                 <div class="flex flex-col grow h-fit w-fit space-y-2 w-full overflow-y-auto max-h-min min-h-[4em]">
-                    <div
+                    <button
                         v-for="(step, index) in trip.steps"
                         :key="step.id"
                         class="flex h-fit w-full justify-between items-center space-x-10 rounded-md border-2 py-1 px-2"
-                        :class="(index < startIndex || index > endIndex) ? ' bg-slate-100 dark:bg-slate-700 border-slate-200 dark:border-slate-600' : ' bg-white dark:bg-slate-600 border-slate-300 dark:border-slate-500'"
+                        :class="(index < startIndex || index > endIndex) ? ' bg-slate-100 dark:bg-slate-700 border-slate-200 dark:border-slate-600 ' + (!editMode? 'hover:border-slate-300 hover:dark:border-slate-500' : 'cursor-default') : ' bg-white dark:bg-slate-600 border-slate-300 dark:border-slate-500 ' + (!editMode? 'hover:border-slate-400 hover:dark:border-slate-400' : 'cursor-default')"
+                        @click="toogleStep(index)"
                     >
                         <p
                             class="text-xl font-bold whitespace-nowrap text-ellipsis overflow-hidden"
@@ -27,7 +28,7 @@
                         >
                             {{ new Date(step.date).toLocaleTimeString().substring(0, 5) }}
                         </p>
-                    </div>
+                    </button>
                 </div>
                 <div class="flex flex-col grow rounded-lg bg-slate-200 dark:bg-slate-600 border-2 border-slate-200 dark:border-slate-600 w-fit min-w-full max-w-full mt-4">
                     <p class="text-xl text-slate-600 dark:text-slate-200 font-bold mx-2 mb-1 whitespace-nowrap text-ellipsis overflow-hidden">
@@ -40,8 +41,11 @@
                     </div>
                 </div>
             </div>
-            <span class="hidden md:flex grow h-40 w-1 bg-slate-200 dark:bg-slate-700 rounded-md my-auto" />
-            <div class="flex grow flex-col md:w-[50%] w-full items-center md:pl-4 space-y-4">
+            <div class="flex grow justify-center items-center">
+                <span class="hidden md:flex grow h-40 w-1 bg-slate-200 dark:bg-slate-700 rounded-md" />
+                <span class="md:hidden flex grow mx-8 h-1 bg-slate-200 dark:bg-slate-700 rounded-md" />
+            </div>
+            <div class="flex grow flex-col md:w-[50%] w-fit max-w-full items-center md:pl-4 space-y-4">
                 <div class="flex flex-col h-50% w-full">
                     <p class="text-xl text-slate-600 dark:text-slate-300 font-bold mx-2 mb-1 mr-auto">
                         {{ lang.PASSENGERS }}
@@ -98,7 +102,7 @@
             </div>
         </div>
         <div
-            v-show="!editMode"
+            v-show="!editMode && (User.CurrentUser.id !== trip?.driver?.id || isPast)"
             class="flex w-full justify-center items-center my-4"
         >
             <button-block :action="bookTrip">
@@ -106,7 +110,7 @@
             </button-block>
         </div>
         <div
-            v-show="editMode"
+            v-show="editMode && (User.CurrentUser.id === trip?.driver?.id)"
             class="flex w-full justify-end items-center my-4"
         >
             <button-block
@@ -136,14 +140,12 @@ import { Log, LogZone } from "../../scripts/Logs";
 import {
     UserIcon
 } from '@heroicons/vue/24/outline';
-import CardBadge from "../cards/CardBadge.vue"
 
 export default {
     name: "TripDetail",
     components: {
         ButtonBlock,
-        UserIcon,
-       
+        UserIcon
     },
     props: {
         tripId: {
@@ -236,6 +238,17 @@ export default {
         },
         setPopup(popup) {
             this.popup = popup;
+        },
+        toogleStep(index) {
+            if (this.editMode) return;
+
+            const mid = (this.startIndex + this.endIndex) / 2;
+            if (index < mid) {
+                this.startIndex = index;
+            } else {
+                this.endIndex = index;
+            }
+            this.$forceUpdate();
         }
     },
 };
