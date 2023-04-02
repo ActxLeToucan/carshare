@@ -49,7 +49,7 @@ exports.deleteMyGroup = (req: express.Request, res: express.Response, _: express
                 return;
             }
 
-            prisma.group.delete({ 
+            prisma.group.delete({
                 where: { id: groupId },
                 include: {
                     users: true
@@ -76,7 +76,6 @@ exports.deleteMyGroup = (req: express.Request, res: express.Response, _: express
                     console.error(err);
                     sendMsg(req, res, error.generic.internalError);
                 });
-                
             }).catch((err) => {
                 console.error(err);
                 sendMsg(req, res, error.generic.internalError);
@@ -119,11 +118,10 @@ exports.modifyNameGroup = (req: express.Request, res: express.Response, _: expre
                 users: true
             }
         }).then((group) => {
-
             const data = group.users.map((user) => {
                 const notif = notifs.group.nameUpdated(user, oldName, groupName);
                 return {
-                    
+
                     ...notif,
                     userId: user.id,
                     senderId: Number(res.locals.user.id)
