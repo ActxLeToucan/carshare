@@ -18,6 +18,9 @@ async function update (req: express.Request, res: express.Response, asAdmin: boo
     const travelId = sanitizer.id(req.params.id, req, res);
     if (travelId === null) return;
 
+    const reason = req.query.reason;
+    if (reason !== undefined && !validator.typeString(reason, true, req, res, 'reason')) return;
+    const reasonStr = reason === undefined ? undefined : reason as string;
     const { maxPassengers, price, description, steps } = req.body;
 
     if (maxPassengers !== undefined && !validator.maxPassengers(maxPassengers, true, req, res)) return;
@@ -166,8 +169,8 @@ async function update (req: express.Request, res: express.Response, asAdmin: boo
         .map((booking) => {
             const bookingDeleted = stepsToDelete.map((s: Step) => s.id).includes(booking.departure.id) || stepsToDelete.map((s: Step) => s.id).includes(booking.arrival.id);
             const notif = bookingDeleted
-                ? notifs.booking.deletedDueToTravelUpdate(booking.passenger, booking, updatedTravel, asAdmin)
-                : notifs.booking.travelUpdated(booking.passenger, booking, asAdmin);
+                ? notifs.booking.deletedDueToTravelUpdate(booking.passenger, booking, updatedTravel, asAdmin, reasonStr)
+                : notifs.booking.travelUpdated(booking.passenger, booking, asAdmin, reasonStr);
             return {
                 ...notif,
                 userId: booking.passenger.id,
@@ -186,7 +189,7 @@ async function update (req: express.Request, res: express.Response, asAdmin: boo
 
     // Create notifications for driver
     if (asAdmin) {
-        const notif = notifs.travel.updated(updatedTravel.driver, updatedTravel);
+        const notif = notifs.travel.updated(updatedTravel.driver, updatedTravel, reasonStr);
         await prisma.notification.create({
             data: {
                 ...notif,
@@ -202,4 +205,8 @@ async function update (req: express.Request, res: express.Response, asAdmin: boo
     sendMsg(req, res, info.travel.updated, updatedTravel);
 }
 
-export { update };
+async function cancel (req: express.Request, res: express.Response, asAdmin: boolean) {
+    // TODO: use the same function for cancel as admin and cancel as driver
+}
+
+export { update, cancel };

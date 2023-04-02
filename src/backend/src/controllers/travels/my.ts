@@ -152,9 +152,7 @@ exports.cancelMyTravel = (req: express.Request, res: express.Response, _: expres
             // get passengers and send notifications
             prisma.booking.findMany({
                 where: {
-                    departure: {
-                        travelId
-                    }
+                    departure: { travelId }
                 },
                 include: {
                     departure: true,
@@ -163,7 +161,7 @@ exports.cancelMyTravel = (req: express.Request, res: express.Response, _: expres
                 }
             }).then((bookings) => {
                 const data = bookings.map((booking) => {
-                    const notif = notifs.travel.cancelled(booking.passenger, booking);
+                    const notif = notifs.travel.cancelled(booking.passenger, booking.departure, booking.arrival, false, reason);
                     return {
                         ...notif,
                         userId: booking.passengerId,

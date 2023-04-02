@@ -13,6 +13,7 @@ router.post('/create', auth.access, emailVerified, controller.createTravel);
 
 // admin routes
 router.get('/', auth.access, controller.getTravels);
+router.delete('/:id', auth.access, admin, controller.cancelTravel);
 router.patch('/:id', auth.access, emailVerified, admin, controller.updateTravel);
 
 module.exports = router;
