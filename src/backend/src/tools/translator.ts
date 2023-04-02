@@ -811,14 +811,6 @@ const info = {
                 en: 'Travel cancelled'
             },
             code: 200
-        }),
-
-        deleted: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Trajet supprimé',
-                en: 'Travel deleted'
-            },
-            code: 200
         })
     },
     group: {
@@ -949,7 +941,7 @@ const mail = {
                 <p>L'équipe de ${process.env.FRONTEND_NAME ?? ''}</p>`,
                 en: `${mailHtmlHeader}
                 <p>Hello ${user.firstName ?? ''} ${user.lastName ?? ''},</p>
-                <p>You requested to reset your password. To do so, please click on the link below :</p>
+                <p>You requested to reset your password. To do so, please click on the link below:</p>
                 <p><a href="${String(properties.url.passwordReset)}${token}">${String(properties.url.passwordReset)}${token}</a></p>
                 <p>This link is valid for ${translate(req, properties.token.passwordReset.expirationTxt)}. If you did not request this, please ignore this email.</p>
                 <p>Best regards,</p>
@@ -965,7 +957,7 @@ const mail = {
                 Cordialement,
                 L'équipe de ${process.env.FRONTEND_NAME ?? ''}`,
                 en: `Hello ${user.firstName ?? ''} ${user.lastName ?? ''},
-                You requested to reset your password. To do so, please click on the link below :
+                You requested to reset your password. To do so, please click on the link below:
                 ${String(properties.url.passwordReset)}${token}
 
                 This link is valid for ${translate(req, properties.token.passwordReset.expirationTxt)}. If you did not request this, please ignore this email.
@@ -992,7 +984,7 @@ const mail = {
                 <p>L'équipe de ${process.env.FRONTEND_NAME ?? ''}</p>`,
                 en: `${mailHtmlHeader}
                 <p>Hello ${user.firstName ?? ''} ${user.lastName ?? ''},</p>
-                <p>To verify your email address, please click on the link below :</p>
+                <p>To verify your email address, please click on the link below:</p>
                 <p><a href="${String(properties.url.emailVerification)}${token}">${String(properties.url.emailVerification)}${token}</a></p>
                 <p>This link is valid for ${translate(req, properties.token.verify.expirationTxt)}. If you did not request this, please ignore this email.</p>
                 <p>Best regards,</p>
@@ -1008,7 +1000,7 @@ const mail = {
                 Cordialement,
                 L'équipe de ${process.env.FRONTEND_NAME ?? ''}`,
                 en: `Hello ${user.firstName ?? ''} ${user.lastName ?? ''},
-                To verify your email address, please click on the link below :
+                To verify your email address, please click on the link below:
                 ${String(properties.url.emailVerification)}${token}
 
                 This link is valid for ${translate(req, properties.token.verify.expirationTxt)}. If you did not request this, please ignore this email.
@@ -1023,7 +1015,7 @@ const mail = {
             to: user.email,
             subject: {
                 fr: `Nouvelle notification : ${notification.title}`,
-                en: `New notification : ${notification.title}`
+                en: `New notification: ${notification.title}`
             },
             html: {
                 fr: `${mailHtmlHeader}
@@ -1071,13 +1063,13 @@ const mail = {
                 Cordialement,
                 L'équipe de ${process.env.FRONTEND_NAME ?? ''}`,
                 en: `Hello ${user.firstName ?? ''} ${user.lastName ?? ''},
-                You received a new notification :
+                You received a new notification:
                 ${notification.title}
                 ${dateToString(notification.createdAt, user.timezone, 'en')}
                 ${notification.message}
 
                 ${notification.type === 'request'
-                    ? `\nTo accept or refuse this request, go to your personal space : ${String(properties.url.notifs)}\n`
+                    ? `\nTo accept or refuse this request, go to your personal space: ${String(properties.url.notifs)}\n`
                     : ''}
 
                 Best regards,
@@ -1143,40 +1135,32 @@ const notifs = {
         })
     },
     travel: {
-        cancelled: (user: User, booking: Booking & { departure: Step, arrival: Step } & Record<string, any>) => msgForLang<TemplateNotif, Notif>(user.lang, {
+        cancelled: (user: User, departure: Step, arrival: Step, byAdmin: boolean, reason: string | undefined) => msgForLang<TemplateNotif, Notif>(user.lang, {
             title: {
                 fr: 'Annulation de trajet',
                 en: 'Travel cancelled'
             },
             message: {
-                fr: `Votre trajet de ${booking.departure.city} à ${booking.arrival.city} du ${dateToString(booking.departure.date, user.timezone, 'fr')} a été annulé par le conducteur.`,
-                en: `Your trip from ${booking.departure.city} to ${booking.arrival.city} on ${dateToString(booking.departure.date, user.timezone, 'en')} has been cancelled by the driver.`
+                fr: `Votre trajet de ${departure.city} à ${arrival.city} du ${dateToString(departure.date, user.timezone, 'fr')} a été annulé par ${byAdmin ? 'un administateur' : 'le conducteur'}.` +
+                    (reason === undefined ? '' : `\n\nRaison : ${reason}`),
+                en: `Your trip from ${departure.city} to ${arrival.city} on ${dateToString(departure.date, user.timezone, 'en')} has been cancelled by ${byAdmin ? 'an administrator' : 'the driver'}.` +
+                    (reason === undefined ? '' : `\n\nReason: ${reason}`)
             },
             type: 'standard',
             createdAt: new Date()
         }),
-        deleted: (user: User, travel: Travel & { steps: Step[] }, message: string) => msgForLang<TemplateNotif, Notif>(user.lang, {
-            title: {
-                fr: 'Suppression de trajet',
-                en: 'Travel deleted'
-            },
-            message: {
-                fr: `Votre trajet de ${travel.steps[0].city} à ${travel.steps[travel.steps.length - 1].city} du ${dateToString(new Date(travel.steps[0].date), user.timezone, 'fr')} a été supprimé par l'admin pour le motif suivant : ${message}.`,
-                en: `Your trip from ${travel.steps[0].city} à ${travel.steps[travel.steps.length - 1].city} on ${dateToString(new Date(travel.steps[0].date), user.timezone, 'en')} has been deleted by the admin for the following reason : ${message}.`
-            },
-            type: 'standard',
-            createdAt: new Date()
-        }),
-        updated: (user: User, travel: Travel & { steps: Step[] }) => msgForLang<TemplateNotif, Notif>(user.lang, {
+        updated: (user: User, travel: Travel & { steps: Step[] }, reason: string | undefined) => msgForLang<TemplateNotif, Notif>(user.lang, {
             title: {
                 fr: 'Modification de votre trajet par un administrateur',
                 en: 'Your trip has been modified by an administrator'
             },
             message: {
                 fr: `Votre trajet de ${travel.steps[0].city} à ${travel.steps[travel.steps.length - 1].city} du ${dateToString(new Date(travel.steps[0].date), user.timezone, 'fr')} a été modifié par un administrateur.` +
-                '\n\nVeuillez vérifier que les informations sont correctes et que vous êtes toujours disponible pour ce trajet.',
+                '\n\nVeuillez vérifier que les informations sont correctes et que vous êtes toujours disponible pour ce trajet.' +
+                (reason === undefined ? '' : `\n\nRaison : ${reason}`),
                 en: `Your trip from ${travel.steps[0].city} to ${travel.steps[travel.steps.length - 1].city} on ${dateToString(new Date(travel.steps[0].date), user.timezone, 'en')} has been modified by an administrator.` +
-                '\n\nPlease check that the information is correct and that you are still available for this trip.'
+                '\n\nPlease check that the information is correct and that you are still available for this trip.' +
+                (reason === undefined ? '' : `\n\nReason: ${reason}`)
             },
             type: 'standard',
             createdAt: new Date()
@@ -1255,30 +1239,34 @@ const notifs = {
             type: 'standard',
             createdAt: new Date()
         }),
-        travelUpdated: (user: User, booking: Booking & { departure: Step, passenger: User, arrival: Step } & Record<string, any>, byAnAdmin: boolean) => msgForLang<TemplateNotif, Notif>(user.lang, {
+        travelUpdated: (user: User, booking: Booking & { departure: Step, passenger: User, arrival: Step } & Record<string, any>, byAnAdmin: boolean, reason: string | undefined) => msgForLang<TemplateNotif, Notif>(user.lang, {
             title: {
                 fr: 'Modification de trajet',
                 en: 'Travel updated'
             },
             message: {
                 fr: `Votre trajet de ${booking.departure.city} à ${booking.arrival.city} du ${dateToString(booking.departure.date, user.timezone, 'fr')} a été modifié par ${byAnAdmin ? 'un administrateur' : 'le conducteur'}.` +
-                '\n\nVeuillez vérifier que vous êtes toujours disponible pour ce trajet.',
+                '\n\nVeuillez vérifier que vous êtes toujours disponible pour ce trajet.' +
+                    (reason === undefined ? '' : `\n\nRaison : ${reason}`),
                 en: `Your trip from ${booking.departure.city} to ${booking.arrival.city} on ${dateToString(booking.departure.date, user.timezone, 'en')} has been updated by ${byAnAdmin ? 'an administrator' : 'the driver'}.` +
-                '\n\nPlease check that you are still available for this trip.'
+                '\n\nPlease check that you are still available for this trip.' +
+                    (reason === undefined ? '' : `\n\nReason: ${reason}`)
             },
             type: 'standard',
             createdAt: new Date()
         }),
-        deletedDueToTravelUpdate: (user: User, booking: Booking & { departure: Step, passenger: User, arrival: Step } & Record<string, any>, updatedTravel: Travel & { steps: Step[], driver: User } & Record<string, any>, byAnAdmin: boolean) => msgForLang<TemplateNotif, Notif>(user.lang, {
+        deletedDueToTravelUpdate: (user: User, booking: Booking & { departure: Step, passenger: User, arrival: Step } & Record<string, any>, updatedTravel: Travel & { steps: Step[], driver: User } & Record<string, any>, byAnAdmin: boolean, reason: string | undefined) => msgForLang<TemplateNotif, Notif>(user.lang, {
             title: {
                 fr: 'Réservation supprimée suite à modification de trajet',
                 en: 'Booking deleted due to travel update'
             },
             message: {
                 fr: `Votre réservation pour le trajet ${booking.departure.city} - ${booking.arrival.city} du ${dateToString(booking.departure.date, user.timezone, 'fr')} a été supprimée suite à une modification du trajet par ${byAnAdmin ? 'un administrateur' : 'le conducteur'}.` +
-                `\nLe trajet ne passe plus par ${updatedTravel.steps.findIndex(s => s.id === booking.departure.id) === -1 ? booking.departure.city : booking.arrival.city}.`,
+                `\nLe trajet ne passe plus par ${updatedTravel.steps.findIndex(s => s.id === booking.departure.id) === -1 ? booking.departure.city : booking.arrival.city}.` +
+                    (reason === undefined ? '' : `\n\nRaison : ${reason}`),
                 en: `Your booking for the trip ${booking.departure.city} - ${booking.arrival.city} on ${dateToString(booking.departure.date, user.timezone, 'en')} has been deleted due to a modification of the trip by ${byAnAdmin ? 'an administrator' : 'the driver'}.` +
-                `\nThe travel no longer passes through ${updatedTravel.steps.findIndex(s => s.id === booking.departure.id) === -1 ? booking.departure.city : booking.arrival.city}.`
+                `\nThe travel no longer passes through ${updatedTravel.steps.findIndex(s => s.id === booking.departure.id) === -1 ? booking.departure.city : booking.arrival.city}.` +
+                    (reason === undefined ? '' : `\n\nReason: ${reason}`)
             },
             type: 'standard',
             createdAt: new Date()
