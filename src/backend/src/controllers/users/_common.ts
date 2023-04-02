@@ -23,11 +23,11 @@ async function update (req: express.Request, res: express.Response, userId: numb
     if (asAdmin && level !== undefined && !validator.level(level, true, req, res)) return;
     let _phoneSanitized;
     if (phone !== undefined) {
-        _phoneSanitized = sanitizer.phone(phone, req, res);
+        _phoneSanitized = sanitizer.phone(phone, true, req, res);
         if (_phoneSanitized === null) return;
     }
     const phoneSanitized = _phoneSanitized;
-    const genderSanitized = sanitizer.gender(gender);
+    const genderSanitized = sanitizer.gender(gender, false, req, res);
 
     const user = await prisma.user.findUnique({ where: { id: userId } });
     if (user === null) {

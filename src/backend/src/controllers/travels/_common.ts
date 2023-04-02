@@ -15,7 +15,7 @@ import sanitizer from '../../tools/sanitizer';
  * @param asAdmin Weather to update as an admin or not
  */
 async function update (req: express.Request, res: express.Response, asAdmin: boolean) {
-    const travelId = sanitizer.id(req.params.id, req, res);
+    const travelId = sanitizer.id(req.params.id, true, req, res);
     if (travelId === null) return;
 
     const { maxPassengers, price, description, steps } = req.body;

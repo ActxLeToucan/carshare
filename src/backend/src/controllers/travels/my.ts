@@ -115,7 +115,7 @@ exports.getMyTravels = (req: express.Request, res: express.Response, _: express.
 }
 
 exports.cancelMyTravel = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const travelId = sanitizer.id(req.params.id, req, res);
+    const travelId = sanitizer.id(req.params.id, true, req, res);
     if (travelId === null) return;
 
     prisma.travel.findUnique({

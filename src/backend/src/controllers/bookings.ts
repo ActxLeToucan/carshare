@@ -16,7 +16,7 @@ exports.rejectBooking = (req: express.Request, res: express.Response, _: express
 }
 
 function acceptOrRejectBooking (req: express.Request, res: express.Response, status: number, message: (req: Request, ...args: any) => MessageHTTP) {
-    const bookingId = sanitizer.id(req.params.id, req, res);
+    const bookingId = sanitizer.id(req.params.id, true, req, res);
     if (bookingId === null) return;
 
     prisma.booking.findUnique({

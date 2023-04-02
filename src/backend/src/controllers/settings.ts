@@ -17,10 +17,10 @@ exports.updateSettings = (req: express.Request, res: express.Response, _: expres
 
     if (mailNotif !== undefined && !validator.typeBoolean(mailNotif, true, req, res, 'mailNotif')) return;
     if (lang !== undefined && !validator.lang(lang, true, req, res)) return;
-    const timezoneSanitized = sanitizer.timezone(timezone);
-    if (timezone !== undefined && timezoneSanitized === undefined) {
-        sendMsg(req, res, error.timezone.invalid);
-        return;
+    let timezoneSanitized;
+    if (timezone !== undefined) {
+        timezoneSanitized = sanitizer.timezone(timezone, true, req, res);
+        if (timezoneSanitized === undefined) return;
     }
 
     prisma.user.update({

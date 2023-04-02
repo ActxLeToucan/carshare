@@ -209,6 +209,15 @@ const error = {
             code: 403
         })
     },
+    gender: {
+        unknown: (req: Request, genders: string[]) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Le genre doit être parmi [${genders.reduce((a, b) => `${a}, ${b}`)}].`,
+                en: `Gender must be among [${genders.reduce((a, b) => `${a}, ${b}`)}].`
+            },
+            code: 400
+        })
+    },
     boolean: {
         required: (req: Request, fieldName: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {

@@ -18,11 +18,14 @@ exports.signup = (req: express.Request, res: express.Response, _: express.NextFu
     if (!validator.password(password, true, req, res)) return;
     if (!validator.lastName(lastName, true, req, res)) return;
     if (!validator.firstName(firstName, true, req, res)) return;
-    const phoneSanitized = sanitizer.phone(phone, req, res);
+    const phoneSanitized = sanitizer.phone(phone, true, req, res);
     if (phoneSanitized === null) return;
     if (hasCar !== undefined && !validator.typeBoolean(hasCar, true, req, res, 'hasCar')) return;
-    const genderSanitized = sanitizer.gender(gender);
-    const timezoneSanitized = sanitizer.timezone(timezone);
+    const genderSanitized = sanitizer.gender(gender, false, req, res);
+    let timezoneSanitized: string | undefined;
+    if (timezone !== undefined) {
+        timezoneSanitized = sanitizer.timezone(timezone, false, req, res);
+    }
 
     prisma.user.count({ where: { email } })
         .then((count) => {
@@ -292,7 +295,7 @@ exports.searchUsers = (req: express.Request, res: express.Response, _: express.N
 }
 
 exports.deleteUser = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const userId = sanitizer.id(req.params.id, req, res);
+    const userId = sanitizer.id(req.params.id, true, req, res);
     if (userId === null) return;
 
     prisma.user.findUnique({ where: { id: userId } })
@@ -322,7 +325,7 @@ exports.deleteUser = (req: express.Request, res: express.Response, _: express.Ne
 }
 
 exports.updateUser = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const userId = sanitizer.id(req.params.id, req, res);
+    const userId = sanitizer.id(req.params.id, true, req, res);
     if (userId === null) return;
 
     prisma.user.findUnique({ where: { id: userId } })

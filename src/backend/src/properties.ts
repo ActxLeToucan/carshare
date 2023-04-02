@@ -99,7 +99,10 @@ const properties = {
             open: 0,
             ended: 1
         },
-        hoursLimit: 24
+        hoursLimit: 24,
+        search: {
+            maxDistance: 5 // in kilometers
+        }
     },
     booking: {
         status: {

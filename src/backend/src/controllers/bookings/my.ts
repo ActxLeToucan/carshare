@@ -9,13 +9,13 @@ import sanitizer from '../../tools/sanitizer';
 exports.createBooking = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { travelId, departureId, arrivalId } = req.body;
 
-    const travelIdSanitized = sanitizer.id(travelId, req, res);
+    const travelIdSanitized = sanitizer.id(travelId, true, req, res);
     if (travelIdSanitized === null) return;
 
-    const departureIdSanitized = sanitizer.id(departureId, req, res);
+    const departureIdSanitized = sanitizer.id(departureId, true, req, res);
     if (departureIdSanitized === null) return;
 
-    const arrivalIdSanitized = sanitizer.id(arrivalId, req, res);
+    const arrivalIdSanitized = sanitizer.id(arrivalId, true, req, res);
     if (arrivalIdSanitized === null) return;
 
     prisma.travel.findUnique({
@@ -159,7 +159,7 @@ exports.createBooking = (req: express.Request, res: express.Response, _: express
 };
 
 exports.cancelMyBooking = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const bookingId = sanitizer.id(req.params.id, req, res);
+    const bookingId = sanitizer.id(req.params.id, true, req, res);
     if (bookingId === null) return;
 
     prisma.booking.findUnique({

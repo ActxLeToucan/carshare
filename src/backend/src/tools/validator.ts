@@ -328,10 +328,11 @@ function maxPassengers (value: any, sendError: boolean, req: express.Request, re
  * @param sendError If true, send an error message to the client
  * @param req Express request
  * @param res Express response
+ * @param fieldName Name of the field
  * @returns true if the value is valid and if the value is between -180 and 180, false otherwise
  */
-function longitude (value: any, sendError: boolean, req: express.Request, res: express.Response): boolean {
-    if (!typeNumber(value, sendError, req, res, 'lng')) return false;
+function longitude (value: any, sendError: boolean, req: express.Request, res: express.Response, fieldName: string): boolean {
+    if (!typeNumber(value, sendError, req, res, fieldName)) return false;
 
     if (value < -180 || value > 180) {
         if (sendError) sendMsg(req, res, error.longitude.minMax, properties.longitude.min, properties.longitude.max);
@@ -346,10 +347,11 @@ function longitude (value: any, sendError: boolean, req: express.Request, res: e
  * @param sendError If true, send an error message to the client
  * @param req Express request
  * @param res Express response
+ * @param fieldName Name of the field
  * @returns true if the value is valid and if the value is between -90 and 90, false otherwise
  */
-function latitude (value: any, sendError: boolean, req: express.Request, res: express.Response): boolean {
-    if (!typeNumber(value, sendError, req, res, 'lat')) return false;
+function latitude (value: any, sendError: boolean, req: express.Request, res: express.Response, fieldName: string): boolean {
+    if (!typeNumber(value, sendError, req, res, fieldName)) return false;
 
     if (value < -90 || value > 90) {
         if (sendError) sendMsg(req, res, error.latitude.minMax, properties.latitude.min, properties.latitude.max);
@@ -456,8 +458,8 @@ function checkStepList (steps: any, sendError: boolean, req: express.Request, re
         if (!typeString(steps[step].label, sendError, req, res, 'label')) return false;
         if (!typeString(steps[step].city, sendError, req, res, 'city')) return false;
         if (!typeString(steps[step].context, sendError, req, res, 'context')) return false;
-        if (!latitude(steps[step].lat, sendError, req, res)) return false;
-        if (!longitude(steps[step].lng, sendError, req, res)) return false;
+        if (!latitude(steps[step].lat, sendError, req, res, 'lat')) return false;
+        if (!longitude(steps[step].lng, sendError, req, res, 'lng')) return false;
 
         if (steps[step].id !== undefined && typeof steps[step].id !== 'number') return false;
 
@@ -542,7 +544,9 @@ export default {
     groupName,
     lang,
     lastName,
+    latitude,
     level,
+    longitude,
     maxPassengers,
     note,
     password,

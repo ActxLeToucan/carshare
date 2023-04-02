@@ -38,7 +38,7 @@ exports.deleteAllNotifications = (req: express.Request, res: express.Response, _
 }
 
 exports.deleteOneNotification = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const notifId = sanitizer.id(req.params.id, req, res);
+    const notifId = sanitizer.id(req.params.id, true, req, res);
     if (notifId === null) return;
 
     prisma.notification.count({

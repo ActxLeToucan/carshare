@@ -38,7 +38,7 @@ exports.getMyGroups = (req: express.Request, res: express.Response, next: expres
 exports.modifyNameGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const groupName = req.body.groupName;
     if (!validator.groupName(groupName, true, req, res)) return;
-    const groupId = sanitizer.id(req.params.id, req, res);
+    const groupId = sanitizer.id(req.params.id, true, req, res);
     if (groupId === null) return;
     prisma.group.findUnique({
         where: {
@@ -134,7 +134,7 @@ exports.addUserGroup = (req: express.Request, res: express.Response, _: express.
     const email = req.body.email;
     if (!validator.email(email, true, req, res, false)) return;
 
-    const groupId = sanitizer.id(req.params.id, req, res);
+    const groupId = sanitizer.id(req.params.id, true, req, res);
     if (groupId === null) return;
 
     prisma.group.count({
@@ -224,7 +224,7 @@ exports.addUserGroup = (req: express.Request, res: express.Response, _: express.
 }
 
 exports.deleteGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const groupId = sanitizer.id(req.params.id, req, res);
+    const groupId = sanitizer.id(req.params.id, true, req, res);
     if (groupId === null) return;
 
     prisma.group.count({ where: { id: groupId } })
