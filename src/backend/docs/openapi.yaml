@@ -580,15 +580,7 @@ paths:
                     type: string
                     example: User deleted
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: User id is invalid.
+          $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
         '403':
@@ -672,15 +664,7 @@ paths:
                       user:
                         $ref: '#/components/schemas/PrivateUser'
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: User id is invalid.
+          $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
         '403':
@@ -849,6 +833,12 @@ paths:
           schema:
             type: integer
             example: 1
+        - name: reason
+          in: query
+          description: Reason for the cancellation
+          schema:
+            type: string
+            example: "I have a problem"
       security:
         - bearerAuth: [ ]
       responses:
@@ -863,15 +853,7 @@ paths:
                     type: string
                     example: "Travel deleted"
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Invalid id"
+          $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
         '403':
@@ -905,6 +887,12 @@ paths:
           schema:
             type: integer
             example: 1
+        - name: reason
+          in: query
+          description: Reason for the update
+          schema:
+            type: string
+            example: One more step
       security:
         - bearerAuth: [ ]
       requestBody:
@@ -944,15 +932,7 @@ paths:
                   travel:
                     $ref: '#/components/schemas/PublicTravel'
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Invalid id"
+          $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
         '403':
@@ -1074,15 +1054,7 @@ paths:
                 items:
                   $ref: '#/components/schemas/PublicTravel'
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Id is invalid.
+          $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
         '498':
@@ -1091,8 +1063,8 @@ paths:
           $ref: '#/components/responses/internalError'
     patch:
       summary: Update travel
-      description: Update a travel of the current user.
-      operationId: updateMyTravel
+      description: Update a travel with the given id. Only available to admins.
+      operationId: updateTravel
       tags:
         - Travels
       parameters:
@@ -1104,6 +1076,12 @@ paths:
           schema:
             type: integer
             example: 1
+        - name: reason
+          in: query
+          description: Reason for the update
+          schema:
+            type: string
+            example: Price changed
       security:
         - bearerAuth: [ ]
       requestBody:
@@ -1143,7 +1121,42 @@ paths:
                   travel:
                     $ref: '#/components/schemas/PublicTravel'
         '400':
-          description: Bad request
+          $ref: '#/components/responses/invalidId'
+        '401':
+          $ref: '#/components/responses/noToken'
+        '403':
+          $ref: '#/components/responses/insufficientPrivileges'
+        '404':
+          $ref: '#/components/responses/travelNotFound'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+    delete:
+      summary: Cancel travel
+      description: Cancel a travel with the given id. Only available to admins.
+      operationId: cancelTravel
+      tags:
+        - Travels
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - name: id
+          in: path
+          description: Travel id
+          required: true
+          schema:
+            type: integer
+        - name: reason
+          in: query
+          description: Reason for the cancellation
+          schema:
+            type: string
+            example: Conducteur dangereux
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Travel cancelled
           content:
             application/json:
               schema:
@@ -1151,7 +1164,9 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Invalid id"
+                    example: "Travel cancelled"
+        '400':
+          $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
         '403':
@@ -1379,15 +1394,7 @@ paths:
                     type: string
                     example: The notification have been removed
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Notification id is invalid.
+          $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
         '404':
@@ -1647,17 +1654,8 @@ paths:
                   message:
                     type: string
                     example: Group removed
-
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Id is invalid.
+          $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
         '403':
@@ -1705,17 +1703,8 @@ paths:
                   message:
                     type: string
                     example: Group renamed
-
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: groupId is invalid.
+          $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
         '403':
@@ -1868,15 +1857,7 @@ paths:
                     type: string
                     example: Evaluation removed
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Id is invalid.
+          $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
         '404':
@@ -1925,15 +1906,7 @@ paths:
                     type: string
                     example: Updated evaluation
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Id is invalid.
+          $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
         '404':
@@ -2079,15 +2052,7 @@ paths:
                     type: string
                     example: Booking cancelled
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Id is invalid.
+          $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
         '403':
@@ -2136,15 +2101,7 @@ paths:
                     type: string
                     example: You have just accepted the request of John Doe.
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Id is invalid.
+          $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
         '403':
@@ -2185,15 +2142,7 @@ paths:
                     type: string
                     example: You have just rejected the request of John Doe.
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Id is invalid.
+          $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
         '403':
@@ -2305,6 +2254,16 @@ components:
         type: string
         default: ''
   responses:
+    invalidId:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Id is invalid.
     noToken:
       description: Unauthorized
       content:

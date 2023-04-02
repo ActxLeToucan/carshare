@@ -188,7 +188,14 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
                 driverId: res.locals.user.id,
                 groupId,
                 steps: {
-                    create: steps.map((step: { label: string, city: string, context: string, lat: number, lng: number, date: string }) => ({
+                    create: steps.map((step: {
+                        label: string
+                        city: string
+                        context: string
+                        lat: number
+                        lng: number
+                        date: string
+                    }) => ({
                         label: step.label,
                         city: step.city,
                         context: step.context,
@@ -301,6 +308,98 @@ exports.getTravel = (req: express.Request, res: express.Response, _: express.Nex
 
 exports.updateTravel = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     _travel.update(req, res, true).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
+}
+
+exports.cancelTravel = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    const travelId = sanitizer.id(req.params.id, req, res);
+    if (travelId === null) return;
+
+    const reason = req.query.reason;
+    if (reason !== undefined && !validator.typeString(reason, true, req, res, 'reason')) return;
+    const reasonStr = reason === undefined ? undefined : reason as string;
+
+    prisma.travel.findUnique({
+        where: { id: travelId },
+        include: {
+            steps: {
+                orderBy: { date: 'asc' }
+            },
+            driver: true
+        }
+    }).then((travel) => {
+        if (travel === null) {
+            sendMsg(req, res, error.travel.notFound);
+            return;
+        }
+
+        prisma.travel.update({
+            where: { id: travelId },
+            data: { status: properties.travel.status.cancelled }
+        }).then(() => {
+            // get passengers and send notifications
+            prisma.booking.findMany({
+                where: {
+                    departure: { travelId }
+                },
+                include: {
+                    departure: true,
+                    arrival: true,
+                    passenger: true
+                }
+            }).then((bookings) => {
+                const data = bookings.map((booking) => {
+                    const notif = notifs.travel.cancelled(booking.passenger, booking.departure, booking.arrival, true, reasonStr);
+                    return {
+                        ...notif,
+                        userId: booking.passengerId,
+                        senderId: Number(res.locals.user.id),
+                        travelId: booking.departure.travelId,
+                        bookingId: booking.id
+                    };
+                });
+
+                // create notifications
+                prisma.notification.createMany({ data }).then(() => {
+                    for (const notif of data) {
+                        const booking = bookings.find((b) => b.id === notif.bookingId);
+                        // send email notification
+                        if (booking !== undefined) notify(booking.passenger, notif);
+                    }
+
+                    // create driver's notification
+                    const notifDriver = notifs.travel.cancelled(travel.driver, travel.steps[0], travel.steps[travel.steps.length - 1], req.body.message, reasonStr);
+                    prisma.notification.create({
+                        data: {
+                            ...notifDriver,
+                            userId: travel.driverId,
+                            senderId: Number(res.locals.user.id),
+                            travelId: travel.id
+                        }
+                    }).then(() => {
+                        // send email notification to driver
+                        notify(travel.driver, notifDriver);
+
+                        sendMsg(req, res, info.travel.cancelled, travel.driver);
+                    }).catch((err: any) => {
+                        console.error(err);
+                        sendMsg(req, res, error.generic.internalError);
+                    });
+                }).catch((err) => {
+                    console.error(err);
+                    sendMsg(req, res, error.generic.internalError);
+                });
+            }).catch((err: any) => {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
+            });
+        }).catch((err) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
+    }).catch((err) => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
     });
