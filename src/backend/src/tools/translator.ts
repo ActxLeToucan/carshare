@@ -1155,14 +1155,14 @@ const notifs = {
             type: 'standard',
             createdAt: new Date()
         }),
-        deleted: (user: User, travel: Travel & { steps: Step[] }) => msgForLang<TemplateNotif, Notif>(user.lang, {
+        deleted: (user: User, travel: Travel & { steps: Step[] }, message: string) => msgForLang<TemplateNotif, Notif>(user.lang, {
             title: {
                 fr: 'Suppression de trajet',
                 en: 'Travel deleted'
             },
             message: {
-                fr: `Votre trajet de ${travel.steps[0].city} à ${travel.steps[travel.steps.length - 1].city} du ${dateToString(new Date(travel.steps[0].date), user.timezone, 'fr')} a été supprimé par l'admin.`,
-                en: `Your trip from ${travel.steps[0].city} à ${travel.steps[travel.steps.length - 1].city} on ${dateToString(new Date(travel.steps[0].date), user.timezone, 'en')} has been deleted by the admin.`
+                fr: `Votre trajet de ${travel.steps[0].city} à ${travel.steps[travel.steps.length - 1].city} du ${dateToString(new Date(travel.steps[0].date), user.timezone, 'fr')} a été supprimé par l'admin pour le motif suivant : ${message}.`,
+                en: `Your trip from ${travel.steps[0].city} à ${travel.steps[travel.steps.length - 1].city} on ${dateToString(new Date(travel.steps[0].date), user.timezone, 'en')} has been deleted by the admin for the following reason : ${message}.`
             },
             type: 'standard',
             createdAt: new Date()
