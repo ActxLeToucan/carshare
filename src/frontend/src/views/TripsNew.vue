@@ -3,7 +3,7 @@
         <topbar v-show="User.CurrentUser != null" />
         <div class="flex grow flex-col">
             <p class="text-2xl text-teal-500 font-bold mx-auto md:my-4 my-2">
-                {{ lang.CREATE_TRIP }}
+                {{ pageTitle }}
             </p>
             <div class="flex md:hidden justify-evenly px-1 space-x-1">
                 <button
@@ -135,7 +135,7 @@
                                 {{ lang.CANCEL }}
                             </button-text>
                             <button-block :action="showValidatePopup">
-                                {{ lang.CREATE }}
+                                {{ validateBtnLabel }}
                             </button-block>
                         </div>
                     </div>
@@ -314,7 +314,7 @@
             :onvalidate="uploadTrip"
             :oncancel="() => { $refs['confirm-popup'].hide(); }"
         >
-            <diva
+            <div
                 ref="trip-desc"
                 class="flex flex-col"
             />
@@ -365,6 +365,7 @@ export default {
         CardPopup
     },
     data() {
+        const editMode = window.location.pathname.includes('edit');
         return {
             User,
             lang: Lang.CurrentLang,
@@ -378,6 +379,9 @@ export default {
             groups: [],
             selectedTab: 0,
             isMobile: window.innerWidth < 768,
+            editMode,
+            validateBtnLabel: editMode? Lang.CurrentLang.EDIT: Lang.CurrentLang.CREATE,
+            pageTitle: editMode? Lang.CurrentLang.EDIT_TRIP: Lang.CurrentLang.CREATE_TRIP,
         }
     },
     mounted() {
@@ -391,9 +395,40 @@ export default {
             console.error(err);
         });
 
+        if (this.editMode) {
+            this.loadLinkTrip();
+        }
+
         window.addEventListener('resize', () => { this.isMobile = window.innerWidth < 768; });
     },
     methods: {
+        loadLinkTrip() {
+            const parts = window.location.href.split('?');
+            if (parts.length < 2) goBack(this);
+            const paramParts = parts[1].split('&')[0].split('#')[0].split('=');
+            if (paramParts.length < 2) goBack(this);
+            const tripId = paramParts[1];
+
+            API.execute_logged(API.ROUTE.TRAVELS.GET + "/" + tripId, API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
+                const trip = res;
+                console.log(res);
+                this.selectedTripType = trip.groupId == null? 0: 1;
+                this.selectedGroup = trip.group;
+                this.startStep.destination = trip.start;
+                this.startStep.datetime = trip.start_datetime;
+                this.endStep.destination = trip.end;
+                this.endStep.datetime = trip.end_datetime;
+                this.tripSteps.splice(0, this.tripSteps.length);
+                trip.steps.forEach(step => this.tripSteps.push({destination: step, datetime: null}));
+
+                this.$el.querySelector("input[name=trip-type]").value = this.selectedTripType;
+                this.$el.querySelector("input[name=trip-slots]").value = trip.maxPassengers;
+                this.$el.querySelector("input[name=trip-price]").value = trip.price;
+                this.$el.querySelector("textarea[name=trip-infos]").innerHTML = trip.description;
+            }).catch(err => {
+                console.error(err);
+            });
+        },
         searchCities(selector, search) {
             BAN.search(search).then(cities => {
                 console.log(cities);
