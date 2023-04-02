@@ -266,7 +266,8 @@ exports.getTravel = (req: express.Request, res: express.Response, _: express.Nex
             steps: {
                 orderBy: { date: 'asc' }
             },
-            driver: true
+            driver: true,
+            group: true
         }
     }).then((travel: any) => {
         if (travel === null) {

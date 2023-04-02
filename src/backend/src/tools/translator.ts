@@ -1432,7 +1432,6 @@ function displayableUserPublic (user: User): Partial<User> {
  */
 function displayableTravel (travel: Travel & { steps: Step[], driver: User }): Partial<Travel> {
     const t = Object.assign({}, travel) as any;
-    delete t.groupId;
     t.driver = displayableUserPublic(t.driver);
     return t;
 }
