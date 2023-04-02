@@ -1222,6 +1222,17 @@ paths:
             type: integer
       security:
         - bearerAuth: [ ]
+      requestBody:
+        description: Admin message
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                description:
+                  type: string
+                  required: false
+                  example: Conducteur dangereux
       responses:
         '200':
           description: Travel deleted
