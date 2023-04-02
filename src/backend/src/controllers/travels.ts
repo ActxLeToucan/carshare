@@ -361,7 +361,7 @@ exports.updateTravel = (req: express.Request, res: express.Response, _: express.
 }
 
 exports.cancelTravel = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const travelId = sanitizer.id(req.params.id, req, res);
+    const travelId = sanitizer.id(req.params.id, true, req, res);
     if (travelId === null) return;
 
     const reason = req.query.reason;

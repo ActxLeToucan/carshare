@@ -118,6 +118,10 @@ exports.cancelMyTravel = (req: express.Request, res: express.Response, _: expres
     const travelId = sanitizer.id(req.params.id, true, req, res);
     if (travelId === null) return;
 
+    const reason = req.body.reason;
+    if (reason === undefined && !validator.typeString(reason, true, req, res, 'reason')) return;
+    const reasonStr = reason === undefined ? undefined : reason as string;
+
     prisma.travel.findUnique({
         where: { id: travelId },
         include: {
@@ -161,7 +165,7 @@ exports.cancelMyTravel = (req: express.Request, res: express.Response, _: expres
                 }
             }).then((bookings) => {
                 const data = bookings.map((booking) => {
-                    const notif = notifs.travel.cancelled(booking.passenger, booking.departure, booking.arrival, false, reason);
+                    const notif = notifs.travel.cancelled(booking.passenger, booking.departure, booking.arrival, false, reasonStr);
                     return {
                         ...notif,
                         userId: booking.passengerId,
