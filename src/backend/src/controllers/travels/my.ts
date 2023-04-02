@@ -1,11 +1,8 @@
 import type express from 'express';
 import { preparePagination } from '../_common';
 import { prisma } from '../../app';
-import { displayableSteps, error, info, notifs, notify, sendMsg } from '../../tools/translator';
-import properties from '../../properties';
-import validator from '../../tools/validator';
+import { displayableSteps, error, sendMsg } from '../../tools/translator';
 import * as _travel from './_common';
-import sanitizer from '../../tools/sanitizer';
 
 exports.getMyTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const pagination = preparePagination(req, false);
