@@ -1,12 +1,13 @@
 import type express from 'express';
 import { prisma } from '../app';
-import * as validator from '../tools/validator';
+import validator from '../tools/validator';
 import properties from '../properties';
 
 import { error, sendMsg, info, displayableAverage } from '../tools/translator';
+import sanitizer from '../tools/sanitizer';
 
 exports.getUserEvaluation = (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    const userId = validator.sanitizeId(req.params.id, req, res);
+    const userId = sanitizer.id(req.params.id, true, req, res);
 
     if (userId === null) return;
 
@@ -75,9 +76,9 @@ exports.getAverageTravel = (req: express.Request, res: express.Response, next: e
 exports.createEvaluation = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { note, travelId, evaluatedId } = req.body;
 
-    if (!validator.checkNoteField(note, req, res)) return;
-    if (!validator.checkNumberField(travelId, req, res, 'travelId')) return;
-    if (!validator.checkNumberField(evaluatedId, req, res, 'evaluatedId')) return;
+    if (!validator.note(note, true, req, res)) return;
+    if (!validator.typeInteger(travelId, true, req, res, 'travelId')) return;
+    if (!validator.typeInteger(evaluatedId, true, req, res, 'evaluatedId')) return;
 
     prisma.travel.count({
         where: {
@@ -203,10 +204,10 @@ exports.createEvaluation = (req: express.Request, res: express.Response, _: expr
 
 exports.editEvaluation = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { note } = req.body;
-    const evaluationId = validator.sanitizeId(req.params.id, req, res);
+    const evaluationId = sanitizer.id(req.params.id, true, req, res);
     if (evaluationId === null) return;
 
-    if (!validator.checkNoteField(note, req, res)) return;
+    if (!validator.note(note, true, req, res)) return;
 
     prisma.evaluation.findUnique({
         where: {
@@ -238,7 +239,7 @@ exports.editEvaluation = (req: express.Request, res: express.Response, _: expres
 }
 
 exports.deleteEvaluation = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const notationId = validator.sanitizeId(req.params.id, req, res);
+    const notationId = sanitizer.id(req.params.id, true, req, res);
     if (notationId === null) return;
 
     prisma.evaluation.count({

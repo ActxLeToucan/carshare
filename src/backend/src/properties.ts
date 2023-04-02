@@ -99,7 +99,10 @@ const properties = {
             open: 0,
             ended: 1
         },
-        hoursLimit: 24
+        hoursLimit: 24,
+        search: {
+            maxDistance: 5 // in kilometers
+        }
     },
     booking: {
         status: {
@@ -108,6 +111,10 @@ const properties = {
             accepted: 1, // this value can not be changed, it is used in the database
             rejected: 2
         }
+    },
+    integer: {
+        min: -2147483648,
+        max: 2147483647
     }
 } satisfies Record<string, Record<string, any>>;
 

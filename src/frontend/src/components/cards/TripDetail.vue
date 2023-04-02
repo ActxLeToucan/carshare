@@ -1,5 +1,11 @@
 <template>
     <div class="flex flex-col grow w-full h-fit min-h-0 min-w-[60vw]">
+        <h1
+            v-if="trip != null"
+            class="text-xl font-bold text-center text-teal-500 mb-4"
+        >
+            {{ lang.TRAVEL_CARD_LABEL.replace('{DATE}', new Date(trip.steps[0]?.date).toLocaleDateString()) }}
+        </h1>
         <div
             v-if="trip != null"
             class="flex md:flex-row flex-col grow min-w-0 w-full h-fit md:space-y-0 space-y-4"
@@ -102,7 +108,7 @@
             </div>
         </div>
         <div
-            v-show="!editMode && (User.CurrentUser.id !== trip?.driver?.id || isPast)"
+            v-show="trip != null && !editMode && (User.CurrentUser.id !== trip?.driver?.id || isPast)"
             class="flex w-full justify-center items-center my-4"
         >
             <button-block :action="bookTrip">
@@ -111,10 +117,18 @@
         </div>
         <div
             v-show="editMode && (User.CurrentUser.id === trip?.driver?.id)"
-            class="flex w-full justify-end items-center my-4"
+            class="flex w-full justify-between items-center my-4"
         >
             <button-block
-                v-show="!isPast"
+                v-show="trip != null && !isPast"
+                color="teal"
+                :href="'/trips/edit?id=' + trip?.id"
+                :disabled="trip?.status == -1"
+            >
+                {{ lang.EDIT_TRIP }}
+            </button-block>
+            <button-block
+                v-show="trip != null && !isPast"
                 color="red"
                 :action="removeTravel"
                 :disabled="trip?.status == -1"
@@ -123,10 +137,20 @@
             </button-block>
         </div>
         <div
+            v-show="trip != null"
             ref="log-zone"
             class="flex flex-col w-full justify-center items-center min-h-max h-max transition-all"
             style="max-height: 0px;"
         />
+        <div
+            v-show="state == 'loading'"
+            class="w-40 h-40 justify-center items-center flex mx-auto"
+        >
+            <card-badge
+                :title="lang.LOADING_TRIP"
+                :content="lang.LOADING_TRIP_DESC"
+            />
+        </div>
     </div>
 </template>
 
@@ -140,12 +164,14 @@ import { Log, LogZone } from "../../scripts/Logs";
 import {
     UserIcon
 } from '@heroicons/vue/24/outline';
+import CardBadge from './CardBadge.vue';
 
 export default {
     name: "TripDetail",
     components: {
         ButtonBlock,
-        UserIcon
+        UserIcon,
+        CardBadge
     },
     props: {
         tripId: {
@@ -167,7 +193,7 @@ export default {
         },
     },
     data() {
-        return { User, lang: Lang.CurrentLang, trip: null, startIndex: null, endIndex: null, isPast: false };
+        return { User, lang: Lang.CurrentLang, trip: null, startIndex: null, endIndex: null, isPast: false, state: null };
     },
     watch: {
         tripId: function (newVal, oldVal) {
@@ -189,17 +215,21 @@ export default {
     methods: {
         loadTrip(id) {
             if (id == null) return;
+            this.trip = null;
+            this.state = "loading";
 
-            API.execute_logged(API.ROUTE.TRAVELS.GET + id, API.METHOD.GET, User.CurrentUser.getCredentials()).then(res => {
+            API.execute_logged(API.ROUTE.TRAVELS.GET + "/" + id, API.METHOD.GET, User.CurrentUser.getCredentials()).then(res => {
                 this.trip = res;
 
                 this.startIndex = (this.tripStart)? this.trip?.steps.findIndex(step => step.city == this.tripStart.value) : 0;
                 this.endIndex   = (this.tripEnd)? this.trip?.steps.findIndex(step => step.city == this.tripEnd.value) : this.trip.steps.length - 1;
 
                 this.isPast = new Date(this.trip.steps[this.trip.steps.length - 1].date) < new Date();
+                this.state = "done";
             }).catch(err => {
                 console.error(err);
                 this.popup?.hide();
+                this.state = "error";
             });
         },
         log(msg, type = Log.INFO) {
