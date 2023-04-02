@@ -1,17 +1,20 @@
 import type express from 'express';
 import { preparePagination } from '../_common';
-import * as validator from '../../tools/validator';
 import { prisma } from '../../app';
 import { displayableSteps, error, info, notifs, notify, sendMsg } from '../../tools/translator';
 import properties from '../../properties';
-import { checkTravelHoursEditable } from '../../tools/validator';
+import validator from '../../tools/validator';
 import * as _travel from './_common';
+import sanitizer from '../../tools/sanitizer';
 
 exports.getMyTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const pagination = preparePagination(req, false);
 
-    const type = validator.sanitizeType(req.query.type, req, res);
-    if (type === null) return;
+    const type = req.query.type;
+    if (type !== undefined && !['past', 'future'].includes(type as string)) {
+        sendMsg(req, res, error.travel.invalidType);
+        return;
+    }
 
     let where: any;
     if (type === 'past') {
@@ -91,7 +94,12 @@ exports.getMyTravels = (req: express.Request, res: express.Response, _: express.
         .then((count) => {
             prisma.travel.findMany({
                 where,
-                include: { driver: true, steps: true },
+                include: {
+                    driver: true,
+                    steps: {
+                        orderBy: { date: 'asc' }
+                    }
+                },
                 ...pagination.pagination
             }).then(travels => {
                 const data = travels.map(displayableSteps)
@@ -107,13 +115,15 @@ exports.getMyTravels = (req: express.Request, res: express.Response, _: express.
 }
 
 exports.cancelMyTravel = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const travelId = validator.sanitizeId(req.params.id, req, res);
+    const travelId = sanitizer.id(req.params.id, req, res);
     if (travelId === null) return;
 
     prisma.travel.findUnique({
         where: { id: travelId },
         include: {
-            steps: true
+            steps: {
+                orderBy: { date: 'asc' }
+            }
         }
     }).then((travel) => {
         // verifications
@@ -132,7 +142,7 @@ exports.cancelMyTravel = (req: express.Request, res: express.Response, _: expres
             return;
         }
 
-        if (!checkTravelHoursEditable(travel.steps[0].date, req, res)) return;
+        if (!validator.checkTravelHoursEditable(travel.steps[0].date, true, req, res)) return;
 
         // cancel travel
         prisma.travel.update({

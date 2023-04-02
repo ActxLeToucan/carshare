@@ -3,8 +3,8 @@ import { type Request } from 'express';
 import { prisma } from '../app';
 import { error, info, type MessageHTTP, notifs, notify, sendMsg } from '../tools/translator';
 import properties from '../properties';
-import * as validator from '../tools/validator';
-import { checkTravelHoursEditable } from '../tools/validator';
+import sanitizer from '../tools/sanitizer';
+import validator from '../tools/validator';
 import { getMaxPassengers } from './_common';
 
 exports.acceptBooking = (req: express.Request, res: express.Response, _: express.NextFunction) => {
@@ -16,7 +16,7 @@ exports.rejectBooking = (req: express.Request, res: express.Response, _: express
 }
 
 function acceptOrRejectBooking (req: express.Request, res: express.Response, status: number, message: (req: Request, ...args: any) => MessageHTTP) {
-    const bookingId = validator.sanitizeId(req.params.id, req, res);
+    const bookingId = sanitizer.id(req.params.id, req, res);
     if (bookingId === null) return;
 
     prisma.booking.findUnique({
@@ -25,7 +25,11 @@ function acceptOrRejectBooking (req: express.Request, res: express.Response, sta
             departure: {
                 include: {
                     travel: {
-                        include: { steps: true }
+                        include: {
+                            steps: {
+                                orderBy: { date: 'asc' }
+                            }
+                        }
                     }
                 }
             },
@@ -48,7 +52,7 @@ function acceptOrRejectBooking (req: express.Request, res: express.Response, sta
             return;
         }
 
-        if (!checkTravelHoursEditable(booking.departure.travel.steps[0].date, req, res)) return;
+        if (!validator.checkTravelHoursEditable(booking.departure.travel.steps[0].date, true, req, res)) return;
 
         if (status === properties.booking.status.accepted) {
             // check if there is a place left in the car

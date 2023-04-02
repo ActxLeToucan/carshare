@@ -62,21 +62,23 @@ const mailHtmlHeader = process.env.FRONTEND_LOGO === undefined || process.env.FR
     : `<a href="${process.env.FRONTEND_URL ?? ''}"><img src="${process.env.FRONTEND_LOGO ?? ''}" alt="${process.env.FRONTEND_NAME ?? ''}" style="width: 100px; height: 100px; margin: 0 auto; display: block;"/></a>`;
 
 const error = {
+    integer: {
+        type: (req: Request, field: string, inBody: boolean = true) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `La valeur du ${inBody ? 'champ' : 'paramètre'} ${field} doit être un entier.`,
+                en: `The value of the ${inBody ? 'field' : 'parameter'} ${field} must be an integer.`
+            },
+            code: 400
+        }),
+        outOfRange: (req: Request, min: number, max: number, field: string, inBody: boolean = true) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `La valeur du ${inBody ? 'champ' : 'paramètre'} ${field} doit être comprise entre ${min} et ${max}.`,
+                en: `The value of the ${inBody ? 'field' : 'parameter'} ${field} must be between ${min} and ${max}.`
+            },
+            code: 400
+        })
+    },
     email: {
-        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: "L'adresse email est requise.",
-                en: 'Email address is required.'
-            },
-            code: 400
-        }),
-        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: "L'adresse email doit être une chaîne de caractères.",
-                en: 'Email address must be a string.'
-            },
-            code: 400
-        }),
         max: (req: Request, length: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: `L'adresse email doit contenir au plus ${length} caractère${length > 1 ? 's' : ''}.`,
@@ -107,20 +109,6 @@ const error = {
         })
     },
     password: {
-        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Le mot de passe est requis.',
-                en: 'Password is required.'
-            },
-            code: 400
-        }),
-        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Le mot de passe doit être une chaîne de caractères.',
-                en: 'Password must be a string.'
-            },
-            code: 400
-        }),
         min: (req: Request, length: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: `Le mot de passe doit contenir au moins ${length} caractère${length > 1 ? 's' : ''}.`,
@@ -157,37 +145,7 @@ const error = {
             code: 400
         })
     },
-    oldPassword: {
-        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'L\'ancien mot de passe est requis.',
-                en: 'Old password is required.'
-            },
-            code: 400
-        }),
-        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'L\'ancien mot de passe doit être une chaîne de caractères.',
-                en: 'Old password must be a string.'
-            },
-            code: 400
-        })
-    },
     lastname: {
-        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Le nom est requis.',
-                en: 'Lastname is required.'
-            },
-            code: 400
-        }),
-        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Le nom doit être une chaîne de caractères.',
-                en: 'Lastname must be a string.'
-            },
-            code: 400
-        }),
         max: (req: Request, length: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: `Le nom doit contenir au plus ${length} caractère${length > 1 ? 's' : ''}.`,
@@ -204,20 +162,6 @@ const error = {
         })
     },
     firstname: {
-        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Le prénom est requis.',
-                en: 'Firstname is required.'
-            },
-            code: 400
-        }),
-        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Le prénom doit être une chaîne de caractères.',
-                en: 'Firstname must be a string.'
-            },
-            code: 400
-        }),
         max: (req: Request, length: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: `Le prénom doit contenir au plus ${length} caractère${length > 1 ? 's' : ''}.`,
@@ -257,42 +201,12 @@ const error = {
         })
     },
     level: {
-        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Le niveau est requis.',
-                en: 'Level is required.'
-            },
-            code: 400
-        }),
-        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Le niveau doit être un nombre.',
-                en: 'Level must be a number.'
-            },
-            code: 400
-        }),
         tooHigh: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'a mountain too [H]igh | Le niveau est trop élevé par rapport à votre niveau.',
                 en: 'Level is too high compared to your level.'
             },
             code: 403
-        })
-    },
-    groupName: {
-        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Le nom du groupe est requis.',
-                en: 'Group name is required.'
-            },
-            code: 400
-        }),
-        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Le nom du groupe doit être une chaîne de caractères.',
-                en: 'Group name must be a string.'
-            },
-            code: 400
         })
     },
     boolean: {
@@ -482,6 +396,20 @@ const error = {
             },
             code: 400
         }),
+        creatorMember: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Vous ne pouvez pas être un membre du groupe que vous avez créé.',
+                en: 'You cannot be a member of the group you created.'
+            },
+            code: 400
+        }),
+        alreadyMember: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'L\'utilisateur est déjà dans le groupe.',
+                en: 'The user is already in the group.'
+            },
+            code: 400
+        }),
         requiredId: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Le champs groupeId est requis',
@@ -498,17 +426,17 @@ const error = {
         })
     },
     number: {
-        required: (req: Request, fieldName: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        required: (req: Request, fieldName: string, inBody: boolean = true) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Le champ "${fieldName}" est requis.`,
-                en: `Field "${fieldName}" is required.`
+                fr: `Le ${inBody ? 'champ' : 'paramètre'} "${fieldName}" est requis.`,
+                en: `${inBody ? 'Field' : 'Parameter'} "${fieldName}" is required.`
             },
             code: 400
         }),
-        type: (req: Request, fieldName: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        type: (req: Request, fieldName: string, inBody: boolean = true) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: `Le champ "${fieldName}" doit être un nombre.`,
-                en: `Field "${fieldName}" must be a number.`
+                fr: `Le ${inBody ? 'champ' : 'paramètre'} "${fieldName}" doit être un nombre.`,
+                en: `${inBody ? 'Field' : 'Parameter'} "${fieldName}" must be a number.`
             },
             code: 400
         }),
@@ -516,6 +444,13 @@ const error = {
             msg: {
                 fr: `Le champ "${fieldName}" doit être supérieur ou égal à ${min}.`,
                 en: `Field "${fieldName}" must be greater than or equal to ${min}.`
+            },
+            code: 400
+        }),
+        max: (req: Request, fieldName: string, max: number) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: `Le champ "${fieldName}" doit être inférieur ou égal à ${max}.`,
+                en: `Field "${fieldName}" must be less than or equal to ${max}.`
             },
             code: 400
         })
@@ -598,22 +533,6 @@ const error = {
                 en: 'Notification not found.'
             },
             code: 404
-        })
-    },
-    city: {
-        required: (req: Request, field: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: `Le champ "${field}" est requis.`,
-                en: `Field "${field}" is required.`
-            },
-            code: 400
-        }),
-        type: (req: Request, field: string) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: `Le champ "${field}" doit être une chaîne de caractères.`,
-                en: `Field "${field}" must be a string.`
-            },
-            code: 400
         })
     },
     evaluation: {
@@ -702,6 +621,13 @@ const error = {
                 en: 'There are more passengers than seats.'
             },
             code: 400
+        }),
+        invalidType: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Le type de trajet est invalide.',
+                en: 'The type of travel is invalid.'
+            },
+            code: 400
         })
     },
     booking: {
@@ -733,10 +659,10 @@ const error = {
             },
             code: 400
         }),
-        alreadyBooked: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        sameTime: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Vous avez déjà réservé ce trajet.',
-                en: 'You have already booked this travel.'
+                fr: 'Vous avez une autre réservation durant cette période.',
+                en: 'You have another booking during this period.'
             },
             code: 400
         })
@@ -751,13 +677,6 @@ const error = {
         })
     },
     lang: {
-        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Langue requise.',
-                en: 'Language required.'
-            },
-            code: 400
-        }),
         unknown: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Langue inconnue.',
@@ -907,6 +826,16 @@ const info = {
             msg: {
                 fr: 'Groupe créé',
                 en: 'Group created'
+            },
+            code: 201,
+            data: {
+                group: displayableGroup(group)
+            }
+        }),
+        userAdd: (req: Request, group: Group & { users: User[], creator: User }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Utilisateur ajouté',
+                en: 'User added'
             },
             code: 201,
             data: {
@@ -1251,6 +1180,20 @@ const notifs = {
             },
             type: 'standard',
             createdAt: new Date()
+        }),
+        invitation: (user: User, travel: Travel & { steps: Step[], driver: User }, groupName: string) => msgForLang<TemplateNotif, Notif>(user.lang, {
+            title: {
+                fr: `Invitation de ${travel.driver.firstName ?? ''} ${travel.driver.lastName ?? ''}`,
+                en: `Invitation from ${travel.driver.firstName ?? ''} ${travel.driver.lastName ?? ''}`
+            },
+            message: {
+                fr: `Vous êtes dans le groupe "${groupName}" de ${travel.driver.firstName ?? ''} ${travel.driver.lastName ?? ''} et ce conducteur vous invite à le/la rejoindre` +
+                    ` sur le trajet ${travel.steps[0].city} - ${travel.steps[travel.steps.length - 1].city} (du ${dateToString(new Date(travel.steps[0].date), user.timezone, 'fr')}).`,
+                en: `You are in the group "${groupName}" of ${travel.driver.firstName ?? ''} ${travel.driver.lastName ?? ''} and this driver invites you to join him/her` +
+                    ` on the trip ${travel.steps[0].city} - ${travel.steps[travel.steps.length - 1].city} (on ${dateToString(new Date(travel.steps[0].date), user.timezone, 'en')}).`
+            },
+            type: 'standard',
+            createdAt: new Date()
         })
     },
     booking: {
@@ -1350,6 +1293,18 @@ const notifs = {
             message: {
                 fr: `Le groupe ${oldName} a été renommé en ${newName}.`,
                 en: `The group ${oldName} has been renamed as ${newName}.`
+            },
+            type: 'standard',
+            createdAt: new Date()
+        }),
+        userAdded: (user: User, group: Group, creator: User) => msgForLang<TemplateNotif, Notif>(user.lang, {
+            title: {
+                fr: 'Ajout dans un groupe',
+                en: 'Added to a group'
+            },
+            message: {
+                fr: `${creator.firstName ?? ''} ${creator.lastName ?? ''} vous a ajouté dans le groupe ${group.name}, vous recevrez toutes les notifications de ce groupe.`,
+                en: `${creator.firstName ?? ''} ${creator.lastName ?? ''} added you to the group ${group.name}, you will receive all notifications from this group.`
             },
             type: 'standard',
             createdAt: new Date()
@@ -1497,7 +1452,6 @@ function displayableUserPublic (user: User): Partial<User> {
  */
 function displayableTravel (travel: Travel & { steps: Step[], driver: User }): Partial<Travel> {
     const t = Object.assign({}, travel) as any;
-    t.steps.sort((a: Step, b: Step) => a.date.getTime() - b.date.getTime());
     delete t.groupId;
     t.driver = displayableUserPublic(t.driver);
     return t;
@@ -1563,7 +1517,6 @@ function dateToString (date: Date, timezone: string | null | undefined, lang: st
  */
 function displayableSteps (travel: Travel & { driver: User, steps: Step[] }): Partial<Travel> {
     const t = Object.assign({}, travel) as any;
-    t.steps.sort((a: Step, b: Step) => a.date.getTime() - b.date.getTime());
     t.driver = displayableUserPublic(t.driver);
     t.departure = travel.steps[0];
     t.arrival = travel.steps[travel.steps.length - 1];

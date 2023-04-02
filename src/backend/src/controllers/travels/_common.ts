@@ -1,11 +1,11 @@
 import type express from 'express';
-import * as validator from '../../tools/validator';
-import { checkTravelHours } from '../../tools/validator';
+import validator from '../../tools/validator';
 import { prisma } from '../../app';
 import { error, info, notifs, notify, sendMsg } from '../../tools/translator';
 import { getMaxPassengers } from '../_common';
 import { type Booking, type Step } from '@prisma/client';
 import properties from '../../properties';
+import sanitizer from '../../tools/sanitizer';
 
 /**
  * Update a travel
@@ -15,21 +15,25 @@ import properties from '../../properties';
  * @param asAdmin Weather to update as an admin or not
  */
 async function update (req: express.Request, res: express.Response, asAdmin: boolean) {
-    const travelId = validator.sanitizeId(req.params.id, req, res);
+    const travelId = sanitizer.id(req.params.id, req, res);
     if (travelId === null) return;
 
     const { maxPassengers, price, description, steps } = req.body;
 
-    if (maxPassengers !== undefined && !validator.checkMaxPassengersField(maxPassengers, req, res)) return;
-    if (price !== undefined && !validator.checkPriceField(price, req, res)) return;
-    if (description !== undefined && !validator.checkDescriptionField(description, req, res)) return;
+    if (maxPassengers !== undefined && !validator.maxPassengers(maxPassengers, true, req, res)) return;
+    if (price !== undefined && !validator.price(price, true, req, res)) return;
+    if (description !== undefined && !validator.description(description, true, req, res)) return;
 
-    if (!validator.checkStepList(steps, req, res)) return;
+    if (!validator.checkStepList(steps, true, req, res)) return;
 
     // Check if the travel exists
     const travel = await prisma.travel.findUnique({
         where: { id: travelId },
-        include: { steps: true }
+        include: {
+            steps: {
+                orderBy: { date: 'asc' }
+            }
+        }
     });
     if (travel === null) {
         sendMsg(req, res, error.travel.notFound);
@@ -46,12 +50,9 @@ async function update (req: express.Request, res: express.Response, asAdmin: boo
         return;
     }
 
-    // Sort steps by date
-    travel.steps.sort((a: Step, b: Step) => a.date.getTime() - b.date.getTime());
-
     // Check if the travel is editable
     const firstStep = travel.steps.at(0);
-    if (firstStep !== undefined && !checkTravelHours(firstStep.date)) {
+    if (firstStep !== undefined && !validator.checkTravelHours(firstStep.date)) {
         sendMsg(req, res, error.travel.notModifiable);
         return;
     }
@@ -90,13 +91,13 @@ async function update (req: express.Request, res: express.Response, asAdmin: boo
         },
         select: {
             steps: {
-                select: { date: true }
+                select: { date: true },
+                orderBy: { date: 'asc' }
             }
         }
     });
     for (const travelSteps of travelsSteps) {
-        travelSteps.steps.sort((a: any, b: any) => a.date.getTime() - b.date.getTime());
-        if (!validator.checkTravelAlready(steps[0].date, steps[steps.length - 1].date, travelSteps.steps, req, res)) return;
+        if (!validator.checkTravelAlready(steps[0].date, steps[steps.length - 1].date, travelSteps.steps, true, req, res)) return;
     }
 
     // Get bookings for notifications (before any update to preserve the old data)
@@ -152,7 +153,9 @@ async function update (req: express.Request, res: express.Response, asAdmin: boo
             description
         },
         include: {
-            steps: true,
+            steps: {
+                orderBy: { date: 'asc' }
+            },
             driver: true
         }
     });

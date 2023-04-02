@@ -3,25 +3,26 @@ import { prisma } from '../app';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { displayableUserPrivate, error, info, mail, notifs, sendMail, sendMsg } from '../tools/translator';
-import * as validator from '../tools/validator';
+import validator from '../tools/validator';
 import * as _user from './users/_common';
 import { preparePagination } from './_common';
 import { MailerError } from '../tools/mailer';
 import { type User } from '@prisma/client';
 import properties from '../properties';
+import sanitizer from '../tools/sanitizer';
 
 exports.signup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { email, password, lastName, firstName, phone, hasCar, gender, timezone } = req.body;
 
-    if (!validator.checkEmailField(email, req, res)) return;
-    if (!validator.checkPasswordField(password, req, res)) return;
-    if (!validator.checkLastNameField(lastName, req, res)) return;
-    if (!validator.checkFirstNameField(firstName, req, res)) return;
-    const phoneSanitized = validator.sanitizePhone(phone, req, res);
+    if (!validator.email(email, true, req, res)) return;
+    if (!validator.password(password, true, req, res)) return;
+    if (!validator.lastName(lastName, true, req, res)) return;
+    if (!validator.firstName(firstName, true, req, res)) return;
+    const phoneSanitized = sanitizer.phone(phone, req, res);
     if (phoneSanitized === null) return;
-    if (hasCar !== undefined && !validator.checkBooleanField(hasCar, req, res, 'hasCar')) return;
-    const genderSanitized = validator.sanitizeGender(gender);
-    const timezoneSanitized = validator.sanitizeTimezone(timezone);
+    if (hasCar !== undefined && !validator.typeBoolean(hasCar, true, req, res, 'hasCar')) return;
+    const genderSanitized = sanitizer.gender(gender);
+    const timezoneSanitized = sanitizer.timezone(timezone);
 
     prisma.user.count({ where: { email } })
         .then((count) => {
@@ -83,8 +84,8 @@ exports.signup = (req: express.Request, res: express.Response, _: express.NextFu
 }
 
 exports.login = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    if (!validator.checkEmailField(req.body.email, req, res, false)) return;
-    if (!validator.checkPasswordField(req.body.password, req, res, false)) return;
+    if (!validator.email(req.body.email, true, req, res, false)) return;
+    if (!validator.password(req.body.password, true, req, res, false)) return;
 
     prisma.user.findUnique({ where: { email: req.body.email } })
         .then((user) => {
@@ -120,7 +121,7 @@ exports.login = (req: express.Request, res: express.Response, _: express.NextFun
 }
 
 exports.askForPasswordReset = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    if (!validator.checkEmailField(req.body.email, req, res, false)) return;
+    if (!validator.email(req.body.email, true, req, res, false)) return;
 
     prisma.user.findUnique({ where: { email: req.body.email } })
         .then((user) => {
@@ -175,8 +176,8 @@ exports.resetPassword = (req: express.Request, res: express.Response, next: expr
 }
 
 exports.updatePassword = async (req: express.Request, res: express.Response, _: express.NextFunction, checkOld = true) => {
-    if (!validator.checkPasswordField(req.body.password, req, res)) return;
-    if (checkOld && !validator.checkOldPasswordField(req.body.oldPassword, req, res)) return;
+    if (!validator.password(req.body.password, true, req, res)) return;
+    if (checkOld && !validator.passwordOld(req.body.oldPassword, true, req, res)) return;
 
     if (checkOld) {
         try {
@@ -291,7 +292,7 @@ exports.searchUsers = (req: express.Request, res: express.Response, _: express.N
 }
 
 exports.deleteUser = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const userId = validator.sanitizeId(req.params.id, req, res);
+    const userId = sanitizer.id(req.params.id, req, res);
     if (userId === null) return;
 
     prisma.user.findUnique({ where: { id: userId } })
@@ -321,7 +322,7 @@ exports.deleteUser = (req: express.Request, res: express.Response, _: express.Ne
 }
 
 exports.updateUser = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const userId = validator.sanitizeId(req.params.id, req, res);
+    const userId = sanitizer.id(req.params.id, req, res);
     if (userId === null) return;
 
     prisma.user.findUnique({ where: { id: userId } })

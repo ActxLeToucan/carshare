@@ -282,7 +282,7 @@
                 <button
                     v-for="group in groups"
                     :key="group.name"
-                    class="flex flex-col justify-center py-1 md:m-2 m-1 rounded-md bg-slate-100 bg-slate-700 px-2 w-fit max-w-[14em] border-2 border-transparent
+                    class="flex flex-col justify-center py-1 md:m-2 m-1 rounded-md bg-slate-100 dark:bg-slate-700 px-2 w-fit max-w-[14em] border-2 border-transparent
                             hover:border-slate-200 hover:dark:bg-slate-600 hover:dark:border-slate-700 cursor-pointer transition-all"
                     @click="() => { selectedGroup = group; $refs['group-popup'].hide(); }"
                 >
@@ -384,7 +384,7 @@ export default {
         this.logZone = new LogZone(this.$refs['log-zone']);
 
         this.groups.splice(0, this.groups.length);
-        API.execute_logged(API.ROUTE.GROUPS, API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
+        API.execute_logged(API.ROUTE.GROUPS + "/my" + API.createPagination(0, 100), API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
             const data = res.data ?? res.groups;
             data.forEach(group => this.groups.push(group));
         }).catch(err => {

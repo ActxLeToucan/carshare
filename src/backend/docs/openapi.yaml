@@ -1610,6 +1610,64 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
+  /groups/:id/member:
+    post:
+      summary: Add a new member
+      description: Add a new member in a group.
+      operationId: addUserGroup
+      tags:
+        - Groups
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - name: id
+          in: path
+          description: The id of the group to which a user is added
+          required: true
+          schema:
+            type: integer
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        description: The email of the user to add on the group
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  required: true
+                  example: john@example.com
+      responses:
+        '200':
+          description: User added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User added
+                  group:
+                    $ref: '#/components/schemas/Group'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Group id is required.
+        '401':
+          $ref: '#/components/responses/noToken'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
   /groups/:id:
     delete:
       summary: Delete a groups
