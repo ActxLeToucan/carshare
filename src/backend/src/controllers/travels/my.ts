@@ -13,6 +13,7 @@ exports.getMyTravels = (req: express.Request, res: express.Response, _: express.
         return;
     }
 
+    let croissant = false;
     let where: any;
     if (type === 'past') {
         where = {
@@ -42,6 +43,7 @@ exports.getMyTravels = (req: express.Request, res: express.Response, _: express.
             }]
         };
     } else if (type === 'future') {
+        croissant = true;
         where = {
             OR: [{
                 driverId: res.locals.user.id,
@@ -99,7 +101,11 @@ exports.getMyTravels = (req: express.Request, res: express.Response, _: express.
                 },
                 ...pagination.pagination
             }).then(travels => {
-                const data = travels.map(displayableSteps)
+                const data = travels.sort((a, b) => {
+                    if (a.steps.length === 0) return 1;
+                    if (b.steps.length === 0) return -1;
+                    return croissant ? a.steps[0].date.getTime() - b.steps[0].date.getTime() : b.steps[0].date.getTime() - a.steps[0].date.getTime();
+                }).map(displayableSteps);
                 res.status(200).json(pagination.results(data, count));
             }).catch((err) => {
                 console.error(err);
