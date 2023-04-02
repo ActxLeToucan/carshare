@@ -306,7 +306,7 @@ exports.updateTravel = (req: express.Request, res: express.Response, _: express.
 }
 
 exports.deleteTravel = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const travelId = validator.sanitizeId(req.params.id, req, res);
+    const travelId = sanitizer.id(req.params.id, req, res);
     if (travelId === null) return;
 
     prisma.travel.findUnique({
@@ -328,7 +328,7 @@ exports.deleteTravel = (req: express.Request, res: express.Response, _: express.
                 driver: true
             }
         }).then((travel) => {
-            const notifDriver = notifs.travel.deleted(travel.driver, travel);
+            const notifDriver = notifs.travel.deleted(travel.driver, travel, req.body.message);
             // create driver's notification
             prisma.notification.create({
                 data: {
