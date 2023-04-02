@@ -123,6 +123,7 @@ export default {
     DATE: "Date",
     HOUR: "Hour",
     CREATE_TRIP: "Create a trip",
+    EDIT_TRIP: "Edit the trip",
     TRAVEL_CARD_LABEL: "Travel of the {DATE}",
     SLOTS: "Slots",
     SLOT: "Slot",

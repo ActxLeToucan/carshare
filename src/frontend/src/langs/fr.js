@@ -123,6 +123,7 @@ export default {
     DATE: "Date",
     HOUR: "Heure",
     CREATE_TRIP: "Créer un trajet",
+    EDIT_TRIP: "Modifier le trajet",
     TRAVEL_CARD_LABEL: "Trajet du {DATE}",
     SLOTS: "Places",
     SLOT: "Place",

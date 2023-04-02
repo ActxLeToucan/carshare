@@ -117,8 +117,16 @@
         </div>
         <div
             v-show="editMode && (User.CurrentUser.id === trip?.driver?.id)"
-            class="flex w-full justify-end items-center my-4"
+            class="flex w-full justify-between items-center my-4"
         >
+            <button-block
+                v-show="trip != null && !isPast"
+                color="teal"
+                :href="'/trips/edit?id=' + trip?.id"
+                :disabled="trip?.status == -1"
+            >
+                {{ lang.EDIT_TRIP }}
+            </button-block>
             <button-block
                 v-show="trip != null && !isPast"
                 color="red"
@@ -210,7 +218,7 @@ export default {
             this.trip = null;
             this.state = "loading";
 
-            API.execute_logged(API.ROUTE.TRAVELS.GET + id, API.METHOD.GET, User.CurrentUser.getCredentials()).then(res => {
+            API.execute_logged(API.ROUTE.TRAVELS.GET + "/" + id, API.METHOD.GET, User.CurrentUser.getCredentials()).then(res => {
                 this.trip = res;
 
                 this.startIndex = (this.tripStart)? this.trip?.steps.findIndex(step => step.city == this.tripStart.value) : 0;

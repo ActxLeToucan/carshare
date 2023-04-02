@@ -17,9 +17,15 @@
                         />
                         <card-badge
                             v-show="futureState == 'loading'"
-                            class="flex-grow"
+                            class="flex w-fit"
                             :title="lang.LOADING_TRIPS"
                             :content="lang.LOADING_TRIPS_DESC"
+                        />
+                        <card-badge
+                            v-show="futureState != 'loading' && futureTrips.length == 0"
+                            class="flex w-fit"
+                            :title="lang.NO_TRIPS"
+                            :content="lang.NO_TRIPS_DESC"
                         />
                         <div
                             ref="pag-btn-future"
@@ -53,9 +59,15 @@
                         />
                         <card-badge
                             v-show="pastState == 'loading'"
-                            class="flex-grow"
+                            class="flex w-fit"
                             :title="lang.LOADING_TRIPS"
                             :content="lang.LOADING_TRIPS_DESC"
+                        />
+                        <card-badge
+                            v-show="futureState != 'loading' && pastTrips.length == 0"
+                            class="flex w-fit"
+                            :title="lang.NO_TRIPS"
+                            :content="lang.NO_TRIPS_DESC"
                         />
                         <div
                             ref="pag-btn-past"
@@ -137,14 +149,12 @@ export default {
 
         this.tripPreview = this.$refs["trip-view"];
 
-        window.action = () => {
-            this.futureTrips = [];
-            this.pastTrips = [];
-            this.futurePagination.offset = 0;
-            this.pastPagination.offset = 0;
-            this.fetchFutureTrips();
-            this.fetchPastTrips();
-        }
+        this.futureTrips = [];
+        this.pastTrips = [];
+        this.futurePagination.offset = 0;
+        this.pastPagination.offset = 0;
+        this.fetchFutureTrips();
+        this.fetchPastTrips();
     },
     methods: {
         selectTrip(trip) {

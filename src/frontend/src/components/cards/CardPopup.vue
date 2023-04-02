@@ -160,6 +160,9 @@ export default {
 
         this.hide();
         this.onload?.(this);
+
+        // cant' make a watcher for url path, so we have to do it manually
+        this.$router.afterEach((to, from) => { this.hide(); });
     },
     methods: {
         show() {
