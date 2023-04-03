@@ -1,7 +1,8 @@
 import type express from 'express';
 import { prisma } from '../app';
 import { error, sendMsg, info } from '../tools/translator';
-import * as validator from '../tools/validator';
+import validator from '../tools/validator';
+import sanitizer from '../tools/sanitizer';
 
 exports.getSettings = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     res.status(200).json({
@@ -14,12 +15,12 @@ exports.getSettings = (req: express.Request, res: express.Response, _: express.N
 exports.updateSettings = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { mailNotif, lang, timezone } = req.body;
 
-    if (mailNotif !== undefined && !validator.checkBooleanField(mailNotif, req, res, 'mailNotif')) return;
-    if (lang !== undefined && !validator.checkLang(lang, req, res)) return;
-    const timezoneSanitized = validator.sanitizeTimezone(timezone);
-    if (timezone !== undefined && timezoneSanitized === undefined) {
-        sendMsg(req, res, error.timezone.invalid);
-        return;
+    if (mailNotif !== undefined && !validator.typeBoolean(mailNotif, true, req, res, 'mailNotif')) return;
+    if (lang !== undefined && !validator.lang(lang, true, req, res)) return;
+    let timezoneSanitized;
+    if (timezone !== undefined) {
+        timezoneSanitized = sanitizer.timezone(timezone, true, req, res);
+        if (timezoneSanitized === undefined) return;
     }
 
     prisma.user.update({

@@ -20,6 +20,7 @@ const routes = [
     { path: "/profile", name: 'Profile', component: () => import("./views/Profile.vue") },
     { path: "/admin", name: 'Admin', component: () => import("./views/Admin.vue") },
     { path: "/trips/new", name: 'TripsNew', component: () => import("./views/TripsNew.vue") },
+    { path: "/trips/edit", name: 'TripsEdit', component: () => import("./views/TripsNew.vue") },
     // 404 redirection
     { path: "/:catchAll(.*)", name: 'NotFound', component: () => import("./views/NotFound.vue") }
 ]

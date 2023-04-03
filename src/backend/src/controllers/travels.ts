@@ -1,27 +1,94 @@
 import type express from 'express';
 import { prisma } from '../app';
-import * as validator from '../tools/validator';
-import { checkTravelHours } from '../tools/validator';
-import { displayableTravel, displayableUserPublic, error, info, sendMsg } from '../tools/translator';
+import validator from '../tools/validator';
+
+import { displayableTravel, displayableUserPublic, error, info, notifs, notify, sendMsg } from '../tools/translator';
 import properties from '../properties';
 import { getMaxPassengers, preparePagination } from './_common';
 import moment from 'moment-timezone';
 import * as _travel from './travels/_common';
+import { type Group, type User } from '@prisma/client';
+import sanitizer from '../tools/sanitizer';
 
 exports.searchTravels = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const { date, startCity, startContext, endCity, endContext } = req.query;
-    if (!validator.checkCityField(startCity, req, res, 'startCity')) return;
-    if (!validator.checkCityField(endCity, req, res, 'endCity')) return;
-    if (!validator.checkDateField(date, true, req, res)) return;
-    if (startContext !== undefined && !validator.checkStringField(startContext, req, res, 'startContext')) return;
-    if (endContext !== undefined && !validator.checkStringField(endContext, req, res, 'endContext')) return;
+    const {
+        date,
+        time,
+        startCity,
+        startContext,
+        startLat,
+        startLng,
+        endCity,
+        endContext,
+        endLat,
+        endLng
+    } = req.query;
+
+    if (!validator.date(date, true, req, res, false)) return;
+    if (!validator.city(startCity, true, req, res, 'startCity')) return;
+    if (!validator.city(endCity, true, req, res, 'endCity')) return;
+    if (startContext !== undefined && !validator.typeString(startContext, true, req, res, 'startContext')) return;
+    if (endContext !== undefined && !validator.typeString(endContext, true, req, res, 'endContext')) return;
+
+    let startLatSanitized;
+    if (startLat !== undefined) {
+        const startLatSanitized = sanitizer.typeNumber(startLat, true, req, res, 'startLat');
+        if (startLatSanitized === undefined) return;
+        if (!validator.latitude(startLatSanitized, true, req, res, 'startLat')) return;
+    }
+    let startLngSanitized;
+    if (startLng !== undefined) {
+        const startLngSanitized = sanitizer.typeNumber(startLng, true, req, res, 'startLng');
+        if (startLngSanitized === undefined) return;
+        if (!validator.longitude(startLngSanitized, true, req, res, 'startLng')) return;
+    }
+    let endLatSanitized;
+    if (endLat !== undefined) {
+        const endLatSanitized = sanitizer.typeNumber(endLat, true, req, res, 'endLat');
+        if (endLatSanitized === undefined) return;
+        if (!validator.latitude(endLatSanitized, true, req, res, 'endLat')) return;
+    }
+    let endLngSanitized;
+    if (endLng !== undefined) {
+        const endLngSanitized = sanitizer.typeNumber(endLng, true, req, res, 'endLng');
+        if (endLngSanitized === undefined) return;
+        if (!validator.longitude(endLngSanitized, true, req, res, 'endLng')) return;
+    }
+
+    let timeSanitized;
+    if (time !== undefined) {
+        timeSanitized = sanitizer.time(time, true, req, res);
+        if (timeSanitized === null) return;
+    }
 
     const startCtx = startContext === undefined ? '' : startContext;
     const endCtx = endContext === undefined ? '' : endContext;
 
     const d = new Date(date as string);
-    const date1 = moment(d).subtract(4, 'hour').toDate();
-    const date2 = moment(d).add(18, 'hour').toDate();
+    let date1, date2;
+    if (timeSanitized === undefined) {
+        // check if the date is not before today + 24h
+        if (!validator.checkTravelHours(d)) {
+            sendMsg(req, res, error.date.tooSoon, moment().add(properties.travel.hoursLimit, 'hours').toDate(), res.locals.user.timezone);
+            return;
+        }
+        date1 = d;
+        date2 = moment(d).add(1, 'day').toDate();
+    } else {
+        // add time to date
+        const dt = moment(d).add(timeSanitized.hours(), 'hours').add(timeSanitized.minutes(), 'minutes');
+        // check if the date is not before today + 24h
+        if (!validator.checkTravelHours(dt.toDate())) {
+            sendMsg(req, res, error.date.tooSoon, moment().add(properties.travel.hoursLimit, 'hours').toDate(), res.locals.user.timezone);
+            return;
+        }
+        // search for 4h before and 18h after
+        date1 = moment(dt).subtract(4, 'hour').toDate();
+        date2 = moment(dt).add(18, 'hour').toDate();
+    }
+
+    const useHaversineStart = startLatSanitized !== undefined && startLngSanitized !== undefined;
+    const useHaversineEnd = endLatSanitized !== undefined && endLngSanitized !== undefined;
 
     prisma.$queryRaw`select t.*,
                             u.id              as 'driver.id',
@@ -52,14 +119,23 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
                             arr.date          as 'arrival.date'
                      from travel t
                               inner join user u on u.id = t.driverId
-                              inner join step dep on dep.travelId = t.id and dep.city = ${startCity}
-                              inner join step arr on arr.travelId = t.id and arr.city = ${endCity}
+                              inner join step dep on dep.travelId = t.id
+                              inner join step arr on arr.travelId = t.id
                      where t.status = ${properties.travel.status.open}
                        and dep.date < arr.date
+                       and (dep.city = ${startCity} or
+                            IF(${useHaversineStart},
+                               haversine(dep.lat, dep.lng, ${startLatSanitized}, ${startLngSanitized}) <
+                               ${properties.travel.search.maxDistance}, false))
+                       and (arr.city = ${endCity} or
+                            IF(${useHaversineEnd},
+                               haversine(arr.lat, arr.lng, ${endLatSanitized}, ${endLngSanitized}) <
+                               ${properties.travel.search.maxDistance}, false))
                        and IF(${startCtx} = '', true, dep.context = ${startCtx})
                        and IF(${endCtx} = '', true, arr.context = ${endCtx})
                        and dep.date BETWEEN ${date1} and ${date2}
-                       and t.groupId is null`
+                       and (t.groupId in (select groupId from _users where B = ${res.locals.user.id})
+                         or t.groupId is null)`
         .then(async (data: any) => {
             for (const travel of data) {
                 for (const key of Object.keys(travel)) {
@@ -84,7 +160,7 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
 
             data = data.filter((travel: any) => {
                 return travel.passengers < travel.maxPassengers && // Check if there is still seats available
-                    checkTravelHours(travel.departure.date); // Check if the beginning of the travel is not too early
+                    validator.checkTravelHours(travel.departure.date); // Check if the beginning of the travel is not too early
             });
             data = data.sort((a: any, b: any) => {
                 const diffA = Math.abs(a.departure.date.getTime() - d.getTime());
@@ -102,10 +178,11 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
 exports.createTravel = async (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { maxPassengers, price, description, groupId, steps } = req.body;
 
-    if (!validator.checkMaxPassengersField(maxPassengers, req, res)) return;
-    if (!validator.checkPriceField(price, req, res)) return;
-    if (!validator.checkDescriptionField(description, req, res)) return;
+    if (!validator.maxPassengers(maxPassengers, true, req, res)) return;
+    if (!validator.price(price, true, req, res)) return;
+    if (!validator.description(description, true, req, res)) return;
 
+    let group: (Group & { users: User[] }) | null = null;
     if (groupId !== undefined && groupId !== null) {
         if (typeof groupId !== 'number') {
             sendMsg(req, res, error.group.typeId);
@@ -113,15 +190,18 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
         }
 
         try {
-            const count = await prisma.group.count({
-                where: {
-                    id: groupId,
-                    creatorId: res.locals.user.id
-                }
+            group = await prisma.group.findUnique({
+                where: { id: groupId },
+                include: { users: true }
             });
 
-            if (count === 0) {
+            if (group === null) {
                 sendMsg(req, res, error.group.notFound);
+                return;
+            }
+
+            if (group.creatorId !== res.locals.user.id) {
+                sendMsg(req, res, error.group.notCreator);
                 return;
             }
         } catch (err) {
@@ -129,7 +209,7 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
             sendMsg(req, res, error.generic.internalError);
         }
     }
-    if (!validator.checkStepList(steps, req, res)) return;
+    if (!validator.checkStepList(steps, true, req, res)) return;
 
     prisma.travel.findMany({
         where: {
@@ -138,15 +218,13 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
         },
         select: {
             steps: {
-                select: {
-                    date: true
-                }
+                select: { date: true },
+                orderBy: { date: 'asc' }
             }
         }
     }).then((travels) => {
         for (const travel of travels) {
-            travel.steps.sort((a: any, b: any) => a.date.getTime() - b.date.getTime());
-            if (!validator.checkTravelAlready(steps[0].date, steps[steps.length - 1].date, travel.steps, req, res)) return;
+            if (!validator.checkTravelAlready(steps[0].date, steps[steps.length - 1].date, travel.steps, true, req, res)) return;
         }
 
         prisma.travel.create({
@@ -157,7 +235,14 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
                 driverId: res.locals.user.id,
                 groupId,
                 steps: {
-                    create: steps.map((step: { label: string, city: string, context: string, lat: number, lng: number, date: string }) => ({
+                    create: steps.map((step: {
+                        label: string
+                        city: string
+                        context: string
+                        lat: number
+                        lng: number
+                        date: string
+                    }) => ({
                         label: step.label,
                         city: step.city,
                         context: step.context,
@@ -168,12 +253,34 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
                 }
             },
             include: {
-                steps: true,
+                steps: {
+                    orderBy: { date: 'asc' }
+                },
                 driver: true
             }
         }).then((travel) => {
-            // TODO: notify users in the group
-            sendMsg(req, res, info.travel.created, travel);
+            const users = group === null ? [] : group.users;
+            const data = users.map((user) => {
+                const notif = notifs.travel.invitation(user, travel, group?.name ?? 'noname');
+                return {
+                    ...notif,
+                    userId: user.id,
+                    senderId: travel.driver.id,
+                    travelId: travel.id
+                }
+            });
+            prisma.notification.createMany({ data }).then(() => {
+                for (const notif of data) {
+                    const user = users.find((u) => u.id === notif.userId);
+                    // Send email notification
+                    if (user !== undefined) notify(user, notif);
+                }
+
+                sendMsg(req, res, info.travel.created, travel);
+            }).catch((err) => {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
+            });
         }).catch((err) => {
             console.error(err);
             sendMsg(req, res, error.generic.internalError);
@@ -204,14 +311,17 @@ exports.getTravels = (req: express.Request, res: express.Response, _: express.Ne
 }
 
 exports.getTravel = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const travelId = validator.sanitizeId(req.params.id, req, res);
+    const travelId = sanitizer.id(req.params.id, true, req, res);
     if (travelId === null) return;
 
     prisma.travel.findUnique({
         where: { id: travelId },
         include: {
-            steps: true,
-            driver: true
+            steps: {
+                orderBy: { date: 'asc' }
+            },
+            driver: true,
+            group: true
         }
     }).then((travel: any) => {
         if (travel === null) {
@@ -245,6 +355,13 @@ exports.getTravel = (req: express.Request, res: express.Response, _: express.Nex
 
 exports.updateTravel = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     _travel.update(req, res, true).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
+}
+
+exports.cancelTravel = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    _travel.cancel(req, res, true).catch((err) => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
     });

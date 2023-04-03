@@ -139,7 +139,6 @@
         />
         <card-popup
             ref="trip-view"
-            :title="lang.TRAVEL_CARD_LABEL"
             :cancel-label="lang.BACK"
             :show-validate="false"
         >
@@ -327,7 +326,6 @@ export default {
         },
         showTravel(travelId) {
             this.travelId = travelId;
-            this.tripPreview?.setTitle(Lang.CurrentLang.TRAVEL_CARD_LABEL);
             this.tripPreview?.show();
         },
     },

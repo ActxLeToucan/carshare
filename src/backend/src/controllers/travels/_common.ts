@@ -1,11 +1,11 @@
 import type express from 'express';
-import * as validator from '../../tools/validator';
-import { checkTravelHours } from '../../tools/validator';
+import validator from '../../tools/validator';
 import { prisma } from '../../app';
 import { error, info, notifs, notify, sendMsg } from '../../tools/translator';
 import { getMaxPassengers } from '../_common';
 import { type Booking, type Step } from '@prisma/client';
 import properties from '../../properties';
+import sanitizer from '../../tools/sanitizer';
 
 /**
  * Update a travel
@@ -15,21 +15,28 @@ import properties from '../../properties';
  * @param asAdmin Weather to update as an admin or not
  */
 async function update (req: express.Request, res: express.Response, asAdmin: boolean) {
-    const travelId = validator.sanitizeId(req.params.id, req, res);
+    const travelId = sanitizer.id(req.params.id, true, req, res);
     if (travelId === null) return;
 
+    const reason = req.query.reason;
+    if (reason !== undefined && !validator.typeString(reason, true, req, res, 'reason')) return;
+    const reasonStr = reason === undefined ? undefined : reason as string;
     const { maxPassengers, price, description, steps } = req.body;
 
-    if (maxPassengers !== undefined && !validator.checkMaxPassengersField(maxPassengers, req, res)) return;
-    if (price !== undefined && !validator.checkPriceField(price, req, res)) return;
-    if (description !== undefined && !validator.checkDescriptionField(description, req, res)) return;
+    if (maxPassengers !== undefined && !validator.maxPassengers(maxPassengers, true, req, res)) return;
+    if (price !== undefined && !validator.price(price, true, req, res)) return;
+    if (description !== undefined && !validator.description(description, true, req, res)) return;
 
-    if (!validator.checkStepList(steps, req, res)) return;
+    if (!validator.checkStepList(steps, true, req, res)) return;
 
     // Check if the travel exists
     const travel = await prisma.travel.findUnique({
         where: { id: travelId },
-        include: { steps: true }
+        include: {
+            steps: {
+                orderBy: { date: 'asc' }
+            }
+        }
     });
     if (travel === null) {
         sendMsg(req, res, error.travel.notFound);
@@ -46,12 +53,9 @@ async function update (req: express.Request, res: express.Response, asAdmin: boo
         return;
     }
 
-    // Sort steps by date
-    travel.steps.sort((a: Step, b: Step) => a.date.getTime() - b.date.getTime());
-
     // Check if the travel is editable
     const firstStep = travel.steps.at(0);
-    if (firstStep !== undefined && !checkTravelHours(firstStep.date)) {
+    if (firstStep !== undefined && !validator.checkTravelHours(firstStep.date)) {
         sendMsg(req, res, error.travel.notModifiable);
         return;
     }
@@ -90,13 +94,13 @@ async function update (req: express.Request, res: express.Response, asAdmin: boo
         },
         select: {
             steps: {
-                select: { date: true }
+                select: { date: true },
+                orderBy: { date: 'asc' }
             }
         }
     });
     for (const travelSteps of travelsSteps) {
-        travelSteps.steps.sort((a: any, b: any) => a.date.getTime() - b.date.getTime());
-        if (!validator.checkTravelAlready(steps[0].date, steps[steps.length - 1].date, travelSteps.steps, req, res)) return;
+        if (!validator.checkTravelAlready(steps[0].date, steps[steps.length - 1].date, travelSteps.steps, true, req, res)) return;
     }
 
     // Get bookings for notifications (before any update to preserve the old data)
@@ -152,7 +156,9 @@ async function update (req: express.Request, res: express.Response, asAdmin: boo
             description
         },
         include: {
-            steps: true,
+            steps: {
+                orderBy: { date: 'asc' }
+            },
             driver: true
         }
     });
@@ -163,8 +169,8 @@ async function update (req: express.Request, res: express.Response, asAdmin: boo
         .map((booking) => {
             const bookingDeleted = stepsToDelete.map((s: Step) => s.id).includes(booking.departure.id) || stepsToDelete.map((s: Step) => s.id).includes(booking.arrival.id);
             const notif = bookingDeleted
-                ? notifs.booking.deletedDueToTravelUpdate(booking.passenger, booking, updatedTravel, asAdmin)
-                : notifs.booking.travelUpdated(booking.passenger, booking, asAdmin);
+                ? notifs.booking.deletedDueToTravelUpdate(booking.passenger, booking, updatedTravel, asAdmin, reasonStr)
+                : notifs.booking.travelUpdated(booking.passenger, booking, asAdmin, reasonStr);
             return {
                 ...notif,
                 userId: booking.passenger.id,
@@ -183,7 +189,7 @@ async function update (req: express.Request, res: express.Response, asAdmin: boo
 
     // Create notifications for driver
     if (asAdmin) {
-        const notif = notifs.travel.updated(updatedTravel.driver, updatedTravel);
+        const notif = notifs.travel.updated(updatedTravel.driver, updatedTravel, reasonStr);
         await prisma.notification.create({
             data: {
                 ...notif,
@@ -199,4 +205,97 @@ async function update (req: express.Request, res: express.Response, asAdmin: boo
     sendMsg(req, res, info.travel.updated, updatedTravel);
 }
 
-export { update };
+async function cancel (req: express.Request, res: express.Response, asAdmin: boolean) {
+    const travelId = sanitizer.id(req.params.id, true, req, res);
+    if (travelId === null) return;
+
+    const reason = req.query.reason;
+    if (reason !== undefined && !validator.typeString(reason, true, req, res, 'reason')) return;
+    const reasonStr = reason === undefined ? undefined : reason as string;
+
+    const travel = await prisma.travel.findUnique({
+        where: { id: travelId },
+        include: {
+            steps: {
+                orderBy: { date: 'asc' }
+            },
+            driver: true
+        }
+    });
+
+    // verifications
+    if (travel === null) {
+        sendMsg(req, res, error.travel.notFound);
+        return;
+    }
+
+    if (travel.status !== properties.travel.status.open) {
+        sendMsg(req, res, error.travel.notOpen);
+        return;
+    }
+
+    if (!asAdmin) {
+        if (res.locals.user.id !== travel.driverId) {
+            sendMsg(req, res, error.travel.notDriver);
+            return;
+        }
+
+        if (!validator.checkTravelHoursEditable(travel.steps[0].date, true, req, res)) return;
+    }
+
+    // cancel travel
+    await prisma.travel.update({
+        where: { id: travelId },
+        data: { status: properties.travel.status.cancelled }
+    });
+
+    // get passengers and send notifications
+    const bookings = await prisma.booking.findMany({
+        where: {
+            departure: { travelId }
+        },
+        include: {
+            departure: true,
+            arrival: true,
+            passenger: true
+        }
+    });
+
+    const data = bookings.map((booking) => {
+        const notif = notifs.travel.cancelled(booking.passenger, booking.departure, booking.arrival, asAdmin, reasonStr);
+        return {
+            ...notif,
+            userId: booking.passengerId,
+            senderId: Number(res.locals.user.id),
+            travelId: booking.departure.travelId,
+            bookingId: booking.id
+        };
+    });
+
+    // create notifications
+    await prisma.notification.createMany({ data });
+    for (const notif of data) {
+        const booking = bookings.find((b) => b.id === notif.bookingId);
+        // send email notification
+        if (booking !== undefined) notify(booking.passenger, notif);
+    }
+
+    // create driver's notification
+    if (asAdmin) {
+        const notifDriver = notifs.travel.cancelled(travel.driver, travel.steps[0], travel.steps[travel.steps.length - 1], req.body.message, reasonStr);
+        await prisma.notification.create({
+            data: {
+                ...notifDriver,
+                userId: travel.driverId,
+                senderId: Number(res.locals.user.id),
+                travelId: travel.id
+            }
+        });
+        // send email notification to driver
+        notify(travel.driver, notifDriver);
+    }
+
+    sendMsg(req, res, info.travel.cancelled);
+}
+
+export { update, cancel };
