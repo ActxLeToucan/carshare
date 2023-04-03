@@ -14,6 +14,25 @@ servers:
     description: Antoine's server
   - url: 'https://carshare.apis.furwaz.fr'
     description: Paul's server
+tags:
+  - name: Users
+    description: Operations about users
+  - name: Settings
+    description: Operations about settings
+  - name: Notifications
+    description: Operations about notifications
+  - name: Travels
+    description: Operations about travels
+  - name: Bookings
+    description: Operations about bookings
+  - name: Groups
+    description: Operations about groups
+  - name: Notations
+    description: Operations about notations
+  - name: Docs
+    description: Operations about docs
+  - name: Admin
+    description: Aggregation of administrator-only routes
 paths:
   /users/signup:
     post:
@@ -146,7 +165,7 @@ paths:
 
   /users/me:
     get:
-      summary: Get user
+      summary: Get current user
       description: Get the current user
       operationId: getMe
       tags:
@@ -169,7 +188,7 @@ paths:
         '500':
           $ref: '#/components/responses/internalError'
     delete:
-      summary: Delete user
+      summary: Delete current user
       description: Delete the current user
       operationId: deleteMe
       tags:
@@ -215,7 +234,7 @@ paths:
         '500':
           $ref: '#/components/responses/internalError'
     patch:
-      summary: Update user
+      summary: Update current user
       description: Update the current user
       operationId: updateMe
       tags:
@@ -553,11 +572,12 @@ paths:
 
   /users/:id:
     delete:
-      summary: Delete an user
-      description: Delete an user. Only available to admins.
+      summary: Delete a user (admin)
+      description: Delete a user. Only available to admins.
       operationId: deleteUser
       tags:
         - Users
+        - Admin
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
         - name: id
@@ -592,11 +612,12 @@ paths:
         '500':
           $ref: '#/components/responses/internalError'
     patch:
-      summary: Update an user
-      description: Update an user. Only available to admins.
+      summary: Update a user (admin)
+      description: Update a user. Only available to admins.
       operationId: updateUser
       tags:
         - Users
+        - Admin
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
         - name: id
@@ -819,8 +840,8 @@ paths:
           $ref: '#/components/responses/internalError'
   /travels/my/:id:
     delete:
-      summary: Delete my travel
-      description: Delete a travel of the current user.
+      summary: Cancel my travel
+      description: Cancel a travel of the current user.
       operationId: cancelMyTravel
       tags:
         - Travels
@@ -873,7 +894,7 @@ paths:
         '500':
           $ref: '#/components/responses/internalError'
     patch:
-      summary: Update travel
+      summary: Update my travel
       description: Update a travel of the current user.
       operationId: updateMyTravel
       tags:
@@ -1062,11 +1083,12 @@ paths:
         '500':
           $ref: '#/components/responses/internalError'
     patch:
-      summary: Update travel
+      summary: Update travel (admin)
       description: Update a travel with the given id. Only available to admins.
       operationId: updateTravel
       tags:
         - Travels
+        - Admin
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
         - name: id
@@ -1133,11 +1155,12 @@ paths:
         '500':
           $ref: '#/components/responses/internalError'
     delete:
-      summary: Cancel travel
+      summary: Cancel travel (admin)
       description: Cancel a travel with the given id. Only available to admins.
       operationId: cancelTravel
       tags:
         - Travels
+        - Admin
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
         - name: id
@@ -1185,6 +1208,7 @@ paths:
       operationId: getTravels
       tags:
         - Travels
+        - Admin
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
         - $ref: '#/components/parameters/limit'
@@ -1414,11 +1438,12 @@ paths:
 
   /groups:
     get:
-      summary: Search groups
+      summary: Search groups (admin)
       description: Search in all groups. Only available to admins.
       operationId: searchGroups
       tags:
         - Groups
+        - Admin
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
         - $ref: '#/components/parameters/limit'
@@ -1628,11 +1653,12 @@ paths:
           $ref: '#/components/responses/internalError'
   /groups/:id:
     delete:
-      summary: Delete a groups
-      description: Delete a groups, with the id in parameter. Only available to admins
+      summary: Delete a group (admin)
+      description: Delete a group, with the id in parameter. Only available to admins
       operationId: deleteGroup
       tags:
         - Groups
+        - Admin
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
         - name: id
@@ -2025,8 +2051,8 @@ paths:
 
   /bookings/my/:id:
     delete:
-      summary: Delete a booking
-      description: Delete the specified booking of the current user.
+      summary: Cancel a booking
+      description: Cancel the specified booking of the current user.
       operationId: cancelBooking
       tags:
         - Bookings
