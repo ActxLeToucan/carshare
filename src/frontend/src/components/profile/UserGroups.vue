@@ -117,15 +117,28 @@
                             class="flex overflow-x-auto space-x-4 w-full"
                         >
                             <card-badge
-                                v-for="member in selectedGroup?.users"
+                                v-for="(member, index) in selectedGroup?.users"
                                 :key="member.email"
                                 class="md:max-w-[18em] max-w-[14em]"
                                 :title="member.firstName + ' ' + member.lastName"
                                 :content="member.email"
-                            />
+                            >
+                                <button
+                                    class="absolute top-1 right-1 w-6 h-6 text-slate-500 hover:text-red-500 transition-all"
+                                    @click="removeGroupMember(index)"
+                                >
+                                    <x-mark-icon />
+                                </button>
+                            </card-badge>
                         </div>
                     </div>
-                    <div class="flex grow justify-end p-2">
+                    <div class="flex grow justify-between p-2">
+                        <button-block
+                            :action="showAddMemberPopup"
+                            color="teal"
+                        >
+                            {{ lang.ADD_MEMBER }}
+                        </button-block>
                         <button-block
                             :action="showDeletePopup"
                             color="red"
@@ -137,6 +150,7 @@
             </div>
         </div>
         <card-popup
+            ref="delete-popup"
             color="red"
             :title="lang.DELETE_GROUP"
             :content="lang.GROUP_DELETE_CONFIRMATION"
@@ -145,6 +159,31 @@
             :onload="setDeletePopup"
             :onvalidate="removeGroup"
         />
+        <card-popup
+            ref="add-member-popup"
+            color="teal"
+            :title="lang.ADD_MEMBER"
+            :content="lang.ADD_MEMBER_DESC"
+            :cancel-label="lang.CANCEL"
+            :validate-label="lang.ADD"
+            :disable-validate="selectedGroupUser == null"
+            :onvalidate="addMember"
+        >
+            <selector
+                :onload="s => s.attachInput($el.querySelector('input[name=search]'))"
+                :oncompletion="getSearchUsers"
+                :onclick="selectUser"
+                :detached="true"
+            />
+            <input-text
+                ref="search"
+                :label="lang.USER"
+                :placeholder="lang.USER"
+                :value="selectedGroupUser?.value"
+                :onchange="e => { if (e.target.value != selectedGroupUser?.value) selectedGroupUser = null }"
+                name="search"
+            />
+        </card-popup>
         <card-popup
             ref="create-popup"
             :title="lang.CREATE_GROUP"
@@ -180,6 +219,7 @@ import {
 import API from '../../scripts/API';
 import User from '../../scripts/User';
 import { Log } from '../../scripts/Logs';
+import Selector from '../inputs/Selector.vue';
 
 export default {
     name: "UserGroups",
@@ -193,6 +233,7 @@ export default {
         PlusIcon,
         PencilIcon,
         CheckIcon,
+        Selector,
     },
     data() {
         return {
@@ -206,6 +247,7 @@ export default {
             pagination: API.createPagination(0, 5),
             isCreating: false,
             editGroupName: false,
+            selectedGroupUser: null,
         }
     },
     mounted() {
@@ -304,6 +346,9 @@ export default {
                 this.loading = false;
                 this.pagination.total = res.total ?? 0;
                 this.showPagBtn = this.pagination.hasNext;
+                // TODO : remove this after debug
+                this.selectedGroup = this.groups[0];
+                this.showGroupZone();
             }).catch(err => {
                 console.error(err);
             });
@@ -324,6 +369,53 @@ export default {
                 });
             }
         },
+        removeGroupMember(index) {
+
+        },
+        showAddMemberPopup() {
+            this.$refs["add-member-popup"].show();
+        },
+        getSearchUsers(selector, search) {
+            API.execute_logged(API.ROUTE.USERS + "/search" + API.createPagination(0, 20) + "&query=" + search, API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
+                const users = res.data;
+                const data = users.map(user => {
+                    return {id: user.id, value: user.firstName + " " + user.lastName, desc: user.email, ...user};
+                });
+                console.log(data);
+                selector.setData(data);
+            }).catch(err => {
+                console.error(err);
+            });
+        },
+        selectUser(user) {
+            this.selectedGroupUser = user;
+        },
+        addMember(popup) {
+            const email = this.selectedGroupUser?.desc;
+            const log = popup.log(Lang.CurrentLang.INPUT_VERIFICATION + " ...", Log.INFO);
+
+            if (!email) {
+                popup.focus("email");
+                log.update(Lang.CurrentLang.EMAIL_SPECIFY, Log.WARNING);
+                setTimeout(() => { log.delete(); }, 4000);
+                return;
+            }
+
+            log.update(Lang.CurrentLang.ADDING_MEMBER + " ...", Log.INFO);
+            API.execute_logged(API.ROUTE.GROUPS + "/" + this.selectedGroup.id + "/member", API.METHOD.POST, User.CurrentUser?.getCredentials(), {email}).then(res => {
+                log.update(Lang.CurrentLang.MEMBER_ADDED, Log.SUCCESS);
+                this.selectedGroup.users.push(this.selectedGroupUser);
+                setTimeout(() => {
+                    log.delete();
+                    popup.hide();
+                }, 2000);
+            }).catch(err => {
+                log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
+                setTimeout(() => {
+                    log.delete();
+                }, 4000);
+            });
+        }
     }
 }
 </script>
