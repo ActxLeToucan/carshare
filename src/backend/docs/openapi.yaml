@@ -1773,7 +1773,7 @@ paths:
                     example: Group removed
 
         '400':
-          $ref: '#/components/responses/typeId'
+          $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
         '403':
