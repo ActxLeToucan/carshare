@@ -194,6 +194,7 @@ export default {
     SELECT_GROUP_DESC: "Please select a group of users to share your trip with",
     GROUP_SELECTED: "Group selected",
     SEARCH_GROUP: "Search group",
+    SEARCH_TRIP: "Search trip",
 
     // parameters
     NOTIF_PARAMS: "Notification settings",

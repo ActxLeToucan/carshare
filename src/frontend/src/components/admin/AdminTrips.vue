@@ -8,7 +8,7 @@
                 {{ lang.TRIPS }}
             </p>
              <p class="text-lg text-slate-500 pt-2 font-semibold mx-auto">
-                    {{ lang.SEARCH_GROUP }}
+                    {{ lang.SEARCH_TRIP }}
             </p>
                <div class="flex max-w-full min-w-0 items-center space-x-2">
                 <input-text
@@ -29,10 +29,11 @@
             />
             <div class="flex grow w-full flex-col px-8 space-y-4 pt-4 max-w-full min-w-0">
                     <admin-trip-card
-                        v-for="group in groups"
-                        :key="group?.id"
+                        v-for="trip in trips"
+                        :key="trip?.id"
                         class="min-w-0 w-full show-up"
-                        :data="group"
+                        :data="trip"
+                        @click="selectTrip(trip)"
                         :onclick="onCardClicked"
                     />
             </div>
@@ -103,26 +104,7 @@ import {
 import { getTypedValue } from '../../scripts/data.js';
 import Lang from "../../scripts/Lang";
 import re from "../../scripts/Regex";
-const PAGE = { QUERY: 1, RESULTS: 2 };
 
-function search(obj) {
-    obj.searchBar.buttonEnabled = false;
-    const log = obj.searchLog(Lang.CurrentLang.SEARCHING + "...", Log.INFO);
-
-    const value = obj.$refs['query-zone'].querySelector('input').value;
-
-    API.execute_logged(API.ROUTE.TRAVELS.GET+ obj.pagination + "&query=" + value, API.METHOD.GET, User.CurrentUser?.getCredentials(), { search: value }).then((data) => {
-        obj.groups = data.data;
-        obj.pagination.total = data.total;
-        log.delete();
-    }).catch((err) => {
-        log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
-        setTimeout(() => { log.delete(); }, 4000);
-    }).finally(() => {
-        obj.searchBar.buttonEnabled = true;
-    });
-
-}
 export default {
     name: 'AdminTrips',
     components: {
@@ -134,7 +116,8 @@ export default {
         CardBadge,
         MagnifyingGlassIcon,
         ChevronRightIcon,
-        ChevronLeftIcon
+        ChevronLeftIcon,
+        selectedTrip: null,
     },
     data() {
         return {
@@ -143,48 +126,21 @@ export default {
             searchBar: {
                 buttonEnabled: true,
             },
+              trips: [],
         }
     },
     mounted() {
         Lang.AddCallback(lang => this.lang = lang);
     },
     methods: {
-         onCardClicked(group) {
-            this.selectedGroup = group;    
+          selectTrip(trip) {
+            this.selectedTrip = trip;
         },
-        search() {
-            return search(this);
+        onCardClicked() {
+            this.futurePagination.next();
+            this.fetchFutureTrips();
         },
-          searchLog(msg, type = Log.INFO) {
-            if (!this.searchLogZone) return;
-            const log = new Log(msg, type);
-            log.attachTo(this.searchLogZone);
-            return log;
-        },
-      
-        setTrips(list) {
-            for (const el of list) {
-                this.trips.push({
-                    id: el.id,
-                    date: new Date(el.departure.date).toLocaleDateString(),
-                    author: el.driver.firstName + " " + el.driver.lastName?.substring(0, 1) + ".",
-                    startCity: el.departure.city,
-                    startTime: new Date(el.departure.date).toLocaleTimeString().substring(0, 5),
-                    endCity: el.arrival.city,
-                    endTime: new Date(el.arrival.date).toLocaleTimeString().substring(0, 5),
-                    slots: el.maxPassengers - (el.passengers === undefined ? 0 : el.passengers) + " / " + el.maxPassengers,
-                    price: el.price,
-                });
-                console.log('vdf')
-            }
-        },
-        log(msg, type = Log.INFO) {
-            if (!this.logZone) return null;
-            const log = new Log(msg, type);
-            log.attachTo(this.logZone);
-            return log;
-        },
-        
+
 
     }
 }

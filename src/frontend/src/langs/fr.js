@@ -194,6 +194,7 @@ export default {
     SELECT_GROUP_DESC: "Veuillez sélectionner un groupe d'utilisateurs pour pouvoir partager vos trajets avec eux",
     GROUP_SELECTED: "Groupe sélectionné",
     SEARCH_GROUP: "Rechercher un groupe",
+     SEARCH_TRIP: "Rechercher un trajet",
 
     // parametres
     NOTIF_PARAMS: "Paramètres de notifications",
