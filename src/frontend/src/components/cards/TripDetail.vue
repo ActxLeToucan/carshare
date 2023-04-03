@@ -123,10 +123,11 @@
         </div>
         <div
             v-show="editMode && (User.CurrentUser.id === trip?.driver?.id)"
-            class="flex w-full justify-between items-center my-4"
+            class="flex md:flex-row flex-col w-full justify-between items-center my-4 md:space-y-0 space-y-2"
         >
             <button-block
                 v-show="trip != null && !isPast"
+                class="max-w-full"
                 color="yellow"
                 :href="trip?.id ? '/trips/edit?id=' + trip?.id : undefined"
                 :disabled="trip?.status != 0"
@@ -135,6 +136,7 @@
             </button-block>
             <button-block
                 v-show="trip != null"
+                class="max-w-full"
                 :action="endTravel"
                 :disabled="trip?.status != 0"
             >
@@ -142,6 +144,7 @@
             </button-block>
             <button-block
                 v-show="trip != null && !isPast"
+                class="max-w-full"
                 color="red"
                 :action="removeTravel"
                 :disabled="trip?.status != 0"

@@ -1,14 +1,14 @@
 <template>
-    <div>
+    <div class="flex w-fit max-w-full min-w-0">
         <router-link
             v-show="_link"
             ref="btn"
             :to="href"
             class="flex items-center justify-center w-fit h-fit py-2 px-4 text-slate-500 dark:text-slate-300 text-xl font-bold bg-white dark:bg-slate-600 rounded-md bg-slate-100 border-b-4 border-slate-200 dark:border-slate-700
-                outline-none hover:text-slate-50 hover:dark:text-slate-200 hover:shadow-md transition-all"
+                outline-none hover:text-slate-50 hover:dark:text-slate-200 hover:shadow-md transition-all max-w-full"
             :class="'hover:bg-'+color+'-500 hover:border-'+color+'-600  focus:border-'+color+'-500'"
         >
-            <p class="whitespace-nowrap text-ellipsis max-w-full min-w-0 w-fit h-fit max-h-full min-h-0">
+            <p class="whitespace-nowrap text-ellipsis overflow-hidden max-w-full min-w-0 w-fit h-fit max-h-full min-h-0">
                 <slot />
             </p>
         </router-link>
@@ -16,10 +16,10 @@
             v-show="!_link"
             ref="btn-2"
             class="flex items-center justify-center w-fit h-fit py-2 px-4 text-slate-500 dark:text-slate-300 text-xl font-bold bg-white dark:bg-slate-600 rounded-md bg-slate-100 border-b-4 border-slate-200 dark:border-slate-700
-                outline-none hover:text-slate-50 hover:dark:text-slate-200 hover:shadow-md transition-all"
+                outline-none hover:text-slate-50 hover:dark:text-slate-200 hover:shadow-md transition-all max-w-full"
             :class="'hover:bg-'+color+'-500 hover:border-'+color+'-600  focus:border-'+color+'-500'"
         >
-            <p class="whitespace-nowrap text-ellipsis max-w-full min-w-0 w-fit h-fit max-h-full min-h-0">
+            <p class="whitespace-nowrap text-ellipsis overflow-hidden max-w-full min-w-0 w-fit h-fit max-h-full min-h-0">
                 <slot />
             </p>
         </button>

@@ -132,7 +132,7 @@
                             </card-badge>
                         </div>
                     </div>
-                    <div class="flex grow justify-between p-2">
+                    <div class="flex md:flex-row flex-col grow justify-between p-2 md:space-y-0 space-y-2">
                         <button-block
                             :action="showAddMemberPopup"
                             color="teal"
