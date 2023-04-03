@@ -10,6 +10,7 @@ router.use('/my', auth.access, require('./travels/my'));
 router.get('/search', auth.access, controller.searchTravels);
 router.get('/:id', auth.access, controller.getTravel);
 router.post('/create', auth.access, emailVerified, controller.createTravel);
+router.patch('/:id/end', auth.access, emailVerified, controller.endTravel);
 
 // admin routes
 router.get('/', auth.access, controller.getTravels);

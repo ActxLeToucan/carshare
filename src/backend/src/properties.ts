@@ -93,6 +93,10 @@ const properties = {
         minLimit: 1, // in database queries, the minimum value allowed for LIMIT statements
         maxLimit: 50 // the max value allowed for LIMIT statements
     },
+    note: {
+        min: 0,
+        max: 5
+    },
     travel: {
         status: {
             cancelled: -1,

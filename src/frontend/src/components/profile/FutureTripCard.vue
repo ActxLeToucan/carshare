@@ -37,6 +37,12 @@
                     >
                         {{ lang.CANCELED }}
                     </p>
+                    <p
+                        v-show="trip.status == 1"
+                        class="text-slate-300 dark:text-slate-500 text-base font-semibold"
+                    >
+                        {{ lang.FINISHED }}
+                    </p>
                 </div>
             </div>
         </div>
