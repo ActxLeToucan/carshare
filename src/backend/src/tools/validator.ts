@@ -479,11 +479,11 @@ function checkStepList (steps: any, sendError: boolean, req: express.Request, re
 function note (value: any, sendError: boolean, req: express.Request, res: express.Response): boolean {
     if (!typeInteger(value, sendError, req, res, 'note')) return false;
 
-    if (value < 0) {
+    if (value < properties.note.min) {
         if (sendError) sendMsg(req, res, error.number.min, 'note', 0);
         return false;
     }
-    if (value > 5) {
+    if (value > properties.note.max) {
         if (sendError) sendMsg(req, res, error.number.max, 'note', 5);
         return false;
     }
