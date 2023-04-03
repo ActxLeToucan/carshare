@@ -346,9 +346,6 @@ export default {
                 this.loading = false;
                 this.pagination.total = res.total ?? 0;
                 this.showPagBtn = this.pagination.hasNext;
-                // TODO : remove this after debug
-                this.selectedGroup = this.groups[0];
-                this.showGroupZone();
             }).catch(err => {
                 console.error(err);
             });
@@ -381,7 +378,6 @@ export default {
                 const data = users.map(user => {
                     return {id: user.id, value: user.firstName + " " + user.lastName, desc: user.email, ...user};
                 });
-                console.log(data);
                 selector.setData(data);
             }).catch(err => {
                 console.error(err);

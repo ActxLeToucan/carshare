@@ -95,6 +95,7 @@
             :show-validate="false"
         >
             <trip-detail
+                ref="trip-details"
                 :trip-start="null"
                 :trip-end="null"
                 :trip-id="selectedTrip?.id ?? null"
@@ -159,6 +160,7 @@ export default {
     methods: {
         selectTrip(trip) {
             this.selectedTrip = trip;
+            this.$refs["trip-details"].setPopup(this.tripPreview);
             this.tripPreview?.show();
         },
         fetchTrips(type, array, pagination, showBtn) {

@@ -24,6 +24,7 @@ export default {
     CREATOR: "Creator", 
     CREATION_DATE: "Creation date",
     CANCELED: "Canceled",
+    FINISHED: "Finished",
 
     // languages (do not translate)
     ENGLISH: "English",
@@ -217,6 +218,12 @@ export default {
     LOADING_TRIP_DESC: "Please wait while we load the trip informations",
     LOADING_TRIPS: "Loading trips",
     LOADING_TRIPS_DESC: "Loading all your trips",
+    MARK_AS_FINISHED: "Mark as finished",
+    CANCELLING_TRIP: "Cancelling trip",
+    TRIP_CANCELLED: "Trip cancelled successfully",
+    MARKING_TRIP_AS_FINISHED: "Finishing trip",
+    TRIP_MARKED_AS_FINISHED: "Trip finished successfully",
+
 
     // booking
     BOOKING_DOESNT_EXIST_ANYMORE: "This booking doesn't exist anymore.",

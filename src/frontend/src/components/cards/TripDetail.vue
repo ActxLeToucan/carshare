@@ -121,17 +121,24 @@
         >
             <button-block
                 v-show="trip != null && !isPast"
-                color="teal"
-                :href="'/trips/edit?id=' + trip?.id"
-                :disabled="trip?.status == -1"
+                color="yellow"
+                :href="trip?.status == 0 ? ('/trips/edit?id=' + trip?.id) : '#trips'"
+                :disabled="trip?.status != 0"
             >
                 {{ lang.EDIT_TRIP }}
+            </button-block>
+            <button-block
+                v-show="trip != null"
+                :action="endTravel"
+                :disabled="trip?.status != 0"
+            >
+                {{ lang.MARK_AS_FINISHED }}
             </button-block>
             <button-block
                 v-show="trip != null && !isPast"
                 color="red"
                 :action="removeTravel"
-                :disabled="trip?.status == -1"
+                :disabled="trip?.status != 0"
             >
                 {{ lang.CANCEL_TRIP }}
             </button-block>
@@ -255,14 +262,26 @@ export default {
             });
         },
         removeTravel() {
-            const log = this.log("Annulation du trajet ...", Log.INFO);
+            const log = this.log(Lang.CurrentLang.CANCELLING_TRIP + " ...", Log.INFO);
 
             API.execute_logged(API.ROUTE.TRAVELS.MY + "/" + this.trip.id, API.METHOD.DELETE, User.CurrentUser.getCredentials()).then(res => {
-                log.update(res.message, Log.SUCCESS);
-                setTimeout(() => { log.delete(); this.popup?.hide(); }, 4000);
+                log.update(Lang.CurrentLang.TRIP_CANCELLED, Log.SUCCESS);
+                setTimeout(() => { log.delete(); this.popup?.hide(); this.$router.go(); }, 2000); // TODO : change reload to something better
             }).catch(err => {
                 log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
-                setTimeout(() => { log.delete(); }, 6000);
+                setTimeout(() => { log.delete(); }, 4000);
+                console.error(err);
+            });
+        },
+        endTravel() {
+            const log = this.log(Lang.CurrentLang.MARKING_TRIP_AS_FINISHED + " ...", Log.INFO);
+
+            API.execute_logged(API.ROUTE.TRAVELS.MY + "/" + this.trip.id + "/end", API.METHOD.PATCH, User.CurrentUser.getCredentials()).then(res => {
+                log.update(Lang.CurrentLang.TRIP_MARKED_AS_FINISHED, Log.SUCCESS);
+                setTimeout(() => { log.delete(); this.popup?.hide(); this.$router.go(); }, 2000);
+            }).catch(err => {
+                log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
+                setTimeout(() => { log.delete(); }, 4000);
                 console.error(err);
             });
         },
