@@ -29,9 +29,9 @@ exports.getMyTravels = (req: express.Request, res: express.Response, _: express.
             },
             {
                 steps: {
-                    every: {
+                    some: {
                         departureOfBookings: {
-                            every: {
+                            some: {
                                 passengerId: res.locals.user.id
                             }
                         },
