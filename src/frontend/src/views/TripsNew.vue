@@ -244,7 +244,7 @@
                         </div>
 
                         <!-- END STEP -->
-                        <card-border class="flex flex-col mb-2 p-2 w-full">
+                        <card-border class="flex flex-col my-2 p-2 w-full">
                             <input-text
                                 ref="endstep-input"
                                 class="my-1"
@@ -309,8 +309,9 @@
         <card-popup
             ref="confirm-popup"
             :title="lang.CONFIRM_TRIP"
-            :content="lang.CONFIRM_TRIP_DESC"
+            :content="editMode ? lang.EDIT_TRIP_DESC : lang.CONFIRM_TRIP_DESC"
             :show-validate="true"
+            :validate-label="editMode ? lang.EDIT : lang.CREATE"
             :onvalidate="uploadTrip"
             :oncancel="() => { $refs['confirm-popup'].hide(); }"
         >
@@ -382,6 +383,7 @@ export default {
             editMode,
             validateBtnLabel: editMode? Lang.CurrentLang.EDIT: Lang.CurrentLang.CREATE,
             pageTitle: editMode? Lang.CurrentLang.EDIT_TRIP: Lang.CurrentLang.CREATE_TRIP,
+            oldTrip: null
         }
     },
     mounted() {
@@ -409,9 +411,18 @@ export default {
             if (paramParts.length < 2) goBack(this);
             const tripId = paramParts[1];
 
+            const toDate = (str) => {
+                const parts = new Date(str).toLocaleString().split(" ");
+                const date = parts[0];
+                const time = parts[1];
+                return date.split('/').reverse().join('-') + "T" + time;
+            };
+            const toStepObject = (step) => {
+                return {destination: {...step, value: step.city}, datetime: toDate(step.date)};
+            };
+
             API.execute_logged(API.ROUTE.TRAVELS.GET + "/" + tripId, API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
                 const trip = res;
-                console.log(res);
                 this.selectedTripType = trip.groupId == null? 0: 1;
                 this.selectedGroup = trip.group;
                 this.startStep.destination = trip.start;
@@ -419,19 +430,22 @@ export default {
                 this.endStep.destination = trip.end;
                 this.endStep.datetime = trip.end_datetime;
                 this.tripSteps.splice(0, this.tripSteps.length);
-                trip.steps.forEach(step => this.tripSteps.push({destination: step, datetime: null}));
-
+                this.startStep = toStepObject(trip.steps[0]);
+                this.endStep = toStepObject(trip.steps[trip.steps.length - 1]);
+                for (let i = 1; i < trip.steps.length - 1; i++) {
+                    this.tripSteps.push(toStepObject(trip.steps[i]));
+                }
                 this.$el.querySelector("input[name=trip-type]").value = this.selectedTripType;
                 this.$el.querySelector("input[name=trip-slots]").value = trip.maxPassengers;
                 this.$el.querySelector("input[name=trip-price]").value = trip.price;
                 this.$el.querySelector("textarea[name=trip-infos]").innerHTML = trip.description;
+                this.oldTrip = Object.assign({}, trip);
             }).catch(err => {
                 console.error(err);
             });
         },
         searchCities(selector, search) {
             BAN.search(search).then(cities => {
-                console.log(cities);
                 let index = 0;
                 let res = cities.map(city => ({
                     id: index++,
@@ -629,24 +643,57 @@ export default {
             const data = this.createTrip(false);
             if (!data) return;
 
-            const msg_log = popup.log(Lang.CurrentLang.CREATING_TRIP, Log.INFO);
-            API.execute_logged(API.ROUTE.TRAVELS.CREATE, API.METHOD.POST, User.CurrentUser?.getCredentials(), data).then(res => {
-                msg_log.update(Lang.CurrentLang.TRIP_CREATED, Log.SUCCESS);
-                setTimeout(() => {
-                    msg_log.delete();
-                    popup.hide();
-
+            if (!this.editMode) {
+                const msg_log = popup.log(Lang.CurrentLang.CREATING_TRIP, Log.INFO);
+                API.execute_logged(API.ROUTE.TRAVELS.CREATE, API.METHOD.POST, User.CurrentUser?.getCredentials(), data).then(res => {
+                    msg_log.update(Lang.CurrentLang.TRIP_CREATED, Log.SUCCESS);
                     setTimeout(() => {
-                        goHome(this);
-                    }, 1000);
+                        msg_log.delete();
+                        popup.hide();
 
-                }, 2000);
-            }).catch(err => {
-                msg_log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
-                setTimeout(() => {
-                    msg_log.delete();
-                }, 6000);
-            });
+                        setTimeout(() => {
+                            goHome(this);
+                        }, 1000);
+
+                    }, 2000);
+                }).catch(err => {
+                    msg_log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
+                    setTimeout(() => {
+                        msg_log.delete();
+                    }, 6000);
+                });
+            } else {
+                const areStepEquals = (step1, step2) => {
+                    return step1.label == step2.label && step1.date == step2.date;
+                }
+                if (this.oldTrip)
+                    data.steps.forEach((step, index) => {
+                        this.oldTrip.steps.forEach((oldStep, oldIndex) => {
+                            if (areStepEquals(step, oldStep)) {
+                                step.id = oldStep.id;
+                            }
+                        });
+                    });
+
+                const msg_log = popup.log(Lang.CurrentLang.EDITING_TRIP, Log.INFO);
+                API.execute_logged(API.ROUTE.TRAVELS.MY_EDIT + "/" + this.oldTrip.id, API.METHOD.PATCH, User.CurrentUser?.getCredentials(), data).then(res => {
+                    msg_log.update(Lang.CurrentLang.TRIP_EDITED, Log.SUCCESS);
+                    setTimeout(() => {
+                        msg_log.delete();
+                        popup.hide();
+
+                        setTimeout(() => {
+                            goHome(this);
+                        }, 1000);
+
+                    }, 2000);
+                }).catch(err => {
+                    msg_log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
+                    setTimeout(() => {
+                        msg_log.delete();
+                    }, 6000);
+                });
+            }
         }
     }
 }
