@@ -122,7 +122,7 @@
             <button-block
                 v-show="trip != null && !isPast"
                 color="yellow"
-                :href="trip?.status == 0 ? ('/trips/edit?id=' + trip?.id) : '#trips'"
+                :href="trip?.id ? '/trips/edit?id=' + trip?.id : undefined"
                 :disabled="trip?.status != 0"
             >
                 {{ lang.EDIT_TRIP }}
