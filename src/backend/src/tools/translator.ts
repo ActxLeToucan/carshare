@@ -603,6 +603,13 @@ const error = {
             },
             code: 403
         }),
+        notStarted: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Ce trajet n\'a pas encore commencé.',
+                en: 'This travel has not yet started.'
+            },
+            code: 403
+        }),
         notAPassenger: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Vous n\'ête pas un passager de ce voyage.',
@@ -818,6 +825,13 @@ const info = {
             msg: {
                 fr: 'Trajet annulé',
                 en: 'Travel cancelled'
+            },
+            code: 200
+        }),
+        ended: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Trajet terminé',
+                en: 'Travel done'
             },
             code: 200
         })
@@ -1154,6 +1168,18 @@ const notifs = {
                     (reason === undefined ? '' : `\n\nRaison : ${reason}`),
                 en: `Your trip from ${departure.city} to ${arrival.city} on ${dateToString(departure.date, user.timezone, 'en')} has been cancelled by ${byAdmin ? 'an administrator' : 'the driver'}.` +
                     (reason === undefined ? '' : `\n\nReason: ${reason}`)
+            },
+            type: 'standard',
+            createdAt: new Date()
+        }),
+        ended: (user: User, departure: Step, arrival: Step, byAdmin: boolean) => msgForLang<TemplateNotif, Notif>(user.lang, {
+            title: {
+                fr: 'Fin de trajet',
+                en: 'Travel finished'
+            },
+            message: {
+                fr: `Votre trajet de ${departure.city} à ${arrival.city} du ${dateToString(departure.date, user.timezone, 'fr')} a été marqué fini par ${byAdmin ? 'un administateur' : 'le conducteur'}.`,
+                en: `Your trip from ${departure.city} to ${arrival.city} on ${dateToString(departure.date, user.timezone, 'en')} has been marked finished by ${byAdmin ? 'an administrator' : 'the driver'}.`
             },
             type: 'standard',
             createdAt: new Date()

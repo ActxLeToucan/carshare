@@ -130,3 +130,10 @@ exports.updateMyTravel = (req: express.Request, res: express.Response, _: expres
         sendMsg(req, res, error.generic.internalError);
     });
 }
+
+exports.endMyTravel = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    _travel.end(req, res, false).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
+}

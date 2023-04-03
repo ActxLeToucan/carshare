@@ -7,6 +7,7 @@ const emailVerified = require('../../middlewares/emailVerified');
 
 router.get('/', auth.access, controller.getMyTravels);
 router.delete('/:id', auth.access, emailVerified, controller.cancelMyTravel);
+router.patch('/:id/end', auth.access, emailVerified, controller.endMyTravel);
 router.patch('/:id', auth.access, emailVerified, controller.updateMyTravel);
 
 module.exports = router;

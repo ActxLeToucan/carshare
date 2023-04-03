@@ -366,3 +366,10 @@ exports.cancelTravel = (req: express.Request, res: express.Response, _: express.
         sendMsg(req, res, error.generic.internalError);
     });
 }
+
+exports.endTravel = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    _travel.end(req, res, true).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
+}
