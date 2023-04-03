@@ -1444,6 +1444,20 @@ function displayableUserPublic (user: User): Partial<User> {
 }
 
 /**
+ * Returns only the minimal information about a user for display
+ * @param user User to display
+ */
+function displayableUserMinimal (user: User | Partial<User>): Partial<User> {
+    const { id, firstName, lastName, email } = user;
+    return {
+        id,
+        firstName: titleCase(firstName ?? ''),
+        lastName: lastName?.toUpperCase(),
+        email
+    };
+}
+
+/**
  * Returns a travel without some properties for display to all users
  * @param travel Travel to display
  */
@@ -1531,6 +1545,7 @@ export {
     notify,
     displayableUserPrivate,
     displayableUserPublic,
+    displayableUserMinimal,
     displayableTravel,
     displayableGroup,
     displayableAverage,

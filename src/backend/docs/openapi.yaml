@@ -569,6 +569,57 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
+  /users/search:
+    get:
+      summary: Search users (public)
+      description: Search in all users. Available to everyone.
+      operationId: searchUsersPublic
+      tags:
+        - Users
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/query'
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: A list of users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MinimalUser'
+                  query:
+                    type: string
+                    required: false
+                    example: John
+                  limit:
+                    type: integer
+                    example: 10
+                  offset:
+                    type: integer
+                    example: 0
+                  next:
+                    type: integer
+                    nullable: true
+                    example: 10
+                  prev:
+                    type: integer
+                    nullable: true
+                    example: 0
+                  total:
+                    type: integer
+                    example: 12
+        '401':
+          $ref: '#/components/responses/noToken'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
 
   /users/:id:
     delete:
@@ -2548,6 +2599,21 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PublicUser'
+    MinimalUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        email:
+          type: string
+          example: john@example.com
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Doe
     PublicUser:
       type: object
       properties:
