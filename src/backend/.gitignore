@@ -7,3 +7,4 @@ mail.config.json
 db/
 /docs/out/
 *.log
+package-lock.json

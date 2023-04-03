@@ -8,7 +8,7 @@ const admin = require('../middlewares/admin');
 
 router.post('/my', auth.access, emailVerified, controller.createGroup);
 router.get('/my', auth.access, emailVerified, controller.getMyGroups);
-router.delete('/:id/my', auth.access, emailVerified, controller.deleteMyGroup);
+router.delete('/my/:id', auth.access, emailVerified, controller.deleteMyGroup);
 router.post('/:id/member', auth.access, emailVerified, controller.addUserGroup);
 router.patch('/:id/name', auth.access, emailVerified, controller.modifyNameGroup);
 

@@ -1312,8 +1312,8 @@ const notifs = {
                 en: 'Group deleted'
             },
             message: {
-                fr: `${creator.firstName ?? ''} ${creator.lastName ?? ''} a supprimé le groupe ${group.name}, les trajets du groupe ne sont pas annulés.`,
-                en: `${creator.firstName ?? ''} ${creator.lastName ?? ''} deleted the group ${group.name}, the travels of the group are not canceled.`
+                fr: `${creator.firstName ?? ''} ${creator.lastName ?? ''} a supprimé le groupe ${group.name}.`,
+                en: `${creator.firstName ?? ''} ${creator.lastName ?? ''} deleted the group ${group.name}.`
             },
             type: 'standard',
             createdAt: new Date()

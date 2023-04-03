@@ -1666,7 +1666,7 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
-  /groups/:id/my:
+  /groups/my/:id:
     delete:
       summary: Delete a group
       description: Delete a group created by the user, with the id in parameter.
@@ -1696,15 +1696,7 @@ paths:
                     example: Group removed
 
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Id is invalid.
+          $ref: '#/components/responses/typeId'
         '401':
           $ref: '#/components/responses/noToken'
         '403':
