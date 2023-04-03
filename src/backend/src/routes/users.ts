@@ -13,6 +13,7 @@ router.post('/password-reset', controller.askForPasswordReset);
 router.patch('/password-reset', auth.resetPassword, controller.resetPassword);
 router.post('/email-verification', auth.access, controller.askForEmailVerification);
 router.patch('/email-verification', auth.verify, controller.emailVerification);
+router.get('/search', auth.access, controller.searchUsersPublic);
 
 // admin routes
 router.get('/', auth.access, emailVerified, admin, controller.searchUsers);

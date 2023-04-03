@@ -34,6 +34,7 @@
                             :list="tripTypes"
                             :onchange="val => selectedTripType = Number(val)"
                             :value="selectedTripType"
+                            :disabled="editMode"
                         />
                         <input-text
                             class="max-w-full"
@@ -70,7 +71,7 @@
                                     {{ lang.SELECT_GROUP }}
                                 </p>
                                 <button
-                                    class="p-2 mt-2 mx-auto text-slate-400 rounded-lg border-2 border-transparent hover:bg-slate-100 hover:border-slate-200 transition-all"
+                                    class="p-2 mt-2 mx-auto text-slate-400 rounded-lg border-2 border-transparent hover:bg-slate-100 hover:border-slate-200 hover:dark:bg-slate-600 hover:dark:border-slate-700 transition-all"
                                     @click="() => { $refs['group-popup'].show(); }"
                                 >
                                     <svg
@@ -97,8 +98,9 @@
                                     {{ lang.GROUP_SELECTED }}
                                 </p>
                                 <button
-                                    class="p-2 mt-2 mx-auto text-slate-400 rounded-lg border-2 border-transparent hover:bg-slate-100 hover:border-slate-200 hover:dark:bg-slate-600 hover:dark:border-slate-700 transition-all"
-                                    @click="() => { $refs['group-popup'].show(); }"
+                                    class="p-2 mt-2 mx-auto text-slate-400 rounded-lg border-2 border-transparent transition-all"
+                                    :class="editMode ? ' cursor-default' : ' hover:bg-slate-100 hover:border-slate-200 hover:dark:bg-slate-600 hover:dark:border-slate-700'"
+                                    @click="() => { if (!editMode) $refs['group-popup'].show(); }"
                                 >
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -244,7 +246,7 @@
                         </div>
 
                         <!-- END STEP -->
-                        <card-border class="flex flex-col mb-2 p-2 w-full">
+                        <card-border class="flex flex-col my-2 p-2 w-full">
                             <input-text
                                 ref="endstep-input"
                                 class="my-1"
@@ -293,24 +295,20 @@
                         {{ group.users.length }} {{ group.users.length > 1? lang.MEMBERS: lang.MEMBER }}
                     </p>
                 </button>
-                <div
+                <card-badge
                     v-show="groups.length == 0"
-                    class="flex flex-col justify-center py-1 md:m-2 m-1 rounded-md bg-slate-100 px-2 w-fit max-w-[80%] border-2 border-transparent"
-                >
-                    <p class="md:text-xl text-lg text-slate-500 font-bold mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full">
-                        {{ lang.NO_GROUPS }}
-                    </p>
-                    <p class="md:text-lg text-md text-slate-500 mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full">
-                        {{ lang.NO_GROUPS_DESC }}
-                    </p>
-                </div>
+                    class="mx-auto w-fit"
+                    :title="lang.NO_GROUPS"
+                    :content="lang.NO_GROUPS_DESC"
+                />
             </div>
         </card-popup>
         <card-popup
             ref="confirm-popup"
             :title="lang.CONFIRM_TRIP"
-            :content="lang.CONFIRM_TRIP_DESC"
+            :content="editMode ? lang.EDIT_TRIP_DESC : lang.CONFIRM_TRIP_DESC"
             :show-validate="true"
+            :validate-label="editMode ? lang.EDIT : lang.CREATE"
             :onvalidate="uploadTrip"
             :oncancel="() => { $refs['confirm-popup'].hide(); }"
         >
@@ -343,6 +341,7 @@ import {
     XMarkIcon
 } from '@heroicons/vue/24/outline';
 import API from '../scripts/API';
+import CardBadge from '../components/cards/CardBadge.vue';
 
 const tripTypes = [
     { value: 0, id: 'TRIP_PUBLIC' },
@@ -362,7 +361,8 @@ export default {
         XMarkIcon,
         Selector,
         CardBorder,
-        CardPopup
+        CardPopup,
+        CardBadge
     },
     data() {
         const editMode = window.location.pathname.includes('edit');
@@ -382,6 +382,7 @@ export default {
             editMode,
             validateBtnLabel: editMode? Lang.CurrentLang.EDIT: Lang.CurrentLang.CREATE,
             pageTitle: editMode? Lang.CurrentLang.EDIT_TRIP: Lang.CurrentLang.CREATE_TRIP,
+            oldTrip: null
         }
     },
     mounted() {
@@ -409,9 +410,18 @@ export default {
             if (paramParts.length < 2) goBack(this);
             const tripId = paramParts[1];
 
+            const toDate = (str) => {
+                const parts = new Date(str).toLocaleString().split(" ");
+                const date = parts[0];
+                const time = parts[1];
+                return date.split('/').reverse().join('-') + "T" + time;
+            };
+            const toStepObject = (step) => {
+                return {destination: {...step, value: step.city}, datetime: toDate(step.date)};
+            };
+
             API.execute_logged(API.ROUTE.TRAVELS.GET + "/" + tripId, API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
                 const trip = res;
-                console.log(res);
                 this.selectedTripType = trip.groupId == null? 0: 1;
                 this.selectedGroup = trip.group;
                 this.startStep.destination = trip.start;
@@ -419,19 +429,22 @@ export default {
                 this.endStep.destination = trip.end;
                 this.endStep.datetime = trip.end_datetime;
                 this.tripSteps.splice(0, this.tripSteps.length);
-                trip.steps.forEach(step => this.tripSteps.push({destination: step, datetime: null}));
-
+                this.startStep = toStepObject(trip.steps[0]);
+                this.endStep = toStepObject(trip.steps[trip.steps.length - 1]);
+                for (let i = 1; i < trip.steps.length - 1; i++) {
+                    this.tripSteps.push(toStepObject(trip.steps[i]));
+                }
                 this.$el.querySelector("input[name=trip-type]").value = this.selectedTripType;
                 this.$el.querySelector("input[name=trip-slots]").value = trip.maxPassengers;
                 this.$el.querySelector("input[name=trip-price]").value = trip.price;
                 this.$el.querySelector("textarea[name=trip-infos]").innerHTML = trip.description;
+                this.oldTrip = Object.assign({}, trip);
             }).catch(err => {
                 console.error(err);
             });
         },
         searchCities(selector, search) {
             BAN.search(search).then(cities => {
-                console.log(cities);
                 let index = 0;
                 let res = cities.map(city => ({
                     id: index++,
@@ -629,24 +642,57 @@ export default {
             const data = this.createTrip(false);
             if (!data) return;
 
-            const msg_log = popup.log(Lang.CurrentLang.CREATING_TRIP, Log.INFO);
-            API.execute_logged(API.ROUTE.TRAVELS.CREATE, API.METHOD.POST, User.CurrentUser?.getCredentials(), data).then(res => {
-                msg_log.update(Lang.CurrentLang.TRIP_CREATED, Log.SUCCESS);
-                setTimeout(() => {
-                    msg_log.delete();
-                    popup.hide();
-
+            if (!this.editMode) {
+                const msg_log = popup.log(Lang.CurrentLang.CREATING_TRIP, Log.INFO);
+                API.execute_logged(API.ROUTE.TRAVELS.CREATE, API.METHOD.POST, User.CurrentUser?.getCredentials(), data).then(res => {
+                    msg_log.update(Lang.CurrentLang.TRIP_CREATED, Log.SUCCESS);
                     setTimeout(() => {
-                        goHome(this);
-                    }, 1000);
+                        msg_log.delete();
+                        popup.hide();
 
-                }, 2000);
-            }).catch(err => {
-                msg_log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
-                setTimeout(() => {
-                    msg_log.delete();
-                }, 6000);
-            });
+                        setTimeout(() => {
+                            goHome(this);
+                        }, 1000);
+
+                    }, 2000);
+                }).catch(err => {
+                    msg_log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
+                    setTimeout(() => {
+                        msg_log.delete();
+                    }, 6000);
+                });
+            } else {
+                const areStepEquals = (step1, step2) => {
+                    return step1.label == step2.label && step1.date == step2.date;
+                }
+                if (this.oldTrip)
+                    data.steps.forEach((step, index) => {
+                        this.oldTrip.steps.forEach((oldStep, oldIndex) => {
+                            if (areStepEquals(step, oldStep)) {
+                                step.id = oldStep.id;
+                            }
+                        });
+                    });
+
+                const msg_log = popup.log(Lang.CurrentLang.EDITING_TRIP, Log.INFO);
+                API.execute_logged(API.ROUTE.TRAVELS.MY_EDIT + "/" + this.oldTrip.id, API.METHOD.PATCH, User.CurrentUser?.getCredentials(), data).then(res => {
+                    msg_log.update(Lang.CurrentLang.TRIP_EDITED, Log.SUCCESS);
+                    setTimeout(() => {
+                        msg_log.delete();
+                        popup.hide();
+
+                        setTimeout(() => {
+                            goHome(this);
+                        }, 1000);
+
+                    }, 2000);
+                }).catch(err => {
+                    msg_log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
+                    setTimeout(() => {
+                        msg_log.delete();
+                    }, 6000);
+                });
+            }
         }
     }
 }

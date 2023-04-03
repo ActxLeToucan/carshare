@@ -2,7 +2,7 @@ import type express from 'express';
 import { prisma } from '../app';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { displayableUserPrivate, error, info, mail, notifs, sendMail, sendMsg } from '../tools/translator';
+import { displayableUserMinimal, displayableUserPrivate, error, info, mail, notifs, sendMail, sendMsg } from '../tools/translator';
 import validator from '../tools/validator';
 import * as _user from './users/_common';
 import { preparePagination } from './_common';
@@ -348,4 +348,30 @@ exports.updateUser = (req: express.Request, res: express.Response, _: express.Ne
             console.error(err);
             sendMsg(req, res, error.generic.internalError);
         });
+}
+
+exports.searchUsersPublic = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    const pagination = preparePagination(req, true);
+
+    prisma.user.findMany({
+        where: {
+            OR: [
+                { email: { contains: pagination.query } },
+                { firstName: { contains: pagination.query } },
+                { lastName: { contains: pagination.query } }
+            ]
+        },
+        ...pagination.pagination,
+        select: {
+            id: true,
+            firstName: true,
+            lastName: true,
+            email: true
+        }
+    }).then(users => {
+        res.status(200).json(pagination.results(users.map(displayableUserMinimal), users.length));
+    }).catch(err => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
 }

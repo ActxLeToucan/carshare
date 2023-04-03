@@ -176,6 +176,7 @@ class API {
             MY: "/travels/my",
             SEARCH: "/travels/search",
             GET: "/travels",
+            MY_EDIT: "/travels/my",
         },
         BOOKINGS: {
             MY: {
