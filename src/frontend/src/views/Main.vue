@@ -367,7 +367,7 @@ export default {
         searchCities(selector, search) {
             BAN.searchCities(search).then(cities => {
                 let index = 0;
-                const data = cities.map(city => ({ id: index++, value: city.city, desc: city.context }));
+                const data = cities.map(city => ({ id: index++, value: city.city, desc: city.context, ...city }));
                 selector.setData(data);
             }).catch(err => {
                 selector.setData([]);
@@ -412,14 +412,20 @@ export default {
             }
 
             msg_log.update(Lang.CurrentLang.SEARCHING + " ...", Log.INFO);
-            API.execute_logged(API.ROUTE.TRAVELS.SEARCH + API.createParameters({
-                date: input_date.value,
-                time: input_time.value ?? undefined,
+            const params = {
+                date: new Date(input_date.value).toISOString(),
                 startCity: this.startCity.value,
                 endCity: this.endCity.value,
                 startContext: this.startCity.desc,
                 endContext: this.endCity.desc,
-            }), API.METHOD.GET, User.CurrentUser.getCredentials()).then(res => {
+                startLat: this.startCity.lat,
+                startLng: this.startCity.lng,
+                endLat: this.endCity.lat,
+                endLng: this.endCity.lng,
+            };
+            if (input_time.value) params.time = input_time.value;
+
+            API.execute_logged(API.ROUTE.TRAVELS.SEARCH + API.createParameters(params), API.METHOD.GET, User.CurrentUser.getCredentials()).then(res => {
                 this.setTrips(res);
                 msg_log.delete();
             }).catch(err => {
