@@ -1071,6 +1071,30 @@ paths:
           schema:
             type: string
             example: 55, Moselle, Grand Est
+        - name: startLat
+          in: query
+          description: Start latitude
+          schema:
+            type: number
+            example: 48.692054
+        - name: startLng
+          in: query
+          description: Start longitude
+          schema:
+            type: number
+            example: 6.184417
+        - name: endLat
+          in: query
+          description: End latitude
+          schema:
+            type: number
+            example: 49.119309
+        - name: endLng
+          in: query
+          description: End longitude
+          schema:
+            type: number
+            example: 6.175868
       security:
         - bearerAuth: [ ]
       responses:
