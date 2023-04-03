@@ -74,10 +74,26 @@
                 <div class="flex flex-col h-fit grow rounded-lg border-2 border-slate-200 dark:border-slate-700 overflow-hidden">
                     <div class="flex grow justify-between bg-slate-100 dark:bg-slate-700 h-fit items-center">
                         <div class="relative w-8 h-8" />
-                        <div class="flex grow justify-center py-1 max-w-[80%]">
-                            <p class="text-2xl text-slate-500 dark:text-slate-300 font-bold mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full">
+                        <div class="flex grow justify-center items-center py-1 max-w-[80%] text-slate-500 dark:text-slate-300 space-x-4">
+                            <p
+                                v-show="!editGroupName"
+                                class="text-2xl font-bold w-fit whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full"
+                            >
                                 {{ selectedGroup?.name }}
                             </p>
+                            <input
+                                v-show="editGroupName"
+                                class="flex h-fit rounded-md px-2 py-1 text-center font-bold text-lg whitespace-nowrap max-w-full min-w-0 text-ellipsis transition-all focus:outline outline-transparent text-slate-600 placeholder-slate-600/[0.5] bg-white dark:bg-slate-600 text-slate-400 dark:text-slate-200"
+                                :value="selectedGroup?.name"
+                                @blur="changeGroupName"
+                            >
+                            <button
+                                class="w-6 h-6 hover:text-teal-500 transition-all"
+                                @click="editGroupName = !editGroupName"
+                            >
+                                <pencil-icon v-show="!editGroupName" />
+                                <check-icon v-show="editGroupName" />
+                            </button>
                         </div>
                         <x-mark-icon
                             class="relative w-8 h-8 mr-1 text-slate-500 dark:text-slate-400 hover:text-slate-600 cursor-pointer transition-all"
@@ -101,18 +117,31 @@
                             class="flex overflow-x-auto space-x-4 w-full"
                         >
                             <card-badge
-                                v-for="member in selectedGroup?.users"
+                                v-for="(member, index) in selectedGroup?.users"
                                 :key="member.email"
                                 class="md:max-w-[18em] max-w-[14em]"
                                 :title="member.firstName + ' ' + member.lastName"
                                 :content="member.email"
-                            />
+                            >
+                                <button
+                                    class="absolute top-1 right-1 w-6 h-6 text-slate-500 hover:text-red-500 transition-all"
+                                    @click="removeGroupMember(index)"
+                                >
+                                    <x-mark-icon />
+                                </button>
+                            </card-badge>
                         </div>
                     </div>
-                    <div class="flex grow justify-end p-2">
+                    <div class="flex grow justify-between p-2">
                         <button-block
+                            :action="showAddMemberPopup"
+                            color="teal"
+                        >
+                            {{ lang.ADD_MEMBER }}
+                        </button-block>
+                        <button-block
+                            :action="showDeletePopup"
                             color="red"
-                            :action="deletePopup?.show"
                         >
                             {{ lang.DELETE_GROUP }}
                         </button-block>
@@ -121,6 +150,7 @@
             </div>
         </div>
         <card-popup
+            ref="delete-popup"
             color="red"
             :title="lang.DELETE_GROUP"
             :content="lang.GROUP_DELETE_CONFIRMATION"
@@ -129,6 +159,31 @@
             :onload="setDeletePopup"
             :onvalidate="removeGroup"
         />
+        <card-popup
+            ref="add-member-popup"
+            color="teal"
+            :title="lang.ADD_MEMBER"
+            :content="lang.ADD_MEMBER_DESC"
+            :cancel-label="lang.CANCEL"
+            :validate-label="lang.ADD"
+            :disable-validate="selectedGroupUser == null"
+            :onvalidate="addMember"
+        >
+            <selector
+                :onload="s => s.attachInput($el.querySelector('input[name=search]'))"
+                :oncompletion="getSearchUsers"
+                :onclick="selectUser"
+                :detached="true"
+            />
+            <input-text
+                ref="search"
+                :label="lang.USER"
+                :placeholder="lang.USER"
+                :value="selectedGroupUser?.value"
+                :onchange="e => { if (e.target.value != selectedGroupUser?.value) selectedGroupUser = null }"
+                name="search"
+            />
+        </card-popup>
         <card-popup
             ref="create-popup"
             :title="lang.CREATE_GROUP"
@@ -157,11 +212,14 @@ import CardPopup from '../cards/CardPopup.vue';
 
 import {
     XMarkIcon,
-    PlusIcon
+    PlusIcon,
+    PencilIcon,
+    CheckIcon,
 } from '@heroicons/vue/24/outline';
 import API from '../../scripts/API';
 import User from '../../scripts/User';
 import { Log } from '../../scripts/Logs';
+import Selector from '../inputs/Selector.vue';
 
 export default {
     name: "UserGroups",
@@ -172,7 +230,10 @@ export default {
         XMarkIcon,
         CardPopup,
         InputText,
-        PlusIcon
+        PlusIcon,
+        PencilIcon,
+        CheckIcon,
+        Selector,
     },
     data() {
         return {
@@ -184,7 +245,9 @@ export default {
             createPopup: null,
             showPagBtn: false,
             pagination: API.createPagination(0, 5),
-            isCreating: false
+            isCreating: false,
+            editGroupName: false,
+            selectedGroupUser: null,
         }
     },
     mounted() {
@@ -211,9 +274,29 @@ export default {
         setDeletePopup(popup) {
             this.deletePopup = popup;
         },
-        removeGroup() {
-            this.selectedGroup
+        showDeletePopup() {
+            this.deletePopup.setTitle(this.lang.DELETE + ' ' + this.selectedGroup?.name);
+            this.deletePopup.show();
         },
+        removeGroup(popup) {
+            popup.setTitle(this.lang.DELETE + ' ' + this.selectedGroup?.name);
+            const log = popup.log(Lang.CurrentLang.DELETING_GROUP + "...", Log.INFO);
+            API.execute_logged(API.ROUTE.GROUPS + "/" + this.selectedGroup.id, API.METHOD.DELETE, User.CurrentUser?.getCredentials()).then((data) => {
+                log.update(Lang.CurrentLang.GROUP_DELETED, Log.SUCCESS);
+                this.groups.splice(this.groups.indexOf(this.selectedGroup), 1);
+                this.selectedGroup = null;
+                this.hideGroupZone();
+                setTimeout(() => {
+                    log.delete();
+                    popup.hide();
+                }, 2000);
+            }).catch(err => {
+                log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.SUCCESS);
+                setTimeout(() => {
+                    log.delete();
+                }, 4000);
+            });
+        }, 
         createGroup(popup) {
             this.isCreating = true;
             const log = popup.log(Lang.CurrentLang.INPUT_VERIFICATION + " ...", Log.INFO);
@@ -270,6 +353,64 @@ export default {
         showMoreGroups() {
             this.pagination.next();
             this.updateGroups();
+        },
+        changeGroupName(ev) {
+            const oldName = this.selectedGroup.name;
+            const newName = ev.target.value.trim();
+            if (oldName != newName) {
+                API.execute_logged(API.ROUTE.GROUPS + "/" + this.selectedGroup.id + "/name", API.METHOD.PATCH, User.CurrentUser?.getCredentials(), {groupName: newName}).then(res => {
+                    this.selectedGroup.name = newName;
+                    this.editGroupName = false;
+                }).catch(err => {
+                    console.error(err);
+                });
+            }
+        },
+        removeGroupMember(index) {
+
+        },
+        showAddMemberPopup() {
+            this.$refs["add-member-popup"].show();
+        },
+        getSearchUsers(selector, search) {
+            API.execute_logged(API.ROUTE.USERS + "/search" + API.createPagination(0, 20) + "&query=" + search, API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
+                const users = res.data;
+                const data = users.map(user => {
+                    return {id: user.id, value: user.firstName + " " + user.lastName, desc: user.email, ...user};
+                });
+                selector.setData(data);
+            }).catch(err => {
+                console.error(err);
+            });
+        },
+        selectUser(user) {
+            this.selectedGroupUser = user;
+        },
+        addMember(popup) {
+            const email = this.selectedGroupUser?.desc;
+            const log = popup.log(Lang.CurrentLang.INPUT_VERIFICATION + " ...", Log.INFO);
+
+            if (!email) {
+                popup.focus("email");
+                log.update(Lang.CurrentLang.EMAIL_SPECIFY, Log.WARNING);
+                setTimeout(() => { log.delete(); }, 4000);
+                return;
+            }
+
+            log.update(Lang.CurrentLang.ADDING_MEMBER + " ...", Log.INFO);
+            API.execute_logged(API.ROUTE.GROUPS + "/" + this.selectedGroup.id + "/member", API.METHOD.POST, User.CurrentUser?.getCredentials(), {email}).then(res => {
+                log.update(Lang.CurrentLang.MEMBER_ADDED, Log.SUCCESS);
+                this.selectedGroup.users.push(this.selectedGroupUser);
+                setTimeout(() => {
+                    log.delete();
+                    popup.hide();
+                }, 2000);
+            }).catch(err => {
+                log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
+                setTimeout(() => {
+                    log.delete();
+                }, 4000);
+            });
         }
     }
 }

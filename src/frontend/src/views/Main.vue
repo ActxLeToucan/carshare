@@ -407,18 +407,14 @@ export default {
                     msg_log.update(check.msg, Log.WARNING);
                     check.field.focus();
                     setTimeout(() => { msg_log.delete(); }, 6000);
-                    // return;
+                    return;
                 }
-            }
-
-            let input = input_date.value;
-            if (input_time.value != '') {
-                input = input + 'T' + input_time.value;
             }
 
             msg_log.update(Lang.CurrentLang.SEARCHING + " ...", Log.INFO);
             API.execute_logged(API.ROUTE.TRAVELS.SEARCH + API.createParameters({
-                date: new Date(input).toISOString(),
+                date: input_date.value,
+                time: input_time.value ?? undefined,
                 startCity: this.startCity.value,
                 endCity: this.endCity.value,
                 startContext: this.startCity.desc,
@@ -473,7 +469,6 @@ export default {
             this.selectedTripId = null;
             this.selectedTripId = id;
             const popup = this.$refs["trip-details"];
-            popup.setTitle(Lang.CurrentLang.TRIP_DETAILS);
             popup.show();
         },
         onpopupcancel(popup) {

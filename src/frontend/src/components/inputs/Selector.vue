@@ -67,10 +67,15 @@ export default {
             type: Function,
             default: null,
             required: false
+        },
+        detached: {
+            type: Boolean,
+            default: false,
+            required: false
         }
     },
     data() {
-        return {m_data: [], showing: true, mouse: {x: 0, y: 0}, m_selection: 0};
+        return {m_data: [], showing: true, mouse: {x: 0, y: 0}, m_selection: 0, input: null};
     },
     mounted() {
         this.setData(this.data);
@@ -82,14 +87,25 @@ export default {
 
         if (this.onload)
             this.onload(this);
+
+        if (this.detached) {
+            this.$el.style.position = "absolute";
+            this.$el.classList.remove("h-0", "w-full", "pointer-events-none")
+            this.$el.style.top = "0";
+            this.$el.style.left = "0";
+            document.body.appendChild(this.$el);
+            this.goToInput();
+        }
     },
     methods: {
         setData(data) {
             if (this.m_data.length != data.length) this.setSelection(-1);
             this.m_data = data;
+            this.goToInput();
         },
         setShowing(showing) {
             this.showing = showing;
+            this.goToInput();
         },
         getData() {
             return this.m_data;
@@ -109,9 +125,11 @@ export default {
                 }
                 index++;
             }
+            this.goToInput();
         },
         attachInput(input) {
             let timeout = null;
+            this.input = input;
             
             const rect = input.getBoundingClientRect();
             this.$el.firstElementChild.style.width = rect.width + "px";
@@ -165,6 +183,8 @@ export default {
                     break;
                 }
             });
+
+            this.goToInput();
         },
         onclicked(el) {
             if (this.onclick) {
@@ -180,6 +200,13 @@ export default {
         },
         prev() {
             this.setSelection((this.m_selection - 1 < 0) ? this.m_data.length - 1 : this.m_selection - 1);
+        },
+        goToInput() {
+            if (!this.detached || !this.input) return;
+
+            const rect = this.input.getBoundingClientRect();
+            this.$el.style.top = rect.top + rect.height + "px";
+            this.$el.style.left = rect.left + "px";
         }
     }
 }
