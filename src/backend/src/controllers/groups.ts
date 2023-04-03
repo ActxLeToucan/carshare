@@ -36,7 +36,7 @@ exports.getMyGroups = (req: express.Request, res: express.Response, next: expres
 }
 
 exports.deleteMyGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const groupId = validator.sanitizeId(req.params.id, req, res);
+    const groupId = sanitizer.id(req.params.id, true, req, res);
     if (groupId === null) return;
 
     prisma.group.findUnique({ where: { id: groupId } })
