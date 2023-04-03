@@ -74,10 +74,26 @@
                 <div class="flex flex-col h-fit grow rounded-lg border-2 border-slate-200 dark:border-slate-700 overflow-hidden">
                     <div class="flex grow justify-between bg-slate-100 dark:bg-slate-700 h-fit items-center">
                         <div class="relative w-8 h-8" />
-                        <div class="flex grow justify-center py-1 max-w-[80%]">
-                            <p class="text-2xl text-slate-500 dark:text-slate-300 font-bold mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full">
+                        <div class="flex grow justify-center items-center py-1 max-w-[80%] text-slate-500 dark:text-slate-300 space-x-4">
+                            <p
+                                v-show="!editGroupName"
+                                class="text-2xl font-bold w-fit whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full"
+                            >
                                 {{ selectedGroup?.name }}
                             </p>
+                            <input
+                                v-show="editGroupName"
+                                class="flex h-fit rounded-md px-2 py-1 text-center font-bold text-lg whitespace-nowrap max-w-full min-w-0 text-ellipsis transition-all focus:outline outline-transparent text-slate-600 placeholder-slate-600/[0.5] bg-white dark:bg-slate-600 text-slate-400 dark:text-slate-200"
+                                :value="selectedGroup?.name"
+                                @blur="changeGroupName"
+                            >
+                            <button
+                                class="w-6 h-6 hover:text-teal-500 transition-all"
+                                @click="editGroupName = !editGroupName"
+                            >
+                                <pencil-icon v-show="!editGroupName" />
+                                <check-icon v-show="editGroupName" />
+                            </button>
                         </div>
                         <x-mark-icon
                             class="relative w-8 h-8 mr-1 text-slate-500 dark:text-slate-400 hover:text-slate-600 cursor-pointer transition-all"
@@ -157,7 +173,9 @@ import CardPopup from '../cards/CardPopup.vue';
 
 import {
     XMarkIcon,
-    PlusIcon
+    PlusIcon,
+    PencilIcon,
+    CheckIcon,
 } from '@heroicons/vue/24/outline';
 import API from '../../scripts/API';
 import User from '../../scripts/User';
@@ -172,7 +190,9 @@ export default {
         XMarkIcon,
         CardPopup,
         InputText,
-        PlusIcon
+        PlusIcon,
+        PencilIcon,
+        CheckIcon,
     },
     data() {
         return {
@@ -184,7 +204,8 @@ export default {
             createPopup: null,
             showPagBtn: false,
             pagination: API.createPagination(0, 5),
-            isCreating: false
+            isCreating: false,
+            editGroupName: false,
         }
     },
     mounted() {
@@ -290,7 +311,19 @@ export default {
         showMoreGroups() {
             this.pagination.next();
             this.updateGroups();
-        }
+        },
+        changeGroupName(ev) {
+            const oldName = this.selectedGroup.name;
+            const newName = ev.target.value.trim();
+            if (oldName != newName) {
+                API.execute_logged(API.ROUTE.GROUPS + "/" + this.selectedGroup.id + "/name", API.METHOD.PATCH, User.CurrentUser?.getCredentials(), {groupName: newName}).then(res => {
+                    this.selectedGroup.name = newName;
+                    this.editGroupName = false;
+                }).catch(err => {
+                    console.error(err);
+                });
+            }
+        },
     }
 }
 </script>
