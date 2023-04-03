@@ -1,5 +1,11 @@
 <template>
-    <div class="flex flex-col grow w-full h-fit min-h-0 min-w-[60vw]">
+    <div class="relative flex flex-col grow w-full h-fit min-h-0 min-w-[60vw]">
+        <p
+            v-if="trip != null"
+            class="md:absolute text-xl font-semibold md:text-center text-slate-500 md:mb-4"
+        >
+            {{ (trip?.status == -1)? lang.CANCELED : ((trip?.status == 1)? lang.FINISHED : '') }}
+        </p>
         <h1
             v-if="trip != null"
             class="text-xl font-bold text-center text-teal-500 mb-4"
@@ -10,7 +16,7 @@
             v-if="trip != null"
             class="flex md:flex-row flex-col grow min-w-0 w-full h-fit md:space-y-0 space-y-4"
         >
-            <div class="flex grow flex-col md:w-[50%] w-fit max-w-full justify-center items-center md:pr-4">
+            <div class="flex grow mx-auto flex-col md:w-[50%] w-fit max-w-full justify-center items-center md:pr-4">
                 <p class="text-xl text-slate-600 dark:text-slate-300 font-bold whitespace-nowrap text-ellipsis mb-1">
                     {{ lang.TRIP_DESTINATIONS }}
                 </p>
@@ -51,7 +57,7 @@
                 <span class="hidden md:flex grow h-40 w-1 bg-slate-200 dark:bg-slate-700 rounded-md" />
                 <span class="md:hidden flex grow mx-8 h-1 bg-slate-200 dark:bg-slate-700 rounded-md" />
             </div>
-            <div class="flex grow flex-col md:w-[50%] w-fit max-w-full items-center md:pl-4 space-y-4">
+            <div class="flex grow mx-auto flex-col md:w-[50%] w-fit max-w-full items-center md:pl-4 space-y-4">
                 <div class="flex flex-col h-50% w-full">
                     <p class="text-xl text-slate-600 dark:text-slate-300 font-bold mx-2 mb-1 mr-auto">
                         {{ lang.PASSENGERS }}
