@@ -34,6 +34,7 @@
                             :list="tripTypes"
                             :onchange="val => selectedTripType = Number(val)"
                             :value="selectedTripType"
+                            :disabled="editMode"
                         />
                         <input-text
                             class="max-w-full"
@@ -70,7 +71,7 @@
                                     {{ lang.SELECT_GROUP }}
                                 </p>
                                 <button
-                                    class="p-2 mt-2 mx-auto text-slate-400 rounded-lg border-2 border-transparent hover:bg-slate-100 hover:border-slate-200 transition-all"
+                                    class="p-2 mt-2 mx-auto text-slate-400 rounded-lg border-2 border-transparent hover:bg-slate-100 hover:border-slate-200 hover:dark:bg-slate-600 hover:dark:border-slate-700 transition-all"
                                     @click="() => { $refs['group-popup'].show(); }"
                                 >
                                     <svg
@@ -97,8 +98,9 @@
                                     {{ lang.GROUP_SELECTED }}
                                 </p>
                                 <button
-                                    class="p-2 mt-2 mx-auto text-slate-400 rounded-lg border-2 border-transparent hover:bg-slate-100 hover:border-slate-200 hover:dark:bg-slate-600 hover:dark:border-slate-700 transition-all"
-                                    @click="() => { $refs['group-popup'].show(); }"
+                                    class="p-2 mt-2 mx-auto text-slate-400 rounded-lg border-2 border-transparent transition-all"
+                                    :class="editMode ? ' cursor-default' : ' hover:bg-slate-100 hover:border-slate-200 hover:dark:bg-slate-600 hover:dark:border-slate-700'"
+                                    @click="() => { if (!editMode) $refs['group-popup'].show(); }"
                                 >
                                     <svg
                                         xmlns="http://www.w3.org/2000/svg"
@@ -293,17 +295,12 @@
                         {{ group.users.length }} {{ group.users.length > 1? lang.MEMBERS: lang.MEMBER }}
                     </p>
                 </button>
-                <div
+                <card-badge
                     v-show="groups.length == 0"
-                    class="flex flex-col justify-center py-1 md:m-2 m-1 rounded-md bg-slate-100 px-2 w-fit max-w-[80%] border-2 border-transparent"
-                >
-                    <p class="md:text-xl text-lg text-slate-500 font-bold mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full">
-                        {{ lang.NO_GROUPS }}
-                    </p>
-                    <p class="md:text-lg text-md text-slate-500 mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full">
-                        {{ lang.NO_GROUPS_DESC }}
-                    </p>
-                </div>
+                    class="mx-auto w-fit"
+                    :title="lang.NO_GROUPS"
+                    :content="lang.NO_GROUPS_DESC"
+                />
             </div>
         </card-popup>
         <card-popup
@@ -344,6 +341,7 @@ import {
     XMarkIcon
 } from '@heroicons/vue/24/outline';
 import API from '../scripts/API';
+import CardBadge from '../components/cards/CardBadge.vue';
 
 const tripTypes = [
     { value: 0, id: 'TRIP_PUBLIC' },
@@ -363,7 +361,8 @@ export default {
         XMarkIcon,
         Selector,
         CardBorder,
-        CardPopup
+        CardPopup,
+        CardBadge
     },
     data() {
         const editMode = window.location.pathname.includes('edit');
