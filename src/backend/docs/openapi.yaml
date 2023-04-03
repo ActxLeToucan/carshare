@@ -1702,6 +1702,53 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
+    delete:
+      summary: Remove a member
+      description: Remove a member of a group.
+      operationId: removeUserGroup
+      tags:
+        - Groups
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - name: id
+          in: path
+          description: The id of the group to which a user is removed
+          required: true
+          schema:
+            type: integer
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        description: The email of the user to add on the group
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  required: true
+                  example: john@example.com
+      responses:
+        '200':
+          description: Member removed
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Member removed
+        '400':
+          $ref: '#/components/responses/invalidId'
+        '401':
+          $ref: '#/components/responses/noToken'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
   /groups/:id:
     delete:
       summary: Delete a group (admin)
@@ -1788,62 +1835,6 @@ paths:
           $ref: '#/components/responses/insufficientPrivileges'
         '404':
           $ref: '#/components/responses/groupNotFound'
-        '498':
-          $ref: '#/components/responses/invalidToken'
-        '500':
-          $ref: '#/components/responses/internalError'
-  /groups/:id/member:
-    patch:
-      summary: Remove a member
-      description: Remove a member in a group.
-      operationId: removeMember
-      tags:
-        - Groups
-      parameters:
-        - $ref: '#/components/parameters/Accept-Language'
-        - name: id
-          in: path
-          description: The id of the group to which a user is removed
-          required: true
-          schema:
-            type: integer
-      security:
-        - bearerAuth: [ ]
-      requestBody:
-        description: The user ID of the user you want to remove from the group
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                userMail:
-                  type: integer
-                  required: true
-                  example: 1
-      responses:
-        '200':
-          description: member removed
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Member removed
-        '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Group id is required.
-        '401':
-          $ref: '#/components/responses/noToken'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':

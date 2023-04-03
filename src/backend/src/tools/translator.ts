@@ -435,8 +435,8 @@ const error = {
         }),
         notMember: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'L\'utilisateur donné n\'est pas dans le groupe.',
-                en: 'Given user is not in the group.'
+                fr: 'Cet utilisateur n\'est pas dans le groupe.',
+                en: 'This user is not in the group.'
             },
             code: 403
         })
@@ -878,7 +878,7 @@ const info = {
             },
             code: 200
         }),
-        memberRemove: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        memberRemoved: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Membre retiré',
                 en: 'Member removed'
@@ -1349,7 +1349,7 @@ const notifs = {
         userRemoved: (user: User, group: Group, creator: User) => msgForLang<TemplateNotif, Notif>(user.lang, {
             title: {
                 fr: 'Retiré d\'un groupe',
-                en: 'Adding to a group'
+                en: 'Removed from a group'
             },
             message: {
                 fr: `${creator.firstName ?? ''} ${creator.lastName ?? ''} vous a retiré du groupe ${group.name}, vous ne recevrez plus les notifications de ce groupe.`,
