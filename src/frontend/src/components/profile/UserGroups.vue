@@ -228,7 +228,9 @@ export default {
                     popup.hide();
                 }, 2000);
             }).catch(err => {
+                log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.SUCCESS);
                 setTimeout(() => {
+                    log.delete();
                 }, 4000);
             });
         }, 
