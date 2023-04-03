@@ -222,6 +222,7 @@ export default {
                 log.update(Lang.CurrentLang.GROUP_DELETED, Log.SUCCESS);
                 this.groups.splice(this.groups.indexOf(this.selectedGroup), 1);
                 this.selectedGroup = null;
+                this.hideGroupZone();
                 setTimeout(() => {
                     log.delete();
                     popup.hide();
@@ -229,7 +230,6 @@ export default {
             }).catch(err => {
                 setTimeout(() => {
                 }, 4000);
-             
             });
         }, 
         createGroup(popup) {
