@@ -1,15 +1,17 @@
 <template>
-    <div class="flex h-fit w-full justify-between md:space-x-8 items-center my-2">
+    <div class="flex h-fit w-full justify-between md:space-x-8 space-x-4 items-center my-2 min-w-0 max-w-full">
         <label class="flex text-xl text-slate-500 dark:text-slate-400 font-bold whitespace-nowrap text-ellipsis w-fit">
             {{ label }}
         </label>
-        <div>
+        <div class="min-w-0 max-w-full">
             <select
                 id=""
                 ref="select"
                 name=""
-                class="flex w-fit h-fit bg-white dark:bg-slate-600 rounded-md text-slate-600 dark:text-slate-300 font-bold text-lg whitespace-nowrap text-ellipsis outline-none
-                       outline-transparent px-4 py-2 border-b-4 border-slate-200 dark:border-slate-700 transition-all focus:border-teal-500 hover:border-slate-300"
+                :disabled="disabled"
+                class="flex w-fit h-fit bg-white dark:bg-slate-600 rounded-md font-bold text-lg whitespace-nowrap text-ellipsis outline-none
+                       min-w-0 max-w-full outline-transparent px-4 py-2 border-b-4 border-slate-200 dark:border-slate-700 transition-all focus:border-teal-500"
+                :class="disabled? ' bg-slate-100 dark:bg-slate-700 text-slate-300 dark:text-slate-300 ' : ' bg-white dark:bg-slate-600 text-slate-400 dark:text-slate-200 hover:border-slate-300 hover:dark:border-slate-500 '"
             >
                 <option
                     v-for="el in elements"
@@ -93,6 +95,11 @@ export default {
         name: {
             type: String,
             default: "",
+            required: false
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
             required: false
         }
     },

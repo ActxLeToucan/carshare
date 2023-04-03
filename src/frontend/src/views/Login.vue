@@ -29,7 +29,7 @@
                     class="flex items-center justify-center w-fit h-fit text-slate-400 hover:text-teal-500 transition-all"
                 >
                     <p class="text-md font-bold whitespace-nowrap text-ellipsis max-w-full min-w-0 w-fit h-fit max-h-full min-h-0">
-                        {{ lang.FORGOT_PASSWORD }} ?
+                        {{ lang.FORGOT_PASSWORD }}
                     </p>
                 </router-link>
             </card-modal>
@@ -78,7 +78,7 @@ function onValidate(modal) {
         };
 
         API.execute(API.ROUTE.LOGIN, API.METHOD.POST, userInfos, API.TYPE.JSON).then(res => {
-            log.update(Lang.CurrentLang.LOGIN_SUCCESS + " !", Log.SUCCESS);
+            log.update(Lang.CurrentLang.LOGIN_SUCCESS, Log.SUCCESS);
 
             const user = new User({id: res.userId, token: res.token});
             user.save();

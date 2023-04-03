@@ -1,8 +1,8 @@
 import type express from 'express';
 import { prisma } from '../app';
 import { error, info, sendMsg } from '../tools/translator';
-import * as validator from '../tools/validator';
 import { preparePagination } from './_common';
+import sanitizer from '../tools/sanitizer';
 
 exports.getMyNotifications = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const pagination = preparePagination(req, false);
@@ -38,7 +38,7 @@ exports.deleteAllNotifications = (req: express.Request, res: express.Response, _
 }
 
 exports.deleteOneNotification = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const notifId = validator.sanitizeId(req.params.id, req, res);
+    const notifId = sanitizer.id(req.params.id, true, req, res);
     if (notifId === null) return;
 
     prisma.notification.count({

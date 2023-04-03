@@ -1,9 +1,9 @@
 <template>
-    <div class="md:show-up flex flex-col grow">
+    <div class="md:show-up flex flex-col grow min-w-0 max-w-full">
         <p class="text-2xl text-teal-500 py-2 font-bold mx-auto">
             {{ lang.PARAMS }}
         </p> 
-        <div class="flex flex-col grow justify-evenly items-center p-4 space-y-4">
+        <div class="flex flex-col grow justify-evenly items-center p-4 space-y-4 min-w-0 max-w-full">
             <card-border class="w-full flex-col max-w-[35em]">
                 <p class="text-xl font-bold text-slate-500 dark:text-slate-300 text-center mx-auto">
                     {{ lang.DISPLAY_PARAMS }}
@@ -54,9 +54,10 @@
                     {{ lang.OTHER_PARAMS }}
                 </p>
                 <input-choice
+                    ref="timezone"
+                    class="min-w-0 max-w-full"
                     :list="Intl.supportedValuesOf('timeZone').map(tz => ({ value: tz, label: tz }))"
                     :label="lang.TIMEZONE"
-                    ref="timezone"
                     name="timezone"
                     :value="User?.CurrentUser?.timezone"
                     :onchange="onTimezoneChanged"

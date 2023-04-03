@@ -1,8 +1,8 @@
 export default {
     // common
-    CARSHARE: "Car share",
-    CARSHARE_DESC: "Carpool with friends or strangers !",
-    WELCOME: "Welcome to Car Share !",
+    CARSHARE: "Car Share",
+    CARSHARE_DESC: "Carpool with friends or strangers!",
+    WELCOME: "Welcome to Car Share!",
     WELCOME_DESC: "To start using the application, please login or register.",
     HOME: "Home",
     PROFILE: "Profile",
@@ -30,15 +30,24 @@ export default {
     FRENCH: "Français",
 
     // 404 page
-    WOOPS: "Oops",
+    WOOPS: "Woops!",
     NOT_FOUND: "The page you are looking for does not exist 🤔",
-    UNKNOWN_ERROR: "A unknown error occured",
+    UNKNOWN_ERROR: "A unknown error occurred",
 
     // validation page
     VALIDATION_TITLE: "Account validation",
     VALIDATION_LOADING: "Validating account",
-    VALIDATION_SUCCESS: "Account validated successfully !\nYou can close this page.",
+    VALIDATION_SUCCESS: "Account validated successfully!\nYou can close this page.",
     VALIDATION_NO_TOKEN: "No token provided in the link,\nplease check the link you received by email.",
+
+    // reinit password page
+    REINIT_PASSWORD_TITLE: "Reset password",
+    REINIT_NO_TOKEN: "No token provided in the link",
+    PASSWORD_REINIT_SUCCESS: "Password reset successfully !",
+
+    // Recovery page (forgot password)
+    RECOVERY_TITLE: "You forgot your password ?",
+    RECOVERY_DESC: "No problem ! We will send you an email to reset your password.",
 
     // actions
     LOGIN: "Login",
@@ -56,7 +65,7 @@ export default {
     CHANGE: "Change",
     BACK: "Back",
     CREATE: "Create",
-    DISCONNECT: "Disconnect",
+    DISCONNECT: "Logout",
     LOAD_MORE: "Load more",
 
     // register
@@ -75,9 +84,9 @@ export default {
     REQUIRED_FIELDS: "Required fields",
     INPUT_VERIFICATION: "Input verification",
     DATA_SENDING: "Sending data",
-    REGISTER_SUCCESS: "Account created successfully",
+    REGISTER_SUCCESS: "Account created successfully!",
     SENDING_EMAILVERIF: "Sending email verification",
-    SENDING_EMAIL_SUCCESS: "Email sent successfully",
+    SENDING_EMAIL_SUCCESS: "Email sent successfully!",
 
     // checks errors
     FIRSTNAME_SPECIFY: "Please specify the first name",
@@ -105,8 +114,8 @@ export default {
     // login
     LOGIN_TITLE: "Login",
     LOGIN_DESC: "Please fill the fields below to login",
-    FORGOT_PASSWORD: "Forgot password",
-    LOGIN_SUCCESS: "Logged in successfully",
+    FORGOT_PASSWORD: "Forgot password?",
+    LOGIN_SUCCESS: "Logged in successfully!",
     
     // main screen
     STARTING_POINT: "Departure",
@@ -114,6 +123,7 @@ export default {
     DATE: "Date",
     HOUR: "Hour",
     CREATE_TRIP: "Create a trip",
+    EDIT_TRIP: "Edit the trip",
     TRAVEL_CARD_LABEL: "Travel of the {DATE}",
     SLOTS: "Slots",
     SLOT: "Slot",
@@ -151,9 +161,12 @@ export default {
     LOADING_NOTIFS: "Loading notifications",
     LOADING_NOTIFS_DESC: "Please wait while we load your notifications",
     DELETE_ALL_NOTIFS: "Delete all notifications",
-    DELETE_ALL_NOTIFS_CONFIRMATION: "Are you sure you want to delete all your notifications ?\nThey will be deleted, even if they are not displayed on this page.\nThis action is irreversible.",
+    DELETE_ALL_NOTIFS_CONFIRMATION: "Are you sure you want to delete all your notifications?\nThey will be deleted, even if they are not displayed on this page.\nThis action is irreversible.",
     DELETING_NOTIFS: "Deleting notifications",
     NOTIFS_DELETED: "Notifications deleted successfully",
+    ACCEPT: "Accept",
+    REJECT: "Reject",
+    SEE_TRAVEL: "See travel",
 
     // groups
     NO_GROUPS: "You haven't created any group yet",
@@ -164,10 +177,14 @@ export default {
     GROUP_CREATE_CONFIRMATION: "Please specify the group informations to create it",
     MEMBERS: "Members",
     MEMBER: "Member",
+    ADD_MEMBER: "Add a member",
+    ADD_MEMBER_DESC: "Search the user you want to add to this group",
+    ADDING_MEMBER: "Adding member",
+    MEMBER_ADDED: "Member added successfully",
     DELETE_GROUP: "Delete group",
     DELETING_GROUP: "Deleting group",
     GROUP_DELETED: "Group deleted successfully",
-    GROUP_DELETE_CONFIRMATION: "Are you sure you want to delete this group ?\nThis action is irreversible.",
+    GROUP_DELETE_CONFIRMATION: "Are you sure you want to delete this group?\nThis action is irreversible.",
     GROUP_NAME: "Group name",
     CREATING_GROUP: "Creating group",
     GROUP_CREATED: "Group created successfully",
@@ -177,7 +194,6 @@ export default {
     SELECT_GROUP_DESC: "Please select a group of users to share your trip with",
     GROUP_SELECTED: "Group selected",
     SEARCH_GROUP: "Search group",
-    GROUP_NAME: "Group name",
 
     // parameters
     NOTIF_PARAMS: "Notification settings",
@@ -197,6 +213,13 @@ export default {
     FUTURE_TRIPS: "Future trips",
     PAST_TRIPS: "Past trips",
     CANCEL_TRIP: "Cancel trip",
+    LOADING_TRIP: "Loading trip",
+    LOADING_TRIP_DESC: "Please wait while we load the trip informations",
+    LOADING_TRIPS: "Loading trips",
+    LOADING_TRIPS_DESC: "Loading all your trips",
+
+    // booking
+    BOOKING_DOESNT_EXIST_ANYMORE: "This booking doesn't exist anymore.",
 
     // informations
     ADDRESS_NOT_VERIFIED: "Address not verified",
@@ -206,7 +229,7 @@ export default {
     ADDRESS_ERROR_SPAM: "Email already sent, please wait 10 minutes",
     OLD_PASSWORD: "Old password",
     NEW_PASSWORD: "New password",
-    ACCOUNT_DELETE_CONFIRMATION: "Are you sure you want to delete your account ?\nThis action is irreversible.",
+    ACCOUNT_DELETE_CONFIRMATION: "Are you sure you want to delete your account?\nThis action is irreversible.",
 
     // administration
     ADMINISTRATION: "Administration",
@@ -215,8 +238,8 @@ export default {
     
     // users
     SEARCH_USER: "Search user",
-    ACCOUNT_DELETE_VERIFY: "Are you sure you want to delete this account ?\nThis action is irreversible.",
-    GROUP_DELETE_VERIFY: "Are you sure you want to delete this group ?\nThis action is irreversible.",
+    ACCOUNT_DELETE_VERIFY: "Are you sure you want to delete this account?\nThis action is irreversible.",
+    GROUP_DELETE_VERIFY: "Are you sure you want to delete this group?\nThis action is irreversible.",
     ACCOUNT_EMAIL: "Account Email",
     EMAIL_VERIFICATION: "Email verification",
     EMAIL_UNMATCHING: "Emails do not match",
@@ -227,25 +250,28 @@ export default {
     TRIP_TYPE: "Trip type",
     TRIP_PUBLIC: "Public",
     TRIP_PRIVATE: "Private",
-    TRIP_SLOTS: "Nomber of slots",
+    TRIP_SLOTS: "Number of slots",
     TRIP_START: "Start",
     TRIP_END: "End",
     TRIP_INFO: "Additional informations",
     SAME_DAY: "Same day",
     CONFIRM_TRIP: "Confirm trip",
     CONFIRM_TRIP_DESC: "Please verify the informations below before confirming the trip",
+    EDIT_TRIP_DESC: "Please verify the informations below before editing the trip",
     CONFIRM_TRIP_CONTENT: "You are about to create a trip from {0} to {1} starting the {2} at {3} and arriving the {4} at {5}.\nThe trip will be {6} and will have {7} slots available.",
     CONFIRM_TRIP_CONTENT_1: "You are about to create a trip from {0} to {1} starting the {2} at {3} and arriving the {4} at {5}.\nThe trip will be {6} and will have {7} slot available.",
     CONFIRM_TRIP_PUBLIC: "This trip will be public and everyone will be able to see it",
     CONFIRM_TRIP_PRIVATE: "This trip will be private and only the users of the group {0} will be able to see it",
-    CONFIRM_TRIP_INFOS: "Additionnal informations : {0}",
-    CONFIRM_TRIP_NO_INFOS: "No additionnal informations have been specified",
+    CONFIRM_TRIP_INFOS: "Additional informations: {0}",
+    CONFIRM_TRIP_NO_INFOS: "No additional informations have been specified",
     CONFIRM_TRIP_NO_STEPS: "This trip will have no steps",
     CONFIRM_TRIP_N_STEPS: "This trip will have {0} steps",
     CONFIRM_TRIP_1_STEP: "This trip will have {0} step",
-    CONFIRM_TRIP_STEP: "Step {0} : You will arrive at {1} on {2} at {3}",
+    CONFIRM_TRIP_STEP: "Step {0}: You will arrive at {1} on {2} at {3}",
     CREATING_TRIP: "Creating trip",
     TRIP_CREATED: "Trip created successfully",
+    EDITING_TRIP: "Editing trip",
+    TRIP_EDITED: "Trip edited successfully",
     DESTINATION_SPECIFY: "Please specify all the trip destinations",
     DATETIME_SPECIFY: "Please specify all the trip dates and times",
     SLOTS_SPECIFY: "Please specify the number of slots for the trip",

@@ -1,19 +1,26 @@
 <template>
-    <div class="flex flex-col grow w-full max-h-full min-h-0 min-w-[60vw]">
+    <div class="flex flex-col grow w-full h-fit min-h-0 min-w-[60vw]">
+        <h1
+            v-if="trip != null"
+            class="text-xl font-bold text-center text-teal-500 mb-4"
+        >
+            {{ lang.TRAVEL_CARD_LABEL.replace('{DATE}', new Date(trip.steps[0]?.date).toLocaleDateString()) }}
+        </h1>
         <div
             v-if="trip != null"
-            class="flex md:flex-row flex-col grow min-w-0 w-full max-h-full min-h-0"
+            class="flex md:flex-row flex-col grow min-w-0 w-full h-fit md:space-y-0 space-y-4"
         >
-            <div class="flex grow flex-col md:w-[50%] w-fit justify-center items-center md:pr-4">
+            <div class="flex grow flex-col md:w-[50%] w-fit max-w-full justify-center items-center md:pr-4">
                 <p class="text-xl text-slate-600 dark:text-slate-300 font-bold whitespace-nowrap text-ellipsis mb-1">
                     {{ lang.TRIP_DESTINATIONS }}
                 </p>
                 <div class="flex flex-col grow h-fit w-fit space-y-2 w-full overflow-y-auto max-h-min min-h-[4em]">
-                    <div
+                    <button
                         v-for="(step, index) in trip.steps"
                         :key="step.id"
                         class="flex h-fit w-full justify-between items-center space-x-10 rounded-md border-2 py-1 px-2"
-                        :class="(index < startIndex || index > endIndex) ? ' bg-slate-100 dark:bg-slate-700 border-slate-200 dark:border-slate-600' : ' bg-white dark:bg-slate-600 border-slate-300 dark:border-slate-500'"
+                        :class="(index < startIndex || index > endIndex) ? ' bg-slate-100 dark:bg-slate-700 border-slate-200 dark:border-slate-600 ' + (!editMode? 'hover:border-slate-300 hover:dark:border-slate-500' : 'cursor-default') : ' bg-white dark:bg-slate-600 border-slate-300 dark:border-slate-500 ' + (!editMode? 'hover:border-slate-400 hover:dark:border-slate-400' : 'cursor-default')"
+                        @click="toogleStep(index)"
                     >
                         <p
                             class="text-xl font-bold whitespace-nowrap text-ellipsis overflow-hidden"
@@ -27,7 +34,7 @@
                         >
                             {{ new Date(step.date).toLocaleTimeString().substring(0, 5) }}
                         </p>
-                    </div>
+                    </button>
                 </div>
                 <div class="flex flex-col grow rounded-lg bg-slate-200 dark:bg-slate-600 border-2 border-slate-200 dark:border-slate-600 w-fit min-w-full max-w-full mt-4">
                     <p class="text-xl text-slate-600 dark:text-slate-200 font-bold mx-2 mb-1 whitespace-nowrap text-ellipsis overflow-hidden">
@@ -40,8 +47,11 @@
                     </div>
                 </div>
             </div>
-            <span class="hidden md:flex grow h-40 w-1 bg-slate-200 dark:bg-slate-700 rounded-md my-auto" />
-            <div class="flex grow flex-col md:w-[50%] w-full items-center md:pl-4 space-y-4">
+            <div class="flex grow justify-center items-center">
+                <span class="hidden md:flex grow h-40 w-1 bg-slate-200 dark:bg-slate-700 rounded-md" />
+                <span class="md:hidden flex grow mx-8 h-1 bg-slate-200 dark:bg-slate-700 rounded-md" />
+            </div>
+            <div class="flex grow flex-col md:w-[50%] w-fit max-w-full items-center md:pl-4 space-y-4">
                 <div class="flex flex-col h-50% w-full">
                     <p class="text-xl text-slate-600 dark:text-slate-300 font-bold mx-2 mb-1 mr-auto">
                         {{ lang.PASSENGERS }}
@@ -98,7 +108,7 @@
             </div>
         </div>
         <div
-            v-show="!editMode"
+            v-show="trip != null && !editMode && (User.CurrentUser.id !== trip?.driver?.id || isPast)"
             class="flex w-full justify-center items-center my-4"
         >
             <button-block :action="bookTrip">
@@ -106,11 +116,19 @@
             </button-block>
         </div>
         <div
-            v-show="editMode"
-            class="flex w-full justify-end items-center my-4"
+            v-show="editMode && (User.CurrentUser.id === trip?.driver?.id)"
+            class="flex w-full justify-between items-center my-4"
         >
             <button-block
-                v-show="!isPast"
+                v-show="trip != null && !isPast"
+                color="teal"
+                :href="'/trips/edit?id=' + trip?.id"
+                :disabled="trip?.status == -1"
+            >
+                {{ lang.EDIT_TRIP }}
+            </button-block>
+            <button-block
+                v-show="trip != null && !isPast"
                 color="red"
                 :action="removeTravel"
                 :disabled="trip?.status == -1"
@@ -119,10 +137,20 @@
             </button-block>
         </div>
         <div
+            v-show="trip != null"
             ref="log-zone"
             class="flex flex-col w-full justify-center items-center min-h-max h-max transition-all"
             style="max-height: 0px;"
         />
+        <div
+            v-show="state == 'loading'"
+            class="w-40 h-40 justify-center items-center flex mx-auto"
+        >
+            <card-badge
+                :title="lang.LOADING_TRIP"
+                :content="lang.LOADING_TRIP_DESC"
+            />
+        </div>
     </div>
 </template>
 
@@ -165,7 +193,7 @@ export default {
         },
     },
     data() {
-        return { User, lang: Lang.CurrentLang, trip: null, startIndex: null, endIndex: null, isPast: false };
+        return { User, lang: Lang.CurrentLang, trip: null, startIndex: null, endIndex: null, isPast: false, state: null };
     },
     watch: {
         tripId: function (newVal, oldVal) {
@@ -187,17 +215,21 @@ export default {
     methods: {
         loadTrip(id) {
             if (id == null) return;
+            this.trip = null;
+            this.state = "loading";
 
-            API.execute_logged(API.ROUTE.TRAVELS.GET + id, API.METHOD.GET, User.CurrentUser.getCredentials()).then(res => {
+            API.execute_logged(API.ROUTE.TRAVELS.GET + "/" + id, API.METHOD.GET, User.CurrentUser.getCredentials()).then(res => {
                 this.trip = res;
 
                 this.startIndex = (this.tripStart)? this.trip?.steps.findIndex(step => step.city == this.tripStart.value) : 0;
                 this.endIndex   = (this.tripEnd)? this.trip?.steps.findIndex(step => step.city == this.tripEnd.value) : this.trip.steps.length - 1;
 
                 this.isPast = new Date(this.trip.steps[this.trip.steps.length - 1].date) < new Date();
+                this.state = "done";
             }).catch(err => {
                 console.error(err);
                 this.popup?.hide();
+                this.state = "error";
             });
         },
         log(msg, type = Log.INFO) {
@@ -236,6 +268,17 @@ export default {
         },
         setPopup(popup) {
             this.popup = popup;
+        },
+        toogleStep(index) {
+            if (this.editMode) return;
+
+            const mid = (this.startIndex + this.endIndex) / 2;
+            if (index < mid) {
+                this.startIndex = index;
+            } else {
+                this.endIndex = index;
+            }
+            this.$forceUpdate();
         }
     },
 };

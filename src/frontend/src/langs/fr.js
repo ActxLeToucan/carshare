@@ -1,6 +1,6 @@
 export default {
     // common
-    CARSHARE: "Car share",
+    CARSHARE: "Car Share",
     CARSHARE_DESC: "Covoiturez entre amis ou inconnus !",
     WELCOME: "Bienvenue sur Car Share !",
     WELCOME_DESC: "Pour commencer à utiliser l'application, veuillez vous connecter ou vous inscrire.",
@@ -40,6 +40,15 @@ export default {
     VALIDATION_SUCCESS: "Compte validé avec succès !\nVous pouvez fermer cette page.",
     VALIDATION_NO_TOKEN: "Aucun token n'a été fourni dans le lien,\nveuillez vérifier le lien que vous avez reçu par email.",
 
+    // reinit password page
+    REINIT_PASSWORD_TITLE: "Réinitialisation du mot de passe",
+    REINIT_NO_TOKEN: "Aucun token de réinitialisation n'a été fourni",
+    PASSWORD_REINIT_SUCCESS: "Mot de passe réinitialisé avec succès !",
+
+    // Recovery page (forgot password)
+    RECOVERY_TITLE: "Vous avez oublié votre mot de passe ?",
+    RECOVERY_DESC: "Pas de soucis ! Nous vous enverrons un mail pour le réinitialiser.",
+
     // actions
     LOGIN: "Se connecter",
     REGISTER: "S'inscrire",
@@ -75,9 +84,9 @@ export default {
     REQUIRED_FIELDS: "Champs obligatoires",
     INPUT_VERIFICATION: "Vérification des entrées",
     DATA_SENDING: "Envoi des données",
-    REGISTER_SUCCESS: "Compte créé avec succès",
+    REGISTER_SUCCESS: "Compte créé avec succès !",
     SENDING_EMAILVERIF: "Envoi de l'email de vérification",
-    SENDING_EMAIL_SUCCESS: "Email envoyé avec succès",
+    SENDING_EMAIL_SUCCESS: "Email envoyé avec succès !",
 
     // checks errors
     FIRSTNAME_SPECIFY: "Veuillez renseignez votre nom",
@@ -105,8 +114,8 @@ export default {
     // login
     LOGIN_TITLE: "Connexion",
     LOGIN_DESC: "Veuillez remplir les champs ci-dessous pour vous connecter",
-    FORGOT_PASSWORD: "Mot de passe oublié",
-    LOGIN_SUCCESS: "Connecté avec succès",
+    FORGOT_PASSWORD: "Mot de passe oublié ?",
+    LOGIN_SUCCESS: "Connecté avec succès !",
 
     // main screen
     STARTING_POINT: "Départ",
@@ -114,6 +123,7 @@ export default {
     DATE: "Date",
     HOUR: "Heure",
     CREATE_TRIP: "Créer un trajet",
+    EDIT_TRIP: "Modifier le trajet",
     TRAVEL_CARD_LABEL: "Trajet du {DATE}",
     SLOTS: "Places",
     SLOT: "Place",
@@ -154,6 +164,9 @@ export default {
     DELETE_ALL_NOTIFS_CONFIRMATION: "Êtes-vous sûr de vouloir supprimer toutes vos notifications ?\nElles seront supprimées, même si elles ne sont pas affichées sur cette page.\nCette action est irréversible.",
     DELETING_NOTIFS: "Suppression des notifications",
     NOTIFS_DELETED: "Notifications supprimées avec succès",
+    ACCEPT: "Accepter",
+    REJECT: "Refuser",
+    SEE_TRAVEL: "Voir le trajet",
 
     // groups
     NO_GROUPS: "Vous n'avez pas encore créé de groupe",
@@ -164,6 +177,10 @@ export default {
     GROUP_CREATE_CONFIRMATION: "Veuillez renseigner les informations du groupe pour le créer",
     MEMBERS: "Membres",
     MEMBER: "Membre",
+    ADD_MEMBER: "Ajouter un membre",
+    ADD_MEMBER_DESC: "Recherchez l'utilisateur que vous souhaitez ajouter à votre groupe",
+    ADDING_MEMBER: "Ajout du membre",
+    MEMBER_ADDED: "Membre ajouté avec succès",
     DELETE_GROUP: "Supprimer le groupe",
     DELETING_GROUP: "Suppression du groupe",
     GROUP_DELETED: "Groupe supprimé avec succès",
@@ -177,7 +194,6 @@ export default {
     SELECT_GROUP_DESC: "Veuillez sélectionner un groupe d'utilisateurs pour pouvoir partager vos trajets avec eux",
     GROUP_SELECTED: "Groupe sélectionné",
     SEARCH_GROUP: "Rechercher un groupe",
-    GROUP_NAME: "Nom du groupe",
 
     // parametres
     NOTIF_PARAMS: "Paramètres de notifications",
@@ -197,6 +213,13 @@ export default {
     FUTURE_TRIPS: "Trajets futurs",
     PAST_TRIPS: "Trajets passés",
     CANCEL_TRIP: "Annuler le trajet",
+    LOADING_TRIP: "Chargement du trajet",
+    LOADING_TRIP_DESC: "Veuillez patienter pendant que nous chargeons les informations du trajet",
+    LOADING_TRIPS: "Chargement des trajets",
+    LOADING_TRIPS_DESC: "Chargement de tous vos trajets",
+
+    // booking
+    BOOKING_DOESNT_EXIST_ANYMORE: "Cette réservation n'existe plus.",
 
     // informations
     ADDRESS_NOT_VERIFIED: "Adresse non vérifiée",
@@ -235,6 +258,7 @@ export default {
     SAME_DAY: "Même jour",
     CONFIRM_TRIP: "Confirmer le trajet",
     CONFIRM_TRIP_DESC: "Veuillez vérifier les informations du trajet avant de le créer",
+    EDIT_TRIP_DESC: "Veuillez vérifier les informations du trajet avant de le modifier",
     CONFIRM_TRIP_CONTENT: "Vous allez faire un trajet de {0} à {1}.\nEn partant le {2} à {3} et arrivant le {4} à {5}.\nLe trajet sera au prix de {6}€ par personne et il y aura {7} places disponibles.",
     CONFIRM_TRIP_CONTENT_1: "Vous allez faire un trajet de {0} à {1}.\nEn partant le {2} à {3} et arrivant le {4} à {5}.\nLe trajet sera au prix de {6}€ par personne et il y aura {7} place disponible.",
     CONFIRM_TRIP_PUBLIC: "Ce trajet sera public et tout le monde pourra le voir",
@@ -247,6 +271,8 @@ export default {
     CONFIRM_TRIP_STEP: "Étape {0} : Vous arriverez à {1} le {2} à {3}",
     CREATING_TRIP: "Création du trajet",
     TRIP_CREATED: "Trajet créé avec succès",
+    EDITING_TRIP: "Modification du trajet",
+    TRIP_EDITED: "Trajet modifié avec succès",
     DESTINATION_SPECIFY: "Veuillez spécifier toutes les destinations du trajet",
     DATETIME_SPECIFY: "Veuillez spécifier toutes les dates et heures du trajet",
     SLOTS_SPECIFY: "Veuillez spécifier le nombre de places disponibles pour le trajet",

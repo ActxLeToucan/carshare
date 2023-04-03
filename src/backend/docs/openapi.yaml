@@ -14,6 +14,25 @@ servers:
     description: Antoine's server
   - url: 'https://carshare.apis.furwaz.fr'
     description: Paul's server
+tags:
+  - name: Users
+    description: Operations about users
+  - name: Settings
+    description: Operations about settings
+  - name: Notifications
+    description: Operations about notifications
+  - name: Travels
+    description: Operations about travels
+  - name: Bookings
+    description: Operations about bookings
+  - name: Groups
+    description: Operations about groups
+  - name: Notations
+    description: Operations about notations
+  - name: Docs
+    description: Operations about docs
+  - name: Admin
+    description: Aggregation of administrator-only routes
 paths:
   /users/signup:
     post:
@@ -146,7 +165,7 @@ paths:
 
   /users/me:
     get:
-      summary: Get user
+      summary: Get current user
       description: Get the current user
       operationId: getMe
       tags:
@@ -169,7 +188,7 @@ paths:
         '500':
           $ref: '#/components/responses/internalError'
     delete:
-      summary: Delete user
+      summary: Delete current user
       description: Delete the current user
       operationId: deleteMe
       tags:
@@ -215,7 +234,7 @@ paths:
         '500':
           $ref: '#/components/responses/internalError'
     patch:
-      summary: Update user
+      summary: Update current user
       description: Update the current user
       operationId: updateMe
       tags:
@@ -550,14 +569,66 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
+  /users/search:
+    get:
+      summary: Search users (public)
+      description: Search in all users. Available to everyone.
+      operationId: searchUsersPublic
+      tags:
+        - Users
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/query'
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: A list of users
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/MinimalUser'
+                  query:
+                    type: string
+                    required: false
+                    example: John
+                  limit:
+                    type: integer
+                    example: 10
+                  offset:
+                    type: integer
+                    example: 0
+                  next:
+                    type: integer
+                    nullable: true
+                    example: 10
+                  prev:
+                    type: integer
+                    nullable: true
+                    example: 0
+                  total:
+                    type: integer
+                    example: 12
+        '401':
+          $ref: '#/components/responses/noToken'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
 
   /users/:id:
     delete:
-      summary: Delete an user
-      description: Delete an user. Only available to admins.
+      summary: Delete a user (admin)
+      description: Delete a user. Only available to admins.
       operationId: deleteUser
       tags:
         - Users
+        - Admin
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
         - name: id
@@ -580,15 +651,7 @@ paths:
                     type: string
                     example: User deleted
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: User id is invalid.
+          $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
         '403':
@@ -600,11 +663,12 @@ paths:
         '500':
           $ref: '#/components/responses/internalError'
     patch:
-      summary: Update an user
-      description: Update an user. Only available to admins.
+      summary: Update a user (admin)
+      description: Update a user. Only available to admins.
       operationId: updateUser
       tags:
         - Users
+        - Admin
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
         - name: id
@@ -672,15 +736,7 @@ paths:
                       user:
                         $ref: '#/components/schemas/PrivateUser'
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: User id is invalid.
+          $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
         '403':
@@ -757,30 +813,7 @@ paths:
                     type: string
                     example: "Travel created"
                   travel:
-                    type: object
-                    properties:
-                      id:
-                        type: integer
-                        example: 2
-                      maxPassengers:
-                        type: integer
-                        example: 10
-                      price:
-                        type: integer
-                        example: 78
-                      description:
-                        type: string
-                        example: Voyage non fumeur
-                      groupId:
-                        type: integer
-                        example: null
-                      createdAt:
-                        type: string
-                        example: 2023-03-05T13:30:41.483Z
-                      steps:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/Step'
+                    $ref: '#/components/schemas/PublicTravel'
         '401':
           $ref: '#/components/responses/noToken'
         '400':
@@ -858,8 +891,8 @@ paths:
           $ref: '#/components/responses/internalError'
   /travels/my/:id:
     delete:
-      summary: Delete my travel
-      description: Delete a travel of the current user.
+      summary: Cancel my travel
+      description: Cancel a travel of the current user.
       operationId: cancelMyTravel
       tags:
         - Travels
@@ -872,6 +905,12 @@ paths:
           schema:
             type: integer
             example: 1
+        - name: reason
+          in: query
+          description: Reason for the cancellation
+          schema:
+            type: string
+            example: "I have a problem"
       security:
         - bearerAuth: [ ]
       responses:
@@ -886,7 +925,11 @@ paths:
                     type: string
                     example: "Travel deleted"
         '400':
-          description: Bad request
+          $ref: '#/components/responses/invalidId'
+        '401':
+          $ref: '#/components/responses/noToken'
+        '403':
+          description: Forbidden
           content:
             application/json:
               schema:
@@ -894,7 +937,74 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: "Invalid id"
+                    example: "You are not the driver of this travel."
+        '404':
+          $ref: '#/components/responses/travelNotFound'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+    patch:
+      summary: Update my travel
+      description: Update a travel of the current user.
+      operationId: updateMyTravel
+      tags:
+        - Travels
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - name: id
+          in: path
+          description: Travel id
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - name: reason
+          in: query
+          description: Reason for the update
+          schema:
+            type: string
+            example: One more step
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        description: Travel to update
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                maxPassengers:
+                  type: integer
+                  required: false
+                  example: 10
+                price:
+                  type: integer
+                  required: false
+                  example: 78
+                description:
+                  type: string
+                  required: false
+                  example: Voyage non fumeur
+                steps:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/StepInput'
+      responses:
+        '200':
+          description: Travel updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Travel updated"
+                  travel:
+                    $ref: '#/components/schemas/PublicTravel'
+        '400':
+          $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
         '403':
@@ -925,10 +1035,18 @@ paths:
         - $ref: '#/components/parameters/Accept-Language'
         - name: date
           in: query
-          description: Wanted departure date
+          description: Wanted departure date (only the date, at midnight)
           schema:
             type: string
-            example: 2023-03-16T09:15:36.000Z
+            example: 2023-03-16T02:00:00.000Z
+        - name: time
+          in: query
+          description: "Wanted departure time (only the time, in the format HH:mm, in the user's timezone)
+          For example, if the user is in a timezone UTC+2, and wants to search for a travel starting at 10:00, he should send 10:00, not 08:00."
+          schema:
+            type: string
+            required: false
+            example: 10:00
         - name: startCity
           in: query
           description: Start city
@@ -1008,7 +1126,63 @@ paths:
                 items:
                   $ref: '#/components/schemas/PublicTravel'
         '400':
-          description: Bad request
+          $ref: '#/components/responses/invalidId'
+        '401':
+          $ref: '#/components/responses/noToken'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+    patch:
+      summary: Update travel (admin)
+      description: Update a travel with the given id. Only available to admins.
+      operationId: updateTravel
+      tags:
+        - Travels
+        - Admin
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - name: id
+          in: path
+          description: Travel id
+          required: true
+          schema:
+            type: integer
+            example: 1
+        - name: reason
+          in: query
+          description: Reason for the update
+          schema:
+            type: string
+            example: Price changed
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        description: Travel to update
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                maxPassengers:
+                  type: integer
+                  required: false
+                  example: 10
+                price:
+                  type: integer
+                  required: false
+                  example: 78
+                description:
+                  type: string
+                  required: false
+                  example: Voyage non fumeur
+                steps:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/StepInput'
+      responses:
+        '200':
+          description: Travel updated
           content:
             application/json:
               schema:
@@ -1016,9 +1190,63 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: Id is invalid.
+                    example: "Travel updated"
+                  travel:
+                    $ref: '#/components/schemas/PublicTravel'
+        '400':
+          $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
+        '403':
+          $ref: '#/components/responses/insufficientPrivileges'
+        '404':
+          $ref: '#/components/responses/travelNotFound'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+    delete:
+      summary: Cancel travel (admin)
+      description: Cancel a travel with the given id. Only available to admins.
+      operationId: cancelTravel
+      tags:
+        - Travels
+        - Admin
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - name: id
+          in: path
+          description: Travel id
+          required: true
+          schema:
+            type: integer
+        - name: reason
+          in: query
+          description: Reason for the cancellation
+          schema:
+            type: string
+            example: Conducteur dangereux
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Travel cancelled
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Travel cancelled"
+        '400':
+          $ref: '#/components/responses/invalidId'
+        '401':
+          $ref: '#/components/responses/noToken'
+        '403':
+          $ref: '#/components/responses/insufficientPrivileges'
+        '404':
+          $ref: '#/components/responses/travelNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
@@ -1031,6 +1259,7 @@ paths:
       operationId: getTravels
       tags:
         - Travels
+        - Admin
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
         - $ref: '#/components/parameters/limit'
@@ -1240,15 +1469,7 @@ paths:
                     type: string
                     example: The notification have been removed
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Notification id is invalid.
+          $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
         '404':
@@ -1268,11 +1489,12 @@ paths:
 
   /groups:
     get:
-      summary: Search groups
+      summary: Search groups (admin)
       description: Search in all groups. Only available to admins.
       operationId: searchGroups
       tags:
         - Groups
+        - Admin
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
         - $ref: '#/components/parameters/limit'
@@ -1422,13 +1644,72 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
+  /groups/:id/member:
+    post:
+      summary: Add a new member
+      description: Add a new member in a group.
+      operationId: addUserGroup
+      tags:
+        - Groups
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - name: id
+          in: path
+          description: The id of the group to which a user is added
+          required: true
+          schema:
+            type: integer
+      security:
+        - bearerAuth: [ ]
+      requestBody:
+        description: The email of the user to add on the group
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  required: true
+                  example: john@example.com
+      responses:
+        '200':
+          description: User added
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: User added
+                  group:
+                    $ref: '#/components/schemas/Group'
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Group id is required.
+        '401':
+          $ref: '#/components/responses/noToken'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
   /groups/:id:
     delete:
-      summary: Delete a groups
-      description: Delete a groups, with the id in parameter. Only available to admins
+      summary: Delete a group (admin)
+      description: Delete a group, with the id in parameter. Only available to admins
       operationId: deleteGroup
       tags:
         - Groups
+        - Admin
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
         - name: id
@@ -1450,17 +1731,8 @@ paths:
                   message:
                     type: string
                     example: Group removed
-
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Id is invalid.
+          $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
         '403':
@@ -1508,17 +1780,8 @@ paths:
                   message:
                     type: string
                     example: Group renamed
-
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: groupId is invalid.
+          $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
         '403':
@@ -1671,15 +1934,7 @@ paths:
                     type: string
                     example: Evaluation removed
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Id is invalid.
+          $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
         '404':
@@ -1728,15 +1983,7 @@ paths:
                     type: string
                     example: Updated evaluation
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Id is invalid.
+          $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
         '404':
@@ -1855,8 +2102,8 @@ paths:
 
   /bookings/my/:id:
     delete:
-      summary: Delete a booking
-      description: Delete the specified booking of the current user.
+      summary: Cancel a booking
+      description: Cancel the specified booking of the current user.
       operationId: cancelBooking
       tags:
         - Bookings
@@ -1882,15 +2129,7 @@ paths:
                     type: string
                     example: Booking cancelled
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Id is invalid.
+          $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
         '403':
@@ -1939,15 +2178,7 @@ paths:
                     type: string
                     example: You have just accepted the request of John Doe.
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Id is invalid.
+          $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
         '403':
@@ -1988,15 +2219,7 @@ paths:
                     type: string
                     example: You have just rejected the request of John Doe.
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Id is invalid.
+          $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
         '403':
@@ -2108,6 +2331,16 @@ components:
         type: string
         default: ''
   responses:
+    invalidId:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Id is invalid.
     noToken:
       description: Unauthorized
       content:
@@ -2366,6 +2599,21 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/PublicUser'
+    MinimalUser:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        email:
+          type: string
+          example: john@example.com
+        firstName:
+          type: string
+          example: John
+        lastName:
+          type: string
+          example: Doe
     PublicUser:
       type: object
       properties:
@@ -2510,6 +2758,9 @@ components:
     StepInput:
       type: object
       properties:
+        id:
+          type: integer
+          required: false
         label:
           type: string
         city:

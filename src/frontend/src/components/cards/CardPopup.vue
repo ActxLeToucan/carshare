@@ -2,17 +2,18 @@
     <div class="fixed top-0 left-0 w-screen h-screen flex justify-center items-center bg-slate-900/[0.3] opacity-0 pointer-events-none transition-all p-4">
         <div
             ref="popup"
-            class="flex flex-col rounded-lg shadow-lg border-4 border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 p-4 space-y-4 max-w-full max-h-full"
+            class="flex flex-col rounded-lg shadow-lg border-4 border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 p-4 max-w-full max-h-full"
         >
             <h1
-                class="text-xl font-bold text-center"
+                v-show="title != ''"
+                class="text-xl font-bold text-center mb-4"
                 :class="'text-'+color+'-500'"
             >
                 {{ m_title }}
             </h1>
             <div
                 v-show="content != '' && content != null && content != undefined"
-                class="flex flex-col"
+                class="flex flex-col mb-4"
             >
                 <p
                     v-for="line in content.split(/\n|\\n/g)"
@@ -25,7 +26,7 @@
             <div
                 v-show="content != '' && content != null && content != undefined"
                 ref="log-zone"
-                class="flex flex-col w-full justify-center items-center min-h-max h-max transition-all"
+                class="flex flex-col w-full justify-center items-center min-h-max h-max transition-all mb-4"
                 style="max-height: 0px;"
             />
             <div
@@ -42,6 +43,8 @@
                 <button-block
                     v-show="showValidate"
                     ref="btn-validate"
+                    :disabled="disableValidate"
+                    :action="execOnValidate"
                     :color="color"
                 >
                     {{ validateLabel }}
@@ -93,6 +96,11 @@ export default {
         showValidate: {
             type: [Boolean, String],
             default: true,
+            required: false
+        },
+        disableValidate: {
+            type: [Boolean, String],
+            default: false,
             required: false
         },
         oncancel: {
@@ -147,19 +155,14 @@ export default {
                 }
             );
         });
-        this.$refs["btn-validate"].$el.addEventListener("click", () => {
-            executeAfter(
-                this.validate?.(this),
-                res => {
-                    if (res) this.hide();
-                }
-            );
-        });
 
         this.logZone = new LogZone(this.$refs["log-zone"]);
 
         this.hide();
         this.onload?.(this);
+
+        // cant' make a watcher for url path, so we have to do it manually
+        this.$router.afterEach((to, from) => { this.hide(); });
     },
     methods: {
         show() {
@@ -212,6 +215,14 @@ export default {
         setTitle(title) {
             this.m_title = title;
         },
+        execOnValidate() {
+            executeAfter(
+                this.validate?.(this),
+                res => {
+                    if (res) this.hide();
+                }
+            );
+        }
     }
 }
 </script>
