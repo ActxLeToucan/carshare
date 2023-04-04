@@ -33,6 +33,8 @@ npx prisma migrate deploy
 ```bash
 npm run dev
 ```
+10. Créer un compte (sur le front ou directement dans la base de données)
+11. Modifier le rôle de votre compte pour le passer en `Super Admin` (champ `level` dans la table `users` à `2`)
 
 ### Développement
 Lorsque vous développez, lancez le serveur avec la commande suivante :
@@ -78,7 +80,9 @@ Vous devez avoir les outils suivants installés sur votre machine :
 ```bash
 docker-compose up -d
 ```
-8. Configurer le serveur web pour qu'il redirige les requêtes vers le serveur Node.js (reverse proxy)
+8. Créer un compte (sur le front ou directement dans la base de données)
+9. Modifier le rôle de votre compte pour le passer en `Super Admin` (champ `level` dans la table `users` à `2`)
+10. Configurer le serveur web pour qu'il redirige les requêtes vers le serveur Node.js (reverse proxy)
 
 
 
@@ -112,7 +116,9 @@ npx prisma migrate deploy
 ```bash
 pm2 start dist/src/server.js --name "backend"
 ```
-11. Configurer le serveur web pour qu'il redirige les requêtes vers le serveur Node.js (reverse proxy)
+11. Créer un compte (sur le front ou directement dans la base de données)
+12. Modifier le rôle de votre compte pour le passer en `Super Admin` (champ `level` dans la table `users` à `2`)
+13. Configurer le serveur web pour qu'il redirige les requêtes vers le serveur Node.js (reverse proxy)
 
 #### Quelques commandes utiles
 Pour lancer le serveur en mode production sans pm2, exécuter la commande suivante :
@@ -132,3 +138,18 @@ pm2 monit
 
 ## Base de données
 ![database.png](docs/database.png)
+
+### Modifications
+Pour modifier la base de données, modifiez le fichier [`schema.prisma`](prisma/schema.prisma) puis exécutez la commande suivante :
+```bash
+npx prisma migrate dev
+```
+Un fichier de migration sera généré dans le dossier [`migrations`](prisma/migrations) et la base de données sera mise à jour.
+
+> Pour plus d'informations sur les migrations, consultez la [documentation de Prisma](https://www.prisma.io/docs/concepts/components/prisma-migrate).
+
+## Personnalisation supplémentaire
+En plus des variables d'environnement, vous pouvez personnaliser le serveur en modifiant les fichiers suivants :
+* [`translator.ts`](src/tools/translator.ts) pour modifier les messages (erreurs, succès, notifications, mails) envoyés par le serveur, ou ajouter des langues
+* [`properties.ts`](src/properties.ts) pour modifier les propriétés utilisées par le serveur, notamment pour 
+la vérification des champs, ou quelques éléments de protection (anti-spam, durée de validité des tokens, etc.)
