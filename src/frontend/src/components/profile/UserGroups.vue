@@ -281,7 +281,7 @@ export default {
         removeGroup(popup) {
             popup.setTitle(this.lang.DELETE + ' ' + this.selectedGroup?.name);
             const log = popup.log(Lang.CurrentLang.DELETING_GROUP + "...", Log.INFO);
-            API.execute_logged(API.ROUTE.GROUPS + "/" + this.selectedGroup.id, API.METHOD.DELETE, User.CurrentUser?.getCredentials()).then((data) => {
+            API.execute_logged(API.ROUTE.GROUPS + "/my/" + this.selectedGroup?.id, API.METHOD.DELETE, User.CurrentUser?.getCredentials()).then((data) => {
                 log.update(Lang.CurrentLang.GROUP_DELETED, Log.SUCCESS);
                 this.groups.splice(this.groups.indexOf(this.selectedGroup), 1);
                 this.selectedGroup = null;
@@ -291,7 +291,7 @@ export default {
                     popup.hide();
                 }, 2000);
             }).catch(err => {
-                log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.SUCCESS);
+                log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
                 setTimeout(() => {
                     log.delete();
                 }, 4000);
