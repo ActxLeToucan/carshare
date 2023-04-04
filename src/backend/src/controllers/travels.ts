@@ -32,25 +32,25 @@ exports.searchTravels = (req: express.Request, res: express.Response, _: express
 
     let startLatSanitized;
     if (startLat !== undefined) {
-        const startLatSanitized = sanitizer.typeNumber(startLat, true, req, res, 'startLat');
+        startLatSanitized = sanitizer.typeNumber(startLat, true, req, res, 'startLat');
         if (startLatSanitized === undefined) return;
         if (!validator.latitude(startLatSanitized, true, req, res, 'startLat')) return;
     }
     let startLngSanitized;
     if (startLng !== undefined) {
-        const startLngSanitized = sanitizer.typeNumber(startLng, true, req, res, 'startLng');
+        startLngSanitized = sanitizer.typeNumber(startLng, true, req, res, 'startLng');
         if (startLngSanitized === undefined) return;
         if (!validator.longitude(startLngSanitized, true, req, res, 'startLng')) return;
     }
     let endLatSanitized;
     if (endLat !== undefined) {
-        const endLatSanitized = sanitizer.typeNumber(endLat, true, req, res, 'endLat');
+        endLatSanitized = sanitizer.typeNumber(endLat, true, req, res, 'endLat');
         if (endLatSanitized === undefined) return;
         if (!validator.latitude(endLatSanitized, true, req, res, 'endLat')) return;
     }
     let endLngSanitized;
     if (endLng !== undefined) {
-        const endLngSanitized = sanitizer.typeNumber(endLng, true, req, res, 'endLng');
+        endLngSanitized = sanitizer.typeNumber(endLng, true, req, res, 'endLng');
         if (endLngSanitized === undefined) return;
         if (!validator.longitude(endLngSanitized, true, req, res, 'endLng')) return;
     }
@@ -362,6 +362,13 @@ exports.updateTravel = (req: express.Request, res: express.Response, _: express.
 
 exports.cancelTravel = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     _travel.cancel(req, res, true).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
+}
+
+exports.endTravel = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    _travel.end(req, res, true).catch((err) => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
     });

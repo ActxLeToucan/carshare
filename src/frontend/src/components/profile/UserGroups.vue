@@ -117,7 +117,7 @@
                             class="flex overflow-x-auto space-x-4 w-full"
                         >
                             <card-badge
-                                v-for="(member, index) in selectedGroup?.users"
+                                v-for="member in selectedGroup?.users"
                                 :key="member.email"
                                 class="md:max-w-[18em] max-w-[14em]"
                                 :title="member.firstName + ' ' + member.lastName"
@@ -125,14 +125,14 @@
                             >
                                 <button
                                     class="absolute top-1 right-1 w-6 h-6 text-slate-500 hover:text-red-500 transition-all"
-                                    @click="removeGroupMember(index)"
+                                    @click="removeGroupMember(member)"
                                 >
                                     <x-mark-icon />
                                 </button>
                             </card-badge>
                         </div>
                     </div>
-                    <div class="flex grow justify-between p-2">
+                    <div class="flex md:flex-row flex-col grow justify-between p-2 md:space-y-0 space-y-2">
                         <button-block
                             :action="showAddMemberPopup"
                             color="teal"
@@ -281,7 +281,7 @@ export default {
         removeGroup(popup) {
             popup.setTitle(this.lang.DELETE + ' ' + this.selectedGroup?.name);
             const log = popup.log(Lang.CurrentLang.DELETING_GROUP + "...", Log.INFO);
-            API.execute_logged(API.ROUTE.GROUPS + "/" + this.selectedGroup.id, API.METHOD.DELETE, User.CurrentUser?.getCredentials()).then((data) => {
+            API.execute_logged(API.ROUTE.GROUPS + "/my/" + this.selectedGroup?.id, API.METHOD.DELETE, User.CurrentUser?.getCredentials()).then((data) => {
                 log.update(Lang.CurrentLang.GROUP_DELETED, Log.SUCCESS);
                 this.groups.splice(this.groups.indexOf(this.selectedGroup), 1);
                 this.selectedGroup = null;
@@ -291,7 +291,7 @@ export default {
                     popup.hide();
                 }, 2000);
             }).catch(err => {
-                log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.SUCCESS);
+                log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
                 setTimeout(() => {
                     log.delete();
                 }, 4000);
@@ -346,9 +346,6 @@ export default {
                 this.loading = false;
                 this.pagination.total = res.total ?? 0;
                 this.showPagBtn = this.pagination.hasNext;
-                // TODO : remove this after debug
-                this.selectedGroup = this.groups[0];
-                this.showGroupZone();
             }).catch(err => {
                 console.error(err);
             });
@@ -369,19 +366,24 @@ export default {
                 });
             }
         },
-        removeGroupMember(index) {
-
+        removeGroupMember(member) {
+            API.execute_logged(API.ROUTE.GROUPS + "/" + this.selectedGroup.id + "/member", API.METHOD.DELETE, User.CurrentUser?.getCredentials(), {
+                email: member.email
+            }).then(res => {
+                this.selectedGroup.users.splice(this.selectedGroup.users.indexOf(member), 1);
+            }).catch(err => {
+                console.error(err);
+            });
         },
         showAddMemberPopup() {
             this.$refs["add-member-popup"].show();
         },
         getSearchUsers(selector, search) {
-            API.execute_logged(API.ROUTE.USERS + "/search" + API.createPagination(0, 20) + "&query=" + search, API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
+            API.execute_logged(API.ROUTE.USERS + "/search" + API.createPagination(0, 3) + "&query=" + search, API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
                 const users = res.data;
                 const data = users.map(user => {
                     return {id: user.id, value: user.firstName + " " + user.lastName, desc: user.email, ...user};
                 });
-                console.log(data);
                 selector.setData(data);
             }).catch(err => {
                 console.error(err);

@@ -24,6 +24,7 @@ export default {
     CREATOR: "Créateur",
     CREATION_DATE :"Date de création",
     CANCELED: "Annulé",
+    FINISHED: "Terminé",
 
     // languages (do not translate)
     ENGLISH: "English",
@@ -218,6 +219,11 @@ export default {
     LOADING_TRIP_DESC: "Veuillez patienter pendant que nous chargeons les informations du trajet",
     LOADING_TRIPS: "Chargement des trajets",
     LOADING_TRIPS_DESC: "Chargement de tous vos trajets",
+    MARK_AS_FINISHED: "Marquer comme terminé",
+    CANCELLING_TRIP: "Annulation du trajet",
+    TRIP_CANCELLED: "Trajet annulé avec succès",
+    MARKING_TRIP_AS_FINISHED: "Fin du trajet",
+    TRIP_MARKED_AS_FINISHED: "Trajet terminé avec succès",
 
     // booking
     BOOKING_DOESNT_EXIST_ANYMORE: "Cette réservation n'existe plus.",

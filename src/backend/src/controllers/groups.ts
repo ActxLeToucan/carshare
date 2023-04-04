@@ -35,6 +35,58 @@ exports.getMyGroups = (req: express.Request, res: express.Response, next: expres
     }));
 }
 
+exports.deleteMyGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    const groupId = sanitizer.id(req.params.id, true, req, res);
+    if (groupId === null) return;
+
+    prisma.group.findUnique({ where: { id: groupId } })
+        .then((group) => {
+            if (group === null) {
+                sendMsg(req, res, error.group.notFound);
+                return;
+            }
+            if (group.creatorId !== res.locals.user.id) {
+                sendMsg(req, res, error.group.notCreator);
+                return;
+            }
+
+            prisma.group.delete({
+                where: { id: groupId },
+                include: {
+                    users: true
+                }
+            }).then((group) => {
+                const data = group.users.map((user) => {
+                    const notif = notifs.group.deleted(user, group, res.locals.user);
+                    return {
+                        ...notif,
+                        userId: user.id,
+                        senderId: Number(res.locals.user.id)
+                    };
+                });
+
+                // create notifications
+                prisma.notification.createMany({ data }).then(() => {
+                    for (const notif of data) {
+                        const user = group.users.find((user) => user.id === notif.userId);
+                        // send email notification
+                        if (user !== undefined) notify(user, notif);
+                    }
+                    sendMsg(req, res, info.group.deleted);
+                }).catch((err) => {
+                    console.error(err);
+                    sendMsg(req, res, error.generic.internalError);
+                });
+            }).catch((err) => {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
+            });
+        }).catch((err) => {
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
+}
+
 exports.modifyNameGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const groupName = req.body.groupName;
     if (!validator.groupName(groupName, true, req, res)) return;
@@ -67,10 +119,10 @@ exports.modifyNameGroup = (req: express.Request, res: express.Response, _: expre
                 users: true
             }
         }).then((group) => {
-            const notif = notifs.group.nameUpdated(res.locals.user, oldName, groupName);
-
             const data = group.users.map((user) => {
+                const notif = notifs.group.nameUpdated(user, oldName, groupName);
                 return {
+
                     ...notif,
                     userId: user.id,
                     senderId: Number(res.locals.user.id)
@@ -131,11 +183,11 @@ function getGroups (req: express.Request, res: express.Response, next: express.N
 }
 
 exports.addUserGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const email = req.body.email;
-    if (!validator.email(email, true, req, res, false)) return;
-
     const groupId = sanitizer.id(req.params.id, true, req, res);
     if (groupId === null) return;
+
+    const email = req.body.email;
+    if (!validator.email(email, true, req, res, false)) return;
 
     prisma.group.count({
         where: {
@@ -189,18 +241,100 @@ exports.addUserGroup = (req: express.Request, res: express.Response, _: express.
                     }).then((group) => {
                         const notif: Notif = notifs.group.userAdded(user, group, res.locals.user);
                         const data = {
+                            ...notif,
                             userId,
-                            title: notif.title,
-                            message: notif.message,
-                            type: notif.type,
-                            senderId: Number(res.locals.user.id),
-                            createdAt: notif.createdAt
+                            senderId: Number(res.locals.user.id)
                         };
 
                         prisma.notification.create({ data }).then(() => {
                             notify(user, data);
 
                             sendMsg(req, res, info.group.userAdd, group);
+                        }).catch((err) => {
+                            console.error(err);
+                            sendMsg(req, res, error.generic.internalError);
+                        });
+                    }).catch((err) => {
+                        console.error(err);
+                        sendMsg(req, res, error.generic.internalError);
+                    });
+                }).catch((err) => {
+                    console.error(err);
+                    sendMsg(req, res, error.generic.internalError);
+                });
+            }).catch((err) => {
+                console.error(err);
+                sendMsg(req, res, error.generic.internalError);
+            });
+    }).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
+}
+
+exports.removeUserGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    const groupId = sanitizer.id(req.params.id, true, req, res);
+    if (groupId === null) return;
+
+    const email = req.body.email;
+    if (!validator.email(email, true, req, res, false)) return;
+
+    prisma.group.count({
+        where: {
+            id: groupId,
+            creatorId: res.locals.user.id
+        }
+    }).then((countG) => {
+        if (countG !== 1) {
+            sendMsg(req, res, error.group.notFound);
+            return;
+        }
+
+        prisma.user.findUnique({ where: { email } })
+            .then((user) => {
+                if (user === null) {
+                    sendMsg(req, res, error.user.notFound);
+                    return;
+                }
+
+                prisma.group.count({
+                    where: {
+                        id: groupId,
+                        users: {
+                            some: { id: user.id }
+                        }
+                    }
+                }).then((count) => {
+                    if (count !== 1) {
+                        sendMsg(req, res, error.group.notMember);
+                        return;
+                    }
+
+                    prisma.group.update({
+                        where: { id: groupId },
+                        data: {
+                            users: {
+                                disconnect: {
+                                    id: user.id
+                                }
+                            }
+                        },
+                        include: {
+                            users: true,
+                            creator: true
+                        }
+                    }).then((group) => {
+                        const notif = notifs.group.userRemoved(user, group, res.locals.user);
+                        const data = {
+                            ...notif,
+                            userId: user.id,
+                            senderId: Number(res.locals.user.id)
+                        };
+
+                        prisma.notification.create({ data }).then(() => {
+                            notify(user, data);
+
+                            sendMsg(req, res, info.group.memberRemoved, group);
                         }).catch((err) => {
                             console.error(err);
                             sendMsg(req, res, error.generic.internalError);

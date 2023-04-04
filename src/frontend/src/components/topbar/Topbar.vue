@@ -3,9 +3,10 @@
         <div class="flex grow w-full">
             <router-link
                 to="/"
-                class="flex w-[20%] h-fit py-1"
+                class="flex w-[20%] h-fit py-1 text-slate-500 dark:text-slate-300 text-3xl font-extrabold whitespace-nowrap text-ellipsis
+                       hover:text-teal-500 hover:dark:text-teal-500 outline-none focus:text-teal-500 focus:dark:text-teal-500 transition-all"
             >
-                <h1 class="text-slate-500 dark:text-slate-300 text-3xl font-extrabold hover:text-teal-500 whitespace-nowrap text-ellipsis transition-all">
+                <h1>
                     {{ lang.CARSHARE }}
                 </h1>
             </router-link>
@@ -22,7 +23,8 @@
                 <div class="flex w-[20%] h-fit justify-end space-x-4">
                     <router-link
                         to="/profile#notifs"
-                        class="relative flex text-slate-500 justify-center items-center my-auto"
+                        class="relative flex text-slate-500 justify-center items-center my-auto outline-none
+                               hover:text-teal-500 hover:dark:text-teal-500 focus:text-teal-500 focus:dark:text-teal-500 transition-all"
                     >
                         <bell-icon class="w-7 h-7" />
                         <span
@@ -88,7 +90,6 @@ import ButtonText from '../inputs/ButtonText.vue';
 import ButtonBlock from '../inputs/ButtonBlock.vue';
 import User from '../../scripts/User.js';
 import Lang from '../../scripts/Lang';
-import { goTo } from '../../scripts/redirects';
 
 import {
     BellIcon

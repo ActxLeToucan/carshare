@@ -29,9 +29,9 @@ exports.getMyTravels = (req: express.Request, res: express.Response, _: express.
             },
             {
                 steps: {
-                    every: {
+                    some: {
                         departureOfBookings: {
-                            every: {
+                            some: {
                                 passengerId: res.locals.user.id
                             }
                         },
@@ -126,6 +126,13 @@ exports.cancelMyTravel = (req: express.Request, res: express.Response, _: expres
 
 exports.updateMyTravel = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     _travel.update(req, res, false).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
+}
+
+exports.endMyTravel = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    _travel.end(req, res, false).catch((err) => {
         console.error(err);
         sendMsg(req, res, error.generic.internalError);
     });

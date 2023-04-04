@@ -6,6 +6,7 @@ import { getMaxPassengers } from '../_common';
 import { type Booking, type Step } from '@prisma/client';
 import properties from '../../properties';
 import sanitizer from '../../tools/sanitizer';
+import moment from 'moment-timezone';
 
 /**
  * Update a travel
@@ -298,4 +299,96 @@ async function cancel (req: express.Request, res: express.Response, asAdmin: boo
     sendMsg(req, res, info.travel.cancelled);
 }
 
-export { update, cancel };
+async function end (req: express.Request, res: express.Response, asAdmin: boolean) {
+    const travelId = sanitizer.id(req.params.id, true, req, res);
+    if (travelId === null) return;
+
+    const travel = await prisma.travel.findUnique({
+        where: { id: travelId },
+        include: {
+            steps: {
+                orderBy: { date: 'asc' }
+            },
+            driver: true
+        }
+    });
+
+    // verifications
+    if (travel === null) {
+        sendMsg(req, res, error.travel.notFound);
+        return;
+    }
+
+    if (travel.status !== properties.travel.status.open) {
+        sendMsg(req, res, error.travel.notOpen);
+        return;
+    }
+
+    if (!asAdmin) {
+        if (res.locals.user.id !== travel.driverId) {
+            sendMsg(req, res, error.travel.notDriver);
+            return;
+        }
+
+        if (!moment().isAfter(travel.steps[0].date, 'minute')) {
+            sendMsg(req, res, error.travel.notStarted);
+            return;
+        }
+    }
+
+    // end travel
+    await prisma.travel.update({
+        where: { id: travelId },
+        data: { status: properties.travel.status.ended }
+    });
+
+    // get passengers and send notifications
+    const bookings = await prisma.booking.findMany({
+        where: {
+            departure: { travelId }
+        },
+        include: {
+            departure: true,
+            arrival: true,
+            passenger: true
+        }
+    });
+
+    const data = bookings.map((booking) => {
+        const notif = notifs.travel.ended(booking.passenger, booking.departure, booking.arrival, asAdmin);
+        return {
+            ...notif,
+            userId: booking.passengerId,
+            senderId: Number(res.locals.user.id),
+            travelId: booking.departure.travelId,
+            bookingId: booking.id
+        };
+    });
+
+    // create notifications
+    await prisma.notification.createMany({ data });
+    for (const notif of data) {
+        const booking = bookings.find((b) => b.id === notif.bookingId);
+        // send email notification
+        if (booking !== undefined) notify(booking.passenger, notif);
+    }
+
+    // create driver's notification
+    if (asAdmin) {
+        const notifDriver = notifs.travel.ended(travel.driver, travel.steps[0], travel.steps[travel.steps.length - 1], req.body.message);
+        await prisma.notification.create({
+            data: {
+                ...notifDriver,
+                userId: travel.driverId,
+                senderId: Number(res.locals.user.id),
+                travelId: travel.id
+            }
+        });
+        // send email notification to driver
+        notify(travel.driver, notifDriver);
+    }
+
+    sendMsg(req, res, info.travel.ended);
+}
+
+export { update, cancel, end };

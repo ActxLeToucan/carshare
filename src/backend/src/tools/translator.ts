@@ -432,6 +432,13 @@ const error = {
                 en: 'You are not the creator of this group.'
             },
             code: 403
+        }),
+        notMember: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Cet utilisateur n\'est pas dans le groupe.',
+                en: 'This user is not in the group.'
+            },
+            code: 403
         })
     },
     number: {
@@ -600,6 +607,13 @@ const error = {
             msg: {
                 fr: 'Ce trajet n\'est plus ouvert.',
                 en: 'This travel is no longer open.'
+            },
+            code: 403
+        }),
+        notStarted: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Ce trajet n\'a pas encore commencé.',
+                en: 'This travel has not yet started.'
             },
             code: 403
         }),
@@ -820,6 +834,13 @@ const info = {
                 en: 'Travel cancelled'
             },
             code: 200
+        }),
+        ended: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Trajet terminé',
+                en: 'Travel done'
+            },
+            code: 200
         })
     },
     group: {
@@ -854,6 +875,13 @@ const info = {
             msg: {
                 fr: 'Nom du groupe modfié',
                 en: 'Group name updated'
+            },
+            code: 200
+        }),
+        memberRemoved: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Membre retiré',
+                en: 'Member removed'
             },
             code: 200
         })
@@ -1158,6 +1186,18 @@ const notifs = {
             type: 'standard',
             createdAt: new Date()
         }),
+        ended: (user: User, departure: Step, arrival: Step, byAdmin: boolean) => msgForLang<TemplateNotif, Notif>(user.lang, {
+            title: {
+                fr: 'Fin de trajet',
+                en: 'Travel finished'
+            },
+            message: {
+                fr: `Votre trajet de ${departure.city} à ${arrival.city} du ${dateToString(departure.date, user.timezone, 'fr')} a été marqué fini par ${byAdmin ? 'un administateur' : 'le conducteur'}.`,
+                en: `Your trip from ${departure.city} to ${arrival.city} on ${dateToString(departure.date, user.timezone, 'en')} has been marked finished by ${byAdmin ? 'an administrator' : 'the driver'}.`
+            },
+            type: 'standard',
+            createdAt: new Date()
+        }),
         updated: (user: User, travel: Travel & { steps: Step[] }, reason: string | undefined) => msgForLang<TemplateNotif, Notif>(user.lang, {
             title: {
                 fr: 'Modification de votre trajet par un administrateur',
@@ -1302,6 +1342,30 @@ const notifs = {
             message: {
                 fr: `${creator.firstName ?? ''} ${creator.lastName ?? ''} vous a ajouté dans le groupe ${group.name}, vous recevrez toutes les notifications de ce groupe.`,
                 en: `${creator.firstName ?? ''} ${creator.lastName ?? ''} added you to the group ${group.name}, you will receive all notifications from this group.`
+            },
+            type: 'standard',
+            createdAt: new Date()
+        }),
+        deleted: (user: User, group: Group, creator: User) => msgForLang<TemplateNotif, Notif>(user.lang, {
+            title: {
+                fr: 'Groupe supprimé',
+                en: 'Group deleted'
+            },
+            message: {
+                fr: `${creator.firstName ?? ''} ${creator.lastName ?? ''} a supprimé le groupe ${group.name}.`,
+                en: `${creator.firstName ?? ''} ${creator.lastName ?? ''} deleted the group ${group.name}.`
+            },
+            type: 'standard',
+            createdAt: new Date()
+        }),
+        userRemoved: (user: User, group: Group, creator: User) => msgForLang<TemplateNotif, Notif>(user.lang, {
+            title: {
+                fr: 'Retiré d\'un groupe',
+                en: 'Removed from a group'
+            },
+            message: {
+                fr: `${creator.firstName ?? ''} ${creator.lastName ?? ''} vous a retiré du groupe ${group.name}, vous ne recevrez plus les notifications de ce groupe.`,
+                en: `${creator.firstName ?? ''} ${creator.lastName ?? ''} removed you from the group ${group.name}, you will no longer receive notifications from this group.`
             },
             type: 'standard',
             createdAt: new Date()
