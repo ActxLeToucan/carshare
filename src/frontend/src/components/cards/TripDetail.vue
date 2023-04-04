@@ -128,7 +128,7 @@
             <button-block
                 v-show="trip != null && !isPast"
                 class="max-w-full"
-                color="yellow"
+                color="teal"
                 :href="trip?.id ? '/trips/edit?id=' + trip?.id : undefined"
                 :disabled="trip?.status != 0"
             >
