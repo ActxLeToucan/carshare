@@ -130,9 +130,6 @@ export default {
         attachInput(input) {
             let timeout = null;
             this.input = input;
-            
-            const rect = input.getBoundingClientRect();
-            this.$el.firstElementChild.style.width = rect.width + "px";
 
             input.addEventListener("focus", ev => this.showing = true);
             input.addEventListener("blur", ev => {
@@ -202,9 +199,11 @@ export default {
             this.setSelection((this.m_selection - 1 < 0) ? this.m_data.length - 1 : this.m_selection - 1);
         },
         goToInput() {
-            if (!this.detached || !this.input) return;
-
+            if (!this.input) return;
             const rect = this.input.getBoundingClientRect();
+            this.$el.firstElementChild.style.width = rect.width + "px";
+
+            if (!this.detached) return;
             this.$el.style.top = rect.top + rect.height + "px";
             this.$el.style.left = rect.left + "px";
         }
