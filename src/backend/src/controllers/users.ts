@@ -23,7 +23,7 @@ exports.signup = (req: express.Request, res: express.Response, _: express.NextFu
     if (hasCar !== undefined && !validator.typeBoolean(hasCar, true, req, res, 'hasCar')) return;
     const genderSanitized = sanitizer.gender(gender, false, req, res);
     let timezoneSanitized: string | undefined;
-    if (timezone !== undefined) {
+    if (timezone !== undefined && timezone !== null) {
         timezoneSanitized = sanitizer.timezone(timezone, false, req, res);
     }
 
@@ -265,25 +265,25 @@ exports.emailVerification = (req: express.Request, res: express.Response, _: exp
     });
 }
 
-exports.searchUsers = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+exports.searchUsers = (req: express.Request, res: express.Response, _: express.NextFunction, asAdmin = true) => {
     const pagination = preparePagination(req, true);
 
     const q = `%${pagination.query ?? ''}%`;
 
     prisma.$queryRaw`SELECT COUNT(*) AS count
-                        FROM user
-                        WHERE IF(${pagination.query !== undefined}, email LIKE ${q}
-                            OR phone LIKE ${q}
-                            OR CONCAT(firstName, ' ', lastName) LIKE ${q}, TRUE)`
+                     FROM user
+                     WHERE IF(${pagination.query !== undefined}, email LIKE ${q}
+                        OR (IF(${asAdmin}, phone LIKE ${q}, FALSE)))
+                        OR CONCAT(firstName, ' ', lastName) LIKE ${q}, TRUE)`
         .then((count: any) => {
             prisma.$queryRaw`SELECT *
                      FROM user
                      WHERE IF(${pagination.query !== undefined}, email LIKE ${q}
-                         OR phone LIKE ${q}
+                         OR (IF(${asAdmin}, phone LIKE ${q}, FALSE)))
                          OR CONCAT(firstName, ' ', lastName) LIKE ${q}, TRUE)
                      LIMIT ${pagination.pagination.take} OFFSET ${pagination.pagination.skip}`
                 .then(users => {
-                    res.status(200).json(pagination.results((users as User[]).map(displayableUserPrivate), Number(count[0].count)));
+                    res.status(200).json(pagination.results((users as User[]).map(asAdmin ? displayableUserPrivate : displayableUserMinimal), Number(count[0].count)));
                 }).catch(err => {
                     console.error(err);
                     sendMsg(req, res, error.generic.internalError);
@@ -351,27 +351,5 @@ exports.updateUser = (req: express.Request, res: express.Response, _: express.Ne
 }
 
 exports.searchUsersPublic = (req: express.Request, res: express.Response, _: express.NextFunction) => {
-    const pagination = preparePagination(req, true);
-
-    prisma.user.findMany({
-        where: {
-            OR: [
-                { email: { contains: pagination.query } },
-                { firstName: { contains: pagination.query } },
-                { lastName: { contains: pagination.query } }
-            ]
-        },
-        ...pagination.pagination,
-        select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true
-        }
-    }).then(users => {
-        res.status(200).json(pagination.results(users.map(displayableUserMinimal), users.length));
-    }).catch(err => {
-        console.error(err);
-        sendMsg(req, res, error.generic.internalError);
-    });
+    return exports.searchUsers(req, res, _, false);
 }

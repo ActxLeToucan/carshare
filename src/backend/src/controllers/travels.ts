@@ -184,10 +184,7 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
 
     let group: (Group & { users: User[] }) | null = null;
     if (groupId !== undefined && groupId !== null) {
-        if (typeof groupId !== 'number') {
-            sendMsg(req, res, error.group.typeId);
-            return;
-        }
+        if (!validator.typeInteger(groupId, true, req, res, 'groupId')) return;
 
         try {
             group = await prisma.group.findUnique({
@@ -243,11 +240,7 @@ exports.createTravel = async (req: express.Request, res: express.Response, _: ex
                         lng: number
                         date: string
                     }) => ({
-                        label: step.label,
-                        city: step.city,
-                        context: step.context,
-                        lat: step.lat,
-                        lng: step.lng,
+                        ...step,
                         date: new Date(step.date)
                     }))
                 }

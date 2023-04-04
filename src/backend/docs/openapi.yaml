@@ -1,8 +1,9 @@
+# TODO: verifier que toutes les routes soient là
 openapi: 3.0.3
 info:
   title: Car Share API
   description: This is the API for the Car Share project.
-  version: 0.4.0
+  version: 0.4.0 # TODO: Update version number
   contact:
     name: Car Share, backend team
     email: 'contoux1u@etu.univ-lorraine.fr'
@@ -275,10 +276,6 @@ paths:
                   type: boolean
                   required: false
                   example: true
-                mailNotif:
-                  type: boolean
-                  required: false
-                  example: true
       responses:
         '200':
           description: User updated
@@ -307,8 +304,6 @@ paths:
                     example: Field "hasCar" must be a boolean.
         '401':
           $ref: '#/components/responses/noToken'
-        '403':
-          $ref: '#/components/responses/insufficientPrivileges'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
@@ -516,11 +511,13 @@ paths:
 
   /users:
     get:
-      summary: Search users
-      description: Search in all users. Only available to admins.
+      summary: Search users (admin)
+      description: "Search in all users. Only available to admins.
+      <br /><strong>A verified email is required to perform this action.</strong>"
       operationId: searchUsers
       tags:
         - Users
+        - Admin
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
         - $ref: '#/components/parameters/limit'
@@ -578,12 +575,14 @@ paths:
         - Users
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
         - $ref: '#/components/parameters/query'
       security:
         - bearerAuth: [ ]
       responses:
         '200':
-          description: A list of users
+          description: A list of minimal information about users
           content:
             application/json:
               schema:
@@ -624,7 +623,8 @@ paths:
   /users/:id:
     delete:
       summary: Delete a user (admin)
-      description: Delete a user. Only available to admins.
+      description: "Delete a user. Only available to admins.
+      <br /><strong>A verified email is required to perform this action.</strong>"
       operationId: deleteUser
       tags:
         - Users
@@ -664,7 +664,8 @@ paths:
           $ref: '#/components/responses/internalError'
     patch:
       summary: Update a user (admin)
-      description: Update a user. Only available to admins.
+      description: "Update a user. Only available to admins.
+      <br /><strong>A verified email is required to perform this action.</strong>"
       operationId: updateUser
       tags:
         - Users
@@ -711,10 +712,6 @@ paths:
                   type: boolean
                   required: false
                   example: true
-                mailNotif:
-                  type: boolean
-                  required: false
-                  example: true
                 level:
                   type: integer
                   required: false
@@ -751,7 +748,8 @@ paths:
   /travels/create:
     post:
       summary: Create a travel
-      description: Create a travel with steps.
+      description: "Create a travel with steps.
+      <br /><strong>A verified email is required to perform this action.</strong>"
       operationId: createTravel
       tags:
         - Travels
@@ -814,8 +812,6 @@ paths:
                     example: "Travel created"
                   travel:
                     $ref: '#/components/schemas/PublicTravel'
-        '401':
-          $ref: '#/components/responses/noToken'
         '400':
           description: Bad request
           content:
@@ -826,6 +822,8 @@ paths:
                   message:
                     type: string
                     example: Date is required.
+        '401':
+          $ref: '#/components/responses/noToken'
         '404':
           $ref: '#/components/responses/userNotFound'
         '498':
@@ -883,6 +881,16 @@ paths:
                   total:
                     type: integer
                     example: 2
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: The type of travel searched is invalid.
         '401':
           $ref: '#/components/responses/noToken'
         '498':
@@ -892,7 +900,8 @@ paths:
   /travels/my/:id:
     delete:
       summary: Cancel my travel
-      description: Cancel a travel of the current user.
+      description: "Cancel a travel of the current user.
+      <br /><strong>A verified email is required to perform this action.</strong>"
       operationId: cancelMyTravel
       tags:
         - Travels
@@ -946,7 +955,9 @@ paths:
           $ref: '#/components/responses/internalError'
     patch:
       summary: Update my travel
-      description: Update a travel of the current user.
+      description: "Update a travel of the current user. For each step, if no id is provided, a new step will be created.
+      If an id is provided, the step will be updated. If an existing step is not provided, it will be deleted.
+      <br /><strong>A verified email is required to perform this action.</strong>"
       operationId: updateMyTravel
       tags:
         - Travels
@@ -1027,7 +1038,7 @@ paths:
   /travels/search:
     get:
       summary: Search travels
-      description: Get all the trips fitting with the given criteria
+      description: Get all the travels fitting with the given criteria
       operationId: searchTravels
       tags:
         - Travels
@@ -1035,10 +1046,10 @@ paths:
         - $ref: '#/components/parameters/Accept-Language'
         - name: date
           in: query
-          description: Wanted departure date (only the date, at midnight)
+          description: "Wanted departure date (at midnight, ex: in UTC+2 = 2023-03-15T22:00:00.000Z)"
           schema:
             type: string
-            example: 2023-03-16T02:00:00.000Z
+            example: 2023-03-15T22:00:00.000Z
         - name: time
           in: query
           description: "Wanted departure time (only the time, in the format HH:mm, in the user's timezone)
@@ -1142,24 +1153,25 @@ paths:
         - bearerAuth: [ ]
       responses:
         '200':
-          description: The travels with the given id
+          description: The travel with the given id
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/PublicTravel'
+                $ref: '#/components/schemas/PublicTravel'
         '400':
           $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
+        '404':
+          $ref: '#/components/responses/travelNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
     patch:
       summary: Update travel (admin)
-      description: Update a travel with the given id. Only available to admins.
+      description: "Update a travel with the given id. Only available to admins.
+      <br /><strong>A verified email is required to perform this action.</strong>"
       operationId: updateTravel
       tags:
         - Travels
@@ -1231,7 +1243,8 @@ paths:
           $ref: '#/components/responses/internalError'
     delete:
       summary: Cancel travel (admin)
-      description: Cancel a travel with the given id. Only available to admins.
+      description: "Cancel a travel with the given id. Only available to admins.
+      <br /><strong>A verified email is required to perform this action.</strong>"
       operationId: cancelTravel
       tags:
         - Travels
@@ -1279,7 +1292,8 @@ paths:
   /travels:
     get:
       summary: All travels (admin)
-      description: Get all travels
+      description: "Get all travels.
+      <br /><strong>A verified email is required to perform this action.</strong>"
       operationId: getTravels
       tags:
         - Travels
@@ -1316,6 +1330,12 @@ paths:
                     type: integer
                     nullable: true
                     example: 0
+        '401':
+          $ref: '#/components/responses/noToken'
+        '403':
+          $ref: '#/components/responses/insufficientPrivileges'
+        '498':
+          $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
 
@@ -1456,7 +1476,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: All notifications have been removed
+                    example: Notifications removed
         '401':
           $ref: '#/components/responses/noToken'
         '498':
@@ -1491,7 +1511,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: The notification have been removed
+                    example: Notification removed
         '400':
           $ref: '#/components/responses/invalidId'
         '401':
@@ -1514,7 +1534,8 @@ paths:
   /groups:
     get:
       summary: Search groups (admin)
-      description: Search in all groups. Only available to admins.
+      description: "Search in all groups. Only available to admins.
+      <br /><strong>A verified email is required to perform this action.</strong>"
       operationId: searchGroups
       tags:
         - Groups
@@ -1568,7 +1589,8 @@ paths:
   /groups/my:
     post:
       summary: Create a group
-      description: Create a group.
+      description: "Create a group.
+      <br /><strong>A verified email is required to perform this action.</strong>"
       operationId: createGroup
       tags:
         - Groups
@@ -1671,7 +1693,8 @@ paths:
   /groups/:id/member:
     post:
       summary: Add a new member
-      description: Add a new member in a group.
+      description: "Add a new member in a group.
+      <br /><strong>A verified email is required to perform this action.</strong>"
       operationId: addUserGroup
       tags:
         - Groups
@@ -1711,24 +1734,21 @@ paths:
                   group:
                     $ref: '#/components/schemas/Group'
         '400':
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Group id is required.
+          $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
+        '403':
+          $ref: '#/components/responses/groupNotCreator'
+        '404':
+          $ref: '#/components/responses/groupNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
     delete:
       summary: Remove a member
-      description: Remove a member of a group.
+      description: "Remove a member of a group.
+      <br /><strong>A verified email is required to perform this action.</strong>"
       operationId: removeUserGroup
       tags:
         - Groups
@@ -1769,6 +1789,10 @@ paths:
           $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
+        '403':
+          $ref: '#/components/responses/groupNotCreator'
+        '404':
+          $ref: '#/components/responses/groupNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
@@ -1776,7 +1800,8 @@ paths:
   /groups/:id:
     delete:
       summary: Delete a group (admin)
-      description: Delete a group, with the id in parameter. Only available to admins
+      description: "Delete a group, with the id in parameter. Only available to admins.
+      <br /><strong>A verified email is required to perform this action.</strong>"
       operationId: deleteGroup
       tags:
         - Groups
@@ -1814,10 +1839,61 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
+    patch:
+      summary: Update a group (admin)
+      description: "Update a group.
+      <br /><strong>A verified email is required to perform this action.</strong>"
+      operationId: updateGroup
+      tags:
+        - Groups
+        - Admin
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - name: groupeId
+          in: path
+          description: The id of the group to update
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                groupName:
+                  type: string
+                  example: Bilboquet
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Group updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Group updated
+        '400':
+          $ref: '#/components/responses/invalidId'
+        '401':
+          $ref: '#/components/responses/noToken'
+        '403':
+          $ref: '#/components/responses/insufficientPrivileges'
+        '404':
+          $ref: '#/components/responses/groupNotFound'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
   /groups/my/:id:
     delete:
       summary: Delete a group
-      description: Delete a group created by the user, with the id in parameter.
+      description: "Delete a group created by the user, with the id in parameter.
+      <br /><strong>A verified email is required to perform this action.</strong>"
       operationId: deleteMyGroup
       tags:
         - Groups
@@ -1842,31 +1918,30 @@ paths:
                   message:
                     type: string
                     example: Group removed
-
         '400':
           $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
         '403':
-          $ref: '#/components/responses/insufficientPrivileges'
+          $ref: '#/components/responses/groupNotCreator'
         '404':
           $ref: '#/components/responses/groupNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
-  /groups/:id/name:
     patch:
-      summary: Update name of a group
-      description: Update the name of a group
-      operationId: modifyNameGroup
+      summary: Update a group
+      description: "Update a group owned by the current user.
+      <br /><strong>A verified email is required to perform this action.</strong>"
+      operationId: updateMyGroup
       tags:
         - Groups
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
         - name: groupeId
           in: path
-          description: The id of the group to rename
+          description: The id of the group to update
           required: true
           schema:
             type: integer
@@ -1883,7 +1958,7 @@ paths:
         - bearerAuth: [ ]
       responses:
         '200':
-          description: Group renamed
+          description: Group updated
           content:
             application/json:
               schema:
@@ -1891,20 +1966,20 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: Group renamed
+                    example: Group updated
         '400':
           $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
         '403':
-          $ref: '#/components/responses/insufficientPrivileges'
+          $ref: '#/components/responses/groupNotCreator'
         '404':
           $ref: '#/components/responses/groupNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
-  /notation/average/:id:
+  /notations/average/:id:
     get:
       summary: Obtaining evaluation averages
       description: Get the averages score when the id was a driver and when it was a passenger
@@ -1913,15 +1988,23 @@ paths:
         - Notations
       parameters:
         - $ref: '#/components/parameters/Accept-Language'
+        - name: id
+          in: path
+          description: The id of the user to get the averages
+          required: true
+          schema:
+            type: integer
       security:
         - bearerAuth: [ ]
       responses:
         '200':
-          description: The averages score of the id
+          description: The averages score
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/EvalutationUser'
+        '400':
+          $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
         '404':
@@ -1930,9 +2013,9 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
-  /notation/travels:
+  /notations/travels:
     get:
-      summary: Obtaining evaluation averages for each travel of User
+      summary: Average for each travel
       description: Obtain the average score for each user's trip, when they are a driver or a passenger.
       operationId: getAverageTravel
       tags:
@@ -1950,13 +2033,11 @@ paths:
                 $ref: '#/components/schemas/EvalutationTravel'
         '401':
           $ref: '#/components/responses/noToken'
-        '404':
-          $ref: '#/components/responses/userNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
-  /notation/my:
+  /notations/my:
     post:
       summary: Create an evaluation
       description: Create an evaluation on a past trip, with a note between 0 and 5.
@@ -1988,8 +2069,8 @@ paths:
                   required: true
                   example: 5
       responses:
-        '200':
-          description: Group created
+        '201':
+          description: Evaluation created
           content:
             application/json:
               schema:
@@ -1997,7 +2078,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: Recorded evaluation
+                    example: Evaluation created
                   group:
                     $ref: '#/components/schemas/EvaluationCreate'
         '400':
@@ -2009,9 +2090,11 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: travelId is required.
+                    example: "Field \"note\" is required."
         '401':
           $ref: '#/components/responses/noToken'
+        '404':
+          $ref: '#/components/responses/travelNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
@@ -2084,7 +2167,7 @@ paths:
         - bearerAuth: [ ]
       responses:
         '200':
-          description: Updated evaluation
+          description: Evaluation updated
           content:
             application/json:
               schema:
@@ -2092,7 +2175,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: Updated evaluation
+                    example: Evaluation updated
         '400':
           $ref: '#/components/responses/invalidId'
         '401':
@@ -2106,7 +2189,8 @@ paths:
   /bookings/my:
     post:
       summary: Create a new booking
-      description: Create a booking request for the specified travel
+      description: "Create a booking request for the specified travel.
+      <br /><strong>A verified email is required to perform this action.</strong>"
       operationId: createBooking
       tags:
         - Bookings
@@ -2134,7 +2218,7 @@ paths:
                   example: 18
       responses:
         '200':
-          description: Booking accepted
+          description: Booking created
           content:
             application/json:
               schema:
@@ -2142,7 +2226,7 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: You have asked to join Paul LOISIL trip.
+                    example: You have asked to join Paul LOISIL's trip.
         '400':
           description: Bad request
           content:
@@ -2152,13 +2236,11 @@ paths:
                 properties:
                   message:
                     type: string
-                    example: travelId is invalid.
+                    example: "Field \"travelId\" is required."
         '401':
           $ref: '#/components/responses/noToken'
-        '403':
-          $ref: '#/components/responses/notDriver'
         '404':
-          $ref: '#/components/responses/bookingNotFound'
+          $ref: '#/components/responses/travelNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':
@@ -2215,7 +2297,7 @@ paths:
     delete:
       summary: Cancel a booking
       description: Cancel the specified booking of the current user.
-      operationId: cancelBooking
+      operationId: cancelMyBooking
       tags:
         - Bookings
       parameters:
@@ -2263,7 +2345,8 @@ paths:
   /bookings/:id/accept:
     patch:
       summary: Accept a booking
-      description: Accept a booking, with the id in parameter
+      description: "Accept a booking, with the id in parameter.
+      <br /><strong>A verified email is required to perform this action.</strong>"
       operationId: acceptBooking
       tags:
         - Bookings
@@ -2304,7 +2387,8 @@ paths:
   /bookings/:id/reject:
     patch:
       summary: Reject a booking
-      description: Reject a booking, with the id in parameter
+      description: "Reject a booking, with the id in parameter.
+      <br /><strong>A verified email is required to perform this action.</strong>"
       operationId: rejectBooking
       tags:
         - Bookings
@@ -2442,6 +2526,16 @@ components:
         type: string
         default: ''
   responses:
+    groupNotCreator:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: You are not the creator of this group.
     invalidId:
       description: Bad request
       content:
