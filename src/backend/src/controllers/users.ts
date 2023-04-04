@@ -46,7 +46,7 @@ exports.signup = (req: express.Request, res: express.Response, _: express.NextFu
                             avatar: null,
                             hasCar,
                             gender: genderSanitized,
-                            lang: req.acceptsLanguages().find((lang) => lang in properties.languages), // detect language from browser
+                            lang: req.acceptsLanguages().find((lang) => properties.languages.includes(lang)), // detect language from browser
                             timezone: timezoneSanitized
                         }
                     }).then((user) => {
