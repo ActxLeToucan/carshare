@@ -69,15 +69,18 @@
                         >
                             {{ lang.NO_PASSENGERS }}.
                         </p>
-                        <div
+                        <button
                             v-for="passenger in trip.passengers"
+                            :id="'passenger-' + passenger.id"
+                            :ref="'passenger-' + passenger.id"
                             :key="passenger.id"
-                            :class="passenger.id == User.CurrentUser.id ? 'bg-slate-200 dark:bg-slate-600' : 'bg-slate-100 dark:bg-slate-500'"
-                            class="mx-2 rounded-md px-2 py-1 max-w-[6em] justify-center hover:max-w-[20em] transition-all"
+                            :class="passenger.id == User.CurrentUser.id ? 'bg-slate-200 dark:bg-slate-600 cursor-default' : 'bg-slate-100 dark:bg-slate-500 hover:border-slate-300 hover:dark:border-slate-400 cursor-pointer'"
+                            class="mx-2 border-2 border-transparent rounded-md px-2 py-1 max-w-[6em] justify-center hover:max-w-[20em] transition-all"
+                            @click="displayNotation(passenger)"
                         >
                             <user-icon class="w-full text-slate-600 dark:text-slate-50 w-8 h-8" />
                             <p class="text-lg text-slate-600 dark:text-slate-50 font-semibold text-center whitespace-nowrap text-ellipsis overflow-hidden"> {{ passenger.firstName + ' ' + passenger.lastName.substring(0, 1) + '.' }} </p>
-                        </div>
+                        </button>
                     </div>
                 </div>
 
@@ -87,14 +90,20 @@
                             <p class="text-xl text-slate-600 dark:text-slate-300 font-bold mx-2 mb-1 mx-auto text-center">
                                 {{ lang.DRIVER }}
                             </p>
-                            <div class="flex flex-col justify-center items-center m-2 px-2 h-20 min-w-[5em] max-w-[10em] items-center bg-white dark:bg-slate-700 rounded-md mx-auto">
+                            <button
+                                :id="'passenger-' + trip.driver.id"
+                                :ref="'passenger-' + trip.driver.id"
+                                class="flex flex-col justify-center items-center bg-white dark:bg-slate-700 m-2 px-2 h-20 min-w-[5em] max-w-[10em] items-center rounded-md mx-auto border-2 border-transparent"
+                                :class="trip.driver.id == User.CurrentUser.id ? ' cursor-default' : ' hover:border-slate-200 hover:dark:border-slate-400 cursor-pointer transition-all'"
+                                @click="displayNotation(trip.driver)"
+                            >
                                 <div class="flex w-11 h-11 mx-auto">
                                     <user-icon class="w-10 text-slate-500 dark:text-slate-400 mx-auto" />
                                 </div>
                                 <p class="text-slate-500 dark:text-slate-300 text-lg font-semibold max-w-full whitespace-nowrap text-ellipsis overflow-hidden">
                                     {{ trip.driver.firstName + " " + trip.driver.lastName.substring(0, 1) + "." }}
                                 </p>
-                            </div>
+                            </button>
                         </div>
                     </div>
 
@@ -167,6 +176,32 @@
                 :content="lang.LOADING_TRIP_DESC"
             />
         </div>
+        <div
+            id="notation-div"
+            ref="notation-div"
+            class="flex absolute bg-slate-50 border-2 border-slate-200 rounded-lg shadow-lg p-2 w-fit h-min"
+            style="display: none;"
+        >
+            <p
+                v-show="loadingNotations"
+                class="text-center text-slate-500 dark:text-slate-300 font-semibold text-lg"
+            >
+                ...
+            </p>
+            <button
+                v-for="i in [1, 2, 3, 4, 5]"
+                v-show="!loadingNotations"
+                :key="i"
+                class="inline w-7 h-7 text-slate-400 dark:text-slate-400 mx-0.5"
+                @click="setNotation(i)"
+            >
+                <star-icon v-if="currentEvaluation?.note < i || currentEvaluation == null" />
+                <star-icon-solid
+                    v-if="currentEvaluation?.note >= i"
+                    class="text-yellow-500"
+                />
+            </button>
+        </div>
     </div>
 </template>
 
@@ -177,8 +212,10 @@ import User from "../../scripts/User";
 import ButtonBlock from "../inputs/ButtonBlock.vue";
 import { Log, LogZone } from "../../scripts/Logs";
 
+import { StarIcon as StarIconSolid } from '@heroicons/vue/24/solid';
 import {
-    UserIcon
+    UserIcon,
+    StarIcon
 } from '@heroicons/vue/24/outline';
 import CardBadge from './CardBadge.vue';
 
@@ -187,7 +224,9 @@ export default {
     components: {
         ButtonBlock,
         UserIcon,
-        CardBadge
+        CardBadge,
+        StarIcon,
+        StarIconSolid
     },
     props: {
         tripId: {
@@ -209,7 +248,19 @@ export default {
         },
     },
     data() {
-        return { User, lang: Lang.CurrentLang, trip: null, startIndex: null, endIndex: null, isPast: false, state: null };
+        return {
+            User,
+            lang: Lang.CurrentLang,
+            trip: null,
+            startIndex: null,
+            endIndex: null,
+            isPast: false,
+            state: null,
+            notationDiv: null,
+            evaluatedUser: null,
+            loadingNotations: false,
+            currentEvaluation: null,
+        };
     },
     watch: {
         tripId: function (newVal, oldVal) {
@@ -307,6 +358,97 @@ export default {
                 this.endIndex = index;
             }
             this.$forceUpdate();
+        },
+        setEval(ev) {
+            this.currentEvaluation = ev;
+        },
+        displayNotation(passenger) {
+            const getElement = el => {
+                if (!el) return null;
+
+                while (!el.id.startsWith("passenger") && el.id !== "notation-div" && el.parentElement) {
+                    el = el.parentElement;
+                }
+
+                if (!el.parentElement) return null;
+                return el;
+            };
+
+            if (!passenger || passenger.id === User.CurrentUser.id) return;
+            const target = getElement(this.$el.querySelector("#passenger-" + passenger.id));
+            if (!target) return;
+
+            if (this.notationDiv == null) {
+                this.notationDiv = this.$el.querySelector("#notation-div");
+                document.body.appendChild(this.notationDiv);
+            }
+            this.notationDiv.style.display = "block";
+
+            const listener = (e) => {
+                if (getElement(e.target) == null) {
+                    this.notationDiv.style.display = "none";
+                    document.removeEventListener("click", listener);
+                }
+            };
+            document.addEventListener("click", listener);
+
+            const rect = this.notationDiv.getBoundingClientRect();
+            const trect = target.getBoundingClientRect();
+            this.notationDiv.style.top = trect.top + trect.height + 10 + "px";
+
+            const margin = 195;
+            const wantedX = trect.left + trect.width / 2 - rect.width / 2;
+            const maxX = document.body.clientWidth - margin;
+            const minX = margin;
+            this.notationDiv.style.left = Math.min(Math.max(wantedX, minX), maxX) + "px";
+
+            this.evaluatedUser = passenger;
+
+            // loading notations
+            this.loadingNotations = true;
+            API.execute_logged(API.ROUTE.NOTATIONS.MY + API.createParameters({
+                travelId: this.trip.id,
+                evaluatedId: passenger.id,
+            }), API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
+                this.setEval(res.evaluation);
+            }).catch(err => {
+                console.error(err);
+            }).finally(() => {
+                this.loadingNotations = false;
+            });
+        },
+        setNotation(n) {
+            if (this.currentEvaluation === null) {
+                API.execute_logged(API.ROUTE.NOTATIONS.MY, API.METHOD.POST, User.CurrentUser?.getCredentials(), {
+                    travelId: this.trip.id,
+                    evaluatedId: this.evaluatedUser.id,
+                    note: n,
+                }).then(res => {
+                    this.setEval(res.evaluation);
+                }).catch(err => {
+                    console.error(err);
+                }).finally(() => {
+                    this.loadingNotations = false;
+                });
+            } else {
+                if (this.currentEvaluation.note == n) {
+                    API.execute_logged(API.ROUTE.NOTATIONS.ALL + '/' + this.currentEvaluation.id, API.METHOD.DELETE, User.CurrentUser?.getCredentials()).then(res => {
+                        this.setEval(null);
+                    }).catch(err => {
+                        console.error(err);
+                    }).finally(() => {
+                        this.loadingNotations = false;
+                    });
+                } else {
+                    API.execute_logged(API.ROUTE.NOTATIONS.ALL + '/' + this.currentEvaluation.id, API.METHOD.PATCH, User.CurrentUser?.getCredentials(), {note: n}).then(res => {
+                        this.currentEvaluation.note = n;
+                    }).catch(err => {
+                        console.error(err);
+                    }).finally(() => {
+                        this.loadingNotations = false;
+                    });
+                }
+            }
         }
     },
 };

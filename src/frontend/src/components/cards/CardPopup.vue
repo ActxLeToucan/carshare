@@ -127,7 +127,7 @@ export default {
         document.body.appendChild(this.$el);
 
         this.$refs["inputs"].addEventListener("keydown", ev => {
-            if (ev.key == "Enter") this.$refs["btn-validate"].$el.click();
+            if (ev.key == "Enter") this.execOnValidate();
         });
 
         const el = this.$el;
@@ -143,7 +143,7 @@ export default {
         window.addEventListener("keydown", ev => {
             if (ev.key == "Escape") {
                 if (this.$el.classList.contains("opacity-1"))
-                    this.hide();
+                    this.execOnValidate();
             }
         });
 

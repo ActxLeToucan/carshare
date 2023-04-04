@@ -1,5 +1,5 @@
 <template>
-    <div class="flex w-fit max-w-full min-w-0">
+    <div class="flex w-fit max-w-full w-fit">
         <router-link
             v-show="_link"
             ref="btn"
