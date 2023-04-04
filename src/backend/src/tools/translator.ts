@@ -1346,6 +1346,18 @@ const notifs = {
             type: 'standard',
             createdAt: new Date()
         }),
+        deleted: (user: User, group: Group, creator: User) => msgForLang<TemplateNotif, Notif>(user.lang, {
+            title: {
+                fr: 'Groupe supprimé',
+                en: 'Group deleted'
+            },
+            message: {
+                fr: `${creator.firstName ?? ''} ${creator.lastName ?? ''} a supprimé le groupe ${group.name}.`,
+                en: `${creator.firstName ?? ''} ${creator.lastName ?? ''} deleted the group ${group.name}.`
+            },
+            type: 'standard',
+            createdAt: new Date()
+        }),
         userRemoved: (user: User, group: Group, creator: User) => msgForLang<TemplateNotif, Notif>(user.lang, {
             title: {
                 fr: 'Retiré d\'un groupe',
