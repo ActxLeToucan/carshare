@@ -106,7 +106,7 @@ npm i -g pm2
 8. Compléter le fichier `mail.config.json` avec les informations de votre serveur SMTP
 9. Initialiser la base de données
 ```bash
-npx prisma migrate dev
+npx prisma migrate deploy
 ```
 10. Lancer le serveur
 ```bash
@@ -129,3 +129,6 @@ Pour accéder à la console de pm2, exécuter la commande suivante :
 ```bash
 pm2 monit
 ```
+
+## Base de données
+![database.png](docs/database.png)
