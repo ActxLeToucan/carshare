@@ -186,8 +186,11 @@ class API {
             },
             ACCEPT: (id) => `/bookings/${id}/accept`,
             REJECT: (id) => `/bookings/${id}/reject`,
+        },
+        NOTATIONS: {
+            MY: "/notations/my",
+            ALL: "/notations",
         }
-     
     };
 
     /**
