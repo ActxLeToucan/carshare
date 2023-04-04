@@ -224,6 +224,11 @@ export default {
     TRIP_CANCELLED: "Trajet annulé avec succès",
     MARKING_TRIP_AS_FINISHED: "Fin du trajet",
     TRIP_MARKED_AS_FINISHED: "Trajet terminé avec succès",
+    MAXPASSENGERS: "Passagers maximum",
+    DESCRIPTION: "Description",
+    DELETE_TRIP: "Supprimer le trajet",
+    DELETING_TRIP: "Suppression du trajet",
+    TRIP_DELETED: "Trajet supprimé avec succès",
 
     // booking
     BOOKING_DOESNT_EXIST_ANYMORE: "Cette réservation n'existe plus.",
@@ -247,6 +252,7 @@ export default {
     SEARCH_USER: "Rechercher un utilisateur",
     ACCOUNT_DELETE_VERIFY: "Êtes-vous sûr de vouloir supprimer ce compte ?\nCette action est irréversible.",
     GROUP_DELETE_VERIFY: "Êtes-vous sûr de vouloir supprimer ce groupe ?\nCette action est irréversible.",
+    TRIP_DELETE_VERIFY: "Êtes-vous sûr de vouloir supprimer ce trajet ?\nCette action est irréversible.",
     ACCOUNT_EMAIL: "Email du compte",
     EMAIL_VERIFICATION: "Vérification de l'Email",
     EMAIL_UNMATCHING: "L'Email ne correspond pas",

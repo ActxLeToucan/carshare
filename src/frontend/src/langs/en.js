@@ -224,6 +224,11 @@ export default {
     TRIP_CANCELLED: "Trip cancelled successfully",
     MARKING_TRIP_AS_FINISHED: "Finishing trip",
     TRIP_MARKED_AS_FINISHED: "Trip finished successfully",
+    MAXPASSENGERS: "Max passangers",
+    DESCRIPTION: "Description",
+    DELETE_TRIP: "Delete trip",
+    DELETING_TRIP: "Deleting trip",
+    TRIP_DELETED: "Trip deleted successfully",
 
 
     // booking
@@ -248,6 +253,7 @@ export default {
     SEARCH_USER: "Search user",
     ACCOUNT_DELETE_VERIFY: "Are you sure you want to delete this account?\nThis action is irreversible.",
     GROUP_DELETE_VERIFY: "Are you sure you want to delete this group?\nThis action is irreversible.",
+    TRIP_DELETE_VERIFY: "Are you sure you want to delete this trip?\nThis action is irreversible.",
     ACCOUNT_EMAIL: "Account Email",
     EMAIL_VERIFICATION: "Email verification",
     EMAIL_UNMATCHING: "Emails do not match",

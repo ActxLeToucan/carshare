@@ -16,7 +16,7 @@
                     placeholder="Rechercher"
                 />
                 <button-block
-                    :action="() => { pagination.offset = 0; selectedGroup = null; search(this) }"
+                    :action="() => { pagination.offset = 0; selectedTrip = null; search(this) }"
                     :disabled="!searchBar.buttonEnabled"
                 >
                     <magnifying-glass-icon class="w-7 h-7" />
@@ -78,8 +78,93 @@
                     />
                 </svg>
             </button>
+            <div
+                    v-if="selectedTrip != null"
+                    class="md:show-up flex flex-col justify-center max-h-full min-h-0"
+                >
+                    <p class="text-2xl text-teal-500 py-2 font-bold mx-auto w-fit">
+                        {{  }}
+                    </p>
+                    <card class="flex flex-col m-4 mx-auto max-h-full min-h-0">
+                        <div class="flex flex-col min-h-0">
+                            <input-text
+                               name="driver"
+                                :label="lang.DRIVER"
+                                :placeholder="lang.DRIVER"
+                                :value="selectedTrip.driver"
+                            />
+                            <input-text
+                                    name="price"
+                                    :label="lang.PRICE"
+                                    :placeholder="lang.PRICE"
+                                    :value="selectedTrip.price +' €'"
+                            />
+                            <input-text
+                                    name="maxPassengers"
+                                    :label="lang.MAXPASSENGERS"
+                                    :placeholder="lang.MAXPASSENGERS"
+                                    :value="selectedTrip.maxPassengers"
+                            />
+                            <div
+                                v-if="selectedTrip.description.length > 0">
+                                <input-text
+                                        name="description"
+                                        :label="lang.DESCRIPTION"
+                                        :placeholder="lang.DESCRIPTION"
+                                        :value="selectedTrip.description"
+                                />
+                            </div>
+                            
+                            <p class="flex text-xl dark:text-slate-400 text-slate-500 font-bold whitespace-nowrap text-ellipsis  mb-0">
+                                steps
+                            </p>
+                             <div
+                                class=" flex flex-col items-center mx-auto w-full md:flex-col max-w-full max-h-full min-h-0 overflow-y-auto space-y-2 py-2"
+                            >
+                             <card-badge
+                                        v-for="step in selectedTrip?.steps"
+                                        :key="step.date"
+                                        class="md:w-[18em] w-[14em] my-0"
+                                        :title="step.city"
+                                        :content="step.date.substring(0, 10) +' '+step.date.substring(11, 16)"
+                                />
+                            </div>
+                        <div
+                            ref="user-log-zone"
+                            class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
+                            style="max-height: 0;"
+                        />
+                        <div class="flex md:flex-row flex-col md:space-x-4 md:space-y-0 space-y-2 mt-4">
+                            <button-block
+                                :action="showDeletePopup"
+                                color="red"
+                            >
+                                {{ lang.DELETE_TRIP }}
+                            </button-block>
+                            <div class="flex grow justify-end pl-20">
+                                <button-block :action="updateTrip">
+                                    {{ lang.EDIT }}
+                                </button-block>
+                            </div>
+                        </div>
+                            
+                           
+                        </div>
+                     
+                    </card>
+                </div>
         </div>
+           <card-popup
+                color="red"
+                :title="lang.DELETE + ' ' + selectedTrip?.id"
+                :content="lang.TRIP_DELETE_VERIFY"
+                :cancel-label="lang.CANCEL"
+                :validate-label="lang.DELETE"
+                :onload="setDeletePopup"
+                :onvalidate="deleteTrip"
+            />
     </div>
+    
 </template>
 
 <script>
@@ -121,6 +206,8 @@ function search(obj) {
         obj.searchBar.buttonEnabled = true;
     });
 
+   
+
 }
 export default {
     name: 'AdminTrips',
@@ -140,7 +227,7 @@ export default {
         return {
             User,
             trips: [],
-            selectedGroup: null,
+            selectedTrip: null,
             isMobile: window.innerWidth < 768,
             genres,
             levels,
@@ -199,8 +286,17 @@ export default {
             }
             this.displayedPage = page || this.displayedPage;
         },
-        onCardClicked(group) {
-            this.selectedGroup = group;
+        onCardClicked(trip) {
+            this.selectedTrip = trip;  
+            API.execute_logged(API.ROUTE.TRAVELS.GET + '/' + this.selectedTrip.id , API.METHOD.GET, User.CurrentUser?.getCredentials()).then((data) => {
+                this.selectedTrip = data;
+                console.log('trips', this.selectedTrip)
+                
+            }).catch((err) => {
+                console.log(err)
+            }).finally(() => {
+               
+            });
             this.displayPage(PAGE.RESULTS);
         },
         searchLog(msg, type = Log.INFO) {
@@ -212,9 +308,6 @@ export default {
         search() {
             return search(this);
         },
-        updateGroup() { // TODO : When the route will be available
-
-        },
         groupLog(msg, type = Log.INFO) {
             if (!this.userLogZone) {
                 this.userLogZone = new LogZone(this.$refs["user-log-zone"]);
@@ -223,6 +316,32 @@ export default {
             const log = new Log(msg, type);
             log.attachTo(this.userLogZone);
             return log;
+        },
+        setDeletePopup(popup) {
+            this.deletePopup = popup;
+        },
+          showDeletePopup() {
+            this.deletePopup.setTitle(this.lang.DELETE + ' ' );
+            this.deletePopup.show();
+        },
+        deleteTrip(popup) {
+            popup.setTitle(this.lang.DELETE + ' ' + this.selectedGroup?.name);
+
+            const log = popup.log(Lang.CurrentLang.DELETING_TRIP + "...", Log.INFO);
+            API.execute_logged(API.ROUTE.TRAVELS.GET + "/" + this.selectedTrip.id, API.METHOD.DELETE, User.CurrentUser?.getCredentials()).then((data) => {
+                log.update(Lang.CurrentLang.TRIPP_DELETED, Log.SUCCESS);
+                this.displayPage(PAGE.QUERY);
+                this.trips.splice(this.trips.indexOf(this.selectedTrip), 1);
+                this.selectedTrip = null;
+                setTimeout(() => {
+                    log.delete();
+                    popup.hide();
+                }, 2000);
+            }).catch(err => {
+                setTimeout(() => {
+
+                }, 4000);
+            });
         },
 
     }
