@@ -2017,6 +2017,41 @@ paths:
         '500':
           $ref: '#/components/responses/internalError'
   /notations/:id:
+    get:
+      summary: Get an evaluation
+      description: Get the evaluation, with the id in parameter
+      operationId: getEvaluation
+      tags:
+        - Notations
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - name: id
+          in: path
+          description: The id of the evaluation to get
+          required: true
+          schema:
+            type: integer
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  evaluation:
+                    $ref: '#/components/schemas/EvaluationCreate'
+        '400':
+          $ref: '#/components/responses/invalidId'
+        '401':
+          $ref: '#/components/responses/noToken'
+        '404':
+          $ref: '#/components/responses/evaluationNotFound'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
     delete:
       summary: Delete an evaluation
       description: Delete the evaluation, with the id in parameter

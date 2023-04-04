@@ -202,6 +202,32 @@ exports.createEvaluation = (req: express.Request, res: express.Response, _: expr
     });
 }
 
+exports.getEvaluation = (req: express.Request, res: express.Response, _: express.NextFunction) => {
+    const { travelId, evaluatedId } = req.query;
+
+    const travelIdNbr = sanitizer.id(travelId, true, req, res);
+    if (travelIdNbr === null) return;
+
+    const evaluatedIdNbr = sanitizer.id(evaluatedId, true, req, res);
+    if (evaluatedIdNbr === null) return;
+
+
+    prisma.evaluation.findMany({
+        where: {
+            travelId: travelIdNbr,
+            evaluatedId: evaluatedIdNbr,
+            evaluatorId: res.locals.user.id
+        }
+    }).then((evaluations) => {
+        res.status(200).json({
+            evaluation: evaluations.length > 0 ? evaluations[0] : null
+        });
+    }).catch((err) => {
+        console.error(err);
+        sendMsg(req, res, error.generic.internalError);
+    });
+}
+
 exports.editEvaluation = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { note } = req.body;
     const evaluationId = sanitizer.id(req.params.id, true, req, res);
