@@ -1,41 +1,40 @@
 <template>
-    <div class="flex md:flex-row flex-col grow max-h-full min-h-0">
+     <div class="flex md:flex-row flex-col grow max-h-full max-w-full min-h-0">
         <div
             ref="query-zone"
-            class="flex flex-col items-center h-full md:w-min w-full px-8 py-4 space-y-4 md:border-r-8 border-teal-500 mx-auto overflow-hidden"
+            class="flex flex-col items-center h-full max-h-full md:w-min w-full min-w-0 max-w-full p-4 md:border-r-8 border-teal-500 mx-auto overflow-hidden"
         >
             <p class="text-2xl text-teal-500 py-2 font-bold mx-auto">
                 {{ lang.TRIPS }}
             </p>
-             <p class="text-lg text-slate-500 pt-2 font-semibold mx-auto">
-                    {{ lang.SEARCH_TRIP }}
+            <p class="text-lg text-slate-500 pt-2 font-semibold mx-auto">
+                {{ lang.SEARCH_TRIP }}
             </p>
-               <div class="flex max-w-full min-w-0 items-center space-x-2">
+            <div class="flex max-w-full min-w-0 items-center space-x-2">
                 <input-text
                     class="w-full flex grow"
                     placeholder="Rechercher"
                 />
                 <button-block
-                    :action="search"
+                    :action="() => { pagination.offset = 0; selectedGroup = null; search(this) }"
                     :disabled="!searchBar.buttonEnabled"
                 >
                     <magnifying-glass-icon class="w-7 h-7" />
                 </button-block>
             </div>
             <div
-                    ref="search-log-zone"
-                    class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
-                    style="max-height: 0;"
+                ref="search-log-zone"
+                class="flex flex-col w-full items-center h-fit overflow-hidden transition-all"
+                style="max-height: 0;"
             />
-            <div class="flex grow w-full flex-col px-8 space-y-4 pt-4 max-w-full min-w-0">
-                    <admin-trip-card
-                        v-for="trip in trips"
-                        :key="trip?.id"
-                        class="min-w-0 w-full show-up"
-                        :data="trip"
-                        @click="selectTrip(trip)"
-                        :onclick="onCardClicked"
-                    />
+            <div class="flex grow w-full flex-col px-8 space-y-4 pt-4 max-w-full min-w-0 overflow-y-auto">
+                <admin-trip-card
+                    v-for="trip in trips"
+                    :key="trip?.id"
+                    class="min-w-0 w-full show-up max-w-[20em] mx-auto"
+                    :data="trip"
+                    :onclick="onCardClicked"
+                />
             </div>
             <div class="flex w-full justify-evenly items-center mt-4">
                 <button-block
@@ -55,13 +54,14 @@
                 </button-block>
             </div>
         </div>
+               
         <div
             ref="result-zone"
-            class="flex flex-col grow overflow-scroll"
+            class="flex flex-col grow overflow-auto"
         >
             <button
-                ref="backtabs-btn"
-                class="absolute md:hidden flex rounded-md border-2 border-slate-200 bg-white h-fit w-fit p-2 m-4"
+                ref="backbtn"
+                class="absolute md:hidden flex rounded-md border-2 border-slate-200 bg-white h-fit w-fit p-1 m-2"
             >
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -69,7 +69,7 @@
                     viewBox="0 0 24 24"
                     stroke-width="1.5"
                     stroke="currentColor"
-                    class="w-8 h-8"
+                    class="w-7 h-7"
                 >
                     <path
                         stroke-linecap="round"
@@ -78,8 +78,6 @@
                     />
                 </svg>
             </button>
-
-            <div class="flex grow" />
         </div>
     </div>
 </template>
@@ -89,59 +87,145 @@ import User from '../../scripts/User.js';
 import API from '../../scripts/API.js';
 import InputText from '../inputs/InputText.vue';
 import ButtonBlock from '../inputs/ButtonBlock.vue';
+import AdminGroupCard from './AdminGroupCard.vue';
 import AdminTripCard from './AdminTripCard.vue';
 import CardPopup from '../cards/CardPopup.vue';
 import CardBadge from '../cards/CardBadge.vue';
 import Card from '../cards/CardBorder.vue';
 import { Log, LogZone } from '../../scripts/Logs.js';
-import { genres, isPhoneNumber, levels } from '../../scripts/data';
-
+import { genres, levels } from '../../scripts/data';
 import {
     MagnifyingGlassIcon,
-     ChevronRightIcon,
+    ChevronRightIcon,
     ChevronLeftIcon
-} from '@heroicons/vue/24/outline';
-import { getTypedValue } from '../../scripts/data.js';
+}from '@heroicons/vue/24/outline';
 import Lang from "../../scripts/Lang";
-import re from "../../scripts/Regex";
 
+const PAGE = { QUERY: 1, RESULTS: 2 };
+
+function search(obj) {
+    obj.searchBar.buttonEnabled = false;
+    const log = obj.searchLog(Lang.CurrentLang.SEARCHING + "...", Log.INFO);
+
+    const value = obj.$refs['query-zone'].querySelector('input').value;
+
+    API.execute_logged(API.ROUTE.TRAVELS.GET + obj.pagination + "&query=" + value, API.METHOD.GET, User.CurrentUser?.getCredentials(), { search: value }).then((data) => {
+        obj.trips = data.data;
+        obj.pagination.total = data.total;
+        console.log('rien' , data)
+        log.delete();
+    }).catch((err) => {
+        log.update(Lang.CurrentLang.ERROR + " : " + err.message, Log.ERROR);
+        setTimeout(() => { log.delete(); }, 4000);
+    }).finally(() => {
+        obj.searchBar.buttonEnabled = true;
+    });
+
+}
 export default {
     name: 'AdminTrips',
     components: {
-       InputText,
+     InputText,
         ButtonBlock,
+        AdminGroupCard,
         AdminTripCard,
         CardPopup,
         Card,
         CardBadge,
         MagnifyingGlassIcon,
         ChevronRightIcon,
-        ChevronLeftIcon,
-        selectedTrip: null,
+        ChevronLeftIcon
     },
     data() {
         return {
-            User, lang: Lang.CurrentLang,
+            User,
+            trips: [],
+            selectedGroup: null,
+            isMobile: window.innerWidth < 768,
+            genres,
+            levels,
+            lang: Lang.CurrentLang,
             pagination: API.createPagination(0, 5),
+            formUser: {
+                buttonEnabled: true,
+            },
             searchBar: {
                 buttonEnabled: true,
             },
-              trips: [],
+            groupName: '',
         }
     },
     mounted() {
         Lang.AddCallback(lang => this.lang = lang);
+         const backbtn = this.$refs['backbtn'];
+        backbtn.addEventListener('click', () => {
+            this.displayPage(PAGE.QUERY);
+        });
+
+        this.searchLogZone = new LogZone(this.$refs["search-log-zone"]);
+
+        this.displayPage(PAGE.QUERY);
+        window.addEventListener("resize", _ => {
+            this.isMobile = window.innerWidth < 768;
+            this.displayPage();
+        });
+
+        this.pagination.onChanged(() => {
+            this.search();
+        });
     },
     methods: {
-          selectTrip(trip) {
-            this.selectedTrip = trip;
-        },
-        onCardClicked() {
-            this.futurePagination.next();
-            this.fetchFutureTrips();
-        },
+      
+        displayPage(page) {
+            const queryZone = this.$refs['query-zone'];
+            const resultZone = this.$refs['result-zone'];
+            if (!queryZone || !resultZone) return;
+            if (!page) page = this.displayedPage;
 
+            if (this.isMobile) {
+                switch (page) {
+                    case PAGE.QUERY:
+                        queryZone.classList.remove('hidden');
+                        resultZone.classList.add('hidden');
+                        break;
+                    case PAGE.RESULTS:
+                        queryZone.classList.add('hidden');
+                        resultZone.classList.remove('hidden');
+                        break;
+                }
+            } else {
+                queryZone.classList.remove('hidden');
+                resultZone.classList.remove('hidden');
+            }
+            this.displayedPage = page || this.displayedPage;
+        },
+        onCardClicked(group) {
+            this.selectedGroup = group;
+            this.displayPage(PAGE.RESULTS);
+        },
+        searchLog(msg, type = Log.INFO) {
+            if (!this.searchLogZone) return;
+            const log = new Log(msg, type);
+            log.attachTo(this.searchLogZone);
+            return log;
+        },
+        search() {
+            return search(this);
+        },
+        updateGroup() { // TODO : When the route will be available
+
+        },
+        groupLog(msg, type = Log.INFO) {
+            if (!this.userLogZone) {
+                this.userLogZone = new LogZone(this.$refs["user-log-zone"]);
+                if (!this.userLogZone) return;
+            }
+            const log = new Log(msg, type);
+            log.attachTo(this.userLogZone);
+            return log;
+        },
 
     }
 }
+
 </script>
