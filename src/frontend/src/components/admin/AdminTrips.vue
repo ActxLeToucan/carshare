@@ -290,7 +290,7 @@ export default {
             this.selectedTrip = trip;  
             API.execute_logged(API.ROUTE.TRAVELS.GET + '/' + this.selectedTrip.id , API.METHOD.GET, User.CurrentUser?.getCredentials()).then((data) => {
                 this.selectedTrip = data;
-                console.log('trips', this.selectedTrip)
+                console.log('trips', this.selectedTrip.driver.firstName)
                 
             }).catch((err) => {
                 console.log(err)
