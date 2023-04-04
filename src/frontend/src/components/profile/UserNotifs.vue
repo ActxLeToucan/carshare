@@ -201,12 +201,17 @@ export default {
         this.logZones = {};
 
         this.tripPreview = this.$refs["trip-view"];
+
+        const interval = setInterval(() => {
+            if (window.location.hash !== "#notifs") return;
+            this.refreshNotifs();
+        }, 4000);
     },
     methods: {
         getNotifs() {
             this.loading = true;
             API.execute_logged(
-                API.ROUTE.MY_NOTIFS + API.createPagination(this.next),
+                API.ROUTE.MY_NOTIFS + API.createPagination(10), // Max 10 nouvelles notifs par requête (ca devrait aller)
                 API.METHOD.GET,
                 User.CurrentUser?.getCredentials()
             ).then((data) => {
@@ -328,6 +333,22 @@ export default {
             this.travelId = travelId;
             this.tripPreview?.show();
         },
+        refreshNotifs() {
+            const displayedCount = this.next;
+            API.execute_logged(
+                API.ROUTE.MY_NOTIFS + API.createPagination(0, displayedCount),
+                API.METHOD.GET,
+                User.CurrentUser?.getCredentials()
+            ).then((data) => {
+                if (data.data.length > displayedCount) {
+                    this.upsertNotifs(...data.data);
+                    window.topbar?.fetchNotifs();
+                }
+            }).catch((err) => {
+                this.error = err.message;
+                this.notifs = [];
+            });
+        }
     },
 };
 </script>
