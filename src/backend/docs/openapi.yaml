@@ -1,9 +1,8 @@
-# TODO: verifier que toutes les routes soient là
 openapi: 3.0.3
 info:
   title: Car Share API
   description: This is the API for the Car Share project.
-  version: 0.4.0 # TODO: Update version number
+  version: 1.0.0
   contact:
     name: Car Share, backend team
     email: 'contoux1u@etu.univ-lorraine.fr'
@@ -830,6 +829,7 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
+
   /travels/my:
     get:
       summary: My travels
@@ -897,6 +897,7 @@ paths:
           $ref: '#/components/responses/invalidToken'
         '500':
           $ref: '#/components/responses/internalError'
+
   /travels/my/:id:
     delete:
       summary: Cancel my travel
@@ -1028,6 +1029,49 @@ paths:
                   message:
                     type: string
                     example: "You are not the driver of this travel."
+        '404':
+          $ref: '#/components/responses/travelNotFound'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+
+  /travels/my/:id/end:
+    patch:
+      summary: End my travel
+      description: "End a travel of the current user.
+      <br /><strong>A verified email is required to perform this action.</strong>"
+      operationId: endMyTravel
+      tags:
+        - Travels
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - name: id
+          in: path
+          description: Travel id
+          required: true
+          schema:
+            type: integer
+            example: 1
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Travel ended
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Travel ended"
+        '400':
+          $ref: '#/components/responses/invalidId'
+        '401':
+          $ref: '#/components/responses/noToken'
+        '403':
+          $ref: '#/components/responses/notDriver'
         '404':
           $ref: '#/components/responses/travelNotFound'
         '498':
@@ -1276,6 +1320,50 @@ paths:
                   message:
                     type: string
                     example: "Travel cancelled"
+        '400':
+          $ref: '#/components/responses/invalidId'
+        '401':
+          $ref: '#/components/responses/noToken'
+        '403':
+          $ref: '#/components/responses/insufficientPrivileges'
+        '404':
+          $ref: '#/components/responses/travelNotFound'
+        '498':
+          $ref: '#/components/responses/invalidToken'
+        '500':
+          $ref: '#/components/responses/internalError'
+
+  /travels/:id/end:
+    patch:
+      summary: End travel (admin)
+      description: "End a travel with the given id. Only available to admins.
+      <br /><strong>A verified email is required to perform this action.</strong>"
+      operationId: endTravel
+      tags:
+        - Travels
+        - Admin
+      parameters:
+        - $ref: '#/components/parameters/Accept-Language'
+        - name: id
+          in: path
+          description: Travel id
+          required: true
+          schema:
+            type: integer
+            example: 1
+      security:
+        - bearerAuth: [ ]
+      responses:
+        '200':
+          description: Travel ended
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Travel ended"
         '400':
           $ref: '#/components/responses/invalidId'
         '401':
@@ -2118,19 +2206,38 @@ paths:
         - bearerAuth: [ ]
       responses:
         '200':
+          description: The evaluation
           content:
             application/json:
               schema:
                 type: object
                 properties:
                   evaluation:
-                    $ref: '#/components/schemas/EvaluationCreate'
+                    type: object
+                    nullable: true
+                    properties:
+                      id:
+                        type: integer
+                        example: 2
+                      note:
+                        type: integer
+                        example: 4
+                      travel:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Travel'
+                      evaluator:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/PrivateUser'
+                      evaluated:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/PrivateUser'
         '400':
           $ref: '#/components/responses/invalidId'
         '401':
           $ref: '#/components/responses/noToken'
-        '404':
-          $ref: '#/components/responses/evaluationNotFound'
         '498':
           $ref: '#/components/responses/invalidToken'
         '500':

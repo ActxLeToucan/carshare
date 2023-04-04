@@ -794,7 +794,7 @@ const info = {
         ended: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Trajet terminé',
-                en: 'Travel done'
+                en: 'Travel ended'
             },
             code: 200
         })

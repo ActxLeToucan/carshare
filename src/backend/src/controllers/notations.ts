@@ -206,12 +206,11 @@ exports.createEvaluation = (req: express.Request, res: express.Response, _: expr
 exports.getEvaluation = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { travelId, evaluatedId } = req.query;
 
-    const travelIdNbr = sanitizer.id(travelId, true, req, res);
+    const travelIdNbr = sanitizer.id(travelId, true, req, res, 'travelId');
     if (travelIdNbr === null) return;
 
-    const evaluatedIdNbr = sanitizer.id(evaluatedId, true, req, res);
+    const evaluatedIdNbr = sanitizer.id(evaluatedId, true, req, res, 'evaluatedId');
     if (evaluatedIdNbr === null) return;
-
 
     prisma.evaluation.findMany({
         where: {
