@@ -5,8 +5,6 @@ import { prisma } from '../app';
 import { type Pagination, preparePagination } from './_common';
 import * as _group from './groups/_common';
 import sanitizer from '../tools/sanitizer';
-import properties from '../properties';
-
 
 exports.createGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { name } = req.body;
@@ -37,8 +35,6 @@ exports.getMyGroups = (req: express.Request, res: express.Response, next: expres
         creatorId: res.locals.user.id
     }));
 }
-
-
 
 exports.modifyNameGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const groupName = req.body.groupName;
@@ -317,4 +313,3 @@ exports.deleteGroup = (req: express.Request, res: express.Response, _: express.N
 exports.deleteMyGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     _group.deleteGroup(req, res, false)
 }
-

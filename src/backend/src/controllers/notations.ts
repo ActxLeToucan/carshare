@@ -211,7 +211,6 @@ exports.getEvaluation = (req: express.Request, res: express.Response, _: express
     const evaluatedIdNbr = sanitizer.id(evaluatedId, true, req, res);
     if (evaluatedIdNbr === null) return;
 
-
     prisma.evaluation.findMany({
         where: {
             travelId: travelIdNbr,

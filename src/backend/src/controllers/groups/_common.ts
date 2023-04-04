@@ -1,9 +1,6 @@
 import type express from 'express';
-import validator from '../../tools/validator';
 import { prisma } from '../../app';
 import { error, info, notifs, notify, sendMsg } from '../../tools/translator';
-import { getMaxPassengers } from '../_common';
-import { type Booking, type Step } from '@prisma/client';
 import properties from '../../properties';
 import sanitizer from '../../tools/sanitizer';
 
@@ -32,11 +29,10 @@ function deleteGroup (req: express.Request, res: express.Response, asAdmin: bool
             }
             prisma.travel.updateMany({
                 where: {
-                    groupId: groupId
+                    groupId
                 },
                 data: { status: properties.travel.status.cancelled }
             }).then(() => {
-
                 prisma.group.delete({
                     where: { id: groupId },
                     include: {
@@ -73,10 +69,9 @@ function deleteGroup (req: express.Request, res: express.Response, asAdmin: bool
                 sendMsg(req, res, error.generic.internalError);
             });
         }).catch((err) => {
-        console.error(err);
-        sendMsg(req, res, error.generic.internalError);
-    });
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
 }
-
 
 export { deleteGroup };
