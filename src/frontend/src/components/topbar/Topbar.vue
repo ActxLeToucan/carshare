@@ -88,7 +88,6 @@ import ButtonText from '../inputs/ButtonText.vue';
 import ButtonBlock from '../inputs/ButtonBlock.vue';
 import User from '../../scripts/User.js';
 import Lang from '../../scripts/Lang';
-import { goTo } from '../../scripts/redirects';
 
 import {
     BellIcon
