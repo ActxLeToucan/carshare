@@ -363,6 +363,7 @@ export default {
             this.currentEvaluation = ev;
         },
         displayNotation(passenger) {
+            if (this.trip.status !== 1) return;
             const getElement = el => {
                 if (!el) return null;
 
