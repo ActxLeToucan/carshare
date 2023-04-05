@@ -361,7 +361,8 @@ function deleteGroup (req: express.Request, res: express.Response, asAdmin: bool
                 prisma.group.delete({
                     where: { id: groupId },
                     include: {
-                        users: true
+                        users: true,
+                        creator: true
                     }
                 }).then((group) => {
                     const data = group.users.map((user) => {
@@ -380,6 +381,26 @@ function deleteGroup (req: express.Request, res: express.Response, asAdmin: bool
                             // send email notification
                             if (user !== undefined) notify(user, notif);
                         }
+
+                        if (asAdmin) {
+                            const notifC = notifs.group.deleted(group.creator, group, res.locals.user, asAdmin);
+
+
+                            prisma.notification.create({
+                                data: {
+                                    ...notifC,
+                                    userId: group.creator.id,
+                                    senderId: Number(res.locals.user.id),
+                                }
+                            }).then(() => {
+                                notify(group.creator, notifC);
+                            }).catch((err) => {
+                                console.error(err);
+                                sendMsg(req, res, error.generic.internalError);
+                            });
+
+                        }
+
                         sendMsg(req, res, info.group.deleted);
                     }).catch((err) => {
                         console.error(err);
