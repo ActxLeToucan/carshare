@@ -36,7 +36,7 @@
                         <button
                             v-for="group in groups"
                             :key="group.id"
-                            class="flex flex-col justify-center py-4 my-4 rounded-lg bg-slate-100 dark:bg-slate-700 px-4 border-2 border-transparent hover:border-slate-200 hover:border-slate-600 cursor-pointer transition-all"
+                            class="flex flex-col justify-center py-4 my-4 md:max-w-[25em] max-w-[15em] rounded-lg bg-slate-100 dark:bg-slate-700 px-4 border-2 border-transparent hover:border-slate-200 hover:border-slate-600 cursor-pointer transition-all"
                             @click="showGroup(group)"
                         >
                             <p class="text-xl md:text-2xl text-slate-500 dark:text-slate-300 font-bold mx-auto whitespace-nowrap text-ellipsis overflow-x-hidden max-w-full">
