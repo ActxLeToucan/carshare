@@ -263,11 +263,17 @@ export default {
 
         if (User.CurrentUser == null) return;
         API.execute_logged(API.ROUTE.ME, API.METHOD.GET, User.CurrentUser?.getCredentials()).then(res => {
-            User.CurrentUser?.setInformations(res);
-            User.CurrentUser?.save();
+            if (User.CurrentUser == null) {
+                new User(res).save();
+                return;
+            } else {
+                User.CurrentUser.setInformations(res);
+                User.CurrentUser.save();
+            }
 
-            const fields = ["lastName", "firstName", "email", "phone", "gender", "hasCar"];
+            const fields = ["lastName", "firstName", "email", "phone", "gender", "hasCar", "emailVerifiedOn", "lang", "level", "timezone"];
             fields.forEach(field => setInputValue(field, User.CurrentUser[field]));
+            this.emailVerified = (User.CurrentUser?.emailVerifiedOn != null).toString();
 
         }).catch(err => {
             console.error(err);
@@ -351,6 +357,7 @@ export default {
                 if (!result) {
                     log.update(check.error, Log.WARNING);
                     setTimeout(() => { log.delete(); }, 4000);
+                    this.formPassword.buttonEnabled = true;
                     return;
                 }
             }
@@ -396,6 +403,7 @@ export default {
                 if (!result) {
                     log.update(check.error, Log.WARNING);
                     setTimeout(() => { log.delete(); }, 4000);
+                    this.formProperties.buttonEnabled = true;
                     return;
                 }
             }
@@ -414,6 +422,7 @@ export default {
                     User.CurrentUser[prop] = data.user[prop];
                 }
                 User.CurrentUser.save();
+                this.emailVerified = 'false';
                 log.update(Lang.CurrentLang.INFORMATIONS_CHANGED, Log.SUCCESS);
                 setTimeout(() => { log.delete(); }, 2000);
             }).catch(err => {

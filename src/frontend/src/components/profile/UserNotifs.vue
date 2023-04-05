@@ -218,7 +218,6 @@ export default {
                 API.METHOD.GET,
                 User.CurrentUser?.getCredentials()
             ).then((data) => {
-                console.log(data)
                 this.upsertNotifs(...data.data);
                 this.next = data.next;
                 this.minorLoading = true;
