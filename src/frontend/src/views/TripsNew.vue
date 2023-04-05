@@ -437,7 +437,7 @@ export default {
                 this.$el.querySelector("input[name=trip-type]").value = this.selectedTripType;
                 this.$el.querySelector("input[name=trip-slots]").value = trip.maxPassengers;
                 this.$el.querySelector("input[name=trip-price]").value = trip.price;
-                this.$el.querySelector("textarea[name=trip-infos]").innerHTML = trip.description;
+                this.$el.querySelector("textarea[name=trip-infos]").innerText = trip.description;
                 this.oldTrip = Object.assign({}, trip);
             }).catch(err => {
                 console.error(err);
@@ -558,7 +558,14 @@ export default {
             if (!data) return false;
             let startDate = "";
 
-            const stylize = str => `<span class="text-slate-600 dark:text-slate-200 font-bold">${str}</span>`;
+            const stylize = str => {
+                if (!str) return "";
+                
+                const span = document.createElement("span");
+                span.classList.add("text-slate-600", "dark:text-slate-200", "font-bold");
+                span.innerText = str;
+                return span.outerHTML;
+            };
             const getDate = date => {
                 if (!date) return undefined;
                 const strDate = new Date(date).toLocaleDateString();
@@ -567,8 +574,13 @@ export default {
             };
             const getTime = date => !date ? undefined: new Date(date).toLocaleTimeString().substring(0, 5);
             const formatString = (str, ...args) => {
+                let shouldStylize = true;
+                if (typeof args[args.length -1] === 'boolean' && args[args.length -1] === false)
+                    shouldStylize = false;
                 return str.replace(/\{(\d+)\}/g, (match, number) => {
-                    return stylize(typeof args[number] != 'undefined' ? args[number] : match);
+                    return shouldStylize
+                        ? stylize(typeof args[number] != 'undefined' ? args[number] : match)
+                        : ( typeof args[number] != 'undefined' ? args[number] : match);
                 });
             }
 
@@ -619,7 +631,8 @@ export default {
 
             desc += formatString(
                 data.description == ""? Lang.CurrentLang.CONFIRM_TRIP_NO_INFOS+".": Lang.CurrentLang.CONFIRM_TRIP_INFOS,
-                "\n" + data.description.split("\n").map(l => stylize(l)).join("\n")
+                "\n" + data.description.split("\n").map(l => stylize(l)).join("\n"),
+                false
             );
 
             const lines = desc.split("\n");

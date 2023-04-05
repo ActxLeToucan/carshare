@@ -112,7 +112,7 @@
                             <p class="text-xl text-slate-600 dark:text-slate-300 font-bold mx-2 mb-1 mx-auto text-center">
                                 {{ lang.PRICE }}
                             </p>
-                            <div class="flex flex-col justify-center items-center m-2 h-20 w-20 items-center bg-white dark:bg-slate-700 rounded-md mx-auto">
+                            <div class="flex flex-col justify-center items-center m-2 p-2 h-20 min-w-20 w-fit items-center bg-white dark:bg-slate-700 rounded-md mx-auto">
                                 <p class="text-slate-500 dark:text-slate-300 text-2xl font-bold">
                                     {{ trip.price + " €" }}
                                 </p>

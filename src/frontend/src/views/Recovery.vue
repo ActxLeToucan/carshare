@@ -36,7 +36,7 @@ import API from '../scripts/API';
 import Lang from '../scripts/Lang';
 
 const field_checks = [
-    {field: "email",            check: (value) => value.length > 0, error: lang.EMAIL_SPECIFY}
+    {field: "email",            check: (value) => value.length > 0, error: Lang.CurrentLang.EMAIL_SPECIFY}
 ];
 
 function onCancel(modal) {

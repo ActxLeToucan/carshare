@@ -1,5 +1,5 @@
 <template>
-    <div class="flex grow flex-col">
+    <div class="flex grow flex-col max-w-full">
         <topbar />
         <div class="flex grow flex-col">
             <div class="show-down relative flex w-full min-h-[60vh] bg-teal-500">
@@ -135,7 +135,7 @@
                 </div>
             </div>
 
-            <div class="flex flex-col grow min-h-[50vh] w-full justify-center items-center md:mt-0 mt-48">
+            <div class="flex flex-col grow min-h-[50vh] w-full md:mt-0 mt-48">
                 <div
                     ref="log-zone"
                     class="flex flex-col w-full justify-center items-center min-h-max h-max transition-all"
@@ -171,13 +171,15 @@
                     </card-border>
                 </div>
 
-                <trip-card
-                    v-for="trip in trips"
-                    :key="trip.id"
-                    :trip="trip"
-                    class="mx-auto"
-                    @click="selectTrip(trip.id)"
-                />
+                <div class="flex md:flex-row flex-col grow wrap p-2 justify-center h-fit max-w-full mt-16">
+                    <trip-card
+                        v-for="trip in trips"
+                        :key="trip.id"
+                        :trip="trip"
+                        class="md:m-8 m-4"
+                        @click="selectTrip(trip.id)"
+                    />
+                </div>
             </div>
         </div>
         <card-popup
