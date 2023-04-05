@@ -53,7 +53,7 @@
                     <card-border
                         v-for="notif in notifs"
                         :key="notif.id"
-                        class="py-4 my-4 rounded-lg px-4 hover:bg-slate-100 hover:dark:bg-slate-700 hover:dark:border-slate-600 transition-all w-full text-left text-slate-600 dark:text-slate-300"
+                        class="show-down py-4 my-4 rounded-lg px-4 hover:bg-slate-100 hover:dark:bg-slate-700 hover:dark:border-slate-600 transition-all w-full text-left text-slate-600 dark:text-slate-300"
                     >
                         <div class="w-full">
                             <button-block
@@ -75,11 +75,11 @@
                             </p>
                             <div
                                 v-if="notif.type === 'request' || notif.travelId"
-                                class="flex-wrap align-middle mt-4 items-center"
+                                class="flex md:flex-row flex-col mt-4 md:items-center"
                             >
                                 <button-block
                                     v-if="notif.travelId"
-                                    class="inline-block"
+                                    class="inline-block mb-2"
                                     :disabled="notif.locked"
                                     :action="() => showTravel(notif.travelId)"
                                 >
@@ -87,18 +87,21 @@
                                 </button-block>
                                 <div
                                     v-if="notif.travelId && notif.type === 'request'"
-                                    class="inline-block border-l-2 border-slate-400 dark:border-slate-600 h-4 mx-4"
+                                    class="md:flex hidden inline-block border-l-2 border-slate-400 dark:border-slate-600 h-4 mx-4"
                                 />
-                                <span v-if="notif.type === 'request'">
+                                <span
+                                    v-if="notif.type === 'request'"
+                                    class="flex md:flex-row flex-col"
+                                >
                                     <button-block
-                                        class="inline-block mt-2 mr-4"
+                                        class="inline-block mb-2 mr-4"
                                         :disabled="notif.locked"
                                         :action="() => acceptOrReject(notif, true)"
                                     >
                                         {{ lang.ACCEPT }}
                                     </button-block>
                                     <button-block
-                                        class="inline-block mt-2"
+                                        class="inline-block"
                                         color="red"
                                         :disabled="notif.locked"
                                         :action="() => acceptOrReject(notif, false)"
@@ -211,10 +214,11 @@ export default {
         getNotifs() {
             this.loading = true;
             API.execute_logged(
-                API.ROUTE.MY_NOTIFS + API.createPagination(10), // Max 10 nouvelles notifs par requête (ca devrait aller)
+                API.ROUTE.MY_NOTIFS + API.createPagination(this.next),
                 API.METHOD.GET,
                 User.CurrentUser?.getCredentials()
             ).then((data) => {
+                console.log(data)
                 this.upsertNotifs(...data.data);
                 this.next = data.next;
                 this.minorLoading = true;
@@ -336,7 +340,7 @@ export default {
         refreshNotifs() {
             const displayedCount = this.next;
             API.execute_logged(
-                API.ROUTE.MY_NOTIFS + API.createPagination(0, displayedCount),
+                API.ROUTE.MY_NOTIFS + API.createPagination(0, 10), // Max 10 nouvelles notifs par requête (ca devrait aller)
                 API.METHOD.GET,
                 User.CurrentUser?.getCredentials()
             ).then((data) => {
