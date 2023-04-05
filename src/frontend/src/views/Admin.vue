@@ -114,6 +114,9 @@ export default {
             this.isMobile = window.innerWidth < 768;
             this.setupView();
         });
+
+        if (User.CurrentUser == null) return;
+        if (User.CurrentUser.level < 1) this.$router.push({ name: 'Main' });
     },
     methods: {
         setupView() {
