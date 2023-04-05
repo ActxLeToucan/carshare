@@ -273,13 +273,13 @@ exports.searchUsers = (req: express.Request, res: express.Response, _: express.N
     prisma.$queryRaw`SELECT COUNT(*) AS count
                      FROM user
                      WHERE IF(${pagination.query !== undefined}, email LIKE ${q}
-                        OR (IF(${asAdmin}, phone LIKE ${q}, FALSE)))
+                        OR (IF(${asAdmin}, phone LIKE ${q}, FALSE))
                         OR CONCAT(firstName, ' ', lastName) LIKE ${q}, TRUE)`
         .then((count: any) => {
             prisma.$queryRaw`SELECT *
                      FROM user
                      WHERE IF(${pagination.query !== undefined}, email LIKE ${q}
-                         OR (IF(${asAdmin}, phone LIKE ${q}, FALSE)))
+                         OR (IF(${asAdmin}, phone LIKE ${q}, FALSE))
                          OR CONCAT(firstName, ' ', lastName) LIKE ${q}, TRUE)
                      LIMIT ${pagination.pagination.take} OFFSET ${pagination.pagination.skip}`
                 .then(users => {
