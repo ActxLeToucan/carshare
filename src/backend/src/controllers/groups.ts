@@ -132,7 +132,7 @@ exports.searchGroups = (req: express.Request, res: express.Response, next: expre
 function getGroups (req: express.Request, res: express.Response, next: express.NextFunction, searchMode: boolean, where: (pagination: Pagination) => any) {
     const pagination = preparePagination(req, searchMode);
 
-    prisma.group.count().then((count) => {
+    prisma.group.count({ where: where(pagination) }).then((count) => {
         prisma.group.findMany({
             where: where(pagination),
             include: {
@@ -385,12 +385,11 @@ function deleteGroup (req: express.Request, res: express.Response, asAdmin: bool
                         if (asAdmin) {
                             const notifC = notifs.group.deleted(group.creator, group, res.locals.user, asAdmin);
 
-
                             prisma.notification.create({
                                 data: {
                                     ...notifC,
                                     userId: group.creator.id,
-                                    senderId: Number(res.locals.user.id),
+                                    senderId: Number(res.locals.user.id)
                                 }
                             }).then(() => {
                                 notify(group.creator, notifC);
@@ -398,7 +397,6 @@ function deleteGroup (req: express.Request, res: express.Response, asAdmin: bool
                                 console.error(err);
                                 sendMsg(req, res, error.generic.internalError);
                             });
-
                         }
 
                         sendMsg(req, res, info.group.deleted);
@@ -415,9 +413,9 @@ function deleteGroup (req: express.Request, res: express.Response, asAdmin: bool
                 sendMsg(req, res, error.generic.internalError);
             });
         }).catch((err) => {
-        console.error(err);
-        sendMsg(req, res, error.generic.internalError);
-    });
+            console.error(err);
+            sendMsg(req, res, error.generic.internalError);
+        });
 }
 
 exports.deleteGroup = (req: express.Request, res: express.Response, _: express.NextFunction) => {
