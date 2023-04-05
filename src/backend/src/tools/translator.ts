@@ -1302,14 +1302,14 @@ const notifs = {
             type: 'standard',
             createdAt: new Date()
         }),
-        deleted: (user: User, group: Group, creator: User) => msgForLang<TemplateNotif, Notif>(user.lang, {
+        deleted: (user: User, group: Group, creator: User, byAdmin: boolean) => msgForLang<TemplateNotif, Notif>(user.lang, {
             title: {
                 fr: 'Groupe supprimé',
                 en: 'Group deleted'
             },
             message: {
-                fr: `${creator.firstName ?? ''} ${creator.lastName ?? ''} a supprimé le groupe ${group.name}.`,
-                en: `${creator.firstName ?? ''} ${creator.lastName ?? ''} deleted the group ${group.name}.`
+                fr: `${byAdmin ? 'Un administateur' : `${creator.firstName ?? ''} ${creator.lastName ?? ''}`} a supprimé le groupe ${group.name}. Tous les trajets reliés à ce groupe ont été supprimées et vous ne recevrez plus de notifications de ce groupe.`,
+                en: `${byAdmin ? 'An administrator' : `${creator.firstName ?? ''} ${creator.lastName ?? ''}`} deleted the group ${group.name}. All trips related to this group have been deleted and you will no longer receive notifications from this group.`
             },
             type: 'standard',
             createdAt: new Date()
