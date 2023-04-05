@@ -13,13 +13,12 @@ import sanitizer from '../../tools/sanitizer';
  * @param asAdmin Weather to update as an admin or not (admin can update level)
  */
 async function update (req: express.Request, res: express.Response, userId: number, asAdmin: boolean) {
-    const { email, lastName, firstName, phone, hasCar, gender, mailNotif, level } = req.body;
+    const { email, lastName, firstName, phone, hasCar, gender, level } = req.body;
 
     if (email !== undefined && !validator.email(email, true, req, res)) return;
     if (lastName !== undefined && !validator.lastName(lastName, true, req, res)) return;
     if (firstName !== undefined && !validator.firstName(firstName, true, req, res)) return;
     if (hasCar !== undefined && !validator.typeBoolean(hasCar, true, req, res, 'hasCar')) return;
-    if (mailNotif !== undefined && !validator.typeBoolean(mailNotif, true, req, res, 'mailNotif')) return;
     if (asAdmin && level !== undefined && !validator.level(level, true, req, res)) return;
     let _phoneSanitized;
     if (phone !== undefined) {
@@ -41,7 +40,6 @@ async function update (req: express.Request, res: express.Response, userId: numb
         firstName,
         phone: phoneSanitized,
         hasCar,
-        mailNotif,
         gender: genderSanitized,
         emailVerifiedOn: email !== undefined && email !== user.email ? null : undefined,
         level: asAdmin ? level : undefined

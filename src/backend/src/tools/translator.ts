@@ -178,20 +178,6 @@ const error = {
         })
     },
     phone: {
-        required: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Le numéro de téléphone est requis.',
-                en: 'Phone number is required.'
-            },
-            code: 400
-        }),
-        type: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Le numéro de téléphone doit être une chaîne de caractères.',
-                en: 'Phone number must be a string.'
-            },
-            code: 400
-        }),
         invalid: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Le numéro de téléphone est invalide.',
@@ -258,8 +244,8 @@ const error = {
         }),
         identical: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Les dates mises sont les mêmes.',
-                en: 'The dates are the same.'
+                fr: 'Les dates sont identiques.',
+                en: 'Dates are identical.'
             },
             code: 400
         })
@@ -271,15 +257,6 @@ const error = {
                 en: 'User not found.'
             },
             code: 404
-        })
-    },
-    id: {
-        invalid: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'L\'identifiant est invalide.',
-                en: 'Id is invalid.'
-            },
-            code: 400
         })
     },
     db: {
@@ -398,13 +375,6 @@ const error = {
             },
             code: 404
         }),
-        typeId: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'L\'identifiant du groupe doit être un nombre.',
-                en: 'Group id must be a number.'
-            },
-            code: 400
-        }),
         creatorMember: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Vous ne pouvez pas être un membre du groupe que vous avez créé.',
@@ -416,13 +386,6 @@ const error = {
             msg: {
                 fr: 'L\'utilisateur est déjà dans le groupe.',
                 en: 'The user is already in the group.'
-            },
-            code: 400
-        }),
-        requiredId: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Le champs groupeId est requis',
-                en: 'The field groupId is required'
             },
             code: 400
         }),
@@ -438,7 +401,7 @@ const error = {
                 fr: 'Cet utilisateur n\'est pas dans le groupe.',
                 en: 'This user is not in the group.'
             },
-            code: 403
+            code: 400
         })
     },
     number: {
@@ -557,14 +520,14 @@ const error = {
                 fr: 'Vous n\'avez jamais fait de trajet avec la personne que vous voulez évaluer.',
                 en: 'You have never made a trip with the person you want to evaluate.'
             },
-            code: 404
+            code: 400
         }),
         alreadyNoted: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Vous avez déjà noté cet utilisateur.',
                 en: 'You have already noted this user.'
             },
-            code: 404
+            code: 400
         }),
         notFound: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
@@ -601,28 +564,21 @@ const error = {
                 fr: 'Vous êtes le conducteur de ce trajet.',
                 en: 'You are the driver of this travel.'
             },
-            code: 403
+            code: 400
         }),
         notOpen: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Ce trajet n\'est plus ouvert.',
                 en: 'This travel is no longer open.'
             },
-            code: 403
+            code: 400
         }),
         notStarted: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Ce trajet n\'a pas encore commencé.',
                 en: 'This travel has not yet started.'
             },
-            code: 403
-        }),
-        notAPassenger: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
-            msg: {
-                fr: 'Vous n\'ête pas un passager de ce voyage.',
-                en: 'You are not a passenger of this trip.'
-            },
-            code: 403
+            code: 400
         }),
         noSeats: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
@@ -647,8 +603,8 @@ const error = {
         }),
         invalidType: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Le type de trajet est invalide.',
-                en: 'The type of travel is invalid.'
+                fr: 'Le type de trajet recherché est invalide.',
+                en: 'The type of travel searched is invalid.'
             },
             code: 400
         })
@@ -838,7 +794,7 @@ const info = {
         ended: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Trajet terminé',
-                en: 'Travel done'
+                en: 'Travel ended'
             },
             code: 200
         })
@@ -854,12 +810,12 @@ const info = {
                 group: displayableGroup(group)
             }
         }),
-        userAdd: (req: Request, group: Group & { users: User[], creator: User }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        userAdded: (req: Request, group: Group & { users: User[], creator: User }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Utilisateur ajouté',
                 en: 'User added'
             },
-            code: 201,
+            code: 200,
             data: {
                 group: displayableGroup(group)
             }
@@ -871,10 +827,10 @@ const info = {
             },
             code: 200
         }),
-        nameUpdated: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+        updated: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Nom du groupe modfié',
-                en: 'Group name updated'
+                fr: 'Groupe modifié',
+                en: 'Group updated'
             },
             code: 200
         }),
@@ -905,8 +861,8 @@ const info = {
     evaluation: {
         created: (req: Request, evaluation: Evaluation & { travel: Travel, evaluated: User, evaluator: User }) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
-                fr: 'Évaluation enregistrée',
-                en: 'Recorded evaluation'
+                fr: 'Évaluation créée',
+                en: 'Evaluation created'
             },
             code: 201,
             data: {
@@ -923,9 +879,9 @@ const info = {
         updated: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
             msg: {
                 fr: 'Évaluation modifiée',
-                en: 'Updated evaluation'
+                en: 'Evaluation updated'
             },
-            code: 201
+            code: 200
         })
     },
     booking: {
@@ -1322,14 +1278,14 @@ const notifs = {
         })
     },
     group: {
-        nameUpdated: (user: User, oldName: string, newName: string) => msgForLang<TemplateNotif, Notif>(user.lang, {
+        nameUpdated: (user: User, oldName: string, newName: string, byAdmin: boolean, toTheOwner: boolean) => msgForLang<TemplateNotif, Notif>(user.lang, {
             title: {
                 fr: 'Nom du groupe modfié',
                 en: 'Group name updated'
             },
             message: {
-                fr: `Le groupe ${oldName} a été renommé en ${newName}.`,
-                en: `The group ${oldName} has been renamed as ${newName}.`
+                fr: `${toTheOwner ? 'Votre' : 'Le'} groupe ${oldName} a été renommé en ${newName} par ${byAdmin ? 'un administrateur' : 'le créateur'}.`,
+                en: `${toTheOwner ? 'Your' : 'The'} group ${oldName} has been renamed to ${newName} by ${byAdmin ? 'an administrator' : 'the creator'}.`
             },
             type: 'standard',
             createdAt: new Date()
@@ -1375,7 +1331,7 @@ const notifs = {
         welcome: (user: User) => msgForLang<TemplateNotif, Notif>(user.lang, {
             title: {
                 fr: `Bienvenue sur ${process.env.FRONTEND_NAME ?? ''} !`,
-                en: `Welcome to ${process.env.FRONTEND_NAME ?? ''} !`
+                en: `Welcome to ${process.env.FRONTEND_NAME ?? ''}!`
             },
             message: {
                 fr: `Bonjour ${user.firstName ?? ''} ${user.lastName ?? ''} !\n\n` +

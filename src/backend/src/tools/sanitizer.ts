@@ -64,13 +64,14 @@ function typeNumber (number: any, sendError: boolean, req: express.Request, res:
  * @param sendError If true, send an error message to the client
  * @param req Express request
  * @param res Express response
+ * @param fieldName Name of the field
  * @returns The id number if it is valid, null otherwise
  */
-function id (id: any, sendError: boolean, req: express.Request, res: express.Response): number | null {
-    const num = typeNumber(id, sendError, req, res, 'id', false);
+function id (id: any, sendError: boolean, req: express.Request, res: express.Response, fieldName: string = 'id'): number | null {
+    const num = typeNumber(id, sendError, req, res, fieldName, false);
     if (num === undefined) return null;
 
-    if (!validator.typeInteger(num, true, req, res, 'id', false)) return null;
+    if (!validator.typeInteger(num, true, req, res, fieldName, false)) return null;
 
     return num;
 }

@@ -9,17 +9,12 @@ import sanitizer from '../../tools/sanitizer';
 exports.createBooking = (req: express.Request, res: express.Response, _: express.NextFunction) => {
     const { travelId, departureId, arrivalId } = req.body;
 
-    const travelIdSanitized = sanitizer.id(travelId, true, req, res);
-    if (travelIdSanitized === null) return;
-
-    const departureIdSanitized = sanitizer.id(departureId, true, req, res);
-    if (departureIdSanitized === null) return;
-
-    const arrivalIdSanitized = sanitizer.id(arrivalId, true, req, res);
-    if (arrivalIdSanitized === null) return;
+    if (!validator.typeInteger(travelId, true, req, res, 'travelId')) return;
+    if (!validator.typeInteger(departureId, true, req, res, 'departureId')) return;
+    if (!validator.typeInteger(arrivalId, true, req, res, 'arrivalId')) return;
 
     prisma.travel.findUnique({
-        where: { id: travelIdSanitized },
+        where: { id: travelId },
         include: {
             steps: {
                 orderBy: { date: 'asc' }
@@ -42,8 +37,8 @@ exports.createBooking = (req: express.Request, res: express.Response, _: express
             return;
         }
 
-        const startStepIndex = travel.steps.findIndex((s) => s.id === departureIdSanitized);
-        const endStepIndex = travel.steps.findIndex((s) => s.id === arrivalIdSanitized);
+        const startStepIndex = travel.steps.findIndex((s) => s.id === departureId);
+        const endStepIndex = travel.steps.findIndex((s) => s.id === arrivalId);
         const startStep = travel.steps[startStepIndex];
         const endStep = travel.steps[endStepIndex];
         if (startStep === undefined || endStep === undefined) {
@@ -131,7 +126,7 @@ exports.createBooking = (req: express.Request, res: express.Response, _: express
 
             // check if there is a place left in the car
             try {
-                const count: any = await getMaxPassengers(travelIdSanitized, startStep, endStep);
+                const count: any = await getMaxPassengers(travelId, startStep, endStep);
                 const passengers = Number(count[0].nbPassengers);
                 if (Number.isNaN(passengers)) {
                     throw new Error('Error while getting the number of passengers in the trip');

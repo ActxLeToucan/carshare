@@ -22,6 +22,7 @@ async function update (req: express.Request, res: express.Response, asAdmin: boo
     const reason = req.query.reason;
     if (reason !== undefined && !validator.typeString(reason, true, req, res, 'reason')) return;
     const reasonStr = reason === undefined ? undefined : reason as string;
+
     const { maxPassengers, price, description, steps } = req.body;
 
     if (maxPassengers !== undefined && !validator.maxPassengers(maxPassengers, true, req, res)) return;

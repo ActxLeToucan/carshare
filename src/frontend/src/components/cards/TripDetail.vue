@@ -179,7 +179,7 @@
         <div
             id="notation-div"
             ref="notation-div"
-            class="flex absolute bg-slate-50 border-2 border-slate-200 rounded-lg shadow-lg p-2 w-fit h-fit"
+            class="flex absolute bg-slate-50 border-2 border-slate-200 rounded-lg shadow-lg p-2 w-fit h-min"
             style="display: none;"
         >
             <p
@@ -395,8 +395,12 @@ export default {
             const rect = this.notationDiv.getBoundingClientRect();
             const trect = target.getBoundingClientRect();
             this.notationDiv.style.top = trect.top + trect.height + 10 + "px";
-            this.notationDiv.style.left = trect.left + trect.width / 2 - rect.width / 2 + "px";
-            setTimeout(() => { this.notationDiv.style.left = trect.left + trect.width / 2 - rect.width / 2 + "px"; }, 100);
+
+            const margin = 195;
+            const wantedX = trect.left + trect.width / 2 - rect.width / 2;
+            const maxX = document.body.clientWidth - margin;
+            const minX = margin;
+            this.notationDiv.style.left = Math.min(Math.max(wantedX, minX), maxX) + "px";
 
             this.evaluatedUser = passenger;
 
