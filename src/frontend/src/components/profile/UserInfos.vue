@@ -306,7 +306,7 @@ export default {
                         resolve(true);
                     }, 1000);
                 }).catch(err => {
-                    log.update(this.lang.ERROR + err.message, Log.ERROR);
+                    log.update(this.lang.ERROR + ' : ' + err.message, Log.ERROR);
                     setTimeout(() => {
                         log.delete();
                         resolve(false);
