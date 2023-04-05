@@ -47,7 +47,7 @@
                             </p>
                         </button>
                         <button-block
-                            v-show="showPagBtn"
+                            v-show="pagination.hasNext"
                             :disabled="loading"
                             class="w-fit mt-8 mx-auto"
                             :action="showMoreGroups"
@@ -243,7 +243,6 @@ export default {
             selectedGroup: null,
             deletePopup: null,
             createPopup: null,
-            showPagBtn: false,
             pagination: API.createPagination(0, 5),
             isCreating: false,
             editGroupName: false,
@@ -344,8 +343,7 @@ export default {
                         this.groups.push(group)
                 });
                 this.loading = false;
-                this.pagination.total = res.total ?? 0;
-                this.showPagBtn = this.pagination.hasNext;
+                this.pagination.total = res.total ?? 0;;
             }).catch(err => {
                 console.error(err);
             });
