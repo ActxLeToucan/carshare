@@ -356,7 +356,7 @@ export default {
             const oldName = this.selectedGroup.name;
             const newName = ev.target.value.trim();
             if (oldName != newName) {
-                API.execute_logged(API.ROUTE.GROUPS + "/" + this.selectedGroup.id + "/name", API.METHOD.PATCH, User.CurrentUser?.getCredentials(), {groupName: newName}).then(res => {
+                API.execute_logged(API.ROUTE.GROUPS + "/my/" + this.selectedGroup.id, API.METHOD.PATCH, User.CurrentUser?.getCredentials(), {groupName: newName}).then(res => {
                     this.selectedGroup.name = newName;
                     this.editGroupName = false;
                 }).catch(err => {
