@@ -12,7 +12,7 @@ class Log {
         this.zone = null;
         this.type = type;
         this.dom = document.createElement("p");
-        this.dom.innerHTML = msg;
+        this.dom.innerText = msg;
         applyClasses(this.dom, "text-lg h-fit text-center font-semibold transition-all overflow-hidden " + this.type);
         this.dom.style.maxHeight = "100px";
     }
@@ -44,12 +44,12 @@ class Log {
         if (animate) {
             this.dom.style.opacity = "0";
             setTimeout(() => {
-                this.dom.innerHTML = msg;
+                this.dom.innerText = msg;
                 this.dom.style.opacity = "1";
                 this.resize();
             }, 200);
         } else {
-            this.dom.innerHTML = msg;
+            this.dom.innerText = msg;
             this.resize();
         }
     }

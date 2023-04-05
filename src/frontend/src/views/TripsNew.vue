@@ -437,7 +437,7 @@ export default {
                 this.$el.querySelector("input[name=trip-type]").value = this.selectedTripType;
                 this.$el.querySelector("input[name=trip-slots]").value = trip.maxPassengers;
                 this.$el.querySelector("input[name=trip-price]").value = trip.price;
-                this.$el.querySelector("textarea[name=trip-infos]").innerHTML = trip.description;
+                this.$el.querySelector("textarea[name=trip-infos]").innerText = trip.description;
                 this.oldTrip = Object.assign({}, trip);
             }).catch(err => {
                 console.error(err);
@@ -632,7 +632,7 @@ export default {
                     p.classList.add("mt-4");
                     text = line.substring(1);
                 }
-                p.innerHTML = text;
+                p.innerText = text;
                 tripDesc.appendChild(p);
             });
 

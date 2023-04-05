@@ -224,7 +224,6 @@ export default {
     MARKING_TRIP_AS_FINISHED: "Finishing trip",
     TRIP_MARKED_AS_FINISHED: "Trip finished successfully",
 
-
     // booking
     BOOKING_DOESNT_EXIST_ANYMORE: "This booking doesn't exist anymore.",
 
@@ -260,6 +259,7 @@ export default {
     TRIP_SLOTS: "Number of slots",
     TRIP_START: "Start",
     TRIP_END: "End",
+    TRIP_STEP: "Step",
     TRIP_INFO: "Additional informations",
     SAME_DAY: "Same day",
     CONFIRM_TRIP: "Confirm trip",
