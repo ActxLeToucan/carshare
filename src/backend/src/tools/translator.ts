@@ -607,6 +607,13 @@ const error = {
                 en: 'The type of travel searched is invalid.'
             },
             code: 400
+        }),
+        notEnded: (req: Request) => msgForLang<TemplateMessageHTTP, MessageHTTP>(req, {
+            msg: {
+                fr: 'Ce trajet n\'est pas terminé.',
+                en: 'This travel is not finished.'
+            },
+            code: 400
         })
     },
     booking: {

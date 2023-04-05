@@ -87,12 +87,18 @@ exports.createEvaluation = (req: express.Request, res: express.Response, _: expr
     if (!validator.typeInteger(travelId, true, req, res, 'travelId')) return;
     if (!validator.typeInteger(evaluatedId, true, req, res, 'evaluatedId')) return;
 
-    prisma.travel.count({ where: { id: travelId } })
-        .then((count) => {
-            if (count === 0) {
+    prisma.travel.findUnique({ where: { id: travelId } })
+        .then((travel) => {
+            if (travel === null) {
                 sendMsg(req, res, error.travel.notFound);
                 return;
             }
+
+            if (travel.status !== properties.travel.status.ended) {
+                sendMsg(req, res, error.travel.notEnded);
+                return;
+            }
+
             prisma.user.count({ where: { id: evaluatedId } })
                 .then((count) => {
                     if (count === 0) {
