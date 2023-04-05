@@ -30,6 +30,7 @@
                 style="max-height: 0px;"
             />
             <div
+                id="inputs-div"
                 ref="inputs"
                 class="flex flex-col overflow-auto"
             >
@@ -215,10 +216,16 @@ export default {
         setTitle(title) {
             this.m_title = title;
         },
+        clearInputs() {
+            const inputsContainer = this.$el.querySelector("#inputs-div")
+            const inputs = inputsContainer.querySelectorAll("input");
+            inputs.forEach(i => { i.value = ''; });
+        },
         execOnValidate() {
             executeAfter(
                 this.validate?.(this),
                 res => {
+                    this.clearInputs();
                     if (res) this.hide();
                 }
             );
