@@ -1,5 +1,5 @@
 <template>
-    <div class="flex grow flex-col">
+    <div class="flex grow flex-col max-w-full">
         <topbar />
         <div class="flex grow flex-col">
             <div class="show-down relative flex w-full min-h-[60vh] bg-teal-500">
@@ -171,12 +171,12 @@
                     </card-border>
                 </div>
 
-                <div class="flex grow wrap p-2 justify-center">
+                <div class="flex md:flex-row flex-col grow wrap p-2 justify-center h-fit max-w-full mt-16">
                     <trip-card
                         v-for="trip in trips"
                         :key="trip.id"
                         :trip="trip"
-                        class="m-8"
+                        class="md:m-8 m-4"
                         @click="selectTrip(trip.id)"
                     />
                 </div>
