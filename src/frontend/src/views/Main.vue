@@ -177,7 +177,7 @@
                         :key="trip.id"
                         :trip="trip"
                         class="md:m-8 m-4"
-                        @click="selectTrip(trip.id)"
+                        @click="selectTrip(trip)"
                     />
                 </div>
             </div>
@@ -190,8 +190,8 @@
             <trip-detail
                 ref="trip-comp"
                 :trip-id="selectedTripId"
-                :trip-start="startCity"
-                :trip-end="endCity"
+                :trip-start="startingCity"
+                :trip-end="endingCity"
             />
         </card-popup>
     </div>
@@ -323,7 +323,7 @@ export default {
         CardPopup
     },
     data() {
-        return { lang: Lang.CurrentLang, trips: [], startCity: {}, endCity: {}, selectedTripId: null }
+        return { lang: Lang.CurrentLang, trips: [], startCity: {}, endCity: {}, startingCity: null, endingCity: null, selectedTripId: null }
     },
     mounted() {
         Lang.AddCallback(lang => this.lang = lang);
@@ -472,11 +472,15 @@ export default {
                 });
             }
         },
-        selectTrip(id) {
-            this.$refs["trip-comp"].setPopup(this.$refs["trip-details"]);
+        selectTrip(trip) {
             this.selectedTripId = null;
-            this.selectedTripId = id;
+            this.selectedTripId = trip.id;
+
+            this.startingCity = {value: trip.startCity};
+            this.endingCity = {value: trip.endCity};
+
             const popup = this.$refs["trip-details"];
+            this.$refs["trip-comp"].setPopup(popup);
             popup.show();
         },
         onpopupcancel(popup) {
