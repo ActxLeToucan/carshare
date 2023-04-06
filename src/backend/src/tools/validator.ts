@@ -369,6 +369,7 @@ function latitude (value: any, sendError: boolean, req: express.Request, res: ex
  * @returns true if the value is valid, false otherwise
  */
 function description (value: any, sendError: boolean, req: express.Request, res: express.Response): boolean {
+    if (value === undefined || value === '') return true;
     return typeString(value, sendError, req, res, 'description');
 }
 
