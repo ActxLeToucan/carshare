@@ -8,7 +8,7 @@
     },
     "dependencies": {
         "@heroicons/vue": "^2.0.14",
-        "vite": "^2.9.17",
+        "vite": "^2.9.18",
         "vue": "^3.2.47",
         "vue-router": "^4.1.6"
     },
