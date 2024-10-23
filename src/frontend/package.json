@@ -8,12 +8,12 @@
     },
     "dependencies": {
         "@heroicons/vue": "^2.0.14",
-        "vite": "^2.9.18",
+        "vite": "^5.4.7",
         "vue": "^3.2.47",
         "vue-router": "^4.1.6"
     },
     "devDependencies": {
-        "@vitejs/plugin-vue": "^2.0.0",
+        "@vitejs/plugin-vue": "^5.1.4",
         "eslint": "^8.36.0",
         "eslint-plugin-vue": "^9.9.0",
         "postcss": "^8.4.31",
